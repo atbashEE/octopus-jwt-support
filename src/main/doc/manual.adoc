@@ -1,6 +1,6 @@
 = Atbash Octopus JWT Support
 Rudy De Busscher <rdebusscher@gmail.com>
-v0.5.0, ??/??/2018
+v0.5.0, 01/05/2018
 :example-caption!:
 ifndef::imagesdir[:imagesdir: images]
 ifndef::sourcedir[:sourcedir: ../../main/java]

@@ -30,7 +30,7 @@
 
     <name>Atbash Octopus JWT Support</name>
     <description>Atbash Octopus JWT Support parent</description>
-    <url>https://raw.githubusercontent.com/atbashEE/octopus-jwt-support/master/impl/src/main/doc/manual.adoc</url>
+    <url>https://raw.githubusercontent.com/atbashEE/octopus-jwt-support/master/src/main/doc/manual.adoc</url>
 
     <developers>
         <developer>
