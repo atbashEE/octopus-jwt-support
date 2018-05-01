@@ -51,15 +51,21 @@
         </license>
     </licenses>
 
+    <scm>
+        <connection>scm:git:git://github.com/atbashEE/octopus-jwt-support.git</connection>
+        <developerConnection>scm:git:ssh://github.com:atbashEE/octopus-jwt-support.git</developerConnection>
+        <url>http://github.com/atbashEE/octopus-jwt-support/tree/master</url>
+    </scm>
+
     <properties>
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <atbash-utils.version>0.9.1-SNAPSHOT</atbash-utils.version>
-        <atbash-config.version>0.9.1.1-SNAPSHOT</atbash-config.version>
-        <atbash-json.version>0.9.0-SNAPSHOT</atbash-json.version>
+        <atbash-utils.version>0.9.1</atbash-utils.version>
+        <atbash-config.version>0.9.1.1</atbash-config.version>
+        <atbash-json.version>0.9.0</atbash-json.version>
         <nimbus-jose-jwt.version>5.7</nimbus-jose-jwt.version>
 
         <asciidoctor.maven.plugin.version>1.5.6</asciidoctor.maven.plugin.version>
