@@ -31,7 +31,8 @@ import java.util.LinkedHashMap;
 import java.util.Objects;
 
 /**
- * Easier then OctetSequenceKey?
+ * Easier then OctetSequenceKey?`
+ * FIXME Remove in favor of OctetSequenceKey
  */
 
 public class HMACSecret extends JWK implements SecretJWK {

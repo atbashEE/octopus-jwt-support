@@ -27,6 +27,7 @@ import com.nimbusds.jose.crypto.ECDSASigner;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jose.jwk.ECKey;
+import com.nimbusds.jose.jwk.KeyType;
 import com.nimbusds.jose.jwk.RSAKey;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -42,45 +43,46 @@ public class JWTSignerFactory {
     private HMACAlgorithmFactory hmacAlgorithmFactory;
 
     public JWSSigner createSigner(JWTParametersSigning parametersSigning) {
-        JWSSigner result;
-        switch (parametersSigning.getSecretKeyType()) {
+        JWSSigner result = null;
 
-            case HMAC:
-                try {
-                    if (!(parametersSigning.getJWK() instanceof HMACSecret)) {
-                        throw new AtbashIllegalActionException("(OCT-DEV-102) Secret is expected to be an instance of be.atbash.ee.security.octopus.jwt.keys.HMACSecret");
-                    }
-                    result = new MACSigner(((HMACSecret) parametersSigning.getJWK()).toSecretKey());
-                } catch (KeyLengthException e) {
+        if (KeyType.OCT.equals(parametersSigning.getKeyType())) {
+            try {
+                if (!(parametersSigning.getJWK() instanceof HMACSecret)) {
+                    throw new AtbashIllegalActionException("(OCT-DEV-102) Secret is expected to be an instance of be.atbash.ee.security.octopus.jwt.keys.HMACSecret");
+                }
+                result = new MACSigner(((HMACSecret) parametersSigning.getJWK()).toSecretKey());
+            } catch (KeyLengthException e) {
 
-                    throw new AtbashUnexpectedException(e);
-                    // TODO
-                    //This should be already covered by HMACAlgorithmFactory.
-                    // What when developers are using this directly?
-                }
-                break;
-            case RSA:
-                if (!(parametersSigning.getJWK() instanceof RSAKey)) {
-                    throw new AtbashIllegalActionException("(OCT-DEV-103) Secret is expected to be an instance of com.nimbusds.jose.jwk.RSAKey");
-                }
-                try {
-                    result = new RSASSASigner((RSAKey) parametersSigning.getJWK());
-                } catch (JOSEException e) {
-                    throw new AtbashUnexpectedException(e);
-                }
-                break;
-            case EC:
-                if (!(parametersSigning.getJWK() instanceof ECKey)) {
-                    throw new AtbashIllegalActionException("(OCT-DEV-104) Secret is expected to be an instance of com.nimbusds.jose.jwk.ECKey");
-                }
-                try {
-                    result = new ECDSASigner((ECKey) parametersSigning.getJWK());
-                } catch (JOSEException e) {
-                    throw new AtbashUnexpectedException(e);
-                }
-                break;
-            default:
-                throw new IllegalArgumentException(String.format("Unsupported value for SecretKeyType : %s", parametersSigning.getSecretKeyType()));
+                throw new AtbashUnexpectedException(e);
+                // TODO
+                //This should be already covered by HMACAlgorithmFactory.
+                // What when developers are using this directly?
+            }
+        }
+        if (KeyType.RSA.equals(parametersSigning.getKeyType())) {
+            if (!(parametersSigning.getJWK() instanceof RSAKey)) {
+                throw new AtbashIllegalActionException("(OCT-DEV-103) Secret is expected to be an instance of com.nimbusds.jose.jwk.RSAKey");
+            }
+            try {
+                result = new RSASSASigner((RSAKey) parametersSigning.getJWK());
+            } catch (JOSEException e) {
+                throw new AtbashUnexpectedException(e);
+            }
+        }
+        if (KeyType.EC.equals(parametersSigning.
+                getKeyType())) {
+            if (!(parametersSigning.getJWK() instanceof ECKey)) {
+                throw new AtbashIllegalActionException("(OCT-DEV-104) Secret is expected to be an instance of com.nimbusds.jose.jwk.ECKey");
+            }
+            try {
+                result = new ECDSASigner((ECKey) parametersSigning.getJWK());
+            } catch (JOSEException e) {
+                throw new AtbashUnexpectedException(e);
+            }
+        }
+
+        if (result == null) {
+            throw new IllegalArgumentException(String.format("Unsupported value for SecretKeyType : %s", parametersSigning.getKeyType()));
         }
         return result;
     }
@@ -88,24 +90,24 @@ public class JWTSignerFactory {
     public JWSAlgorithm defineJWSAlgorithm(JWTParametersSigning parametersSigning) {
         checkDependencies();
 
-        JWSAlgorithm result;
+        JWSAlgorithm result = null;
 
-        switch (parametersSigning.getSecretKeyType()) {
-            case HMAC:
-                result = hmacAlgorithmFactory.determineOptimalAlgorithm(((HMACSecret) parametersSigning.getJWK()).toSecretKey().getEncoded());
-                break;
-            case RSA:
-                result = JWSAlgorithm.RS256; // FIXME Is this always (what about 384 and 512
-                break;
-            case EC:
-                result = JWSAlgorithm.ES256; // FIXME Is this always (what about 384 and 512
-                break;
-            default:
-                throw new IllegalArgumentException(String.format("Unsupported value for SecretKeyType : %s", parametersSigning.getSecretKeyType()));
+        if (KeyType.OCT.equals(parametersSigning.getKeyType())) {
+
+            result = hmacAlgorithmFactory.determineOptimalAlgorithm(((HMACSecret) parametersSigning.getJWK()).toSecretKey().getEncoded());
+        }
+        if (KeyType.RSA.equals(parametersSigning.getKeyType())) {
+
+            result = JWSAlgorithm.RS256; // FIXME Is this always (what about 384 and 512
+        }
+        if (KeyType.EC.equals(parametersSigning.getKeyType())) {
+            result = JWSAlgorithm.ES256; // FIXME Is this always (what about 384 and 512
+        }
+        if (result == null) {
+            throw new IllegalArgumentException(String.format("Unsupported value for SecretKeyType : %s", parametersSigning.getKeyType()));
         }
 
         return result;
-
     }
 
     private void checkDependencies() {

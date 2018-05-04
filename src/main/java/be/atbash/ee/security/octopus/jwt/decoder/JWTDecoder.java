@@ -17,7 +17,9 @@ package be.atbash.ee.security.octopus.jwt.decoder;
 
 import be.atbash.ee.security.octopus.jwt.InvalidJWTException;
 import be.atbash.ee.security.octopus.jwt.JWTEncoding;
-import be.atbash.ee.security.octopus.jwt.keys.KeySelector;
+import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
+import be.atbash.ee.security.octopus.keys.selector.KeySelector;
+import be.atbash.ee.security.octopus.keys.selector.SelectorCriteria;
 import be.atbash.json.JSONValue;
 import be.atbash.util.StringUtils;
 import be.atbash.util.exception.AtbashIllegalActionException;
@@ -80,7 +82,9 @@ public class JWTDecoder {
         SignedJWT signedJWT = SignedJWT.parse(data);
 
         String keyID = signedJWT.getHeader().getKeyID();
-        Key key = keySelector.selectSecretKey(keyID);
+
+        SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(keyID).withAsymmetricPart(AsymmetricPart.PUBLIC).build();
+        Key key = keySelector.selectSecretKey(criteria);
         if (key == null) {
             throw new InvalidJWTException(String.format("No key found for %s", keyID));
         }

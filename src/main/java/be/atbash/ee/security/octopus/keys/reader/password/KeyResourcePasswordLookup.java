@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.ee.security.octopus.jwt.keys;
+package be.atbash.ee.security.octopus.keys.reader.password;
 
-/**
- *
- */
+public interface KeyResourcePasswordLookup {
 
-public enum SecretKeyType {
-    HMAC, RSA, EC
+    char[] getResourcePassword(String path);
+
+    char[] getKeyPassword(String path, String keyId);
 }

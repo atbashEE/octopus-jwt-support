@@ -13,15 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.ee.security.octopus.jwt.keys;
+package be.atbash.ee.security.octopus.keys.selector;
 
-import java.security.Key;
+public enum AsymmetricPart {
 
-/**
- *
- */
-
-public interface KeySelector {
-
-    <T extends Key> T selectSecretKey(String keyId);
+    PUBLIC, PRIVATE
 }

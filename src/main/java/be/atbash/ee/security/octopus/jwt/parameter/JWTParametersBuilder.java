@@ -16,7 +16,6 @@
 package be.atbash.ee.security.octopus.jwt.parameter;
 
 import be.atbash.ee.security.octopus.jwt.JWTEncoding;
-import be.atbash.ee.security.octopus.jwt.keys.SecretKeyType;
 import be.atbash.util.Reviewed;
 import be.atbash.util.exception.AtbashIllegalActionException;
 import com.nimbusds.jose.jwk.JWK;
@@ -39,7 +38,7 @@ public final class JWTParametersBuilder {
 
     private Map<String, Object> headerValues;
     private JWK secretKeySigning;
-    private SecretKeyType secretKeyType;
+    private KeyType keyType;
 
     private JWK secretKeyEncryption;
     private JWTParametersSigning parametersSigning;
@@ -65,21 +64,8 @@ public final class JWTParametersBuilder {
             logger.warn("SecretKey value is not supported with JWTEncoding.NONE");
         }
         secretKeySigning = key;
-        determineSecretKeyType();
+        keyType = key.getKeyType();
         return this;
-    }
-
-    private void determineSecretKeyType() {
-        if (KeyType.OCT.equals(secretKeySigning.getKeyType())) {
-            secretKeyType = SecretKeyType.HMAC;
-        }
-        if (KeyType.RSA.equals(secretKeySigning.getKeyType())) {
-            secretKeyType = SecretKeyType.RSA;
-        }
-        if (KeyType.EC.equals(secretKeySigning.getKeyType())) {
-            secretKeyType = SecretKeyType.EC;
-        }
-
     }
 
     public JWTParametersBuilder withSecretKeyForEncryption(JWK key) {
@@ -107,7 +93,7 @@ public final class JWTParametersBuilder {
                 result = new JWTParametersNone();
                 break;
             case JWS:
-                result = new JWTParametersSigning(headerValues, secretKeyType, secretKeySigning);
+                result = new JWTParametersSigning(headerValues, keyType, secretKeySigning);
                 break;
             case JWE:
                 result = new JWTParametersEncryption(parametersSigning, headerValues, secretKeyEncryption);

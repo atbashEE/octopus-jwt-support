@@ -17,7 +17,6 @@ package be.atbash.ee.security.octopus.jwt.parameter
 
 import be.atbash.ee.security.octopus.jwt.JWTEncoding
 import be.atbash.ee.security.octopus.jwt.keys.HMACSecret
-import be.atbash.ee.security.octopus.jwt.keys.SecretKeyType
 import com.nimbusds.jose.jwk.JWK
 import com.nimbusds.jose.jwk.KeyType
 import spock.lang.Specification

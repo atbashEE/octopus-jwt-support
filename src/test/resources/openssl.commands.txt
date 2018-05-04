@@ -1,0 +1,61 @@
+====
+    Copyright 2017-2018 Rudy De Busscher (https://www.atbash.be)
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+====
+
+# shows info about key
+
+openssl rsa -in enckey.pk8 -text -noout
+
+# generate RSA keys, 2048 bit, encrypted with des3
+
+openssl genrsa -des3 -out private.pem 2048
+
+# private key unprotected !!
+
+openssl rsa -in private.pem -out keyout.pem
+
+# Public only
+
+openssl rsa -in private.pem -pubout -out rsa_pub.pem
+
+# Convert to pkcs8 format
+
+openssl pkcs8 -in private.pem -topk8 -out enckey.pem
+
+
+# Generate EC keys, curve secp256k1 , unprotected !!
+
+openssl ecparam -name secp256r1 -genkey -noout -out secp256r1-key.pem
+
+# Create format with PW ecryption
+
+openssl ec -in secp256r1-key.pem -out secp256r1-key-aes.pem -aes256
+
+# Public only
+
+openssl ec -in secp256r1-key.pem -pubout -out ecpubkey.pem
+
+# Convert to pkcs8 format
+
+openssl pkcs8 -in secp256r1-key-aes.pem -topk8 -out enckey.pem
+
+
+# Convert to DER
+
+openssl rsa -outform der -in keyout.pem -out keyout.der
+
+# Generate key in JKS
+
+keytool -genkey -alias rsa_jks -keyalg RSA -keystore keystore.jks

@@ -63,7 +63,7 @@
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <atbash-utils.version>0.9.1</atbash-utils.version>
+        <atbash-utils.version>0.9.2-SNAPSHOT</atbash-utils.version>
         <atbash-config.version>0.9.1.1</atbash-config.version>
         <atbash-json.version>0.9.0</atbash-json.version>
         <nimbus-jose-jwt.version>5.7</nimbus-jose-jwt.version>
@@ -85,6 +85,12 @@
         <dependency>
             <groupId>be.atbash.utils</groupId>
             <artifactId>utils-se</artifactId>
+            <version>${atbash-utils.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>be.atbash.utils</groupId>
+            <artifactId>utils-cdi</artifactId>
             <version>${atbash-utils.version}</version>
         </dependency>
 
@@ -115,6 +121,19 @@
             <version>${nimbus-jose-jwt.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpkix-jdk15on</artifactId>
+            <version>1.53</version>
+        </dependency>
+
+        <!-- looking up all resource files -->
+        <dependency>
+            <groupId>org.reflections</groupId>
+            <artifactId>reflections</artifactId>
+            <version>0.9.11</version>
+        </dependency>
+
         <!-- test dependencies-->
         <dependency>
             <groupId>junit</groupId>
@@ -134,6 +153,13 @@
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
             <version>1.7.0</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>uk.org.lidalia</groupId>
+            <artifactId>slf4j-test</artifactId>
+            <version>1.2.0</version>
             <scope>test</scope>
         </dependency>
 
@@ -254,11 +280,14 @@
                         <exclude>**/*.adoc</exclude>
                         <exclude>**/*.adi</exclude>
                         <exclude>**/*.jwk</exclude>
+                        <exclude>**/*.pem</exclude>
+                        <exclude>**/*.jwke</exclude>
+                        <exclude>**/*.jwkset</exclude>
                         <exclude>**/README</exclude>
-                        <exclude>**/LICENSE.txt</exclude>
+                        <exclude>**/LICENSE</exclude>
                         <exclude>**/NOTICE.txt</exclude>
                         <exclude>**/NOTICE</exclude>
-                        <exclude>**/Base64Codec.java</exclude>
+
                     </excludes>
                     <mapping>
                         <java>SLASHSTAR_STYLE</java>

@@ -16,8 +16,8 @@
 package be.atbash.ee.security.octopus.jwt.parameter;
 
 import be.atbash.ee.security.octopus.jwt.JWTEncoding;
-import be.atbash.ee.security.octopus.jwt.keys.SecretKeyType;
 import com.nimbusds.jose.jwk.JWK;
+import com.nimbusds.jose.jwk.KeyType;
 
 import java.util.Map;
 
@@ -28,13 +28,13 @@ import java.util.Map;
 public class JWTParametersSigning implements JWTParameters {
 
     private Map<String, Object> headerValues;
-    private SecretKeyType secretKeyType;
+    private KeyType keyType;
     private JWK secretKeySigning;
 
-    public JWTParametersSigning(Map<String, Object> headerValues, SecretKeyType secretKeyType, JWK secretKeySigning) {
+    public JWTParametersSigning(Map<String, Object> headerValues, KeyType keyType, JWK secretKeySigning) {
 
         this.headerValues = headerValues;
-        this.secretKeyType = secretKeyType;
+        this.keyType = keyType;
         this.secretKeySigning = secretKeySigning;
     }
 
@@ -53,8 +53,8 @@ public class JWTParametersSigning implements JWTParameters {
 
     }
 
-    public SecretKeyType getSecretKeyType() {
-        return secretKeyType;
+    public KeyType getKeyType() {
+        return keyType;
     }
 
     public JWK getJWK() {

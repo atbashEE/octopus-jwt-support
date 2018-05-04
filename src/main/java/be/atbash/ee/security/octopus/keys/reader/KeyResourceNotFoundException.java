@@ -13,22 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.ee.security.octopus.jwk.config;
+package be.atbash.ee.security.octopus.keys.reader;
 
-import be.atbash.config.AbstractConfiguration;
-import be.atbash.config.logging.ModuleConfig;
-import be.atbash.config.logging.ModuleConfigName;
-
-import javax.enterprise.context.ApplicationScoped;
+import be.atbash.util.exception.AtbashException;
 
 /**
  *
  */
-@ApplicationScoped
-@ModuleConfigName("Octopus JWT Support Configuration")
-public class JwtSupportConfiguration extends AbstractConfiguration implements ModuleConfig {
 
-    public String getJWKFile() {
-        return getOptionalValue("jwk.file", String.class);
+public class KeyResourceNotFoundException extends AtbashException {
+
+    public KeyResourceNotFoundException(String path) {
+        super(String.format("Resource is not found '%s'", path));
     }
 }

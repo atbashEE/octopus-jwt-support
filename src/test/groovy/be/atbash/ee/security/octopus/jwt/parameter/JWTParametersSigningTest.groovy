@@ -16,7 +16,7 @@
 package be.atbash.ee.security.octopus.jwt.parameter
 
 import be.atbash.ee.security.octopus.jwt.keys.HMACSecret
-import be.atbash.ee.security.octopus.jwt.keys.SecretKeyType
+import be.atbash.ee.security.octopus.keys.selector.SecretKeyType
 import com.nimbusds.jose.jwk.JWK
 import com.nimbusds.jose.jwk.KeyType
 import spock.lang.Specification
@@ -34,7 +34,7 @@ class JWTParametersSigningTest extends Specification {
         HMACSecret hmac = new HMACSecret("secret", "hmacKeyId", false)
 
         when:
-        JWTParametersSigning parameters = new JWTParametersSigning(null, SecretKeyType.HMAC, null, hmac)
+        JWTParametersSigning parameters = new JWTParametersSigning(null, new SecretKeyType(KeyType.OCT), null, hmac)
 
         then:
         parameters.keyID == "hmacKeyId"
