@@ -16,7 +16,6 @@
 package be.atbash.ee.security.octopus.keys.selector.filter;
 
 import be.atbash.ee.security.octopus.keys.AtbashKey;
-import be.atbash.ee.security.octopus.keys.selector.SecretKeyType;
 import com.nimbusds.jose.jwk.KeyType;
 
 import java.util.ArrayList;

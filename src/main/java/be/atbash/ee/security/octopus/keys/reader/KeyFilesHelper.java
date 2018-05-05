@@ -16,8 +16,6 @@
 package be.atbash.ee.security.octopus.keys.reader;
 
 import be.atbash.config.util.ResourceUtils;
-import be.atbash.ee.security.octopus.keys.reader.DefaultKeyResourceTypeProvider;
-import be.atbash.ee.security.octopus.keys.reader.KeyResourceTypeProvider;
 import be.atbash.util.CDIUtils;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;

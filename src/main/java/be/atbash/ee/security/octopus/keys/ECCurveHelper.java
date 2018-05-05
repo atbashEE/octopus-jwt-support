@@ -20,8 +20,6 @@ import org.bouncycastle.jce.spec.ECNamedCurveSpec;
 
 import java.security.interfaces.ECKey;
 import java.security.spec.ECParameterSpec;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *
@@ -44,6 +42,5 @@ public final class ECCurveHelper {
 
         return Curve.forStdName(namedCurve);
     }
-
 
 }

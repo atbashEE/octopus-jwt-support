@@ -18,13 +18,9 @@ package be.atbash.ee.security.octopus.jwt
 import be.atbash.ee.security.octopus.jwt.decoder.JWTDecoder
 import be.atbash.ee.security.octopus.jwt.encoder.JWTEncoder
 import be.atbash.ee.security.octopus.jwt.encoder.testclasses.Payload
-import be.atbash.ee.security.octopus.jwt.keys.HMACSecret
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParameters
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersBuilder
-import be.atbash.ee.security.octopus.keys.selector.KeySelector
 import spock.lang.Specification
-
-import java.security.SecureRandom
 
 /**
  *

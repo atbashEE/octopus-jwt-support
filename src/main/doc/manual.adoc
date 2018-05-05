@@ -22,7 +22,7 @@ The code will be improved when Atbash Octopus has full support for MP JWT Auth s
 In a second version, a better support for Cryptographic keys is planned.
 There is no support for JWE yet.
 
-== Standard usage
+== Standard usage JWT Serialization
 
 Convert the Object _data_ to JSON and Base64 encoded format.
 
@@ -87,3 +87,23 @@ In a next release, selector will work on multiple sources (JWK, PEM files and Ja
 MPBearerTokenVerifier -> Optional verifier for validating the JWT.
 
 TODO : Describe the default verifications.
+
+== Keys
+
+TODO, describe
+
+KeyReader -> Support for PEM, JKS (Java KeyStore), JWK en JWKSet
+
+KeySelector -> retrieve a certain key based on criteria. Use builder to define criteria
+
+=== Customization
+
+KeyManager -> Manages the set of keys
+
+Default KeyManager -> LocalKeyManager (by parameter _key.manager.class_)
+
+This local KeyManager is configured by _keys.location_
+
+Password are by default read from configuration (parameter _lookup.password.class_ define the class)
+
+KeyResourceTypeProvider -> defines mapping between file extension and type of key (PEM, JKS, ...)

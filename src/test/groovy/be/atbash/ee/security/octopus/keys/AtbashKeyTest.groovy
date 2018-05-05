@@ -28,29 +28,29 @@ class AtbashKeyTest extends Specification {
 
         when:
 
-            def key = new AtbashKey(ResourceUtils.CLASSPATH_PREFIX + "test.pem", null, null)
+        def key = new AtbashKey(ResourceUtils.CLASSPATH_PREFIX + "test.pem", null, null)
 
         then:
-            key.keyId == "test"
+        key.keyId == "test"
     }
 
     def "GetKeyId multiple dot"() {
 
         when:
 
-            def key = new AtbashKey(ResourceUtils.CLASSPATH_PREFIX + "test.pub.pem", null, null)
+        def key = new AtbashKey(ResourceUtils.CLASSPATH_PREFIX + "test.pub.pem", null, null)
 
         then:
-            key.keyId == "test.pub"
+        key.keyId == "test.pub"
     }
 
     def "GetKeyId no extension"() {
 
         when:
 
-            def key = new AtbashKey(ResourceUtils.CLASSPATH_PREFIX + "test", null, null)
+        def key = new AtbashKey(ResourceUtils.CLASSPATH_PREFIX + "test", null, null)
 
         then:
-            key.keyId == "test"
+        key.keyId == "test"
     }
 }
