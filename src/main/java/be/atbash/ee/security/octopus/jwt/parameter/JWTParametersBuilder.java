@@ -16,10 +16,9 @@
 package be.atbash.ee.security.octopus.jwt.parameter;
 
 import be.atbash.ee.security.octopus.jwt.JWTEncoding;
+import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.util.Reviewed;
 import be.atbash.util.exception.AtbashIllegalActionException;
-import com.nimbusds.jose.jwk.JWK;
-import com.nimbusds.jose.jwk.KeyType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,10 +36,9 @@ public final class JWTParametersBuilder {
     private JWTEncoding encoding;
 
     private Map<String, Object> headerValues;
-    private JWK secretKeySigning;
-    private KeyType keyType;
+    private AtbashKey secretKeySigning;
 
-    private JWK secretKeyEncryption;
+    private AtbashKey secretKeyEncryption;
     private JWTParametersSigning parametersSigning;
 
     private JWTParametersBuilder(JWTEncoding encoding) {
@@ -59,16 +57,15 @@ public final class JWTParametersBuilder {
         return this;
     }
 
-    public JWTParametersBuilder withSecretKeyForSigning(JWK key) {
+    public JWTParametersBuilder withSecretKeyForSigning(AtbashKey key) {
         if (encoding == JWTEncoding.NONE) {
             logger.warn("SecretKey value is not supported with JWTEncoding.NONE");
         }
         secretKeySigning = key;
-        keyType = key.getKeyType();
         return this;
     }
 
-    public JWTParametersBuilder withSecretKeyForEncryption(JWK key) {
+    public JWTParametersBuilder withSecretKeyForEncryption(AtbashKey key) {
         if (encoding != JWTEncoding.JWE) {
             logger.warn("SecretKey value for encryption only needed for JWTEncoding.JWE");
         }
@@ -93,7 +90,7 @@ public final class JWTParametersBuilder {
                 result = new JWTParametersNone();
                 break;
             case JWS:
-                result = new JWTParametersSigning(headerValues, keyType, secretKeySigning);
+                result = new JWTParametersSigning(headerValues, secretKeySigning);
                 break;
             case JWE:
                 result = new JWTParametersEncryption(parametersSigning, headerValues, secretKeyEncryption);
