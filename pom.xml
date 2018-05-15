@@ -82,6 +82,7 @@
         </dependency>
 
         <!-- atbash -->
+        <!-- comes also through transient dependencies, but want to make sure we use the correct version -->
         <dependency>
             <groupId>be.atbash.utils</groupId>
             <artifactId>utils-se</artifactId>
@@ -160,6 +161,21 @@
             <groupId>uk.org.lidalia</groupId>
             <artifactId>slf4j-test</artifactId>
             <version>1.2.0</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>be.atbash.config</groupId>
+            <artifactId>atbash-config-test</artifactId>
+            <version>${atbash-config.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>be.atbash.utils</groupId>
+            <artifactId>utils-se</artifactId>
+            <version>${atbash-utils.version}</version>
+            <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
 

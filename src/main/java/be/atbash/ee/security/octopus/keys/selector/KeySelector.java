@@ -47,6 +47,15 @@ public class KeySelector {
      * @return
      */
     public <T extends Key> T selectSecretKey(SelectorCriteria selectorCriteria) {
+        AtbashKey key = selectAtbashKey(selectorCriteria);
+        if (key == null) {
+            return null;
+        }
+
+        return (T) key.getKey();
+    }
+
+    public AtbashKey selectAtbashKey(SelectorCriteria selectorCriteria) {
         retrieveKeyManager();
 
         List<KeyFilter> filters = new ArrayList<>();
@@ -73,8 +82,7 @@ public class KeySelector {
             LOGGER.warn("(OCT-KEY-011) Multiple keys found for criteria"); // FIXME log selectorCriteria
             return null;
         }
-
-        return (T) keys.get(0).getKey();
+        return keys.get(0);
     }
 
     private void retrieveKeyManager() {

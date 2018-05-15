@@ -83,6 +83,9 @@ public class ConfigKeyResourcePasswordLookup implements KeyResourcePasswordLooku
     private Map<ConfigKey, char[]> readPasswordsFromConfig() {
         Map<ConfigKey, char[]> result = new HashMap<>();
         Config config = ConfigProvider.getConfig();
+        if (config.getPropertyNames() == null) {
+            return result;
+        }
         for (String configKeyName : config.getPropertyNames()) {
             if (configKeyName.startsWith(KEY_PREFIX)) {
                 String value = config.getValue(configKeyName, String.class);
