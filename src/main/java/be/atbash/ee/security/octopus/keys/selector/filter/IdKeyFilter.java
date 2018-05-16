@@ -16,6 +16,8 @@
 package be.atbash.ee.security.octopus.keys.selector.filter;
 
 import be.atbash.ee.security.octopus.keys.AtbashKey;
+import be.atbash.util.StringUtils;
+import be.atbash.util.exception.AtbashIllegalActionException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,11 +31,17 @@ public class IdKeyFilter implements KeyFilter {
     private String keyId;
 
     public IdKeyFilter(String keyId) {
+        if (StringUtils.isEmpty(keyId)) {
+            throw new AtbashIllegalActionException("(OCT-DEV-102) Key Id to search can't be null or empty");
+        }
         this.keyId = keyId;
     }
 
     @Override
     public List<AtbashKey> filter(List<AtbashKey> keys) {
+        if (keys == null) {
+            throw new AtbashIllegalActionException("(OCT-DEV-103) List of keys to filter can't be null");
+        }
         List<AtbashKey> result = new ArrayList<>();
         for (AtbashKey key : keys) {
             if (keyId.equals(key.getKeyId())) {

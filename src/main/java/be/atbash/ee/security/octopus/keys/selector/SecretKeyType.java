@@ -15,6 +15,7 @@
  */
 package be.atbash.ee.security.octopus.keys.selector;
 
+import be.atbash.util.exception.AtbashIllegalActionException;
 import com.nimbusds.jose.jwk.KeyType;
 
 import javax.crypto.SecretKey;
@@ -33,15 +34,22 @@ public class SecretKeyType {
     private AsymmetricPart asymmetricPart;
 
     public SecretKeyType(KeyType keyType) {
-        this.keyType = keyType;
+        this(keyType, null);
     }
 
     public SecretKeyType(KeyType keyType, AsymmetricPart asymmetricPart) {
         if (keyType == null) {
-            throw new IllegalArgumentException("Parameter KeyType can't be null");
+            throw new AtbashIllegalActionException("(OCT-DEV-107) Parameter KeyType can't be null");
         }
-        if (asymmetricPart == null) {
-            throw new IllegalArgumentException("Parameter AsymmetricPart can't be null");
+        if (keyType == KeyType.OCT) {
+            if (asymmetricPart != null) {
+                throw new AtbashIllegalActionException("(OCT-DEV-109) AsymmetricPart can't be specified for a symmetric key type");
+            }
+        } else {
+
+            if (asymmetricPart == null) {
+                throw new AtbashIllegalActionException("(OCT-DEV-108) Parameter AsymmetricPart is required for a asymmetric key type");
+            }
         }
         this.keyType = keyType;
         this.asymmetricPart = asymmetricPart;

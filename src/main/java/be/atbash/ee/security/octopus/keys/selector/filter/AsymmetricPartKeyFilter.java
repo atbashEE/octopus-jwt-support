@@ -17,6 +17,7 @@ package be.atbash.ee.security.octopus.keys.selector.filter;
 
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
+import be.atbash.util.exception.AtbashIllegalActionException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,11 +31,16 @@ public class AsymmetricPartKeyFilter implements KeyFilter {
     private AsymmetricPart asymmetricPart;
 
     public AsymmetricPartKeyFilter(AsymmetricPart asymmetricPart) {
+        // In the case of the symmetric keys, null is allowed. (or we need to have something equivalent)
         this.asymmetricPart = asymmetricPart;
     }
 
     @Override
     public List<AtbashKey> filter(List<AtbashKey> keys) {
+        if (keys == null) {
+            throw new AtbashIllegalActionException("(OCT-DEV-103) List of keys to filter can't be null");
+        }
+
         List<AtbashKey> result = new ArrayList<>();
         for (AtbashKey key : keys) {
             if (asymmetricPart.equals(key.getSecretKeyType().getAsymmetricPart())) {

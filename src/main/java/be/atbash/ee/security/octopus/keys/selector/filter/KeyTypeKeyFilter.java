@@ -16,6 +16,7 @@
 package be.atbash.ee.security.octopus.keys.selector.filter;
 
 import be.atbash.ee.security.octopus.keys.AtbashKey;
+import be.atbash.util.exception.AtbashIllegalActionException;
 import com.nimbusds.jose.jwk.KeyType;
 
 import java.util.ArrayList;
@@ -30,11 +31,19 @@ public class KeyTypeKeyFilter implements KeyFilter {
     private KeyType keyType;
 
     public KeyTypeKeyFilter(KeyType keyType) {
+        if (keyType == null) {
+            throw new AtbashIllegalActionException("(OCT-DEV-110) Key Type to search can't be null.");
+        }
+
         this.keyType = keyType;
     }
 
     @Override
     public List<AtbashKey> filter(List<AtbashKey> keys) {
+        if (keys == null) {
+            throw new AtbashIllegalActionException("(OCT-DEV-103) List of keys to filter can't be null.");
+        }
+
         List<AtbashKey> result = new ArrayList<>();
         for (AtbashKey key : keys) {
             if (keyType.equals(key.getSecretKeyType().getKeyType())) {
