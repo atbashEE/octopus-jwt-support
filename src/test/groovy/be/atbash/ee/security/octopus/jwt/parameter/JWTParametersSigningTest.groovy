@@ -15,11 +15,14 @@
  */
 package be.atbash.ee.security.octopus.jwt.parameter
 
-import be.atbash.ee.security.octopus.jwt.keys.HMACSecret
+import be.atbash.ee.security.octopus.keys.AtbashKey
 import be.atbash.ee.security.octopus.keys.selector.SecretKeyType
+import be.atbash.ee.security.octopus.util.HmacSecretUtil
 import com.nimbusds.jose.jwk.JWK
 import com.nimbusds.jose.jwk.KeyType
 import spock.lang.Specification
+
+import java.nio.charset.Charset
 
 /**
  * Only normal usages are tested.
@@ -31,10 +34,10 @@ class JWTParametersSigningTest extends Specification {
     def "GetKeyID_hmac"() {
 
         given:
-        HMACSecret hmac = new HMACSecret("secret", "hmacKeyId", false)
+        AtbashKey atbashKey = HmacSecretUtil.generateSecretKey("hmacKeyId", "secret".getBytes(Charset.forName("UTF-8")))
 
         when:
-        JWTParametersSigning parameters = new JWTParametersSigning(null, new SecretKeyType(KeyType.OCT), null, hmac)
+        JWTParametersSigning parameters = new JWTParametersSigning(null, new SecretKeyType(KeyType.OCT), null, atbashKey)
 
         then:
         parameters.keyID == "hmacKeyId"

@@ -15,7 +15,6 @@
  */
 package be.atbash.ee.security.octopus.jwt.encoder;
 
-import be.atbash.ee.security.octopus.jwt.keys.HMACSecret;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersSigning;
 import be.atbash.util.exception.AtbashUnexpectedException;
 import com.nimbusds.jose.JOSEException;
@@ -46,7 +45,7 @@ public class JWTSignerFactory {
 
         if (KeyType.OCT.equals(parametersSigning.getKeyType())) {
             try {
-                result = new MACSigner(((HMACSecret) parametersSigning.getKey()).toSecretKey());
+                result = new MACSigner(parametersSigning.getKey().getEncoded());
             } catch (KeyLengthException e) {
 
                 throw new AtbashUnexpectedException(e);
@@ -80,7 +79,7 @@ public class JWTSignerFactory {
 
         if (KeyType.OCT.equals(parametersSigning.getKeyType())) {
 
-            result = hmacAlgorithmFactory.determineOptimalAlgorithm(((HMACSecret) parametersSigning.getKey()).toSecretKey().getEncoded());
+            result = hmacAlgorithmFactory.determineOptimalAlgorithm(parametersSigning.getKey().getEncoded());
         }
         if (KeyType.RSA.equals(parametersSigning.getKeyType())) {
 

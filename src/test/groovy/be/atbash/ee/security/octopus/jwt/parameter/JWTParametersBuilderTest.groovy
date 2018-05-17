@@ -16,11 +16,13 @@
 package be.atbash.ee.security.octopus.jwt.parameter
 
 import be.atbash.ee.security.octopus.jwt.JWTEncoding
-import be.atbash.ee.security.octopus.jwt.keys.HMACSecret
+import be.atbash.ee.security.octopus.keys.AtbashKey
+import be.atbash.ee.security.octopus.util.HmacSecretUtil
 import com.nimbusds.jose.jwk.JWK
 import com.nimbusds.jose.jwk.KeyType
 import spock.lang.Specification
 
+import java.nio.charset.Charset
 import java.security.SecureRandom
 
 /**
@@ -32,7 +34,7 @@ class JWTParametersBuilderTest extends Specification {
 
         when:
         JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS)
-                .withSecretKeyForSigning(new HMACSecret("testSecret", "Spock", false))
+                .withSecretKeyForSigning(HmacSecretUtil.generateSecretKey("testSecret", "Spock".getBytes(Charset.forName("UTF-8"))))
                 .withHeader("UnitTest", "Spock")
                 .build()
 
@@ -47,7 +49,7 @@ class JWTParametersBuilderTest extends Specification {
 
         when:
         JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS)
-                .withSecretKeyForSigning(new HMACSecret("testSecret", "Spock", false))
+                .withSecretKeyForSigning(HmacSecretUtil.generateSecretKey("testSecret", "Spock".getBytes(Charset.forName("UTF-8"))))
                 .withHeader("UnitTest", "Spock")
                 .withHeader("key", "value")
                 .build()
@@ -63,7 +65,7 @@ class JWTParametersBuilderTest extends Specification {
 
         when:
         JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS)
-                .withSecretKeyForSigning(new HMACSecret("testSecret", "Spock", false))
+                .withSecretKeyForSigning(HmacSecretUtil.generateSecretKey("testSecret", "Spock".getBytes(Charset.forName("UTF-8"))))
                 .build()
 
         then:
@@ -77,7 +79,7 @@ class JWTParametersBuilderTest extends Specification {
 
         when:
         JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.NONE)
-                .withSecretKeyForSigning(new HMACSecret("testSecret", "Spock", false))
+                .withSecretKeyForSigning(HmacSecretUtil.generateSecretKey("testSecret", "Spock".getBytes(Charset.forName("UTF-8"))))
                 .withHeader("UnitTest", "Spock")
                 .build()
 
@@ -100,7 +102,7 @@ class JWTParametersBuilderTest extends Specification {
 
         when:
         JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS)
-                .withSecretKeyForSigning(new HMACSecret("testSecret", "Spock", false))
+                .withSecretKeyForSigning(nHmacSecretUtil.generateSecretKey("testSecret", "Spock".getBytes(Charset.forName("UTF-8"))))
                 .build()
 
         then:
@@ -153,11 +155,11 @@ class JWTParametersBuilderTest extends Specification {
         byte[] secret = new byte[16]
         new SecureRandom().nextBytes(secret)
 
-        HMACSecret hmac = new HMACSecret(secret, "hmacKeyId")
+        AtbashKey atbashKey = HmacSecretUtil.generateSecretKey("hmacKeyId", "secret".getBytes(Charset.forName("UTF-8")))
 
         when:
         JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS)
-                .withSecretKeyForSigning(hmac)
+                .withSecretKeyForSigning(atbashKey)
                 .build()
         then:
         parameters instanceof JWTParametersSigning
