@@ -39,6 +39,11 @@ public class RSAGenerationParameters extends GenerationParameters {
             return new RSAGenerationParameters(this);
         }
 
+        public RSAGenerationParametersBuilder withKeySize(int keySize) {
+            this.keySize = keySize;
+            return this;
+        }
+
         protected void applyDefaults() {
             super.applyDefaults();
             if (keySize == 0) {
