@@ -16,7 +16,7 @@
 package be.atbash.ee.security.octopus.keys.reader;
 
 public enum KeyResourceType {
-    JWK(".jwk", ".jwke"), JWKSET(".jwkset", ".jwksete"), PEM(".pem", "der"), KEYSTORE(".jks", ".p12", ".pfx");
+    JWK(".jwk", ".jwke"), JWKSET(".jwks", ".jwkset", ".jwksete"), PEM(".pem", "der"), KEYSTORE(".jks", ".p12", ".pfx");
 
     private String[] suffixes;
 

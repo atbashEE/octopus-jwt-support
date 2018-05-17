@@ -61,7 +61,9 @@ public class LocalKeyManager implements KeyManager {
                 if (keys == null) {
                     checkDependencies(); // Support java SE + Config driven Password Lookup class
                     // FIXME use KeyFilesHelper to read all files within directory.
-                    keys = keyReader.readKeyResource(configuration.getKeysLocation(), passwordLookup);
+                    String keysLocation = configuration.getKeysLocation();
+                    // FIXME keysLocation == null -> missingConfiguration
+                    keys = keyReader.readKeyResource(keysLocation, passwordLookup);
                 }
             }
         }

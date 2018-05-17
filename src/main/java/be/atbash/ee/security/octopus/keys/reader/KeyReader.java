@@ -49,6 +49,7 @@ public class KeyReader {
         List<AtbashKey> result = null;
 
         KeyResourceType keyResourceType = keyResourceTypeProvider.determineKeyResourceType(path);
+        // FIXME keyResourceType == null -> Exception.
         switch (keyResourceType) {
 
             case JWK:

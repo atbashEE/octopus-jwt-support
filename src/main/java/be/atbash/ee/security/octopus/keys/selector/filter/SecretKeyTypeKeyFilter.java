@@ -17,7 +17,6 @@ package be.atbash.ee.security.octopus.keys.selector.filter;
 
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.selector.SecretKeyType;
-import be.atbash.util.StringUtils;
 import be.atbash.util.exception.AtbashIllegalActionException;
 
 import java.util.ArrayList;
