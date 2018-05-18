@@ -15,11 +15,14 @@
  */
 package be.atbash.ee.security.octopus.keys;
 
+import be.atbash.config.exception.ConfigurationException;
 import be.atbash.ee.security.octopus.keys.config.JwtSupportConfiguration;
+import be.atbash.ee.security.octopus.keys.reader.KeyFilesHelper;
 import be.atbash.ee.security.octopus.keys.reader.KeyReader;
 import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup;
 import be.atbash.ee.security.octopus.keys.selector.filter.KeyFilter;
-import be.atbash.util.reflection.ClassUtils;
+import be.atbash.util.StringUtils;
+import be.atbash.util.exception.AtbashIllegalActionException;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -39,11 +42,17 @@ public class LocalKeyManager implements KeyManager {
     @Inject
     private KeyReader keyReader;
 
+    @Inject
+    private KeyFilesHelper keyFilesHelper;
+
     private KeyResourcePasswordLookup passwordLookup;
 
     private List<AtbashKey> keys;
 
     public List<AtbashKey> retrieveKeys(List<KeyFilter> filters) {
+        if (filters == null) {
+            throw new AtbashIllegalActionException("Parameter filters can't be null");
+        }
         checkKeyLoading();
 
         List<AtbashKey> result = new ArrayList<>(keys);
@@ -60,10 +69,18 @@ public class LocalKeyManager implements KeyManager {
             synchronized (LOCK) {
                 if (keys == null) {
                     checkDependencies(); // Support java SE + Config driven Password Lookup class
-                    // FIXME use KeyFilesHelper to read all files within directory.
+
                     String keysLocation = configuration.getKeysLocation();
-                    // FIXME keysLocation == null -> missingConfiguration
-                    keys = keyReader.readKeyResource(keysLocation, passwordLookup);
+
+                    if (StringUtils.isEmpty(keysLocation)) {
+                        throw new ConfigurationException("Parameter keys.location is required to have a value");
+                    }
+
+                    List<String> keyFiles = keyFilesHelper.determineKeyFiles(keysLocation);
+                    keys = new ArrayList<>();
+                    for (String keyFile : keyFiles) {
+                        keys.addAll(keyReader.readKeyResource(keyFile, passwordLookup));
+                    }
                 }
             }
         }
@@ -74,9 +91,10 @@ public class LocalKeyManager implements KeyManager {
             // Java SE
             configuration = new JwtSupportConfiguration();
             keyReader = new KeyReader();
+            keyFilesHelper = new KeyFilesHelper();
         }
         if (passwordLookup == null) {
-            passwordLookup = ClassUtils.newInstance(configuration.getPasswordLookupClass());
+            passwordLookup = configuration.getPasswordLookup();
         }
     }
 }

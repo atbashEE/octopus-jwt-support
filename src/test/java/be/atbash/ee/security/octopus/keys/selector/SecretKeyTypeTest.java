@@ -15,19 +15,10 @@
  */
 package be.atbash.ee.security.octopus.keys.selector;
 
+import be.atbash.ee.security.octopus.keys.fake.*;
 import be.atbash.util.exception.AtbashIllegalActionException;
 import com.nimbusds.jose.jwk.KeyType;
 import org.junit.Test;
-
-import javax.crypto.SecretKey;
-import java.math.BigInteger;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.interfaces.ECPrivateKey;
-import java.security.interfaces.ECPublicKey;
-import java.security.interfaces.RSAKey;
-import java.security.spec.ECParameterSpec;
-import java.security.spec.ECPoint;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -128,122 +119,4 @@ public class SecretKeyTypeTest {
         new SecretKeyType(KeyType.EC);
     }
 
-    private static class FakeRSAPublic implements RSAKey, PublicKey {
-
-        @Override
-        public String getAlgorithm() {
-            return null;
-        }
-
-        @Override
-        public String getFormat() {
-            return null;
-        }
-
-        @Override
-        public byte[] getEncoded() {
-            return new byte[0];
-        }
-
-        @Override
-        public BigInteger getModulus() {
-            return null;
-        }
-    }
-
-    private static class FakeRSAPrivate implements RSAKey, PrivateKey {
-
-        @Override
-        public String getAlgorithm() {
-            return null;
-        }
-
-        @Override
-        public String getFormat() {
-            return null;
-        }
-
-        @Override
-        public byte[] getEncoded() {
-            return new byte[0];
-        }
-
-        @Override
-        public BigInteger getModulus() {
-            return null;
-        }
-    }
-
-    private static class FakeECPublic implements ECPublicKey {
-
-        @Override
-        public ECPoint getW() {
-            return null;
-        }
-
-        @Override
-        public String getAlgorithm() {
-            return null;
-        }
-
-        @Override
-        public String getFormat() {
-            return null;
-        }
-
-        @Override
-        public byte[] getEncoded() {
-            return new byte[0];
-        }
-
-        @Override
-        public ECParameterSpec getParams() {
-            return null;
-        }
-    }
-
-    private static class FakeECPrivate implements ECPrivateKey {
-        @Override
-        public BigInteger getS() {
-            return null;
-        }
-
-        @Override
-        public String getAlgorithm() {
-            return null;
-        }
-
-        @Override
-        public String getFormat() {
-            return null;
-        }
-
-        @Override
-        public byte[] getEncoded() {
-            return new byte[0];
-        }
-
-        @Override
-        public ECParameterSpec getParams() {
-            return null;
-        }
-    }
-
-    private static class FakeSecretKey implements SecretKey {
-
-        @Override
-        public String getAlgorithm() {
-            return null;
-        }
-
-        @Override
-        public String getFormat() {
-            return null;
-        }
-
-        @Override
-        public byte[] getEncoded() {
-            return new byte[0];
-        }
-    }
 }
