@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import java.security.Key;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +40,7 @@ public class KeySelector {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(KeySelector.class);
 
+    @Inject
     private KeyManager keyManager;
 
     /**
@@ -86,7 +88,7 @@ public class KeySelector {
 
     private void retrieveKeyManager() {
         if (keyManager == null) {
-            // lazy init
+            // lazy init, Java SE
             synchronized (LOCK) {
                 if (keyManager == null) {
 

@@ -26,6 +26,7 @@ import com.google.common.io.Files;
 import org.reflections.Reflections;
 import org.reflections.scanners.ResourcesScanner;
 import org.reflections.vfs.Vfs;
+import org.slf4j.Logger;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
@@ -44,6 +45,9 @@ import java.util.regex.Pattern;
 public class KeyFilesHelper {
 
     private final Object LOCK = new Object();
+
+    @Inject
+    private Logger logger;
 
     @Inject
     private JwtSupportConfiguration jwtSupportConfiguration;
@@ -109,8 +113,9 @@ public class KeyFilesHelper {
         while (iterator.hasNext()) {
             String path = iterator.next();
             if (keyResourceTypeProvider.determineKeyResourceType(path) == null) {
-                // When file isn't matched to any of the types -> remove fro list
+                // When file isn't matched to any of the types -> remove from list
                 iterator.remove();
+                logger.warn(String.format("(OCT-KEY-012) Unable to determine type of '%s'", path));
             }
         }
         return result;

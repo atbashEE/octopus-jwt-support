@@ -107,6 +107,12 @@ public class ConfigKeyResourcePasswordLookup implements KeyResourcePasswordLooku
         return result;
     }
 
+    @Override
+    public String toString() {
+        // For the startup logging.
+        return "class "+ ConfigKeyResourcePasswordLookup.class.getName();
+    }
+
     private String[] determineParts(String keyName) {
         return keyName.substring(KEY_PREFIX.length()).split("!", 2);
     }

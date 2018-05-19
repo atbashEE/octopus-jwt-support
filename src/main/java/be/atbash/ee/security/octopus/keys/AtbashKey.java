@@ -17,10 +17,12 @@ package be.atbash.ee.security.octopus.keys;
 
 import be.atbash.config.util.ResourceUtils;
 import be.atbash.ee.security.octopus.keys.selector.SecretKeyType;
+import be.atbash.util.CollectionUtils;
 import be.atbash.util.exception.AtbashUnexpectedException;
 import com.nimbusds.jose.jwk.KeyUse;
 
 import java.security.Key;
+import java.util.Arrays;
 import java.util.List;
 
 // Useful info https://www.cem.me/pki/
@@ -31,9 +33,16 @@ public class AtbashKey {
     private SecretKeyType secretKeyType;
     private Key key;
 
+    public AtbashKey(String path, Key key) {
+        this(path, Arrays.asList(KeyUse.ENCRYPTION, KeyUse.SIGNATURE), key);
+    }
+
     public AtbashKey(String path, List<KeyUse> keyUses, Key key) {
         this.keyId = defineKeyId(path);
         this.keyUses = keyUses;
+        if (CollectionUtils.isEmpty(this.keyUses)) {
+            this.keyUses = Arrays.asList(KeyUse.ENCRYPTION, KeyUse.SIGNATURE);
+        }
         this.key = key;
         secretKeyType = SecretKeyType.fromKey(key);
     }

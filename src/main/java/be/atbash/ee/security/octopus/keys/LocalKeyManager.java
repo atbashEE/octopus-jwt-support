@@ -24,6 +24,7 @@ import be.atbash.ee.security.octopus.keys.selector.filter.KeyFilter;
 import be.atbash.util.StringUtils;
 import be.atbash.util.exception.AtbashIllegalActionException;
 
+import javax.enterprise.inject.Vetoed;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +32,7 @@ import java.util.List;
 /**
  *
  */
-
+@Vetoed
 public class LocalKeyManager implements KeyManager {
 
     private static final Object LOCK = new Object();
@@ -96,5 +97,11 @@ public class LocalKeyManager implements KeyManager {
         if (passwordLookup == null) {
             passwordLookup = configuration.getPasswordLookup();
         }
+    }
+
+    @Override
+    public String toString() {
+        // For the startup logging.
+        return "class" + LocalKeyManager.class.getName();
     }
 }

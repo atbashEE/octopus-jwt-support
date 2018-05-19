@@ -16,11 +16,9 @@
 package be.atbash.ee.security.octopus.util;
 
 import be.atbash.ee.security.octopus.keys.AtbashKey;
-import com.nimbusds.jose.jwk.KeyUse;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import java.util.ArrayList;
 
 /**
  *
@@ -34,7 +32,7 @@ public final class HmacSecretUtil {
     public static AtbashKey generateSecretKey(String kid, byte[] key) {
         SecretKey secretKey = new SecretKeySpec(key, 0, key.length, "AES");
 
-        return new AtbashKey(kid, new ArrayList<KeyUse>(), secretKey);
+        return new AtbashKey(kid, secretKey);
 
     }
 }

@@ -79,8 +79,8 @@ public class KeyReaderPEM {
                 // Untested for EC key due to https://github.com/kaikramer/keystore-explorer/issues/119
                 PEMKeyPair keyPair = ckp.decryptKeyPair(decProv);
                 KeyPair pair = converter.getKeyPair(keyPair);
-                result.add(new AtbashKey(path, null, pair.getPrivate()));
-                result.add(new AtbashKey(path, null, pair.getPublic()));
+                result.add(new AtbashKey(path, pair.getPrivate()));
+                result.add(new AtbashKey(path, pair.getPublic()));
             }
             if (pemData instanceof PKCS8EncryptedPrivateKeyInfo) {
                 PKCS8EncryptedPrivateKeyInfo privateKeyInfo = (PKCS8EncryptedPrivateKeyInfo) pemData;
@@ -95,21 +95,21 @@ public class KeyReaderPEM {
                 InputDecryptorProvider provider = providerBuilder.build(passphrase);
                 PrivateKeyInfo info = privateKeyInfo.decryptPrivateKeyInfo(provider);
                 PrivateKey privateKey = converter.getPrivateKey(info);
-                result.add(new AtbashKey(path, null, privateKey));
+                result.add(new AtbashKey(path, privateKey));
 
             }
             // Unencrypted key - no password needed
             if (pemData instanceof SubjectPublicKeyInfo) {
                 PublicKey publicKey = converter.getPublicKey((SubjectPublicKeyInfo) pemData);
-                result.add(new AtbashKey(path, null, publicKey));
+                result.add(new AtbashKey(path, publicKey));
 
             }
             if (pemData instanceof PEMKeyPair) {
                 PEMKeyPair keyPair = (PEMKeyPair) pemData;
                 PrivateKey privateKey = converter.getPrivateKey(keyPair.getPrivateKeyInfo());
                 PublicKey publicKey = converter.getPublicKey(keyPair.getPublicKeyInfo());
-                result.add(new AtbashKey(path, null, privateKey));
-                result.add(new AtbashKey(path, null, publicKey));
+                result.add(new AtbashKey(path, privateKey));
+                result.add(new AtbashKey(path, publicKey));
             }
         } catch (IOException | PKCSException | OperatorCreationException e) {
             throw new AtbashUnexpectedException(e);
