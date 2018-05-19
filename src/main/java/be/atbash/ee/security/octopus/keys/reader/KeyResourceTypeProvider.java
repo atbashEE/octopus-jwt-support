@@ -17,5 +17,10 @@ package be.atbash.ee.security.octopus.keys.reader;
 
 public interface KeyResourceTypeProvider {
 
+    /**
+     * Determine the KeyResourceType based on the suffix of the path name. For an URL based resource the suffix must also be in the same format.
+     * @param path Location of the resource
+     * @return KeyResourceType or null when suffix doesn't match.
+     */
     KeyResourceType determineKeyResourceType(String path);
 }

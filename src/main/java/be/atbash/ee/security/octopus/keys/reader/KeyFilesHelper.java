@@ -16,6 +16,7 @@
 package be.atbash.ee.security.octopus.keys.reader;
 
 import be.atbash.config.util.ResourceUtils;
+import be.atbash.ee.security.octopus.keys.config.JwtSupportConfiguration;
 import be.atbash.util.CDIUtils;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
@@ -28,8 +29,8 @@ import org.reflections.vfs.Vfs;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -44,6 +45,9 @@ public class KeyFilesHelper {
 
     private final Object LOCK = new Object();
 
+    @Inject
+    private JwtSupportConfiguration jwtSupportConfiguration;
+
     private KeyResourceTypeProvider keyResourceTypeProvider;
 
     private AtbashResourceScanner scanner;
@@ -51,14 +55,13 @@ public class KeyFilesHelper {
     @PostConstruct
     public void init() {
         keyResourceTypeProvider = CDIUtils.retrieveOptionalInstance(KeyResourceTypeProvider.class);
-        // FIXME Use Config Value first
-        // No developer defined instance, use the default.
+        // No developer defined CDI instance, use the config defined one (is the default if not specified).
         if (keyResourceTypeProvider == null) {
-            keyResourceTypeProvider = new DefaultKeyResourceTypeProvider();
+            keyResourceTypeProvider = jwtSupportConfiguration.getKeyResourceTypeProvider();
         }
     }
 
-    public List<String> determineKeyFiles(String keyConfigParameterValue) throws IOException {
+    public List<String> determineKeyFiles(String keyConfigParameterValue) {
         checkDependencies();
         List<String> result = new ArrayList<>();
         if (ResourceUtils.resourceExists(keyConfigParameterValue)) {
@@ -117,8 +120,8 @@ public class KeyFilesHelper {
         // Duplicated within KeyReader
         // for the JAVA SE Case
         if (keyResourceTypeProvider == null) {
-            // FIXME, use Configuration to retrieve value.
-            keyResourceTypeProvider = new DefaultKeyResourceTypeProvider();
+            jwtSupportConfiguration = JwtSupportConfiguration.getInstance();
+            keyResourceTypeProvider = jwtSupportConfiguration.getKeyResourceTypeProvider();
         }
     }
 

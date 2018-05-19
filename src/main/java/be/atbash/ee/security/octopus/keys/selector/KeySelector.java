@@ -21,7 +21,6 @@ import be.atbash.ee.security.octopus.keys.KeyManager;
 import be.atbash.ee.security.octopus.keys.config.JwtSupportConfiguration;
 import be.atbash.ee.security.octopus.keys.selector.filter.*;
 import be.atbash.util.StringUtils;
-import be.atbash.util.reflection.ClassUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,7 +93,7 @@ public class KeySelector {
                     JwtSupportConfiguration configuration = new JwtSupportConfiguration();
                     StartupLogging.logConfiguration(configuration);  // Java SE logging
 
-                    keyManager = ClassUtils.newInstance(configuration.getKeyManagerClass());
+                    keyManager = configuration.getKeyManager();
                 }
             }
         }

@@ -16,11 +16,19 @@
 package be.atbash.ee.security.octopus.keys.config;
 
 import be.atbash.config.AbstractConfiguration;
+import be.atbash.config.exception.ConfigurationException;
 import be.atbash.config.logging.ConfigEntry;
 import be.atbash.config.logging.ModuleConfig;
 import be.atbash.config.logging.ModuleConfigName;
+import be.atbash.config.logging.StartupLogging;
 import be.atbash.ee.security.octopus.keys.KeyManager;
+import be.atbash.ee.security.octopus.keys.LocalKeyManager;
+import be.atbash.ee.security.octopus.keys.reader.DefaultKeyResourceTypeProvider;
+import be.atbash.ee.security.octopus.keys.reader.KeyResourceTypeProvider;
+import be.atbash.ee.security.octopus.keys.reader.password.ConfigKeyResourcePasswordLookup;
 import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup;
+import be.atbash.util.StringUtils;
+import be.atbash.util.reflection.CDICheck;
 import be.atbash.util.reflection.ClassUtils;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -39,20 +47,90 @@ public class JwtSupportConfiguration extends AbstractConfiguration implements Mo
      */
     @ConfigEntry
     public String getKeysLocation() {
+        // TODO Optional, but afterwards we throw exception when empty
+        // Can't we force the checks here? (so question : when octopus-jwt-support module added, isn't the parameter always required or not?)
+        // be.atbash.ee.security.octopus.keys.LocalKeyManager.checkKeyLoading
         return getOptionalValue("keys.location", String.class);
     }
 
     @ConfigEntry
-    public Class<KeyResourcePasswordLookup> getPasswordLookupClass() {
-        // FIXME Does a Class work here in the lookup?
-        String passwordClass = getOptionalValue("lookup.password.class", "be.atbash.ee.security.octopus.keys.reader.password.ConfigKeyResourcePasswordLookup", String.class);
-        return ClassUtils.forName(passwordClass);
+    public KeyResourcePasswordLookup getPasswordLookup() {
+
+        String passwordClass = getOptionalValue("lookup.password.class", ConfigKeyResourcePasswordLookup.class.getName(), String.class);
+        if (StringUtils.isEmpty(passwordClass)) {
+            throw new ConfigurationException("Configuration parameter lookup.password.class is required to have a value.");
+        }
+
+        if (!ClassUtils.isAvailable(passwordClass)) {
+            throw new ConfigurationException("Configuration parameter lookup.password.class class not found.");
+        }
+
+        Class<?> passwordClz = ClassUtils.forName(passwordClass);
+        if (!KeyResourcePasswordLookup.class.isAssignableFrom(passwordClz)) {
+            throw new ConfigurationException("Configuration parameter lookup.password.class must be an implementation of be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup");
+        }
+        return ClassUtils.newInstance(passwordClz);
     }
 
     @ConfigEntry
-    public Class<KeyManager> getKeyManagerClass() {
-        // FIXME Does a Class work here in the lookup?
-        String keyManagerClass = getOptionalValue("key.manager.class", "be.atbash.ee.security.octopus.keys.LocalKeyManager", String.class);
-        return ClassUtils.forName(keyManagerClass);
+    public KeyManager getKeyManager() {
+
+        String keyManagerClass = getOptionalValue("key.manager.class", LocalKeyManager.class.getName(), String.class);
+
+        if (StringUtils.isEmpty(keyManagerClass)) {
+            throw new ConfigurationException("Configuration parameter key.manager.class is required to have a value.");
+        }
+
+        if (!ClassUtils.isAvailable(keyManagerClass)) {
+            throw new ConfigurationException("Configuration parameter key.manager.class class not found.");
+        }
+
+        Class<?> keyManagerClz = ClassUtils.forName(keyManagerClass);
+        if (!KeyManager.class.isAssignableFrom(keyManagerClz)) {
+            throw new ConfigurationException("Configuration parameter key.manager.class must be an implementation of be.atbash.ee.security.octopus.keys.KeyManager");
+        }
+
+        return ClassUtils.newInstance(keyManagerClz);
     }
+
+    @ConfigEntry
+    public KeyResourceTypeProvider getKeyResourceTypeProvider() {
+        String keyResourceTypeProviderClass = getOptionalValue("key.resourcetype.provider.class", DefaultKeyResourceTypeProvider.class.getName(), String.class);
+
+        if (StringUtils.isEmpty(keyResourceTypeProviderClass)) {
+            throw new ConfigurationException("Configuration parameter key.resourcetype.provider.class is required to have a value.");
+        }
+
+        if (!ClassUtils.isAvailable(keyResourceTypeProviderClass)) {
+            throw new ConfigurationException("Configuration parameter key.resourcetype.provider.class class not found.");
+        }
+
+        Class<?> keyResourceTypeProviderClz = ClassUtils.forName(keyResourceTypeProviderClass);
+        if (!KeyResourceTypeProvider.class.isAssignableFrom(keyResourceTypeProviderClz)) {
+            throw new ConfigurationException("Configuration parameter key.resourcetype.provider.class must be an implementation of be.atbash.ee.security.octopus.keys.reader.KeyResourceTypeProvider");
+        }
+
+        return ClassUtils.newInstance(keyResourceTypeProviderClz);
+
+    }
+
+    // Java SE Support
+    private static JwtSupportConfiguration INSTANCE;
+
+    private static final Object LOCK = new Object();
+
+    public static JwtSupportConfiguration getInstance() {
+        if (INSTANCE == null) {
+            synchronized (LOCK) {
+                if (INSTANCE == null) {
+                    INSTANCE = new JwtSupportConfiguration();
+                    if (!CDICheck.withinContainer()) {
+                        StartupLogging.logConfiguration(INSTANCE);
+                    }
+                }
+            }
+        }
+        return INSTANCE;
+    }
+
 }

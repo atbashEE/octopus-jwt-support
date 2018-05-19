@@ -16,15 +16,20 @@
 package be.atbash.ee.security.octopus.keys.reader;
 
 import be.atbash.ee.security.octopus.keys.AtbashKey;
+import be.atbash.ee.security.octopus.keys.config.JwtSupportConfiguration;
 import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup;
 import be.atbash.util.CDIUtils;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import java.util.List;
 
 @ApplicationScoped
 public class KeyReader {
+
+    @Inject
+    private JwtSupportConfiguration jwtSupportConfiguration;
 
     private KeyResourceTypeProvider keyResourceTypeProvider;
 
@@ -36,10 +41,10 @@ public class KeyReader {
     @PostConstruct
     public void init() {
         keyResourceTypeProvider = CDIUtils.retrieveOptionalInstance(KeyResourceTypeProvider.class);
-        // FIXME Use config value first
-        // No developer defined instance, use the default.
+
+        // No developer defined CDI instance, use the config defined one (is the default if not specified).
         if (keyResourceTypeProvider == null) {
-            keyResourceTypeProvider = new DefaultKeyResourceTypeProvider();
+            keyResourceTypeProvider = jwtSupportConfiguration.getKeyResourceTypeProvider();
         }
     }
 
@@ -75,8 +80,8 @@ public class KeyReader {
         // duplicated in KeyFilesHelper
         // for the JAVA SE Case
         if (keyResourceTypeProvider == null) {
-            // FIXME, use Config value
-            keyResourceTypeProvider = new DefaultKeyResourceTypeProvider();
+            jwtSupportConfiguration = JwtSupportConfiguration.getInstance();
+            keyResourceTypeProvider = jwtSupportConfiguration.getKeyResourceTypeProvider();
         }
     }
 }
