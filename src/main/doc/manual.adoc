@@ -9,6 +9,12 @@ User manual for Atbash configuration.
 
 == Release Notes
 
+=== 0.9.0
+
+. Support for reading multiple formats (PEM, KeyStore, JWK and JWKSet)
+. Concept of KeySelector and KeyManager (with SPI)
+. Key for HMAC uses now standards (SecretKey and OCT JWK)
+
 === 0.5.0
 
 . First separate release from Octopus repository.
@@ -90,20 +96,92 @@ TODO : Describe the default verifications.
 
 == Keys
 
-TODO, describe
+Retrieving a certain Cryptographic key can be performed by the class _KeySelector_ through the methods _selectAtbashKey_ and _selectSecretKey_.  You give it a few criteria (like key id, key type like RSA, EC, etc ..) and it tries to find the key which correspond to these values.
 
-KeyReader -> Support for PEM, JKS (Java KeyStore), JWK en JWKSet
+If it finds no key or multiple keys which match these criteria, you will see a warning in the log and the method returns null. Which will obviously result in a error in the calling method because it probably needs a key.
 
-KeySelector -> retrieve a certain key based on criteria. Use builder to define criteria
+Most of the time, you give it the key id (and if you like the private of public part, see also further on why this is important) but you could also decide that the library can take the only available private key it knows of for creating the signature for instance.
+
+You supply the criteria to match, through a _SelectorCriteria_ when can be created by a Builder pattern.
+
+The filtering is performed in this order
+- id
+- secret key type (combination of type like RSA and part like private part)
+- key type (RSA, EC, ...)
+- part (is possible)
+
+The _KeySelector_ however, is only responsible for selecting the matching key from the 'pool'. Managing (reading) the 'pool' is the responsibility of the _KeyManager_.
+
+=== Providing the keys
+
+The _KeyManager_ is responsible for supplying the requested key to the _KeySelector_. (when verifying signature, when decrypting and so on)
+
+There is a default _KeyManager_ available called **LocalKeyManager** which is active when no specific configuration value is set (see further on or the configuration section in this manual).
+It is capable of reading a specific file with keys, or directory with several key files. It can even read from an URL resource, but will be used most of the times to read it from a local (from the point of the server process) location like the classpath or file and directory.
+
+If you need another implementation, like reading it from a central managed storage or reading keys in a more dynamic way, you can implement the interface _be.atbash.ee.security.octopus.keys.KeyManager_.
+
+In a CDI environment, you can define your custom _KeyManager_ as a CDI bean and it will be picked up. An other option is to define the class as parameter value of configuration parameter _key.manager.class_.  It must contain the fully qualified class name. It is just instantiated, so no CDI features (unless you use programmatic retrieval of beans) will be available.
+
+The keys are read by the _KeyReader_ which has support for PEM, JKS (Java KeyStore), JWK, and JWKSet. (see <<Supported Key Formats>>)
+
+=== Define Key type
+
+By default, based on the file extension, the type is determined and how it should be read. There is a default implementation which makes the following mapping
+
+- .jwk -> JWK
+- .jwke -> JWK  (Atbash encrypted JWK)
+- .jwks -> JWKSet
+- .jwkset -> JWKSet
+- .jwksete -> JWKSet  (Atbash encrypted JWKSet)
+- .pem -> PEM
+- .der -> PEM
+- .jks -> KeyStore
+- .p12 -> KeyStore
+- .pfx -> KeyStore
+
+When you want to use other suffixes, implement the interface _be.atbash.ee.security.octopus.keys.reader.KeyResourceTypeProvider_ and define the class name as parameter value of key _key.resourcetype.provider.class_.
+
+The return value of the interface method _determineKeyResourceType_ will determine how the resource will be read. Returning null means that the type is unknown
+
+=== Supply passwords
+
+Various types have encrypted storage of private keys (as they have a sensitive nature).
+
+TODO Specify how _ConfigKeyResourcePasswordLookup_ reads the password from the configuration.
 
 === Customization
-
-KeyManager -> Manages the set of keys
-
-Default KeyManager -> LocalKeyManager (by parameter _key.manager.class_)
-
-This local KeyManager is configured by _keys.location_
 
 Password are by default read from configuration (parameter _lookup.password.class_ define the class)
 
 KeyResourceTypeProvider -> defines mapping between file extension and type of key (PEM, JKS, ...)
+
+== Supported Key Formats
+
+TODO
+
+== Configuration
+
+=== key.manager.class
+
+default : **be.atbash.ee.security.octopus.keys.LocalKeyManager**
+
+The _KeyManager_ that supplies the request key to the KeySelector.
+
+=== keys.location
+
+default : **none**
+
+The location of the Cryptographic keys. The value must start with **classpath:**, **file:** or **url:**. When the value points to a directory, all files (which are identified as containing a key, see _KeyResourceTypeProvider_) are read.
+
+=== key.resourcetype.provider.class
+
+default : **be.atbash.ee.security.octopus.keys.reader.DefaultKeyResourceTypeProvider**
+
+Defines the class which determines the key format of the resources.
+
+=== lookup.password.class
+
+default : **be.atbash.ee.security.octopus.keys.reader.password.ConfigKeyResourcePasswordLookup**
+
+Defines the class which supplies the passwords for encrypted storage of keys
