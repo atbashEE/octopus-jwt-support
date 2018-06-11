@@ -20,12 +20,13 @@ import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.KeyManager;
 import be.atbash.ee.security.octopus.keys.config.JwtSupportConfiguration;
 import be.atbash.ee.security.octopus.keys.selector.filter.*;
+import be.atbash.util.CDIUtils;
 import be.atbash.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 import java.security.Key;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,8 +41,12 @@ public class KeySelector {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(KeySelector.class);
 
-    @Inject
     private KeyManager keyManager;
+
+    @PostConstruct
+    public void init() {
+        keyManager = CDIUtils.retrieveOptionalInstance(KeyManager.class);
+    }
 
     /**
      * @param <T>
