@@ -57,6 +57,7 @@ public class KeyReaderJWKSet extends KeyReaderJWK {
                 result.addAll(parse(jwkJson, path, passwordLookup));
             }
         } catch (ParseException | JOSEException e) {
+            // TODO We need another exception, indicating that loading failed
             throw new AtbashUnexpectedException(e);
         } finally {
             try {

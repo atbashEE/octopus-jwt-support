@@ -43,10 +43,13 @@ public class KeyReaderKeyStore {
     public List<AtbashKey> readResource(String path, KeyResourcePasswordLookup passwordLookup) {
         List<AtbashKey> result = new ArrayList<>();
 
-        InputStream inputStream = null;
+        KeyStore keyStore = null;
         try {
-            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-            inputStream = ResourceUtils.getInputStream(path);
+            keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+        } catch (KeyStoreException e) {
+            throw new AtbashUnexpectedException(e);
+        }
+        try (InputStream inputStream = ResourceUtils.getInputStream(path)) {
             keyStore.load(inputStream, passwordLookup.getResourcePassword(path));
 
             for (Enumeration<String> keyAliases = keyStore.aliases(); keyAliases.hasMoreElements(); ) {
@@ -59,14 +62,6 @@ public class KeyReaderKeyStore {
             }
         } catch (KeyStoreException | IOException | NoSuchAlgorithmException | CertificateException | UnrecoverableKeyException e) {
             throw new AtbashUnexpectedException(e);
-        } finally {
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch (IOException e) {
-                    // TODO Not import, but log!
-                }
-            }
         }
         return result;
     }

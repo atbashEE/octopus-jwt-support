@@ -30,6 +30,7 @@ import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLoo
 import be.atbash.util.StringUtils;
 import be.atbash.util.reflection.CDICheck;
 import be.atbash.util.reflection.ClassUtils;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import javax.enterprise.context.ApplicationScoped;
 
@@ -112,6 +113,27 @@ public class JwtSupportConfiguration extends AbstractConfiguration implements Mo
 
         return ClassUtils.newInstance(keyResourceTypeProviderClz);
 
+    }
+
+    @ConfigEntry
+    public PemKeyEncryption getPemKeyEncryption() {
+        try {
+            return getOptionalValue("key.pem.encryption", PemKeyEncryption.PKCS8, PemKeyEncryption.class);
+        } catch (IllegalArgumentException e) {
+            // When empty value, we need to return NONE
+            String stringValue = getOptionalValue("key.pem.encryption", "", String.class);
+            if (StringUtils.isEmpty(stringValue)) {
+                return PemKeyEncryption.NONE;
+            }
+
+            // We assume that a wrong value, or wrong case is specified
+            throw new ConfigurationException("Configuration parameter key.pem.encryption must be PKCS8 or PKCS1");
+        }
+    }
+
+    @ConfigProperty
+    public String getPKCS1EncryptionAlgorithm() {
+        return getOptionalValue("key.pem.pkcs1.encryption", "DES-EDE3-CBC", String.class);
     }
 
     // Java SE Support

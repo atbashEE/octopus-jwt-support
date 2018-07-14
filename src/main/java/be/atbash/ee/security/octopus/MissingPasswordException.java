@@ -37,7 +37,7 @@ public class MissingPasswordException extends AtbashException {
             case STORE:
                 return String.format("Password required for opening key store %s", path);
             case ENCRYPTION:
-                return String.format("Password required for encryption/decryption");
+                return "Password required for encryption/decryption";
         }
         throw new UnsupportedOperationException(String.format("Unknown value for ObjectType %s", objectType));
     }

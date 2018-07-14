@@ -51,7 +51,7 @@ public class KeyReader {
     public List<AtbashKey> readKeyResource(String path, KeyResourcePasswordLookup passwordLookup) {
         checkDependencies();
 
-        List<AtbashKey> result = null;
+        List<AtbashKey> result ;
 
         KeyResourceType keyResourceType = keyResourceTypeProvider.determineKeyResourceType(path);
         // FIXME keyResourceType == null -> Exception.

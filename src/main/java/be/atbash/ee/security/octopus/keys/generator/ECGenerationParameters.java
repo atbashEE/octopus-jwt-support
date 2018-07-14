@@ -44,11 +44,6 @@ public class ECGenerationParameters extends GenerationParameters {
             return new ECGenerationParameters(this);
         }
 
-        protected void applyDefaults() {
-            super.applyDefaults();
-
-        }
-
         public ECGenerationParametersBuilder withCurveName(String curveName) {
             this.curveName = curveName;
             return this;

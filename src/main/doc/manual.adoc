@@ -11,7 +11,7 @@ User manual for Atbash configuration.
 
 === 0.9.0
 
-. Support for reading multiple formats (PEM, KeyStore, JWK and JWKSet)
+. Support for reading and writing multiple formats (PEM, KeyStore, JWK and JWKSet)
 . Concept of KeySelector and KeyManager (with SPI)
 . Key for HMAC uses now standards (SecretKey and OCT JWK)
 
@@ -25,7 +25,6 @@ User manual for Atbash configuration.
 A first attempt for converting Java beans to and from a JWT.
 The code will be improved when Atbash Octopus has full support for MP JWT Auth spec and OAuth2/OpenId Connect.
 
-In a second version, a better support for Cryptographic keys is planned.
 There is no support for JWE yet.
 
 == Standard usage JWT Serialization
@@ -158,7 +157,57 @@ KeyResourceTypeProvider -> defines mapping between file extension and type of ke
 
 == Supported Key Formats
 
-TODO
+    PEM
+       PKCS8
+       PKCS1
+    JWK
+    JWKSet
+    Java KeyStore
+
+== Generating Cryptographic key
+
+With the class **be.atbash.ee.security.octopus.keys.generator.KeyGenerator** you are able to generate cryptographic keys.
+
+It is a CDI bean and can be injected into other CDI controlled classes. But you can also create a new instance of this class when you need to generation capabilities in other environments.
+
+By calling the method
+
+    generateKeys(GenerationParameters);
+
+It will give you one or more keys, depending on the type you requested. For asymmetric keys, like RSA keys, you get the corresponding public and private keys.
+
+The kind of keys which are generated, depend on the parameter you supply, which can be created using a builder pattern. The following example gives you the code for generating an RSA key.
+
+        RSAGenerationParameters generationParameters = new RSAGenerationParameters.RSAGenerationParametersBuilder()
+                .withKeyId("the-kid")
+                .build();
+        List<AtbashKey> atbashKeys = generator.generateKeys(generationParameters);
+
+The default size of the generated key is 2048, but you can define it using the method _.withKeySize_ on the builder.
+
+There are also builders for Elliptic Curve (EC) and Octec sequence (used in MAC and symmetric encryption) available.
+
+The key id is always required and for EC keys, the curve name is also required.
+
+The generation is performed by the JVM classes itself in case of the RSA and OCT keys, and BouncyCastle in the case of EC keys (_ECDSA_ algorithm)
+
+
+== Writing Cryptographic key
+
+With the class **be.atbash.ee.security.octopus.keys.writer.KeyWriter** you can convert an _AtbashKey_ into one of the supported formats. See ??? for a list of the formats.
+
+This class can also be used as CDI bean, and injected into other CDI artifacts, or used in other environments by instantiating it yourself.
+
+With the method _writeKeyResource_, you can convert the _AtbashKey_, containing the Cryptographic key, into one of the formats as defined by the parameter **KeyResourceType**.
+
+There are 2 variants for the method. One contains a String value defining the location where it key will be stored, the other one just returns the result as a byte array.
+
+When the target file already exists, and the format supports multiple formats (like Java Key Store - JKS and JWK Set) the file is updated with the key you want to write.
+
+The 2 last parameters are used depending on the type of the format.
+
+* keyPassword: Used for encryption of the key, when this is used in the format or requested through a config parameter (for PEM format for example)
+* filePassword: Used for the encryption of the file when file is encrypted as a whole (like with Java Key store). This password is also used for reading it first if the file already exists.
 
 == Configuration
 
@@ -185,3 +234,27 @@ Defines the class which determines the key format of the resources.
 default : **be.atbash.ee.security.octopus.keys.reader.password.ConfigKeyResourcePasswordLookup**
 
 Defines the class which supplies the passwords for encrypted storage of keys
+
+=== key.pem.encryption
+
+default : **PKCS8**
+
+Defines the encryption of the (RSA only?) private key when written to a PEM formatted file. Valid values ora PKCS1, PKCS8 and NONE (meaning no encryption of the key at all and just BASE64 encoded)
+
+=== key.pem.pkcs1.encryption
+
+default : **DES-EDE3-CBC**
+
+Defines the default PKCS#1 encryption used. Valid values are defined according the following rules.
+
+    algorithm names composed from 3 parts glued with hyphen.
+    The first part determines algorithm, one of AES, DES, BF and RC2.
+    The second part determines key bits and is used for AES and optionally for RC2.
+       For AES it is possible to use values 128, 192 and 256.
+       For RC2 64, 40 can be used or nothing - then value 128 is used.
+    The last part determines the block mode: CFB, ECB, OFB, EDE and CBC.
+    Additionally EDE3 can be used in combination with DES to use DES3 with EDE.
+
+    Examples:
+      AES-192-ECB
+      DES-EDE3.

@@ -17,7 +17,7 @@ package be.atbash.ee.security.octopus.keys.reader;
 
 import be.atbash.config.util.ResourceUtils;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
-import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup;
+import be.atbash.ee.security.octopus.keys.TestPasswordLookup;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -307,30 +307,5 @@ public class KeyReaderTest {
         assertThat(privateKey).isTrue();
         assertThat(publicKey).isTrue();
 
-    }
-
-    private static class TestPasswordLookup implements KeyResourcePasswordLookup {
-
-        private char[] password;
-        private char[] kidPassword;
-
-        private TestPasswordLookup(char[] password) {
-            this.password = password;
-        }
-
-        public TestPasswordLookup(char[] password, char[] kidPassword) {
-            this.password = password;
-            this.kidPassword = kidPassword;
-        }
-
-        @Override
-        public char[] getResourcePassword(String path) {
-            return password;
-        }
-
-        @Override
-        public char[] getKeyPassword(String path, String keyId) {
-            return kidPassword;
-        }
     }
 }

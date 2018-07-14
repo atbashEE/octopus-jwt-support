@@ -20,6 +20,7 @@ import be.atbash.config.test.TestConfig;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.KeyManager;
 import be.atbash.ee.security.octopus.keys.LocalKeyManager;
+import be.atbash.ee.security.octopus.keys.TestPasswordLookup;
 import be.atbash.ee.security.octopus.keys.reader.DefaultKeyResourceTypeProvider;
 import be.atbash.ee.security.octopus.keys.reader.KeyResourceType;
 import be.atbash.ee.security.octopus.keys.reader.KeyResourceTypeProvider;
@@ -154,17 +155,38 @@ public class JwtSupportConfigurationTest {
         configuration.getKeyResourceTypeProvider();
     }
 
-    public static class TestPasswordLookup implements KeyResourcePasswordLookup {
+    //
+    @Test
+    public void getPemKeyEncryption() {
+        // Default
+        PemKeyEncryption encryption = configuration.getPemKeyEncryption();
+        assertThat(encryption).isEqualTo(PemKeyEncryption.PKCS8);
+    }
 
-        @Override
-        public char[] getResourcePassword(String path) {
-            return new char[0];
-        }
+    @Test
+    public void getPemKeyEncryption_pkcs1() {
+        TestConfig.addConfigValue("key.pem.encryption", "PKCS1");
+        TestConfig.registerDefaultConverters();
+        PemKeyEncryption encryption = configuration.getPemKeyEncryption();
+        assertThat(encryption).isEqualTo(PemKeyEncryption.PKCS1);
+    }
 
-        @Override
-        public char[] getKeyPassword(String path, String keyId) {
-            return new char[0];
-        }
+    @Test(expected = ConfigurationException.class)
+    public void getPemKeyEncryption_Wrong() {
+        TestConfig.addConfigValue("key.pem.encryption", "value");
+        TestConfig.registerDefaultConverters();
+
+        configuration.getPemKeyEncryption();
+
+    }
+
+    @Test
+    public void getPemKeyEncryption_Empty() {
+        TestConfig.addConfigValue("key.pem.encryption", "");
+        TestConfig.registerDefaultConverters();
+
+        assertThat(configuration.getPemKeyEncryption()).isEqualTo(PemKeyEncryption.NONE);
+
     }
 
     public static class TestKeyManager implements KeyManager {

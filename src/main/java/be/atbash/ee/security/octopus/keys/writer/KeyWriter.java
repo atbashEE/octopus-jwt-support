@@ -1,0 +1,267 @@
+/*
+ * Copyright 2017-2018 Rudy De Busscher (https://www.atbash.be)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package be.atbash.ee.security.octopus.keys.writer;
+
+import be.atbash.config.util.ResourceUtils;
+import be.atbash.ee.security.octopus.keys.AtbashKey;
+import be.atbash.ee.security.octopus.keys.config.JwtSupportConfiguration;
+import be.atbash.ee.security.octopus.keys.config.PemKeyEncryption;
+import be.atbash.ee.security.octopus.keys.reader.KeyResourceType;
+import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
+import be.atbash.util.StringUtils;
+import be.atbash.util.exception.AtbashUnexpectedException;
+import com.nimbusds.jose.jwk.JWKSet;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.text.ParseException;
+import java.util.Scanner;
+
+/**
+ *
+ */
+@ApplicationScoped
+public class KeyWriter {
+
+    @Inject
+    private JwtSupportConfiguration jwtSupportConfiguration;
+
+    @Inject
+    private KeyWriterFactory keyWriterFactory;
+
+    public void writeKeyResource(AtbashKey atbashKey, KeyResourceType keyResourceType, String target, char[] keyPasssword, char[] filePassword) {
+        checkDependencies();
+        try {
+            byte[] content;
+            switch (keyResourceType) {
+
+                case JWK:
+                    checkTargetFile(target, true);
+                    content = writeKeyAsJWK(atbashKey, keyPasssword);
+                    writeFile(target, content);
+                    break;
+                case JWKSET:
+                    checkTargetFile(target, false);
+                    JWKSet jwkSet = loadExistingJWKSet(target);
+
+                    content = writeKeyAsJWKSet(atbashKey, jwkSet);
+                    writeFile(target, content);
+                    break;
+                case PEM:
+                    checkTargetFile(target, true);
+                    content = writeKeyAsPEM(atbashKey, keyPasssword);
+                    writeFile(target, content);
+                    break;
+                case KEYSTORE:
+                    checkTargetFile(target, false);
+
+                    KeyStore keyStore = loadExistingKeyStore(target, filePassword);
+
+                    content = writeKeyAsKeyStore(atbashKey, keyPasssword, filePassword, keyStore);
+                    writeFile(target, content);
+                    break;
+            }
+        } catch (IOException | CertificateException | NoSuchAlgorithmException | KeyStoreException e) {
+            // TODO org.bouncycastle.util.io.pem.PemGenerationException: encoding exception: unknown encryption with private key
+            // -> Custom exception
+
+            throw new AtbashUnexpectedException(e);
+        }
+    }
+
+    private byte[] writeKeyAsJWKSet(AtbashKey atbashKey, JWKSet jwkSet) throws IOException {
+        KeyEncoderParameters parameters = new KeyEncoderParameters(jwkSet);
+
+        return keyWriterFactory.writeKeyAsJWKSet(atbashKey, parameters);
+
+    }
+
+    private JWKSet loadExistingJWKSet(String target) {
+        JWKSet result;
+        InputStream inputStream = ResourceUtils.getInputStream(target);
+        if (inputStream == null) {
+            result = new JWKSet();
+        } else {
+
+            String fileContent = new Scanner(inputStream).useDelimiter("\\Z").next();
+            try {
+                result = JWKSet.parse(fileContent);
+            } catch (ParseException e) {
+                // TODO We need another exception, indicating that loading failed
+                throw new AtbashUnexpectedException(e);
+            } finally {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    throw new AtbashUnexpectedException(e);
+                }
+            }
+        }
+        return result;
+    }
+
+    private KeyStore loadExistingKeyStore(String target, char[] filePassword) throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
+        KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+
+        InputStream inputStream = ResourceUtils.getInputStream(target);
+        if (inputStream != null) {
+
+            keyStore.load(inputStream, filePassword);
+        } else {
+
+            keyStore.load(null, null);
+        }
+        return keyStore;
+    }
+
+    private void writeFile(String target, byte[] fileContent) throws IOException {
+        FileOutputStream outputStream = new FileOutputStream(target);
+        outputStream.write(fileContent);
+        outputStream.close();
+    }
+
+    public byte[] writeKeyResource(AtbashKey atbashKey, KeyResourceType keyResourceType, char[] keyPasssword, char[] filePassword) {
+        checkDependencies();
+        byte[] result;
+        try {
+            switch (keyResourceType) {
+
+                case JWK:
+                    // FIXME support for encrypted JWK of Atbash (see JWKEncryptedCreator)
+                    result = writeKeyAsJWK(atbashKey, keyPasssword);
+                    break;
+                case JWKSET:
+                    result = writeKeyAsJWKSet(atbashKey, new JWKSet());
+                    break;
+                case PEM:
+                    result = writeKeyAsPEM(atbashKey, keyPasssword);
+                    break;
+                case KEYSTORE:
+                    KeyStore keyStore = KeyStore.getInstance("JKS");
+                    keyStore.load(null, null);
+
+                    result = writeKeyAsKeyStore(atbashKey, keyPasssword, filePassword, keyStore);
+                    break;
+                default:
+                    throw new IllegalArgumentException(String.format("Unsupported value for KeyResourceType : %s", keyResourceType));
+            }
+        } catch (IOException | CertificateException | NoSuchAlgorithmException | KeyStoreException e) {
+            // TODO org.bouncycastle.util.io.pem.PemGenerationException: encoding exception: unknown encryption with private key
+            // -> Custom exception
+            throw new AtbashUnexpectedException(e);
+        }
+        return result;
+    }
+
+    private byte[] writeKeyAsPEM(AtbashKey atbashKey, char[] keyPassword) throws IOException {
+        if (jwtSupportConfiguration.getPemKeyEncryption() != PemKeyEncryption.NONE) {
+
+            boolean checkRequired = true;
+            if (jwtSupportConfiguration.getPemKeyEncryption() == PemKeyEncryption.PKCS1 && StringUtils.isEmpty(jwtSupportConfiguration.getPKCS1EncryptionAlgorithm())) {
+                checkRequired = false;
+            }
+
+            if (checkRequired) {
+                // Only when encrypting the key, we need to check the password/passphrase.
+                checkKeyPassword(atbashKey, keyPassword);
+            }
+        }
+
+        KeyEncoderParameters parameters = new KeyEncoderParameters(keyPassword);
+        parameters.addValue(PemKeyEncryption.class, jwtSupportConfiguration.getPemKeyEncryption());
+        parameters.addValue("PKCS1.encryption", jwtSupportConfiguration.getPKCS1EncryptionAlgorithm());
+
+        return keyWriterFactory.writeKeyAsPEM(atbashKey, parameters);
+    }
+
+    private byte[] writeKeyAsKeyStore(AtbashKey atbashKey, char[] keyPassword, char[] filePassword, KeyStore keyStore) throws IOException {
+        checkKeyPassword(atbashKey, keyPassword);
+        // FIXME check FilePassword
+
+        KeyEncoderParameters parameters = new KeyEncoderParameters(keyPassword, filePassword, keyStore);
+
+        return keyWriterFactory.writeKeyAsKeyStore(atbashKey, parameters);
+    }
+
+    private byte[] writeKeyAsJWK(AtbashKey atbashKey, char[] keyPassword) throws IOException {
+        //checkKeyPassword(atbashKey, keyPassword);
+
+        KeyEncoderParameters parameters = new KeyEncoderParameters(keyPassword);
+
+        return keyWriterFactory.writeKeyAsJWK(atbashKey, parameters);
+    }
+
+    private void checkTargetFile(String target, boolean existingCheck) {
+        // existingCheck -> for KeyStore / JWKSet type, the file may already be existing but must the readable and writable
+        // other types -> no overwrite possible and must be writable.
+        File file = new File(target);
+        if (file.isDirectory()) {
+            throw new KeyResourceLocationException(String.format("Location '%s' denotes a directory and must point to a file", target));
+        }
+        if (existingCheck) {
+            if (file.exists()) {
+                throw new KeyResourceLocationException(String.format("File '%s' already exists and overwrite is not allowed for this key resource type", target));
+            }
+        }
+        boolean fileExists = file.exists();
+        if (fileExists) {
+            if (!file.canWrite()) {
+                throw new KeyResourceLocationException(String.format("File '%s' must be writable", target));
+            }
+        }
+        if (!fileExists) {
+
+            File parentDirectory = file.getParentFile();
+            if (!parentDirectory.exists()) {
+                if (!parentDirectory.mkdirs()) {
+                    throw new AtbashUnexpectedException(String.format("Directory %s could not be created", parentDirectory.getAbsolutePath()));
+                }
+            }
+        } else {
+            if (!file.canRead() || !file.canWrite()) {
+                throw new KeyResourceLocationException(String.format("File '%s' must be readable and writable", target));
+            }
+
+        }
+
+    }
+
+    private void checkKeyPassword(AtbashKey atbashKey, char[] keyPasssword) {
+        if (atbashKey.getSecretKeyType().isAsymmetric() && atbashKey.getSecretKeyType().getAsymmetricPart() == AsymmetricPart.PRIVATE) {
+            if (StringUtils.isEmpty(keyPasssword)) {
+                throw new PasswordRequiredException("A passphrase is required in order to save the key info");
+            }
+        }
+    }
+
+    private void checkDependencies() {
+        // for the JAVA SE Case
+        if (keyWriterFactory == null) {
+            keyWriterFactory = new KeyWriterFactory();
+            keyWriterFactory.init();
+            jwtSupportConfiguration = JwtSupportConfiguration.getInstance();
+        }
+    }
+
+}
