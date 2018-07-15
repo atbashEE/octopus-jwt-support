@@ -20,7 +20,7 @@ import be.atbash.util.exception.AtbashException;
 /**
  *
  */
-
+// FIXME We have also PasswordRequiredException
 public class MissingPasswordException extends AtbashException {
 
     public MissingPasswordException(ObjectType objectType) {

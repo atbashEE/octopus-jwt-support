@@ -21,6 +21,7 @@ import be.atbash.util.exception.AtbashException;
  *
  */
 // FIXME Is this Exception also required for reading the keys.
+    // MissingPasswordException
 public class PasswordRequiredException extends AtbashException {
 
     public PasswordRequiredException(String message) {

@@ -1,0 +1,1 @@
+Not a real key, just to test the mapping from extension to key type

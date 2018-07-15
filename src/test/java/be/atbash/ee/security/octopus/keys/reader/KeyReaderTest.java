@@ -308,4 +308,10 @@ public class KeyReaderTest {
         assertThat(publicKey).isTrue();
 
     }
+
+    @Test(expected = UnknownKeyResourceTypeException.class)
+    public void readKeyResource_scenario13() {
+        // unknown key type from path
+        keyReader.readKeyResource(ResourceUtils.CLASSPATH_PREFIX + "key.txt", null);
+    }
 }
