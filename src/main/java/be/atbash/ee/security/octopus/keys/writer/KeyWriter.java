@@ -16,6 +16,7 @@
 package be.atbash.ee.security.octopus.keys.writer;
 
 import be.atbash.config.util.ResourceUtils;
+import be.atbash.ee.security.octopus.MissingPasswordException;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.config.JwtSupportConfiguration;
 import be.atbash.ee.security.octopus.keys.config.PemKeyEncryption;
@@ -37,6 +38,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.text.ParseException;
 import java.util.Scanner;
+
+import static be.atbash.ee.security.octopus.MissingPasswordException.ObjectType.STORE;
 
 /**
  *
@@ -197,7 +200,9 @@ public class KeyWriter {
 
     private byte[] writeKeyAsKeyStore(AtbashKey atbashKey, char[] keyPassword, char[] filePassword, KeyStore keyStore) throws IOException {
         checkKeyPassword(atbashKey, keyPassword);
-        // FIXME check FilePassword
+        if (StringUtils.isEmpty(filePassword)) {
+            throw new MissingPasswordException(STORE, "A password for the keystore is required in order to save the key info");
+        }
 
         KeyEncoderParameters parameters = new KeyEncoderParameters(keyPassword, filePassword, keyStore);
 
@@ -250,7 +255,7 @@ public class KeyWriter {
     private void checkKeyPassword(AtbashKey atbashKey, char[] keyPasssword) {
         if (atbashKey.getSecretKeyType().isAsymmetric() && atbashKey.getSecretKeyType().getAsymmetricPart() == AsymmetricPart.PRIVATE) {
             if (StringUtils.isEmpty(keyPasssword)) {
-                throw new PasswordRequiredException("A passphrase is required in order to save the key info");
+                throw new MissingPasswordException(STORE, "A passphrase is required in order to save the key info");
             }
         }
     }

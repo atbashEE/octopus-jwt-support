@@ -16,6 +16,7 @@
 package be.atbash.ee.security.octopus.keys.writer;
 
 import be.atbash.config.util.ResourceUtils;
+import be.atbash.ee.security.octopus.MissingPasswordException;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.TestPasswordLookup;
 import be.atbash.ee.security.octopus.keys.config.JwtSupportConfiguration;
@@ -170,6 +171,28 @@ public class KeyWriterTest {
         FileOutputStream outputStream = new FileOutputStream("./scenario7.jks");
         outputStream.write(bytes);
         outputStream.close();
+
+    }
+
+    @Test(expected = MissingPasswordException.class)
+    public void writeKeyResource_scenario7_missingKeyPassword() {
+        // scenario 7 RSA private key as KeyStore
+        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtils.CLASSPATH_PREFIX + "rsa.jwk", null);
+
+        AtbashKey privateKey = filterKeys(keys, AsymmetricPart.PRIVATE);
+
+        keyWriter.writeKeyResource(privateKey, KeyResourceType.KEYSTORE, null, "atbash".toCharArray());
+
+    }
+
+    @Test(expected = MissingPasswordException.class)
+    public void writeKeyResource_scenario7_missingFilePassword() {
+        // scenario 7 RSA private key as KeyStore
+        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtils.CLASSPATH_PREFIX + "rsa.jwk", null);
+
+        AtbashKey privateKey = filterKeys(keys, AsymmetricPart.PRIVATE);
+
+        keyWriter.writeKeyResource(privateKey, KeyResourceType.KEYSTORE,  "atbash".toCharArray(), null);
 
     }
 
