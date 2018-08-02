@@ -13,7 +13,13 @@ User manual for Atbash configuration.
 
 . Support for reading and writing multiple formats (PEM, KeyStore, JWK and JWKSet)
 . Concept of KeySelector and KeyManager (with SPI)
+. Generating Cryptographic keys.
 . Key for HMAC uses now standards (SecretKey and OCT JWK)
+
+Breaking changes (although 0.5.0 was an alfa release and thus changes are expected)
+
+. HMacSecret removed, use now _HmacSecretUtil.generateSecretKey()_.
+
 
 === 0.5.0
 
@@ -43,15 +49,15 @@ Convert the Object _data_ to JSON and Base64 encoded format.
 ----
 
 
-Use the Object _data_ as JWT payload, signed with a HMAC (Warning HMAC support will be changed in next release)
+Use the Object _data_ as JWT payload, signed with a HMAC
 
 ----
     @Inject
     private JWTEncoder jwtEncoder;
 
     JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS)
-                .withHeader("Octopus Offline", "v0.2")
-                .withSecretKeyForSigning(new HMACSecret(localSecret, LOCAL_SECRET_KEY_ID, true))
+                .withHeader("Octopus Offline", "v0.4")
+                .withSecretKeyForSigning(HmacSecretUtil.generateSecretKey(LOCAL_SECRET_KEY_ID, localSecret))
                 .build();
 
     String encoded = encoder.encode(data, parameters);
@@ -77,7 +83,7 @@ The following example converts a signed JWT.
     private JWTDecoder jwtDecoder;
 
     @Inject
-    private JWKManagerKeySelector keySelector;
+    private KeySelector keySelector;
 
     @Inject
     private MPBearerTokenVerifier verifier;
@@ -86,8 +92,7 @@ The following example converts a signed JWT.
     MPJWTToken token = data.getData();
 ----
 
-JWKManagerKeySelector -> Selector of the key based on the id found in the header.
-In a next release, selector will work on multiple sources (JWK, PEM files and Java Key Stores)
+KeySelector -> Selector of the key based on the id found in the header using a default (but can be configured) keyManager which looks for all keys defined based on some location (see _keys.location_ and _key.manager.class_ configuration parameters)
 
 MPBearerTokenVerifier -> Optional verifier for validating the JWT.
 
