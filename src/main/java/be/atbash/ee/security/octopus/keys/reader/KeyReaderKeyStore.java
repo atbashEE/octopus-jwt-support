@@ -43,7 +43,7 @@ public class KeyReaderKeyStore {
     public List<AtbashKey> readResource(String path, KeyResourcePasswordLookup passwordLookup) {
         List<AtbashKey> result = new ArrayList<>();
 
-        KeyStore keyStore = null;
+        KeyStore keyStore;
         try {
             keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
         } catch (KeyStoreException e) {

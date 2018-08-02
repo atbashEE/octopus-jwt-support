@@ -44,7 +44,7 @@ public class JwtSupportConfiguration extends AbstractConfiguration implements Mo
     /**
      * The return value can also be a directory where multiple files are located (and retrieved).
      *
-     * @return
+     * @return Location, file or directory where the keys are located.
      */
     @ConfigEntry
     public String getKeysLocation() {

@@ -57,7 +57,6 @@ public class KeyReader {
         if (keyResourceType == null) {
             throw new UnknownKeyResourceTypeException(path);
         }
-        // FIXME keyResourceType == null -> Exception.
         switch (keyResourceType) {
 
             case JWK:

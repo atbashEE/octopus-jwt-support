@@ -144,7 +144,7 @@ public class KeyWriter {
         outputStream.close();
     }
 
-    public byte[] writeKeyResource(AtbashKey atbashKey, KeyResourceType keyResourceType, char[] keyPasssword, char[] filePassword) {
+    public byte[] writeKeyResource(AtbashKey atbashKey, KeyResourceType keyResourceType, char[] keyPassword, char[] filePassword) {
         checkDependencies();
         byte[] result;
         try {
@@ -152,19 +152,19 @@ public class KeyWriter {
 
                 case JWK:
                     // FIXME support for encrypted JWK of Atbash (see JWKEncryptedCreator)
-                    result = writeKeyAsJWK(atbashKey, keyPasssword);
+                    result = writeKeyAsJWK(atbashKey, keyPassword);
                     break;
                 case JWKSET:
                     result = writeKeyAsJWKSet(atbashKey, new JWKSet());
                     break;
                 case PEM:
-                    result = writeKeyAsPEM(atbashKey, keyPasssword);
+                    result = writeKeyAsPEM(atbashKey, keyPassword);
                     break;
                 case KEYSTORE:
                     KeyStore keyStore = KeyStore.getInstance("JKS");
                     keyStore.load(null, null);
 
-                    result = writeKeyAsKeyStore(atbashKey, keyPasssword, filePassword, keyStore);
+                    result = writeKeyAsKeyStore(atbashKey, keyPassword, filePassword, keyStore);
                     break;
                 default:
                     throw new IllegalArgumentException(String.format("Unsupported value for KeyResourceType : %s", keyResourceType));
