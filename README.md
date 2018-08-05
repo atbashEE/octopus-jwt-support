@@ -1,4 +1,5 @@
 [![License](https://img.shields.io/:license-Apache2-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/be.atbash.json/octopus-jwt-support/badge.svg)](https://maven-badges.herokuapp.com/maven-central/be.atbash.json/octopus-jwt-support)
 
 # octopus-jwt-support
 Wrap Java Objects as JWT and Sign or encrypt. Also support JWT tokens.
