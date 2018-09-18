@@ -37,9 +37,11 @@ public class FakeKeyManager implements KeyManager {
     }
 
     @Override
-    public List<AtbashKey> retrieveKeys(List<KeyFilter> filters) {
+    public List<AtbashKey> retrieveKeys(SelectorCriteria selectorCriteria) {
+        List<KeyFilter> filters = selectorCriteria.asKeyFilters();
         keyFilters.addAll(filters);
         return keys;
     }
+
 
 }

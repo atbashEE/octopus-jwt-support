@@ -26,7 +26,7 @@ import be.atbash.ee.security.octopus.keys.reader.KeyResourceType;
 import be.atbash.ee.security.octopus.keys.reader.KeyResourceTypeProvider;
 import be.atbash.ee.security.octopus.keys.reader.password.ConfigKeyResourcePasswordLookup;
 import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup;
-import be.atbash.ee.security.octopus.keys.selector.filter.KeyFilter;
+import be.atbash.ee.security.octopus.keys.selector.SelectorCriteria;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -192,7 +192,7 @@ public class JwtSupportConfigurationTest {
     public static class TestKeyManager implements KeyManager {
 
         @Override
-        public List<AtbashKey> retrieveKeys(List<KeyFilter> filters) {
+        public List<AtbashKey> retrieveKeys(SelectorCriteria selectorCriteria) {
             return null;
         }
     }

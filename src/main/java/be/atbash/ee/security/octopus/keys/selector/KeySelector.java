@@ -64,21 +64,7 @@ public class KeySelector {
     public AtbashKey selectAtbashKey(SelectorCriteria selectorCriteria) {
         retrieveKeyManager();
 
-        List<KeyFilter> filters = new ArrayList<>();
-        if (StringUtils.hasText(selectorCriteria.getId())) {
-            filters.add(new IdKeyFilter(selectorCriteria.getId()));
-        }
-        if (selectorCriteria.getSecretKeyType() != null) {
-            filters.add(new SecretKeyTypeKeyFilter(selectorCriteria.getSecretKeyType()));
-        }
-        if (selectorCriteria.getKeyType() != null) {
-            filters.add(new KeyTypeKeyFilter(selectorCriteria.getKeyType()));
-        }
-        if (selectorCriteria.getAsymmetricPart() != null) {
-            filters.add(new AsymmetricPartKeyFilter(selectorCriteria.getAsymmetricPart()));
-        }
-
-        List<AtbashKey> keys = keyManager.retrieveKeys(filters);
+        List<AtbashKey> keys = keyManager.retrieveKeys(selectorCriteria);
 
         if (keys.isEmpty()) {
             LOGGER.warn("(OCT-KEY-010) No key found for criteria"); // FIXME log selectorCriteria

@@ -15,7 +15,12 @@
  */
 package be.atbash.ee.security.octopus.keys.selector;
 
+import be.atbash.ee.security.octopus.keys.selector.filter.*;
+import be.atbash.util.StringUtils;
 import com.nimbusds.jose.jwk.KeyType;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -45,6 +50,23 @@ public class SelectorCriteria {
 
     public AsymmetricPart getAsymmetricPart() {
         return asymmetricPart;
+    }
+
+    public List<KeyFilter> asKeyFilters() {
+        List<KeyFilter> result = new ArrayList<>();
+        if (StringUtils.hasText(id)) {
+            result.add(new IdKeyFilter(id));
+        }
+        if (secretKeyType != null) {
+            result.add(new SecretKeyTypeKeyFilter(secretKeyType));
+        }
+        if (keyType != null) {
+            result.add(new KeyTypeKeyFilter(keyType));
+        }
+        if (asymmetricPart != null) {
+            result.add(new AsymmetricPartKeyFilter(asymmetricPart));
+        }
+        return result;
     }
 
     public static Builder newBuilder() {

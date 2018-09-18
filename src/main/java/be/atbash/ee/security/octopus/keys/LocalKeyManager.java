@@ -20,7 +20,9 @@ import be.atbash.ee.security.octopus.keys.config.JwtSupportConfiguration;
 import be.atbash.ee.security.octopus.keys.reader.KeyFilesHelper;
 import be.atbash.ee.security.octopus.keys.reader.KeyReader;
 import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup;
-import be.atbash.ee.security.octopus.keys.selector.filter.KeyFilter;
+import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
+import be.atbash.ee.security.octopus.keys.selector.SelectorCriteria;
+import be.atbash.ee.security.octopus.keys.selector.filter.*;
 import be.atbash.util.StringUtils;
 import be.atbash.util.exception.AtbashIllegalActionException;
 
@@ -50,10 +52,14 @@ public class LocalKeyManager implements KeyManager {
 
     private List<AtbashKey> keys;
 
-    public List<AtbashKey> retrieveKeys(List<KeyFilter> filters) {
-        if (filters == null) {
-            throw new AtbashIllegalActionException("Parameter filters can't be null");
+    @Override
+    public List<AtbashKey> retrieveKeys(SelectorCriteria selectorCriteria) {
+        if (selectorCriteria == null) {
+            throw new AtbashIllegalActionException("Parameter selectorCriteria can't be null");
         }
+
+        List<KeyFilter> filters = selectorCriteria.asKeyFilters();
+
         checkKeyLoading();
 
         List<AtbashKey> result = new ArrayList<>(keys);
@@ -62,6 +68,7 @@ public class LocalKeyManager implements KeyManager {
         }
 
         return result;
+
     }
 
     private void checkKeyLoading() {

@@ -23,9 +23,7 @@ import be.atbash.ee.security.octopus.keys.reader.KeyFilesHelper;
 import be.atbash.ee.security.octopus.keys.reader.KeyReader;
 import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
-import be.atbash.ee.security.octopus.keys.selector.filter.AsymmetricPartKeyFilter;
-import be.atbash.ee.security.octopus.keys.selector.filter.IdKeyFilter;
-import be.atbash.ee.security.octopus.keys.selector.filter.KeyFilter;
+import be.atbash.ee.security.octopus.keys.selector.SelectorCriteria;
 import be.atbash.util.exception.AtbashIllegalActionException;
 import com.nimbusds.jose.jwk.KeyUse;
 import org.junit.Test;
@@ -66,7 +64,7 @@ public class LocalKeyManagerTest {
     @Test(expected = ConfigurationException.class)
     public void testKeyLocations() {
         when(configurationMock.getKeysLocation()).thenReturn("");
-        localKeyManager.retrieveKeys(new ArrayList<KeyFilter>());
+        localKeyManager.retrieveKeys(SelectorCriteria.newBuilder().build());
     }
 
     @Test
@@ -81,10 +79,9 @@ public class LocalKeyManagerTest {
         when(keyReaderMock.readKeyResource("key1", keyResourcePasswordLookupMock)).thenReturn(Collections.singletonList(new AtbashKey("kid2", new ArrayList<KeyUse>(), new FakeRSAPrivate())));
         when(keyReaderMock.readKeyResource("key2", keyResourcePasswordLookupMock)).thenReturn(Collections.singletonList(new AtbashKey("kid1", new ArrayList<KeyUse>(), new FakeRSAPublic())));
 
-        List<KeyFilter> filters = new ArrayList<>();
-        filters.add(new IdKeyFilter("kid1"));
-
-        List<AtbashKey> filteredKeys = localKeyManager.retrieveKeys(filters);
+        SelectorCriteria.Builder builder = SelectorCriteria.newBuilder();
+        builder.withId("kid1");
+        List<AtbashKey> filteredKeys = localKeyManager.retrieveKeys(builder.build());
         assertThat(filteredKeys).hasSize(1);
 
         assertThat(filteredKeys.get(0).getSecretKeyType().getAsymmetricPart()).isEqualTo(AsymmetricPart.PUBLIC);
@@ -102,11 +99,11 @@ public class LocalKeyManagerTest {
         when(keyReaderMock.readKeyResource("key1", keyResourcePasswordLookupMock)).thenReturn(Collections.singletonList(new AtbashKey("kid1", new ArrayList<KeyUse>(), new FakeRSAPrivate())));
         when(keyReaderMock.readKeyResource("key2", keyResourcePasswordLookupMock)).thenReturn(Collections.singletonList(new AtbashKey("kid1", new ArrayList<KeyUse>(), new FakeRSAPublic())));
 
-        List<KeyFilter> filters = new ArrayList<>();
-        filters.add(new IdKeyFilter("kid1"));
-        filters.add(new AsymmetricPartKeyFilter(AsymmetricPart.PUBLIC));
+        SelectorCriteria.Builder builder = SelectorCriteria.newBuilder();
+        builder.withId("kid1");
+        builder.withAsymmetricPart(AsymmetricPart.PUBLIC);
 
-        List<AtbashKey> filteredKeys = localKeyManager.retrieveKeys(filters);
+        List<AtbashKey> filteredKeys = localKeyManager.retrieveKeys(builder.build());
         assertThat(filteredKeys).hasSize(1);
 
         assertThat(filteredKeys.get(0).getSecretKeyType().getAsymmetricPart()).isEqualTo(AsymmetricPart.PUBLIC);
@@ -124,19 +121,20 @@ public class LocalKeyManagerTest {
         when(keyReaderMock.readKeyResource("key1", keyResourcePasswordLookupMock)).thenReturn(Collections.singletonList(new AtbashKey("kid2", new ArrayList<KeyUse>(), new FakeRSAPrivate())));
         when(keyReaderMock.readKeyResource("key2", keyResourcePasswordLookupMock)).thenReturn(Collections.singletonList(new AtbashKey("kid1", new ArrayList<KeyUse>(), new FakeRSAPublic())));
 
-        List<KeyFilter> filters = new ArrayList<>();
-        filters.add(new IdKeyFilter("kid1"));
+        SelectorCriteria.Builder builder = SelectorCriteria.newBuilder();
+        builder.withId("kid1");
 
-        List<AtbashKey> filteredKeys = localKeyManager.retrieveKeys(filters);
+        List<AtbashKey> filteredKeys = localKeyManager.retrieveKeys(builder.build());
+
         assertThat(filteredKeys).hasSize(1);
 
         assertThat(filteredKeys.get(0).getSecretKeyType().getAsymmetricPart()).isEqualTo(AsymmetricPart.PUBLIC);
 
         // Now see if localKeyManager still has the list of all keys and that we can filter it on something else
-        filters.clear();
-        filters.add(new AsymmetricPartKeyFilter(AsymmetricPart.PRIVATE));
+        builder = SelectorCriteria.newBuilder();
+        builder.withAsymmetricPart(AsymmetricPart.PRIVATE);
 
-        filteredKeys = localKeyManager.retrieveKeys(filters);
+        filteredKeys = localKeyManager.retrieveKeys(builder.build());
         assertThat(filteredKeys).hasSize(1);
 
         assertThat(filteredKeys.get(0).getSecretKeyType().getAsymmetricPart()).isEqualTo(AsymmetricPart.PRIVATE);
