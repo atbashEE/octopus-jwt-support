@@ -43,15 +43,12 @@ public final class JWTParametersBuilder {
 
     private JWTParametersBuilder(JWTEncoding encoding) {
         this.encoding = encoding;
+        headerValues = new HashMap<>();
     }
 
     public JWTParametersBuilder withHeader(String key, String value) {
         if (encoding == JWTEncoding.NONE) {
             logger.warn("Header values are not supported with JWTEncoding.NONE");
-        }
-        if (headerValues == null) {
-            headerValues = new HashMap<>();
-
         }
         headerValues.put(key, value);
         return this;

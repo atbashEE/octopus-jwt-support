@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2017-2018 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,26 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.ee.security.octopus.jwt.decoder
+package be.atbash.ee.security.octopus.jwt.decoder;
 
-import spock.lang.Specification
+import org.junit.Test;
 
-/**
- *
- */
+import java.util.HashMap;
+import java.util.Map;
 
-class JWTDecoderTest extends Specification {
-    def "Decode"() {
+import static org.assertj.core.api.Assertions.assertThat;
 
-        given :
-        String data = "{\"pets\":\"dog,cat\",\"dateValue\":\"2017-11-15\",\"valueForClass\":\"Atbash\"}"
+public class JWTDecoderTest {
 
-        when :
-        JWTDecoder decoder = new JWTDecoder()
-        Map<String, String> result = decoder.decode(data, HashMap.class)
+    private JWTDecoder decoder = new JWTDecoder();
 
-        then :
-        assert result.size() == 3
-        assert result.keySet() as List == ["pets", "dateValue", "valueForClass"]
+    @Test
+    public void decode() {
+
+        String data = "{\"pets\":\"dog,cat\",\"dateValue\":\"2017-11-15\",\"valueForClass\":\"Atbash\"}";
+
+        Map<String, String> result = decoder.decode(data, HashMap.class);
+
+
+        assertThat(result.keySet()).containsExactly("pets", "dateValue", "valueForClass");
     }
+
+
 }
