@@ -15,9 +15,9 @@
  */
 package be.atbash.ee.security.octopus.keys.reader;
 
-import be.atbash.config.util.ResourceUtils;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup;
+import be.atbash.util.resource.ResourceUtil;
 import org.bouncycastle.openssl.PKCS8Generator;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.bouncycastle.openssl.jcajce.JcaPKCS8Generator;
@@ -41,7 +41,7 @@ public class KeyReaderTester {
     public static void main(String[] args) throws IOException, OperatorCreationException {
 
         KeyReader keyReader = new KeyReader();
-        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtils.CLASSPATH_PREFIX + "rsa.pk.pem", new TestPasswordLookup("atbash".toCharArray()));
+        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.pk.pem", new TestPasswordLookup("atbash".toCharArray()));
         for (AtbashKey key : keys) {
             System.out.println("XXXXX");
             System.out.println("Key Id " + key.getKeyId());

@@ -15,10 +15,10 @@
  */
 package be.atbash.ee.security.octopus.keys.reader;
 
-import be.atbash.config.util.ResourceUtils;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup;
 import be.atbash.util.exception.AtbashUnexpectedException;
+import be.atbash.util.resource.ResourceUtil;
 import com.nimbusds.jose.jwk.KeyUse;
 
 import java.io.IOException;
@@ -49,7 +49,8 @@ public class KeyReaderKeyStore {
         } catch (KeyStoreException e) {
             throw new AtbashUnexpectedException(e);
         }
-        try (InputStream inputStream = ResourceUtils.getInputStream(path)) {
+        // FIXME .getStream can return null ....
+        try (InputStream inputStream = ResourceUtil.getInstance().getStream(path)) {
             keyStore.load(inputStream, passwordLookup.getResourcePassword(path));
 
             for (Enumeration<String> keyAliases = keyStore.aliases(); keyAliases.hasMoreElements(); ) {

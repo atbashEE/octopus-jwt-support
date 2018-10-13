@@ -15,12 +15,12 @@
  */
 package be.atbash.ee.security.octopus.keys.reader;
 
-import be.atbash.config.util.ResourceUtils;
 import be.atbash.ee.security.octopus.MissingPasswordException;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup;
 import be.atbash.util.StringUtils;
 import be.atbash.util.exception.AtbashUnexpectedException;
+import be.atbash.util.resource.ResourceUtil;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -54,7 +54,8 @@ public class KeyReaderPEM {
         try {
             Security.addProvider(new BouncyCastleProvider());
 
-            InputStream inputStream = ResourceUtils.getInputStream(path);
+            // FIXME Should we first use .resourceExists ?
+            InputStream inputStream = ResourceUtil.getInstance().getStream(path);
             if (inputStream == null) {
                 throw new KeyResourceNotFoundException(path);
             }

@@ -15,10 +15,10 @@
  */
 package be.atbash.ee.security.octopus.keys;
 
-import be.atbash.config.util.ResourceUtils;
 import be.atbash.ee.security.octopus.keys.selector.SecretKeyType;
 import be.atbash.util.CollectionUtils;
 import be.atbash.util.exception.AtbashUnexpectedException;
+import be.atbash.util.resource.ResourceUtil;
 import com.nimbusds.jose.jwk.KeyUse;
 
 import java.security.Key;
@@ -68,12 +68,12 @@ public class AtbashKey {
             throw new AtbashUnexpectedException("Parameter cannot be null");
         }
         String result = value;
-        if (value.startsWith(ResourceUtils.CLASSPATH_PREFIX)) {
+        if (value.startsWith(ResourceUtil.CLASSPATH_PREFIX)) {
             int prefixStart = result.lastIndexOf('.');
             if (prefixStart != -1) {
                 result = result.substring(0, prefixStart);
             }
-            result = result.substring(ResourceUtils.CLASSPATH_PREFIX.length());
+            result = result.substring(ResourceUtil.CLASSPATH_PREFIX.length());
         }
         // FIXME Other prefixes.
         return result;

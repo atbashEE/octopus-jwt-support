@@ -15,7 +15,6 @@
  */
 package be.atbash.ee.security.octopus.keys.writer;
 
-import be.atbash.config.util.ResourceUtils;
 import be.atbash.ee.security.octopus.MissingPasswordException;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.TestPasswordLookup;
@@ -27,6 +26,7 @@ import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.json.JSONObject;
 import be.atbash.json.JSONValue;
 import be.atbash.util.TestReflectionUtils;
+import be.atbash.util.resource.ResourceUtil;
 import com.nimbusds.jose.jwk.JWKSet;
 import org.junit.Before;
 import org.junit.Test;
@@ -73,7 +73,7 @@ public class KeyWriterTest {
         when(jwtSupportConfigurationMock.getPKCS1EncryptionAlgorithm()).thenReturn("DES-EDE3-CBC");
 
         // scenario 1 RSA PKCS#1 format
-        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtils.CLASSPATH_PREFIX + "rsa.pk.pem", new TestPasswordLookup(PASSWORD));
+        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.pk.pem", new TestPasswordLookup(PASSWORD));
 
         AtbashKey privateKey = filterKeys(keys, AsymmetricPart.PRIVATE);
 
@@ -91,7 +91,7 @@ public class KeyWriterTest {
     @Test
     public void writeKeyResource_scenario2() throws IOException {
         // scenario 2 RSA Pub format
-        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtils.CLASSPATH_PREFIX + "rsa.pk.pem", new TestPasswordLookup(PASSWORD));
+        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.pk.pem", new TestPasswordLookup(PASSWORD));
 
         AtbashKey privateKey = filterKeys(keys, AsymmetricPart.PUBLIC);
 
@@ -109,7 +109,7 @@ public class KeyWriterTest {
         // scenario 3 RSA PKCS#8 format
         when(jwtSupportConfigurationMock.getPemKeyEncryption()).thenReturn(PemKeyEncryption.PKCS8);
 
-        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtils.CLASSPATH_PREFIX + "rsa.pk.pem", new TestPasswordLookup(PASSWORD));
+        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.pk.pem", new TestPasswordLookup(PASSWORD));
 
         AtbashKey privateKey = filterKeys(keys, AsymmetricPart.PRIVATE);
 
@@ -126,7 +126,7 @@ public class KeyWriterTest {
         // scenario 4 RSA not encrypted format
         when(jwtSupportConfigurationMock.getPemKeyEncryption()).thenReturn(PemKeyEncryption.NONE);
 
-        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtils.CLASSPATH_PREFIX + "rsa.pk.pem", new TestPasswordLookup(PASSWORD));
+        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.pk.pem", new TestPasswordLookup(PASSWORD));
 
         AtbashKey privateKey = filterKeys(keys, AsymmetricPart.PRIVATE);
 
@@ -142,7 +142,7 @@ public class KeyWriterTest {
     @Test
     public void writeKeyResource_scenario5() throws IOException {
         // scenario 5 RSA private key as JWK
-        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtils.CLASSPATH_PREFIX + "rsa.jwk", null);
+        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.jwk", null);
 
         AtbashKey privateKey = filterKeys(keys, AsymmetricPart.PRIVATE);
 
@@ -162,7 +162,7 @@ public class KeyWriterTest {
     @Test
     public void writeKeyResource_scenario7() throws IOException {
         // scenario 7 RSA private key as KeyStore
-        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtils.CLASSPATH_PREFIX + "rsa.jwk", null);
+        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.jwk", null);
 
         AtbashKey privateKey = filterKeys(keys, AsymmetricPart.PRIVATE);
 
@@ -177,7 +177,7 @@ public class KeyWriterTest {
     @Test(expected = MissingPasswordException.class)
     public void writeKeyResource_scenario7_missingKeyPassword() {
         // scenario 7 RSA private key as KeyStore
-        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtils.CLASSPATH_PREFIX + "rsa.jwk", null);
+        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.jwk", null);
 
         AtbashKey privateKey = filterKeys(keys, AsymmetricPart.PRIVATE);
 
@@ -188,7 +188,7 @@ public class KeyWriterTest {
     @Test(expected = MissingPasswordException.class)
     public void writeKeyResource_scenario7_missingFilePassword() {
         // scenario 7 RSA private key as KeyStore
-        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtils.CLASSPATH_PREFIX + "rsa.jwk", null);
+        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.jwk", null);
 
         AtbashKey privateKey = filterKeys(keys, AsymmetricPart.PRIVATE);
 
@@ -199,7 +199,7 @@ public class KeyWriterTest {
     @Test
     public void writeKeyResource_scenario9() throws IOException, ParseException {
         // scenario 9 RSA private key as JWKSet
-        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtils.CLASSPATH_PREFIX + "rsa.jwk", null);
+        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.jwk", null);
 
         AtbashKey privateKey = filterKeys(keys, AsymmetricPart.PRIVATE);
 

@@ -15,10 +15,10 @@
  */
 package be.atbash.ee.security.octopus.keys.reader;
 
-import be.atbash.config.util.ResourceUtils;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.TestPasswordLookup;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
+import be.atbash.util.resource.ResourceUtil;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -44,7 +44,7 @@ public class KeyReaderTest {
     public void readKeyResource_scenario1() {
         // RSA PKCS#1 format
 
-        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtils.CLASSPATH_PREFIX + "rsa.pk.pem", new TestPasswordLookup("atbash".toCharArray()));
+        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.pk.pem", new TestPasswordLookup("atbash".toCharArray()));
         assertThat(keys).hasSize(2);
 
         boolean privateKey = false;
@@ -72,7 +72,7 @@ public class KeyReaderTest {
     @Test
     public void readKeyResource_scenario2() {
         // RSA public key
-        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtils.CLASSPATH_PREFIX + "rsa.pub.pem", null);
+        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.pub.pem", null);
 
         assertThat(keys).hasSize(1);
         assertThat(keys.get(0).getKeyId()).isEqualTo("rsa.pub");  // filename without extension
@@ -86,7 +86,7 @@ public class KeyReaderTest {
     public void readKeyResource_scenario3() {
         // RSA  PKCS#8 format
 
-        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtils.CLASSPATH_PREFIX + "rsa.pkcs8.pem", new TestPasswordLookup("atbash8".toCharArray()));
+        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.pkcs8.pem", new TestPasswordLookup("atbash8".toCharArray()));
 
         assertThat(keys).hasSize(1);
         assertThat(keys.get(0).getKeyId()).isEqualTo("authentication.pkcs8");  // filename without extension
@@ -98,7 +98,7 @@ public class KeyReaderTest {
     public void readKeyResource_scenario4() {
         // EC PKCS#1 format
 
-        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtils.CLASSPATH_PREFIX + "secp256r1-key-aes.pem", new TestPasswordLookup("atbash".toCharArray()));
+        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "secp256r1-key-aes.pem", new TestPasswordLookup("atbash".toCharArray()));
         assertThat(keys).hasSize(2);
 
         boolean privateKey = false;
@@ -126,7 +126,7 @@ public class KeyReaderTest {
     @Test
     public void readKeyResource_scenario5() {
         // EC public key
-        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtils.CLASSPATH_PREFIX + "ecpubkey.pem", null);
+        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "ecpubkey.pem", null);
 
         assertThat(keys).hasSize(1);
         assertThat(keys.get(0).getKeyId()).isEqualTo("ecpubkey");  // filename without extension
@@ -137,7 +137,7 @@ public class KeyReaderTest {
     public void readKeyResource_scenario6() {
         // EC  PKCS#8 format
 
-        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtils.CLASSPATH_PREFIX + "ec.pkcs8.pem", new TestPasswordLookup("atbash8".toCharArray()));
+        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "ec.pkcs8.pem", new TestPasswordLookup("atbash8".toCharArray()));
 
         assertThat(keys).hasSize(1);
         assertThat(keys.get(0).getKeyId()).isEqualTo("ec.pkcs8");  // filename without extension
@@ -149,7 +149,7 @@ public class KeyReaderTest {
     public void readKeyResource_scenario7() {
         // RSA JWK
 
-        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtils.CLASSPATH_PREFIX + "rsa.jwk", null);
+        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.jwk", null);
         assertThat(keys).hasSize(2);
 
         boolean privateKey = false;
@@ -178,7 +178,7 @@ public class KeyReaderTest {
     public void readKeyResource_scenario8() {
         // EC JWK
 
-        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtils.CLASSPATH_PREFIX + "ec.jwk", null);
+        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "ec.jwk", null);
         assertThat(keys).hasSize(2);
 
         boolean privateKey = false;
@@ -207,7 +207,7 @@ public class KeyReaderTest {
     public void readKeyResource_scenario9() {
         // RSA JWK encrypted
 
-        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtils.CLASSPATH_PREFIX + "rsa.jwke", new TestPasswordLookup(null, "atbash".toCharArray()));
+        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.jwke", new TestPasswordLookup(null, "atbash".toCharArray()));
         assertThat(keys).hasSize(2);
 
         boolean privateKey = false;
@@ -236,7 +236,7 @@ public class KeyReaderTest {
     public void readKeyResource_scenario10() {
         // RSA JWK encrypted
 
-        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtils.CLASSPATH_PREFIX + "ec.jwke", new TestPasswordLookup(null, "atbash".toCharArray()));
+        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "ec.jwke", new TestPasswordLookup(null, "atbash".toCharArray()));
         assertThat(keys).hasSize(2);
 
         boolean privateKey = false;
@@ -265,7 +265,7 @@ public class KeyReaderTest {
     public void readKeyResource_scenario11() {
         // JWKSet (RSA + EC)
 
-        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtils.CLASSPATH_PREFIX + "test.jwkset", new TestPasswordLookup(null, "atbash".toCharArray()));
+        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "test.jwkset", new TestPasswordLookup(null, "atbash".toCharArray()));
         assertThat(keys).hasSize(4);
 
         Set<String> data = new HashSet<>();
@@ -284,7 +284,7 @@ public class KeyReaderTest {
     public void readKeyResource_scenario12() {
         // JKS
 
-        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtils.CLASSPATH_PREFIX + "keystore.jks", new TestPasswordLookup("atbash".toCharArray(), "atbash_key".toCharArray()));
+        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "keystore.jks", new TestPasswordLookup("atbash".toCharArray(), "atbash_key".toCharArray()));
         assertThat(keys).hasSize(2);
 
         boolean privateKey = false;
@@ -312,6 +312,6 @@ public class KeyReaderTest {
     @Test(expected = UnknownKeyResourceTypeException.class)
     public void readKeyResource_scenario13() {
         // unknown key type from path
-        keyReader.readKeyResource(ResourceUtils.CLASSPATH_PREFIX + "key.txt", null);
+        keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "key.txt", null);
     }
 }

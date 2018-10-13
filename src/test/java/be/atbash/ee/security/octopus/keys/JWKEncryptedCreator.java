@@ -15,9 +15,9 @@
  */
 package be.atbash.ee.security.octopus.keys;
 
-import be.atbash.config.util.ResourceUtils;
 import be.atbash.ee.security.octopus.jwk.EncryptedJSONJWK;
 import be.atbash.ee.security.octopus.keys.reader.KeyReader;
+import be.atbash.util.resource.ResourceUtil;
 import com.nimbusds.jose.jwk.JWK;
 
 import java.util.List;
@@ -30,7 +30,7 @@ public class JWKEncryptedCreator {
 
     public static void main(String[] args) {
         KeyReader keyReader = new KeyReader();
-        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtils.CLASSPATH_PREFIX + "secp256r1-key.pem", null);
+        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "secp256r1-key.pem", null);
 
         JWK jwk = JWKCreator.createJWK(keys);
         System.out.println(EncryptedJSONJWK.encryptedOutput(jwk, "atbash".toCharArray()));

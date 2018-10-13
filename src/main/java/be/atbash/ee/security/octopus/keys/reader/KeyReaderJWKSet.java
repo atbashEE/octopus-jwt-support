@@ -15,13 +15,13 @@
  */
 package be.atbash.ee.security.octopus.keys.reader;
 
-import be.atbash.config.util.ResourceUtils;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup;
 import be.atbash.json.JSONArray;
 import be.atbash.json.JSONObject;
 import be.atbash.json.JSONValue;
 import be.atbash.util.exception.AtbashUnexpectedException;
+import be.atbash.util.resource.ResourceUtil;
 import com.nimbusds.jose.JOSEException;
 
 import java.io.IOException;
@@ -37,9 +37,14 @@ public class KeyReaderJWKSet extends KeyReaderJWK {
         List<AtbashKey> result = new ArrayList<>();
         InputStream inputStream;
         //try {
-        inputStream = ResourceUtils.getInputStream(path);
-        if (inputStream == null) {
-            throw new KeyResourceNotFoundException(path);
+        try {
+            // FIXME Should we first use .resourceExists ?
+            inputStream = ResourceUtil.getInstance().getStream(path);
+            if (inputStream == null) {
+                throw new KeyResourceNotFoundException(path);
+            }
+        } catch (IOException e) {
+            throw new AtbashUnexpectedException(e);
         }
 
         String fileContent = new Scanner(inputStream).useDelimiter("\\Z").next();

@@ -15,7 +15,7 @@
  */
 package be.atbash.ee.security.octopus.keys;
 
-import be.atbash.config.util.ResourceUtils;
+import be.atbash.util.resource.ResourceUtil;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,7 +25,7 @@ public class AtbashKeyTest {
     @Test
     public void GetKeyId() {
 
-        AtbashKey key = new AtbashKey(ResourceUtils.CLASSPATH_PREFIX + "test.pem", null, null);
+        AtbashKey key = new AtbashKey(ResourceUtil.CLASSPATH_PREFIX + "test.pem", null, null);
 
         assertThat(key.getKeyId()).isEqualTo("test");
     }
@@ -33,7 +33,7 @@ public class AtbashKeyTest {
     @Test
     public void getKeyId_multiple_dot() {
 
-        AtbashKey key = new AtbashKey(ResourceUtils.CLASSPATH_PREFIX + "test.pub.pem", null, null);
+        AtbashKey key = new AtbashKey(ResourceUtil.CLASSPATH_PREFIX + "test.pub.pem", null, null);
 
         assertThat(key.getKeyId()).isEqualTo("test.pub");
     }
@@ -41,7 +41,7 @@ public class AtbashKeyTest {
     @Test
     public void getKeyId_no_extension() {
 
-        AtbashKey key = new AtbashKey(ResourceUtils.CLASSPATH_PREFIX + "test", null, null);
+        AtbashKey key = new AtbashKey(ResourceUtil.CLASSPATH_PREFIX + "test", null, null);
 
         assertThat(key.getKeyId()).isEqualTo("test");
 

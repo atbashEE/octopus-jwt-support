@@ -15,7 +15,6 @@
  */
 package be.atbash.ee.security.octopus.keys.writer;
 
-import be.atbash.config.util.ResourceUtils;
 import be.atbash.ee.security.octopus.MissingPasswordException;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.config.JwtSupportConfiguration;
@@ -24,6 +23,7 @@ import be.atbash.ee.security.octopus.keys.reader.KeyResourceType;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.util.StringUtils;
 import be.atbash.util.exception.AtbashUnexpectedException;
+import be.atbash.util.resource.ResourceUtil;
 import com.nimbusds.jose.jwk.JWKSet;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -52,6 +52,9 @@ public class KeyWriter {
 
     @Inject
     private KeyWriterFactory keyWriterFactory;
+
+    @Inject
+    private ResourceUtil resourceUtil;
 
     public void writeKeyResource(AtbashKey atbashKey, KeyResourceType keyResourceType, String target, char[] keyPasssword, char[] filePassword) {
         checkDependencies();
@@ -102,7 +105,12 @@ public class KeyWriter {
 
     private JWKSet loadExistingJWKSet(String target) {
         JWKSet result;
-        InputStream inputStream = ResourceUtils.getInputStream(target);
+        InputStream inputStream = null;
+        try {
+            inputStream = resourceUtil.getStream(target);
+        } catch (IOException e) {
+            throw new AtbashUnexpectedException(e);
+        }
         if (inputStream == null) {
             result = new JWKSet();
         } else {
@@ -127,7 +135,7 @@ public class KeyWriter {
     private KeyStore loadExistingKeyStore(String target, char[] filePassword) throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
         KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
 
-        InputStream inputStream = ResourceUtils.getInputStream(target);
+        InputStream inputStream = resourceUtil.getStream(target);
         if (inputStream != null) {
 
             keyStore.load(inputStream, filePassword);

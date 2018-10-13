@@ -15,9 +15,9 @@
  */
 package be.atbash.ee.security.octopus.keys.reader;
 
-import be.atbash.config.util.ResourceUtils;
 import be.atbash.ee.security.octopus.keys.config.JwtSupportConfiguration;
 import be.atbash.util.CDIUtils;
+import be.atbash.util.resource.ResourceUtil;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterators;
@@ -52,6 +52,9 @@ public class KeyFilesHelper {
     @Inject
     private JwtSupportConfiguration jwtSupportConfiguration;
 
+    @Inject
+    private ResourceUtil resourceUtil;
+
     private KeyResourceTypeProvider keyResourceTypeProvider;
 
     private AtbashResourceScanner scanner;
@@ -68,13 +71,13 @@ public class KeyFilesHelper {
     public List<String> determineKeyFiles(String keyConfigParameterValue) {
         checkDependencies();
         List<String> result = new ArrayList<>();
-        if (ResourceUtils.resourceExists(keyConfigParameterValue)) {
-            if (keyConfigParameterValue.startsWith(ResourceUtils.CLASSPATH_PREFIX)) {
+        if (resourceUtil.resourceExists(keyConfigParameterValue)) {
+            if (keyConfigParameterValue.startsWith(ResourceUtil.CLASSPATH_PREFIX)) {
                 // File/resource or directory Exists
 
                 performScanning();
                 // See if it is a resource on the classpath
-                String resourceName = keyConfigParameterValue.substring(ResourceUtils.CLASSPATH_PREFIX.length());
+                String resourceName = keyConfigParameterValue.substring(ResourceUtil.CLASSPATH_PREFIX.length());
 
                 if (scanner.existsResource(keyConfigParameterValue)) {
                     result.add(keyConfigParameterValue);
@@ -83,7 +86,7 @@ public class KeyFilesHelper {
                     String pattern = resourceName + ".*";
                     Set<String> resources = scanner.getResources(Pattern.compile(pattern));
                     for (String resource : resources) {
-                        result.add(ResourceUtils.CLASSPATH_PREFIX + resource);
+                        result.add(ResourceUtil.CLASSPATH_PREFIX + resource);
                     }
                 }
             } else {
@@ -92,15 +95,15 @@ public class KeyFilesHelper {
             }
         } else {
             // Not found, so it can be that it is a directory
-            if (keyConfigParameterValue.startsWith(ResourceUtils.FILE_PREFIX)) {
-                File file = new File(keyConfigParameterValue.substring(ResourceUtils.FILE_PREFIX.length()));
+            if (keyConfigParameterValue.startsWith(ResourceUtil.FILE_PREFIX)) {
+                File file = new File(keyConfigParameterValue.substring(ResourceUtil.FILE_PREFIX.length()));
                 if (file.exists() && file.canRead()) {
                     if (file.isDirectory()) {
                         // directory
                         for (File f : Files.fileTreeTraverser().preOrderTraversal(file)) {
 
                             if (f.isFile()) {
-                                result.add(ResourceUtils.FILE_PREFIX + f.getAbsoluteFile().toString());
+                                result.add(ResourceUtil.FILE_PREFIX + f.getAbsoluteFile().toString());
                             }
                         }
                     }

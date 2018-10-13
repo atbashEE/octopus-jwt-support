@@ -15,9 +15,9 @@
  */
 package be.atbash.ee.security.octopus.keys;
 
-import be.atbash.config.util.ResourceUtils;
 import be.atbash.ee.security.octopus.keys.reader.KeyReader;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
+import be.atbash.util.resource.ResourceUtil;
 import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.KeyType;
@@ -40,7 +40,7 @@ public class JWKCreator {
 
     public static void main(String[] args) {
         KeyReader keyReader = new KeyReader();
-        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtils.CLASSPATH_PREFIX + "secp256r1-key.pem", null);
+        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "secp256r1-key.pem", null);
 
         JWK jwk = createJWK(keys);
         System.out.println(jwk);
