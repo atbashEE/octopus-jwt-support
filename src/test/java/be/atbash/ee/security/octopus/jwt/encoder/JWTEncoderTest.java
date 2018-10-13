@@ -38,7 +38,10 @@ public class JWTEncoderTest {
         JWTEncoder encoder = new JWTEncoder();
         String json = encoder.encode(payload, parameters);
 
-        assertThat(json).isEqualTo("{\"number\":42,\"myList\":[\"permission1\",\"permission2\"],\"value\":\"Spock\"}");
+        // Can't use equals checks as order of elements in JSON aren't defined.
+        assertThat(json).contains("\"number\":42");
+        assertThat(json).isEqualTo("\"myList\":[\"permission1\",\"permission2\"]");
+        assertThat(json).isEqualTo("\"value\":\"Spock\"");
     }
 
 }

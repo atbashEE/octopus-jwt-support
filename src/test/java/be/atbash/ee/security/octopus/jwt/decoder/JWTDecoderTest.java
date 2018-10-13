@@ -34,7 +34,7 @@ public class JWTDecoderTest {
         Map<String, String> result = decoder.decode(data, HashMap.class);
 
 
-        assertThat(result.keySet()).containsExactly("pets", "dateValue", "valueForClass");
+        assertThat(result.keySet()).containsOnlyOnce("pets", "dateValue", "valueForClass");
     }
 
 
