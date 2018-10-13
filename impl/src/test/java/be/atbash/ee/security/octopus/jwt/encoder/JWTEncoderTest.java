@@ -40,8 +40,8 @@ public class JWTEncoderTest {
 
         // Can't use equals checks as order of elements in JSON aren't defined.
         assertThat(json).contains("\"number\":42");
-        assertThat(json).isEqualTo("\"myList\":[\"permission1\",\"permission2\"]");
-        assertThat(json).isEqualTo("\"value\":\"Spock\"");
+        assertThat(json).contains("\"myList\":[\"permission1\",\"permission2\"]");
+        assertThat(json).contains("\"value\":\"Spock\"");
     }
 
 }
