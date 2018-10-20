@@ -274,6 +274,7 @@ public class KeyWriter {
             keyWriterFactory = new KeyWriterFactory();
             keyWriterFactory.init();
             jwtSupportConfiguration = JwtSupportConfiguration.getInstance();
+            resourceUtil = ResourceUtil.getInstance();
         }
     }
 
