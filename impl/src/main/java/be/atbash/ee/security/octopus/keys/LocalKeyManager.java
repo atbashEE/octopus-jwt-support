@@ -109,6 +109,6 @@ public class LocalKeyManager implements KeyManager {
     @Override
     public String toString() {
         // For the startup logging.
-        return "class" + LocalKeyManager.class.getName();
+        return "class " + LocalKeyManager.class.getName();
     }
 }

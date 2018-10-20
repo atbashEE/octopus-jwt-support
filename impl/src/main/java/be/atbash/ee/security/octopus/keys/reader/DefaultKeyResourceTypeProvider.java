@@ -19,6 +19,7 @@ import javax.enterprise.inject.Vetoed;
 
 @Vetoed
 public class DefaultKeyResourceTypeProvider implements KeyResourceTypeProvider {
+
     @Override
     public KeyResourceType determineKeyResourceType(String path) {
         KeyResourceType result = null;
@@ -32,4 +33,11 @@ public class DefaultKeyResourceTypeProvider implements KeyResourceTypeProvider {
         }
         return result;
     }
+
+    @Override
+    public String toString() {
+        // For the startup logging.
+        return "class " + DefaultKeyResourceTypeProvider.class.getName();
+    }
+
 }
