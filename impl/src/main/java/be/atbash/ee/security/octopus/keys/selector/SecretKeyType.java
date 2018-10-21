@@ -67,6 +67,10 @@ public class SecretKeyType {
         return asymmetricPart != null;
     }
 
+    public boolean isPrivate() {
+        return (isAsymmetric() && asymmetricPart == AsymmetricPart.PRIVATE);
+    }
+
     public static SecretKeyType fromKey(Key key) {
         SecretKeyType result = null;
         if (key instanceof RSAKey) {

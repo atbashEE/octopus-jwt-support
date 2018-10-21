@@ -15,6 +15,8 @@
  */
 package be.atbash.ee.security.octopus.keys;
 
+import be.atbash.ee.security.octopus.keys.fake.FakeRSAPrivate;
+import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.util.resource.ResourceUtil;
 import org.junit.Test;
 
@@ -23,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class AtbashKeyTest {
 
     @Test
-    public void GetKeyId() {
+    public void getKeyId() {
 
         AtbashKey key = new AtbashKey(ResourceUtil.CLASSPATH_PREFIX + "test.pem", null, null);
 
@@ -47,4 +49,21 @@ public class AtbashKeyTest {
 
     }
 
+    @Test
+    public void getIsMatch_match() {
+        AtbashKey key = new AtbashKey(ResourceUtil.CLASSPATH_PREFIX + "test.pem", null, new FakeRSAPrivate());
+        assertThat(key.isMatch("test", AsymmetricPart.PRIVATE)).isTrue();
+    }
+
+    @Test
+    public void getIsMatch_differentId() {
+        AtbashKey key = new AtbashKey(ResourceUtil.CLASSPATH_PREFIX + "test.pem", null, new FakeRSAPrivate());
+        assertThat(key.isMatch("Other", AsymmetricPart.PRIVATE)).isFalse();
+    }
+
+    @Test
+    public void getIsMatch_differentType() {
+        AtbashKey key = new AtbashKey(ResourceUtil.CLASSPATH_PREFIX + "test.pem", null, new FakeRSAPrivate());
+        assertThat(key.isMatch("test", AsymmetricPart.PUBLIC)).isFalse();
+    }
 }

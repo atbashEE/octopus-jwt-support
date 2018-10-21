@@ -15,6 +15,7 @@
  */
 package be.atbash.ee.security.octopus.keys;
 
+import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.keys.selector.SecretKeyType;
 import be.atbash.util.CollectionUtils;
 import be.atbash.util.exception.AtbashUnexpectedException;
@@ -76,6 +77,32 @@ public class AtbashKey {
             result = result.substring(ResourceUtil.CLASSPATH_PREFIX.length());
         }
         // FIXME Other prefixes.
+        return result;
+    }
+
+    public boolean isMatch(String keyId, AsymmetricPart asymmetricPart) {
+        return this.keyId.equals(keyId) && secretKeyType.getAsymmetricPart() == asymmetricPart;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        AtbashKey atbashKey = (AtbashKey) o;
+
+        if (!keyId.equals(atbashKey.keyId)) {
+            return false;
+        }
+        return secretKeyType.equals(atbashKey.secretKeyType);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = keyId.hashCode();
+        result = 31 * result + secretKeyType.hashCode();
         return result;
     }
 }

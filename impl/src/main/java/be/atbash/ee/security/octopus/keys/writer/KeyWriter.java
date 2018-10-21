@@ -107,7 +107,9 @@ public class KeyWriter {
         JWKSet result;
         InputStream inputStream = null;
         try {
-            inputStream = resourceUtil.getStream(target);
+            if (resourceUtil.resourceExists(target)) {
+                inputStream = resourceUtil.getStream(target);
+            }
         } catch (IOException e) {
             throw new AtbashUnexpectedException(e);
         }
