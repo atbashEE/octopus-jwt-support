@@ -3,4 +3,4 @@ sudo: false # faster builds
 
 jdk: openjdk7
 
-script: "mvn package"
+script: "mvn package -pl '!keyhelper'"
