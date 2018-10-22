@@ -42,6 +42,8 @@ import java.util.regex.Pattern;
  * Helps to identify all the key files when directory defined (resource or file system)
  */
 @ApplicationScoped
+// We have already dependency on Guava through org.reflections.
+// FIXME Maybe we should incorporate the relevant code into this project and remove Guava dependency here.
 public class KeyFilesHelper {
 
     private final Object LOCK = new Object();

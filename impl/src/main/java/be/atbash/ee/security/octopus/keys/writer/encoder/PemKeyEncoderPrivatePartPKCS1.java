@@ -26,6 +26,7 @@ import org.bouncycastle.openssl.jcajce.JcePEMEncryptorBuilder;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 
 /**
@@ -70,6 +71,6 @@ public class PemKeyEncoderPrivatePartPKCS1 implements KeyEncoder {
 
         pemWriter.close();
 
-        return out.toString().getBytes("UTF-8");
+        return out.toString().getBytes(StandardCharsets.UTF_8);
     }
 }

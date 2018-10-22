@@ -26,6 +26,7 @@ import com.nimbusds.jose.jwk.JWKSet;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -114,7 +115,7 @@ public class KeyWriterFactory {
             jwks.addAll(parameters.getJwkSet().getKeys());
 
             JWKSet jwkSet = new JWKSet(jwks);
-            result = jwkSet.toJSONObject(false).toJSONString().getBytes("UTF-8");
+            result = jwkSet.toJSONObject(false).toJSONString().getBytes(StandardCharsets.UTF_8);
         } catch (ParseException e) {
             // This can never happen as the String is a JSON representation of an actual JWK instance.
             throw new AtbashUnexpectedException(e);

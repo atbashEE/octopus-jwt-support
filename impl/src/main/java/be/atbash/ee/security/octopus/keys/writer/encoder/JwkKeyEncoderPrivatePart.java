@@ -21,6 +21,7 @@ import be.atbash.util.exception.AtbashUnexpectedException;
 import com.nimbusds.jose.jwk.RSAKey;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.security.KeyFactory;
 import java.security.PublicKey;
@@ -42,7 +43,7 @@ public class JwkKeyEncoderPrivatePart implements KeyEncoder {
                 .privateKey((RSAPrivateKey) atbashKey.getKey())
                 .build();
 
-        return rsaKey.toJSONObject().toJSONString().getBytes("UTF-8");
+        return rsaKey.toJSONObject().toJSONString().getBytes(StandardCharsets.UTF_8);
 
     }
 

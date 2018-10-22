@@ -22,6 +22,7 @@ import org.bouncycastle.util.io.pem.PemObject;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 
 /**
  *
@@ -38,7 +39,7 @@ public class PemKeyEncoderPublicPart implements KeyEncoder {
 
         pemWriter.close();
 
-        return out.toString().getBytes("UTF-8");
+        return out.toString().getBytes(StandardCharsets.UTF_8);
 
     }
 }

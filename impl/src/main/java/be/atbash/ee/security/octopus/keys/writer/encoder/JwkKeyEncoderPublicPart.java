@@ -20,6 +20,7 @@ import be.atbash.ee.security.octopus.keys.writer.KeyEncoderParameters;
 import com.nimbusds.jose.jwk.RSAKey;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.interfaces.RSAPublicKey;
 
 /**
@@ -34,7 +35,7 @@ public class JwkKeyEncoderPublicPart implements KeyEncoder {
         RSAKey rsaKey = new RSAKey.Builder((RSAPublicKey) atbashKey.getKey()).keyID(atbashKey.getKeyId())
                 .build();
 
-        return rsaKey.toJSONObject().toJSONString().getBytes("UTF-8");
+        return rsaKey.toJSONObject().toJSONString().getBytes(StandardCharsets.UTF_8);
 
     }
 

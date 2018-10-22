@@ -27,6 +27,7 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.InvalidParameterSpecException;
@@ -65,7 +66,7 @@ public final class EncryptionHelper {
             cipher.init(Cipher.ENCRYPT_MODE, secret);
             AlgorithmParameters params = cipher.getParameters();
             byte[] ivBytes = params.getParameterSpec(IvParameterSpec.class).getIV();
-            byte[] encryptedTextBytes = cipher.doFinal(value.getBytes("UTF-8"));
+            byte[] encryptedTextBytes = cipher.doFinal(value.getBytes(StandardCharsets.UTF_8));
 
             //prepend salt and vi
             byte[] buffer = new byte[saltBytes.length + ivBytes.length + encryptedTextBytes.length];
@@ -73,7 +74,7 @@ public final class EncryptionHelper {
             System.arraycopy(ivBytes, 0, buffer, saltBytes.length, ivBytes.length);
             System.arraycopy(encryptedTextBytes, 0, buffer, saltBytes.length + ivBytes.length, encryptedTextBytes.length);
             return Base64Codec.encodeToString(buffer, false);
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException | InvalidKeyException | NoSuchPaddingException | IllegalBlockSizeException | InvalidParameterSpecException | BadPaddingException | UnsupportedEncodingException e) {
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException | InvalidKeyException | NoSuchPaddingException | IllegalBlockSizeException | InvalidParameterSpecException | BadPaddingException e) {
             throw new AtbashUnexpectedException(e);
         }
     }

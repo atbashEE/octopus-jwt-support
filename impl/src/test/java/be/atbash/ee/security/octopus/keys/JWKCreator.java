@@ -84,6 +84,7 @@ public class JWKCreator {
             }
         }
 
+        // FIXME Check to see if we have private and public key.
         return new RSAKey.Builder((RSAPublicKey) publicKey)
                 .privateKey(privateKey)
                 .keyID(keyId)
@@ -103,6 +104,7 @@ public class JWKCreator {
             }
         }
 
+        // FIXME Check to see if we have private and public key.
         return new ECKey.Builder(ECCurveHelper.getCurve(privateKey), (ECPublicKey) publicKey)
                 .privateKey(privateKey)
                 .keyID(keyId)
