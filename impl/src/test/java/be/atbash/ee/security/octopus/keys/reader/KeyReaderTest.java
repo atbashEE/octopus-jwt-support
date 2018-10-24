@@ -314,4 +314,14 @@ public class KeyReaderTest {
         // unknown key type from path
         keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "key.txt", null);
     }
+
+
+    @Test(expected = InvalidJWKSetFormatException.class)
+    public void readKeyResource_scenario14() {
+        // JWKSet (but same Id)
+
+        keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "duplicate-id.jwkset", new TestPasswordLookup(null, null));
+
+    }
+
 }

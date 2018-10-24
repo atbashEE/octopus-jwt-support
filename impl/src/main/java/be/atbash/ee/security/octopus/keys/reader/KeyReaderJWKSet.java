@@ -27,9 +27,7 @@ import com.nimbusds.jose.JOSEException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class KeyReaderJWKSet extends KeyReaderJWK {
 
@@ -51,14 +49,19 @@ public class KeyReaderJWKSet extends KeyReaderJWK {
 
         JSONObject jsonObject = (JSONObject) JSONValue.parse(fileContent);
         JSONArray keys = (JSONArray) jsonObject.get("keys");
-        // FIXME check on the kid -> must be unique within file.
         try {
+            Set<String> kids = new HashSet<>();
             for (Object key : keys) {
                 if (!(key instanceof JSONObject)) {
                     throw new InvalidJWKSetFormatException("The \"keys\" JSON array must contain JSON objects only");
                 }
 
                 JSONObject jwkJson = (JSONObject) key;
+                String kid = jwkJson.getAsString("kid");
+                if (kids.contains(kid)) {
+                    throw new InvalidJWKSetFormatException(String.format("The kid '%s' was found multiple times in the resource '%s'", kid, path));
+                }
+                kids.add(kid);
                 result.addAll(parse(jwkJson, path, passwordLookup));
             }
         } catch (ParseException | JOSEException e) {
