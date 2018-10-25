@@ -133,6 +133,10 @@ public class KeyFilesHelper {
             jwtSupportConfiguration = JwtSupportConfiguration.getInstance();
             keyResourceTypeProvider = jwtSupportConfiguration.getKeyResourceTypeProvider();
         }
+
+        if (resourceUtil == null) {
+            resourceUtil = ResourceUtil.getInstance();
+        }
     }
 
     private void performScanning() {
