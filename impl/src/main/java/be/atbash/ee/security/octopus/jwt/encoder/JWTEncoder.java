@@ -34,6 +34,9 @@ public class JWTEncoder {
     @Inject
     private JWTSignerFactory signerFactory;
 
+    @Inject
+    private JWEEncryptionFactory encryptionFactory;
+
     public String encode(Object data, JWTParameters parameters) {
         checkDependencies();
 
@@ -62,7 +65,7 @@ public class JWTEncoder {
 
     private String createEncryptedJWE(Object data, JWTParametersEncryption parameters) throws JOSEException {
         JWEObject jweObject = new JWEObject(
-                new JWEHeader.Builder(JWEAlgorithm.RSA_OAEP_256, EncryptionMethod.A256CBC_HS512)
+                new JWEHeader.Builder(JWEAlgorithm.RSA_OAEP_256, EncryptionMethod.A256GCM)
                         .keyID(parameters.getKeyID())
                         .customParams(parameters.getHeaderValues())
                         .contentType("JWT") // required to signal nested JWT
@@ -70,7 +73,7 @@ public class JWTEncoder {
                 new Payload(createSignedJWT(data, parameters.getParametersSigning())));
 
         // Perform encryption
-        //jweObject.encrypt(new RSAEncrypter(parameters.getJWK()));  // FIXME
+        jweObject.encrypt(encryptionFactory.createEncryptor(parameters));
 
         // Serialise to JWE compact form
         return jweObject.serialize();
@@ -110,6 +113,10 @@ public class JWTEncoder {
         // We have CDI injected dependencies, but in a Java SE environment it is possible that they are empty.
         if (signerFactory == null) {
             signerFactory = new JWTSignerFactory();
+        }
+
+        if (encryptionFactory == null) {
+            encryptionFactory = new JWEEncryptionFactory();
         }
     }
 

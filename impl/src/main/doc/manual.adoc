@@ -1,6 +1,6 @@
 = Atbash Octopus JWT Support
 Rudy De Busscher <rdebusscher@gmail.com>
-v0.9.0, 05/08/2018
+v0.9.1, ??/??/2018
 :example-caption!:
 ifndef::imagesdir[:imagesdir: images]
 ifndef::sourcedir[:sourcedir: ../../main/java]
@@ -12,6 +12,7 @@ User manual for Atbash configuration.
 === 0.9.1
 
 . Improve usability KeyManager.
+. Support for creating JWE (Encrypted JWT from Java Object and vice versa)`
 
 Breaking changes
 
@@ -38,8 +39,6 @@ Breaking changes (although 0.5.0 was an alfa release and thus changes are expect
 
 A first attempt for converting Java beans to and from a JWT.
 The code will be improved when Atbash Octopus has full support for MP JWT Auth spec and OAuth2/OpenId Connect.
-
-There is no support for JWE yet.
 
 == Standard usage JWT Serialization
 
@@ -81,10 +80,22 @@ Instead of injecting the Encoder, it is also possible to instantiate the encoder
    JWTEncoder jwtEncoder = new JWTEncoder();
 ----
 
+Use the Object _data_ as payload within a JWE (first signed and then encrypted)
+
+This examples uses an RSA for signing (private key) and encryption (public key).
+
+----
+    JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWE)
+            .withSecretKeyForSigning(keyForSigning)
+            .withSecretKeyForEncryption(keyForEncryption)
+            .build();
+
+    String encoded = new JWTEncoder().encode(data, parameters);
+----
 
 Converting the JWT (or Base64 encoded JSON) to an Object instance.
 
-The following example converts a signed JWT.
+The following example converts a signed JWT or a JWE.
 
 ----
     @Inject

@@ -59,7 +59,7 @@ public class KeySelector {
     }
 
     public AtbashKey selectAtbashKey(SelectorCriteria selectorCriteria) {
-        retrieveKeyManager();
+        checkDependencies();
 
         List<AtbashKey> keys = keyManager.retrieveKeys(selectorCriteria);
 
@@ -74,18 +74,22 @@ public class KeySelector {
         return keys.get(0);
     }
 
-    private void retrieveKeyManager() {
+    private void checkDependencies() {
         if (keyManager == null) {
             // lazy init, Java SE
             synchronized (LOCK) {
                 if (keyManager == null) {
 
-                    JwtSupportConfiguration configuration = new JwtSupportConfiguration();
-                    StartupLogging.logConfiguration(configuration);  // Java SE logging
-
-                    keyManager = configuration.getKeyManager();
+                    keyManager = getKeyManager();
                 }
             }
         }
+    }
+
+    protected KeyManager getKeyManager() {
+        JwtSupportConfiguration configuration = new JwtSupportConfiguration();
+        StartupLogging.logConfiguration(configuration);  // Java SE logging
+
+        return configuration.getKeyManager();
     }
 }

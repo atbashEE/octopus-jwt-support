@@ -17,6 +17,7 @@ package be.atbash.ee.security.octopus.jwt.parameter;
 
 import be.atbash.ee.security.octopus.jwt.JWTEncoding;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
+import com.nimbusds.jose.jwk.KeyType;
 
 import java.security.Key;
 import java.util.Map;
@@ -40,7 +41,7 @@ public class JWTParametersEncryption implements JWTParameters {
 
     @Override
     public JWTEncoding getEncoding() {
-        return JWTEncoding.JWS;
+        return JWTEncoding.JWE;
     }
 
     public Map<String, Object> getHeaderValues() {
@@ -53,8 +54,12 @@ public class JWTParametersEncryption implements JWTParameters {
 
     }
 
-    public Key getJWK() {
+    public Key getKey() {
         return secretKeyEncryption.getKey();
+    }
+
+    public KeyType getKeyType() {
+        return secretKeyEncryption.getSecretKeyType().getKeyType();
     }
 
     public JWTParametersSigning getParametersSigning() {

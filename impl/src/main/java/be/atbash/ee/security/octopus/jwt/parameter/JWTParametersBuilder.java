@@ -90,6 +90,9 @@ public final class JWTParametersBuilder {
                 result = new JWTParametersSigning(headerValues, secretKeySigning);
                 break;
             case JWE:
+                if (parametersSigning == null) {
+                    parametersSigning = new JWTParametersSigning(headerValues, secretKeySigning);
+                }
                 result = new JWTParametersEncryption(parametersSigning, headerValues, secretKeyEncryption);
                 break;
             default:

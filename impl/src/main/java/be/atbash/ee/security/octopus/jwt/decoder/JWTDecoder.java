@@ -25,8 +25,13 @@ import be.atbash.util.StringUtils;
 import be.atbash.util.exception.AtbashIllegalActionException;
 import be.atbash.util.exception.AtbashUnexpectedException;
 import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JWEDecrypter;
+import com.nimbusds.jose.JWEObject;
 import com.nimbusds.jose.JWSVerifier;
+import com.nimbusds.jose.crypto.factories.DefaultJWEDecrypterFactory;
 import com.nimbusds.jose.crypto.factories.DefaultJWSVerifierFactory;
+import com.nimbusds.jose.proc.JWEDecrypterFactory;
+import com.nimbusds.jose.proc.JWSVerifierFactory;
 import com.nimbusds.jwt.SignedJWT;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -39,7 +44,10 @@ import java.text.ParseException;
 @ApplicationScoped
 public class JWTDecoder {
 
-    private DefaultJWSVerifierFactory jwsVerifierFactory = new DefaultJWSVerifierFactory();
+    // TODO Do we ever need some customer factory implementations? Should we made these configurable?
+    private JWSVerifierFactory jwsVerifierFactory = new DefaultJWSVerifierFactory();
+
+    private JWEDecrypterFactory jweDecrypterFactory = new DefaultJWEDecrypterFactory();
 
     public <T> T decode(String data, Class<T> classType) {
         return decode(data, classType, null, null).getData();
@@ -65,7 +73,7 @@ public class JWTDecoder {
                     result = readSignedJWT(data, keySelector, classType, verifier);
                     break;
                 case JWE:
-                    result = null;
+                    result = readEncryptedJWT(data, keySelector, classType, verifier);
                     break;
                 default:
                     throw new IllegalArgumentException(String.format("JWTEncoding not supported %s", encoding));
@@ -76,6 +84,27 @@ public class JWTDecoder {
             throw new AtbashUnexpectedException(e);
         }
         return result;
+    }
+
+    private <T> JWTData<T> readEncryptedJWT(String data, KeySelector keySelector, Class<T> classType, JWTVerifier verifier) throws ParseException, JOSEException {
+
+        JWEObject jweObject = JWEObject.parse(data);
+
+        String keyID = jweObject.getHeader().getKeyID();
+
+        SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(keyID).withAsymmetricPart(AsymmetricPart.PRIVATE).build();
+        Key key = keySelector.selectSecretKey(criteria);
+        if (key == null) {
+            throw new InvalidJWTException(String.format("No key found for %s", keyID));
+        }
+
+        // Decrypt with private key
+        JWEDecrypter decrypter = jweDecrypterFactory.createJWEDecrypter(jweObject.getHeader(), key);
+        jweObject.decrypt(decrypter);
+
+        // Now we have a signedJWT
+        return readSignedJWT(jweObject.getPayload().toString(), keySelector, classType, verifier);
+
     }
 
     private <T> JWTData<T> readSignedJWT(String data, KeySelector keySelector, Class<T> classType, JWTVerifier verifier) throws ParseException, JOSEException {
@@ -125,7 +154,7 @@ public class JWTDecoder {
                 result = JWTEncoding.JWS;
             }
             if (occurrences == 4) {
-                result = JWTEncoding.JWS;
+                result = JWTEncoding.JWE;
             }
         }
         return result;
