@@ -15,10 +15,12 @@
  */
 package be.atbash.ee.security.octopus.keys.selector;
 
+import be.atbash.ee.security.octopus.keys.generator.DHGenerationParameters;
 import be.atbash.util.exception.AtbashIllegalActionException;
 import com.nimbusds.jose.jwk.KeyType;
 
 import javax.crypto.SecretKey;
+import javax.crypto.interfaces.DHKey;
 import java.security.Key;
 import java.security.PrivateKey;
 import java.security.interfaces.ECKey;
@@ -82,6 +84,9 @@ public class SecretKeyType {
         if (key instanceof SecretKey) {  // for HMAC
             result = new SecretKeyType(KeyType.OCT);
         }
+        if (key instanceof DHKey) {
+            result = new SecretKeyType(DHGenerationParameters.DH, determineAsymmetricPart(key));
+        }
         // FIXME OCTKEY (Edwards EC Key)
         // OCTKEY https://tools.ietf.org/html/rfc8037
         /*
@@ -118,7 +123,7 @@ Public keys must contain crv (curve) and x values. Private keys will also contai
     @Override
     public int hashCode() {
         int result = keyType.hashCode();
-        result = 31 * result + asymmetricPart.hashCode();
+        result = 31 * result + (asymmetricPart != null ? asymmetricPart.hashCode() : 0);
         return result;
     }
 

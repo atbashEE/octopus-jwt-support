@@ -23,6 +23,8 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.spec.ECParameterSpec;
 
 import javax.annotation.PostConstruct;
+import javax.crypto.interfaces.DHPrivateKey;
+import javax.crypto.interfaces.DHPublicKey;
 import javax.crypto.spec.SecretKeySpec;
 import javax.enterprise.context.ApplicationScoped;
 import java.security.*;
@@ -62,6 +64,9 @@ public class KeyGenerator {
         if (KeyType.OCT.equals(parameters.getKeyType())) {
             result = generateOctKey((OCTGenerationParameters) parameters);
         }
+        if (DHGenerationParameters.DH.equals(parameters.getKeyType())) {
+            result = generateDHKeys((DHGenerationParameters) parameters);
+        }
         return result;
     }
 
@@ -79,6 +84,24 @@ public class KeyGenerator {
             result.add(new AtbashKey(generationParameters.getKid(), generationParameters.getKeyUsage(), priv));
             return result;
         } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
+            throw new AtbashUnexpectedException(e);
+        }
+    }
+
+    private List<AtbashKey> generateDHKeys(DHGenerationParameters generationParameters) {
+        try {
+            KeyPairGenerator generator = KeyPairGenerator.getInstance("DH");
+            generator.initialize(generationParameters.getKeySize(), new SecureRandom());
+            KeyPair kp = generator.generateKeyPair();
+
+            DHPublicKey pub = (DHPublicKey) kp.getPublic();
+            DHPrivateKey priv = (DHPrivateKey) kp.getPrivate();
+
+            List<AtbashKey> result = new ArrayList<>();
+            result.add(new AtbashKey(generationParameters.getKid(), generationParameters.getKeyUsage(), pub));
+            result.add(new AtbashKey(generationParameters.getKid(), generationParameters.getKeyUsage(), priv));
+            return result;
+        } catch (NoSuchAlgorithmException e) {
             throw new AtbashUnexpectedException(e);
         }
     }
