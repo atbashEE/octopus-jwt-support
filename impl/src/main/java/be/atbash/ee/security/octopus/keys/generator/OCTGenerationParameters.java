@@ -39,6 +39,11 @@ public class OCTGenerationParameters extends GenerationParameters {
             return new OCTGenerationParameters(this);
         }
 
+        public OCTGenerationParameters.OCTGenerationParametersBuilder withKeySize(int keySize) {
+            this.keySize = keySize;
+            return this;
+        }
+
         protected void applyDefaults() {
             super.applyDefaults();
             if (keySize == 0) {

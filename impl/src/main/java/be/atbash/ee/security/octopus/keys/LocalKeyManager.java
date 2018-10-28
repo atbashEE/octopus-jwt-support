@@ -21,7 +21,7 @@ import be.atbash.ee.security.octopus.keys.reader.KeyFilesHelper;
 import be.atbash.ee.security.octopus.keys.reader.KeyReader;
 import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup;
 import be.atbash.ee.security.octopus.keys.selector.SelectorCriteria;
-import be.atbash.ee.security.octopus.keys.selector.filter.*;
+import be.atbash.ee.security.octopus.keys.selector.filter.KeyFilter;
 import be.atbash.util.StringUtils;
 import be.atbash.util.exception.AtbashIllegalActionException;
 
@@ -33,7 +33,8 @@ import java.util.List;
 /**
  *
  */
-@Vetoed
+@Vetoed // This seems needed as multiple implementations can be available.
+// But why are we then using @Inject since we always use instantiation by new?
 public class LocalKeyManager implements KeyManager {
 
     private static final Object LOCK = new Object();
