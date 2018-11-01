@@ -18,24 +18,33 @@ package be.atbash.ee.security.octopus.keys.generator;
 import com.nimbusds.jose.Requirement;
 import com.nimbusds.jose.jwk.KeyType;
 
+import javax.crypto.spec.DHParameterSpec;
+
 public class DHGenerationParameters extends GenerationParameters {
 
     public static final KeyType DH = new KeyType("DH", Requirement.OPTIONAL);
 
     private int keySize;  // in bits
+    private DHParameterSpec parameterSpec; // or the Paramaters to use for generation
 
     private DHGenerationParameters(DHGenerationParametersBuilder builder) {
         super(builder, DH);
         keySize = builder.keySize;
+        parameterSpec = builder.parameterSpec;
     }
 
     public int getKeySize() {
         return keySize;
     }
 
+    public DHParameterSpec getParameterSpec() {
+        return parameterSpec;
+    }
+
     public static class DHGenerationParametersBuilder extends GenerationParametersBuilders<DHGenerationParametersBuilder> {
 
         private int keySize;
+        private DHParameterSpec parameterSpec;
 
         public DHGenerationParameters build() {
             applyDefaults();
@@ -47,9 +56,14 @@ public class DHGenerationParameters extends GenerationParameters {
             return this;
         }
 
+        public DHGenerationParametersBuilder withDHParamaterSpec(DHParameterSpec dhParamaterSpec) {
+            this.parameterSpec = dhParamaterSpec;
+            return this;
+        }
+
         protected void applyDefaults() {
             super.applyDefaults();
-            if (keySize == 0) {
+            if (keySize == 0 && parameterSpec == null) {
                 keySize = 4096;
             }
         }

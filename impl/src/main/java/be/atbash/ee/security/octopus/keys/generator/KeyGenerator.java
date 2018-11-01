@@ -91,7 +91,12 @@ public class KeyGenerator {
     private List<AtbashKey> generateDHKeys(DHGenerationParameters generationParameters) {
         try {
             KeyPairGenerator generator = KeyPairGenerator.getInstance("DH");
-            generator.initialize(generationParameters.getKeySize(), new SecureRandom());
+            if (generationParameters.getParameterSpec() != null) {
+                generator.initialize(generationParameters.getParameterSpec());
+            } else {
+                generator.initialize(generationParameters.getKeySize(), new SecureRandom());
+
+            }
             KeyPair kp = generator.generateKeyPair();
 
             DHPublicKey pub = (DHPublicKey) kp.getPublic();
@@ -101,7 +106,7 @@ public class KeyGenerator {
             result.add(new AtbashKey(generationParameters.getKid(), generationParameters.getKeyUsage(), pub));
             result.add(new AtbashKey(generationParameters.getKid(), generationParameters.getKeyUsage(), priv));
             return result;
-        } catch (NoSuchAlgorithmException e) {
+        } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException e) {
             throw new AtbashUnexpectedException(e);
         }
     }
