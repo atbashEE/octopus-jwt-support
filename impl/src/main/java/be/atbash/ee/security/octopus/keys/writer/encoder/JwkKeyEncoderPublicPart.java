@@ -17,11 +17,23 @@ package be.atbash.ee.security.octopus.keys.writer.encoder;
 
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.writer.KeyEncoderParameters;
+import be.atbash.util.exception.AtbashUnexpectedException;
+import com.nimbusds.jose.jwk.Curve;
+import com.nimbusds.jose.jwk.ECKey;
+import com.nimbusds.jose.jwk.KeyType;
 import com.nimbusds.jose.jwk.RSAKey;
+import org.bouncycastle.asn1.x9.X9ECParameters;
+import org.bouncycastle.jcajce.provider.asymmetric.util.EC5Util;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
+import java.security.PublicKey;
+import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
+import java.security.spec.ECParameterSpec;
+
+import static com.nimbusds.jose.jwk.ECKey.SUPPORTED_CURVES;
 
 /**
  *
@@ -32,11 +44,69 @@ public class JwkKeyEncoderPublicPart implements KeyEncoder {
     @Override
     public byte[] encodeKey(AtbashKey atbashKey, KeyEncoderParameters parameters) throws IOException {
 
+        if (KeyType.RSA.equals(atbashKey.getSecretKeyType().getKeyType())) {
+            return encodeRSAKey(atbashKey);
+        }
+
+        if (KeyType.EC.equals(atbashKey.getSecretKeyType().getKeyType())) {
+            return encodeECKey(atbashKey);
+        }
+        // FIXME
+        return null;
+
+    }
+
+    private byte[] encodeRSAKey(AtbashKey atbashKey) {
         RSAKey rsaKey = new RSAKey.Builder((RSAPublicKey) atbashKey.getKey()).keyID(atbashKey.getKeyId())
                 .build();
 
         return rsaKey.toJSONObject().toJSONString().getBytes(StandardCharsets.UTF_8);
-
     }
+
+    private byte[] encodeECKey(AtbashKey atbashKey) {
+        Curve curve;
+        try {
+            curve = deriveCurve((PublicKey) atbashKey.getKey());
+        } catch (GeneralSecurityException e) {
+            throw new AtbashUnexpectedException(e);
+        }
+
+        ECKey ecKey = new ECKey.Builder(curve, (ECPublicKey) atbashKey.getKey()).keyID(atbashKey.getKeyId())
+                .build();
+
+        return ecKey.toJSONObject().toJSONString().getBytes(StandardCharsets.UTF_8);
+    }
+
+    private Curve deriveCurve(org.bouncycastle.jce.spec.ECParameterSpec ecParameterSpec) throws GeneralSecurityException {
+
+        for (Curve supportedCurve : SUPPORTED_CURVES) {
+
+            String name = supportedCurve.getName();
+
+            X9ECParameters params = org.bouncycastle.asn1.x9.ECNamedCurveTable.getByName(name);
+
+            if (params.getN().equals(ecParameterSpec.getN())
+                    && params.getH().equals(ecParameterSpec.getH())
+                    && params.getCurve().equals(ecParameterSpec.getCurve())
+                    && params.getG().equals(ecParameterSpec.getG())) {
+                return supportedCurve;
+            }
+        }
+
+        throw new GeneralSecurityException("Could not find name for curve");
+    }
+
+    private Curve deriveCurve(PublicKey publicKey) throws GeneralSecurityException {
+        if (publicKey instanceof java.security.interfaces.ECPublicKey) {
+            final java.security.interfaces.ECPublicKey pk = (java.security.interfaces.ECPublicKey) publicKey;
+            final ECParameterSpec params = pk.getParams();
+            return deriveCurve(EC5Util.convertSpec(params, false));
+        } else if (publicKey instanceof org.bouncycastle.jce.interfaces.ECPublicKey) {
+            final org.bouncycastle.jce.interfaces.ECPublicKey pk = (org.bouncycastle.jce.interfaces.ECPublicKey) publicKey;
+            return deriveCurve(pk.getParameters());
+        } else
+            throw new IllegalArgumentException("Can only be used with instances of ECPublicKey (either jce or bc implementation)");
+    }
+
 
 }
