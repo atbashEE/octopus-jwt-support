@@ -134,7 +134,7 @@ public class KeyGenerator {
         byte[] bytes = new byte[generationParameters.getKeySize() / 8];
         new SecureRandom().nextBytes(bytes);
 
-        SecretKeySpec secretKey = new SecretKeySpec(bytes, "");// algo name is this needed and dio we use it??
+        SecretKeySpec secretKey = new SecretKeySpec(bytes, "AES");
 
         List<AtbashKey> result = new ArrayList<>();
         result.add(new AtbashKey(generationParameters.getKid(), generationParameters.getKeyUsage(), secretKey));

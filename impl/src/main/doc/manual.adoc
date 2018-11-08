@@ -12,7 +12,9 @@ User manual for Atbash configuration.
 === 0.9.1
 
 . Improve usability KeyManager.
-. Support for creating JWE (Encrypted JWT from Java Object and vice versa)`
+. Support for creating JWE (Encrypted JWT from Java Object and vice versa)
+. Writing and Reading EC keys in JWK format.
+. Support for AtbashKey by JWTEncoder and JWTDecoder.
 
 Breaking changes
 

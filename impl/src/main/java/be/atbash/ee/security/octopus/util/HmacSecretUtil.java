@@ -21,7 +21,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 /**
- *
+ * Creates an AES key from a Byte Array.
  */
 
 public final class HmacSecretUtil {
@@ -30,7 +30,7 @@ public final class HmacSecretUtil {
     }
 
     public static AtbashKey generateSecretKey(String kid, byte[] key) {
-        SecretKey secretKey = new SecretKeySpec(key, 0, key.length, "AES");
+        SecretKey secretKey = new SecretKeySpec(key, "AES");
 
         return new AtbashKey(kid, secretKey);
 

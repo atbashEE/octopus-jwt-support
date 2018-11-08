@@ -15,8 +15,11 @@
  */
 package be.atbash.ee.security.octopus.keys;
 
+import be.atbash.ee.security.octopus.keys.json.AtbashKeyCustomBeanJSONEncoder;
+import be.atbash.ee.security.octopus.keys.json.AtbashKeyWriter;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.keys.selector.SecretKeyType;
+import be.atbash.json.parser.MappedBy;
 import be.atbash.util.CollectionUtils;
 import be.atbash.util.exception.AtbashUnexpectedException;
 import be.atbash.util.resource.ResourceUtil;
@@ -27,6 +30,7 @@ import java.util.Arrays;
 import java.util.List;
 
 // Useful info https://www.cem.me/pki/
+@MappedBy(writer = AtbashKeyWriter.class, beanEncoder = AtbashKeyCustomBeanJSONEncoder.class)
 public class AtbashKey {
 
     private String keyId;
@@ -39,6 +43,7 @@ public class AtbashKey {
     }
 
     public AtbashKey(String path, List<KeyUse> keyUses, Key key) {
+        // FIXME Check key is not null
         this.keyId = defineKeyId(path);
         this.keyUses = keyUses;
         if (CollectionUtils.isEmpty(this.keyUses)) {
@@ -104,5 +109,24 @@ public class AtbashKey {
         int result = keyId.hashCode();
         result = 31 * result + secretKeyType.hashCode();
         return result;
+    }
+
+    public static class AtbashKeyBuilder {
+        private String keyId;
+        private Key key;
+
+        public AtbashKeyBuilder withKeyId(String keyId) {
+            this.keyId = keyId;
+            return this;
+        }
+
+        public AtbashKeyBuilder withKey(Key key) {
+            this.key = key;
+            return this;
+        }
+
+        public AtbashKey build() {
+            return new AtbashKey(keyId, key);
+        }
     }
 }
