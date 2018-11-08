@@ -64,7 +64,7 @@ public class DHGenerationParameters extends GenerationParameters {
         protected void applyDefaults() {
             super.applyDefaults();
             if (keySize == 0 && parameterSpec == null) {
-                keySize = 4096;
+                keySize = 2048;
             }
         }
     }
