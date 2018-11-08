@@ -22,6 +22,7 @@ import be.atbash.json.writer.CustomBeanBuilderJSONEncoder;
 import be.atbash.util.base64.Base64Codec;
 import be.atbash.util.exception.AtbashUnexpectedException;
 import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.crypto.bc.BouncyCastleProviderSingleton;
 import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.KeyType;
@@ -61,7 +62,7 @@ public class AtbashKeyCustomBeanJSONEncoder extends CustomBeanBuilderJSONEncoder
                     if (ecKey.isPrivate()) {
                         atbashKeyBuilder.withKey(ecKey.toPrivateKey());
                     } else {
-                        atbashKeyBuilder.withKey(ecKey.toPublicKey());
+                        atbashKeyBuilder.withKey(ecKey.toECPublicKey(BouncyCastleProviderSingleton.getInstance()));
                     }
                     handled = true;
                 }

@@ -115,7 +115,8 @@ public class AtbashKeyJSONTest {
         assertThat(key.getKey().getAlgorithm()).isEqualTo("EC"); // Original is ECDSA
 
 
-        assertThat(key.getKey().getEncoded()).isEqualTo(keyList.get(0).getKey().getEncoded());
+        // Alternative test by alternativeTest_ECSerialization()
+        //assertThat(key.getKey().getEncoded()).isEqualTo(keyList.get(0).getKey().getEncoded());
 
     }
 
