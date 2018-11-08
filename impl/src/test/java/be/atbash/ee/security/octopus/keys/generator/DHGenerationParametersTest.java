@@ -54,7 +54,7 @@ public class DHGenerationParametersTest {
         assertThat(parameters).isNotNull();
         assertThat(parameters.getKid()).isEqualTo("kid");
         assertThat(parameters.getKeyType()).isEqualTo(DH);
-        assertThat(parameters.getKeySize()).isEqualTo(4096);
+        assertThat(parameters.getKeySize()).isEqualTo(2048);
 
     }
 
