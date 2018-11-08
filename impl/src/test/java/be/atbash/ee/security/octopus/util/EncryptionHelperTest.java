@@ -16,7 +16,11 @@
 package be.atbash.ee.security.octopus.util;
 
 import be.atbash.ee.security.octopus.DecryptionFailedException;
+import be.atbash.ee.security.octopus.keys.AtbashKey;
 import org.junit.Test;
+
+import javax.crypto.SecretKey;
+import java.security.SecureRandom;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -49,4 +53,20 @@ public class EncryptionHelperTest {
 
         assertThat(encoded1).isNotEqualTo(encoded2);
     }
+
+    @Test
+    public void encode_decode_withAESKey() {
+
+        byte[] secret = new byte[32];
+        new SecureRandom().nextBytes(secret);
+
+        AtbashKey key = HmacSecretUtil.generateSecretKey("hmacID", secret);
+
+        String encoded = EncryptionHelper.encode("This is the text which needs to encrypted", (SecretKey) key.getKey());
+
+        String decoded = EncryptionHelper.decode(encoded, (SecretKey) key.getKey());
+
+        assertThat(decoded).isEqualTo("This is the text which needs to encrypted");
+    }
+
 }
