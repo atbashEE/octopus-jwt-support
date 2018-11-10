@@ -35,6 +35,7 @@ import com.nimbusds.jose.proc.JWSVerifierFactory;
 import com.nimbusds.jwt.SignedJWT;
 
 import javax.enterprise.context.ApplicationScoped;
+import java.net.URI;
 import java.security.Key;
 import java.text.ParseException;
 
@@ -111,8 +112,12 @@ public class JWTDecoder {
         SignedJWT signedJWT = SignedJWT.parse(data);
 
         String keyID = signedJWT.getHeader().getKeyID();
+        URI jwkURI = signedJWT.getHeader().getJWKURL();
 
-        SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(keyID).withAsymmetricPart(AsymmetricPart.PUBLIC).build();
+        SelectorCriteria criteria = SelectorCriteria.newBuilder()
+                .withId(keyID)
+                .withJKU(jwkURI)
+                .withAsymmetricPart(AsymmetricPart.PUBLIC).build();
         Key key = keySelector.selectSecretKey(criteria);
         if (key == null) {
             throw new InvalidJWTException(String.format("No key found for %s", keyID));

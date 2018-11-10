@@ -26,24 +26,18 @@ import java.util.Map;
  *
  */
 
-public class JWTParametersSigning implements JWTParameters {
+public class JWTParametersSigning extends JWTParametersHeader {
 
-    private Map<String, Object> headerValues;
     private AtbashKey secretKeySigning;
 
     public JWTParametersSigning(Map<String, Object> headerValues, AtbashKey secretKeySigning) {
-
-        this.headerValues = headerValues;
+        super(headerValues);
         this.secretKeySigning = secretKeySigning;
     }
 
     @Override
     public JWTEncoding getEncoding() {
         return JWTEncoding.JWS;
-    }
-
-    public Map<String, Object> getHeaderValues() {
-        return headerValues;
     }
 
     public String getKeyID() {

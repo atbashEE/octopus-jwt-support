@@ -19,6 +19,7 @@ import be.atbash.ee.security.octopus.keys.selector.filter.*;
 import be.atbash.util.StringUtils;
 import com.nimbusds.jose.jwk.KeyType;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +33,7 @@ public class SelectorCriteria {
     private SecretKeyType secretKeyType;
     private KeyType keyType;
     private AsymmetricPart asymmetricPart;
+    private URI jku;
 
     private SelectorCriteria() {
     }
@@ -50,6 +52,10 @@ public class SelectorCriteria {
 
     public AsymmetricPart getAsymmetricPart() {
         return asymmetricPart;
+    }
+
+    public URI getJku() {
+        return jku;
     }
 
     public List<KeyFilter> asKeyFilters() {
@@ -96,6 +102,11 @@ public class SelectorCriteria {
 
         public Builder withAsymmetricPart(AsymmetricPart asymmetricPart) {
             criteria.asymmetricPart = asymmetricPart;
+            return this;
+        }
+
+        public Builder withJKU(URI jku) {
+            criteria.jku = jku;
             return this;
         }
 

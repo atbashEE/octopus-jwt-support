@@ -132,4 +132,44 @@ public class JWTParametersBuilderTest {
         assertThat(parametersSigning.getKeyType()).isEqualTo(KeyType.OCT);
 
     }
+
+    @Test
+    public void withHeader_defaultValue() {
+        System.setProperty("default.provider.1", "value1");
+        System.setProperty("default.provider.2", "value2");
+
+        JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS)
+                .withSecretKeyForSigning(HmacSecretUtil.generateSecretKey("testSecret", "Spock".getBytes(Charset.forName("UTF-8"))))
+                .withHeader("UnitTest", "Spock")
+                .build();
+
+        assertThat(parameters).isInstanceOf(JWTParametersSigning.class);
+        JWTParametersSigning parametersSigning = (JWTParametersSigning) parameters;
+
+        assertThat(parametersSigning.getHeaderValues()).hasSize(3);
+        assertThat(parametersSigning.getHeaderValues()).containsEntry("UnitTest", "Spock");
+        assertThat(parametersSigning.getHeaderValues()).containsEntry("default-key1", "value1");
+        assertThat(parametersSigning.getHeaderValues()).containsEntry("default-key2", "value");
+
+        System.setProperty("default.provider.1", "");
+        System.setProperty("default.provider.2", "");
+    }
+
+    @Test
+    public void withHeader_jkuValue() {
+
+        JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS)
+                .withSecretKeyForSigning(HmacSecretUtil.generateSecretKey("testSecret", "Spock".getBytes(Charset.forName("UTF-8"))))
+                .withHeader("UnitTest", "Spock")
+                .withJSONKeyURL("jku_value")
+                .build();
+
+        assertThat(parameters).isInstanceOf(JWTParametersSigning.class);
+        JWTParametersSigning parametersSigning = (JWTParametersSigning) parameters;
+
+        assertThat(parametersSigning.getHeaderValues()).hasSize(2);
+        assertThat(parametersSigning.getHeaderValues()).containsEntry("UnitTest", "Spock");
+        assertThat(parametersSigning.getHeaderValues()).containsEntry("jku", "jku_value");
+
+    }
 }

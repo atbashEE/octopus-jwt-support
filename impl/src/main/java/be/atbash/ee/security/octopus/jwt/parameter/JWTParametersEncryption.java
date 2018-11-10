@@ -26,16 +26,15 @@ import java.util.Map;
  *
  */
 
-public class JWTParametersEncryption implements JWTParameters {
+public class JWTParametersEncryption extends JWTParametersHeader {
 
-    private Map<String, Object> headerValues;
     private AtbashKey secretKeyEncryption;
     private JWTParametersSigning parametersSigning;
 
     public JWTParametersEncryption(JWTParametersSigning parametersSigning, Map<String, Object> headerValues, AtbashKey secretKeyEncryption) {
+        super(headerValues);
         this.parametersSigning = parametersSigning;
 
-        this.headerValues = headerValues;
         this.secretKeyEncryption = secretKeyEncryption;
     }
 
@@ -44,14 +43,8 @@ public class JWTParametersEncryption implements JWTParameters {
         return JWTEncoding.JWE;
     }
 
-    public Map<String, Object> getHeaderValues() {
-        return headerValues;
-    }
-
     public String getKeyID() {
-
         return secretKeyEncryption.getKeyId();
-
     }
 
     public Key getKey() {

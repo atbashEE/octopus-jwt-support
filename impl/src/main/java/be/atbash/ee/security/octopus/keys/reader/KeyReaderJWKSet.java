@@ -32,9 +32,7 @@ import java.util.*;
 public class KeyReaderJWKSet extends KeyReaderJWK {
 
     public List<AtbashKey> readResource(String path, KeyResourcePasswordLookup passwordLookup) {
-        List<AtbashKey> result = new ArrayList<>();
         InputStream inputStream;
-        //try {
         try {
             // FIXME Should we first use .resourceExists ?
             inputStream = ResourceUtil.getInstance().getStream(path);
@@ -47,6 +45,18 @@ public class KeyReaderJWKSet extends KeyReaderJWK {
 
         String fileContent = new Scanner(inputStream).useDelimiter("\\Z").next();
 
+        try {
+            inputStream.close();
+        } catch (IOException e) {
+            throw new AtbashUnexpectedException(e);
+        }
+
+        return parseContent(path, passwordLookup, fileContent);
+
+    }
+
+    public List<AtbashKey> parseContent(String path, KeyResourcePasswordLookup passwordLookup, String fileContent) {
+        List<AtbashKey> result = new ArrayList<>();
         JSONObject jsonObject = (JSONObject) JSONValue.parse(fileContent);
         JSONArray keys = (JSONArray) jsonObject.get("keys");
         try {
@@ -67,16 +77,8 @@ public class KeyReaderJWKSet extends KeyReaderJWK {
         } catch (ParseException | JOSEException e) {
             // TODO We need another exception, indicating that loading failed
             throw new AtbashUnexpectedException(e);
-        } finally {
-            try {
-                inputStream.close();
-            } catch (IOException e) {
-                e.printStackTrace();// TODO Log
-            }
         }
-
         return result;
-
     }
 
 }

@@ -54,6 +54,11 @@ public final class JWTParametersBuilder {
         return this;
     }
 
+    // Convenient way for withHeader("jku",url);
+    public JWTParametersBuilder withJSONKeyURL(String url) {
+        return withHeader("jku", url);
+    }
+
     public JWTParametersBuilder withSecretKeyForSigning(AtbashKey key) {
         if (encoding == JWTEncoding.NONE) {
             logger.warn("SecretKey value is not supported with JWTEncoding.NONE");

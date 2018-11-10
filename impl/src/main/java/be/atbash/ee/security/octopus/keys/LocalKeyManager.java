@@ -19,38 +19,43 @@ import be.atbash.config.exception.ConfigurationException;
 import be.atbash.ee.security.octopus.keys.config.JwtSupportConfiguration;
 import be.atbash.ee.security.octopus.keys.reader.KeyFilesHelper;
 import be.atbash.ee.security.octopus.keys.reader.KeyReader;
+import be.atbash.ee.security.octopus.keys.reader.KeyReaderJWKSet;
 import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup;
 import be.atbash.ee.security.octopus.keys.selector.SelectorCriteria;
 import be.atbash.ee.security.octopus.keys.selector.filter.KeyFilter;
 import be.atbash.util.StringUtils;
 import be.atbash.util.exception.AtbashIllegalActionException;
+import be.atbash.util.exception.AtbashUnexpectedException;
 
 import javax.enterprise.inject.Vetoed;
-import javax.inject.Inject;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 /**
  *
  */
 @Vetoed // This seems needed as multiple implementations can be available.
-// But why are we then using @Inject since we always use instantiation by new?
 public class LocalKeyManager implements KeyManager {
 
     private static final Object LOCK = new Object();
 
-    @Inject
     private JwtSupportConfiguration configuration;
 
-    @Inject
     private KeyReader keyReader;
 
-    @Inject
     private KeyFilesHelper keyFilesHelper;
 
     private KeyResourcePasswordLookup passwordLookup;
 
-    private List<AtbashKey> keys;
+    private KeyReaderJWKSet keyReaderJWKSet;
+
+    private List<AtbashKey> keys = new ArrayList<>();
 
     @Override
     public List<AtbashKey> retrieveKeys(SelectorCriteria selectorCriteria) {
@@ -60,23 +65,51 @@ public class LocalKeyManager implements KeyManager {
 
         List<KeyFilter> filters = selectorCriteria.asKeyFilters();
 
-        checkKeyLoading();
+        if (selectorCriteria.getJku() == null) {
+            checkKeyLoading();
+        }
 
-        List<AtbashKey> result = new ArrayList<>(keys);
-        for (KeyFilter filter : filters) {
-            result = filter.filter(result);
+        List<AtbashKey> result = filterKeys(filters);
+
+        if (result.isEmpty() && selectorCriteria.getJku() != null) {
+            loadRemoteKeys(selectorCriteria.getJku());
+            result = filterKeys(filters);
         }
 
         return result;
 
     }
 
+    private void loadRemoteKeys(URI jkuURL) {
+        String fileContent;
+        try {
+            URL url = jkuURL.toURL();
+            URLConnection uc = url.openConnection();
+            InputStream inputStream = uc.getInputStream();
+            fileContent = new Scanner(inputStream).useDelimiter("\\Z").next();
+            inputStream.close();
+        } catch (IOException e) {
+            throw new AtbashUnexpectedException(e);
+        }
+
+        List<AtbashKey> atbashKeys = keyReaderJWKSet.parseContent(null, passwordLookup, fileContent);
+        keys.addAll(atbashKeys);
+    }
+
+    private List<AtbashKey> filterKeys(List<KeyFilter> filters) {
+        List<AtbashKey> result = new ArrayList<>(keys);
+        for (KeyFilter filter : filters) {
+            result = filter.filter(result);
+        }
+        return result;
+    }
+
     private void checkKeyLoading() {
-        if (keys == null) {
+        if (keys.isEmpty()) { // Not as good as keys == null check
             // lazy loading
             synchronized (LOCK) {
-                if (keys == null) {
-                    checkDependencies(); // Support java SE + Config driven Password Lookup class
+                if (keys.isEmpty()) { // Not as good as keys == null check
+                    checkDependencies(); // Config driven Password Lookup class
 
                     String keysLocation = configuration.getKeysLocation();
 
@@ -85,7 +118,6 @@ public class LocalKeyManager implements KeyManager {
                     }
 
                     List<String> keyFiles = keyFilesHelper.determineKeyFiles(keysLocation);
-                    keys = new ArrayList<>();
                     for (String keyFile : keyFiles) {
                         keys.addAll(keyReader.readKeyResource(keyFile, passwordLookup));
                     }
@@ -96,12 +128,13 @@ public class LocalKeyManager implements KeyManager {
 
     private void checkDependencies() {
         if (configuration == null) {
-            // Java SE
+            // check for null required ??
+
             configuration = new JwtSupportConfiguration();
             keyReader = new KeyReader();
             keyFilesHelper = new KeyFilesHelper();
-        }
-        if (passwordLookup == null) {
+            keyReaderJWKSet = new KeyReaderJWKSet();
+
             passwordLookup = configuration.getPasswordLookup();
         }
     }
