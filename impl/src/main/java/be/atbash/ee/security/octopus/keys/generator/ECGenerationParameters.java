@@ -45,6 +45,7 @@ public class ECGenerationParameters extends GenerationParameters {
         }
 
         public ECGenerationParametersBuilder withCurveName(String curveName) {
+            // FIXME Check with the supported Curves by nimbus
             this.curveName = curveName;
             return this;
         }

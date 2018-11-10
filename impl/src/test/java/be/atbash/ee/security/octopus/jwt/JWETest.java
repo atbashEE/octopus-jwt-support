@@ -74,7 +74,7 @@ public class JWETest {
 
         KeySelector keySelector = new TestKeySelector(keyManager);
         Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector, null).getData();
-        System.out.println(data);
+        assertThat(data).isEqualToComparingFieldByField(payload);
 
     }
 
