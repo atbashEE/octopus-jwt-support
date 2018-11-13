@@ -15,6 +15,7 @@ User manual for Atbash configuration.
 . Support for creating JWE (Encrypted JWT from Java Object and vice versa)
 . Writing and Reading EC keys in JWK format.
 . Support for AtbashKey by JWTEncoder and JWTDecoder.
+. Support for jku header (JSON Key URL)
 
 Breaking changes
 
@@ -114,6 +115,11 @@ The following example converts a signed JWT or a JWE.
 ----
 
 KeySelector -> Selector of the key based on the id found in the header using a default (but can be configured) keyManager which looks for all keys defined based on some location (see _keys.location_ and _key.manager.class_ configuration parameters)
+
+The default KeyManager now also supports the _jku_ header. When available, the URL is called to retrieve the keys (in the format of a JWK Set as defined in the specification). In this scenario, the parameter _keys.location_ is not required.
+The current version is a draft implementation and will be improved in the future (so that rotating keys are better supported and caching of those keys).
+
+See also https://github.com/rdebusscher/atbash-key-server for a Key management server implementation.
 
 MPBearerTokenVerifier -> Optional verifier for validating the JWT.
 

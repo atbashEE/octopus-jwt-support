@@ -67,6 +67,8 @@ public class LocalKeyManager implements KeyManager {
 
         if (selectorCriteria.getJku() == null) {
             checkKeyLoading();
+        } else {
+            checkDependencies();
         }
 
         List<AtbashKey> result = filterKeys(filters);
@@ -81,6 +83,7 @@ public class LocalKeyManager implements KeyManager {
     }
 
     private void loadRemoteKeys(URI jkuURL) {
+        // FIXME use com.nimbusds.jose.jwk.source.RemoteJWKSet ??
         String fileContent;
         try {
             URL url = jkuURL.toURL();
