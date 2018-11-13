@@ -25,6 +25,7 @@ import be.atbash.util.resource.ResourceUtil;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.AsymmetricJWK;
 import com.nimbusds.jose.jwk.JWK;
+import com.nimbusds.jose.jwk.RSAKey;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -95,6 +96,18 @@ public class KeyReaderJWK {
             if (publicKey != null) {
                 result.add(new AtbashKey(jwk.getKeyID(), Collections.singletonList(jwk.getKeyUse()), publicKey));
             }
+        }
+        if (result.isEmpty() && jwk instanceof RSAKey) {
+            // Support Payara because it has an old version of Nimbus which uses AssymmetricJWK
+            PrivateKey privateKey = ((RSAKey) jwk).toPrivateKey();
+            if (privateKey != null) {
+                result.add(new AtbashKey(jwk.getKeyID(), Collections.singletonList(jwk.getKeyUse()), privateKey));
+            }
+            PublicKey publicKey = ((RSAKey) jwk).toPublicKey();
+            if (publicKey != null) {
+                result.add(new AtbashKey(jwk.getKeyID(), Collections.singletonList(jwk.getKeyUse()), publicKey));
+            }
+
         }
         return result;
     }
