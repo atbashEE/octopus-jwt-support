@@ -16,6 +16,7 @@ User manual for Atbash configuration.
 . Writing and Reading EC keys in JWK format.
 . Support for AtbashKey by JWTEncoder and JWTDecoder.
 . Support for jku header (JSON Key URL)
+. _discriminator_ object for SelectorCriteria
 
 Breaking changes
 
@@ -180,6 +181,12 @@ The return value of the interface method _determineKeyResourceType_ will determi
 Various types have encrypted storage of private keys (as they have a sensitive nature).
 
 TODO Specify how _ConfigKeyResourcePasswordLookup_ reads the password from the configuration.
+
+=== Discriminator in SelectorCriteria
+
+Some _KeyManager_ support some kind of separation of the keys (like tenants). The KeyManager implemented in the [Key Manager Server](https://github.com/atbashEE/atbash-key-server) for example has such a separation.
+
+Therefor we can pass some kind of _discriminator_ object to the SelectorCriteria. This discriminator (a string, a POJO, whatever will be understood by the KeyManager) will then be used by it to distinct keys.
 
 === Customization
 

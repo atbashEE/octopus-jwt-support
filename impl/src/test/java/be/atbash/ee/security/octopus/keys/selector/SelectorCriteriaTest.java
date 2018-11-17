@@ -40,6 +40,9 @@ public class SelectorCriteriaTest {
         builder.withAsymmetricPart(AsymmetricPart.PUBLIC);
         builder.withJKU(new URI("http://jkuURL"));
 
+        Long discriminator = 123L;
+        builder.withDiscriminator(discriminator);
+
         SelectorCriteria criteria = builder.build();
 
         assertThat(criteria.getId()).isEqualTo("kid");
@@ -47,5 +50,9 @@ public class SelectorCriteriaTest {
         assertThat(criteria.getSecretKeyType()).isEqualTo(secretKeyType);
         assertThat(criteria.getAsymmetricPart()).isEqualTo(AsymmetricPart.PUBLIC);
         assertThat(criteria.getJku().toString()).isEqualTo("http://jkuURL");
+
+        Object d = criteria.getDiscriminator();
+        assertThat(d).isInstanceOf(Long.class);
+        assertThat(d).isEqualTo(123L);
     }
 }

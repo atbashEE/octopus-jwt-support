@@ -34,6 +34,7 @@ public class SelectorCriteria {
     private KeyType keyType;
     private AsymmetricPart asymmetricPart;
     private URI jku;
+    private Object discriminator;
 
     private SelectorCriteria() {
     }
@@ -56,6 +57,10 @@ public class SelectorCriteria {
 
     public URI getJku() {
         return jku;
+    }
+
+    public Object getDiscriminator() {
+        return discriminator;
     }
 
     public List<KeyFilter> asKeyFilters() {
@@ -107,6 +112,11 @@ public class SelectorCriteria {
 
         public Builder withJKU(URI jku) {
             criteria.jku = jku;
+            return this;
+        }
+
+        public Builder withDiscriminator(Object discriminator) {
+            criteria.discriminator = discriminator;
             return this;
         }
 
