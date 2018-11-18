@@ -324,4 +324,20 @@ public class KeyReaderTest {
 
     }
 
+    @Test
+    public void readKeyResource_scenario15() {
+        // JWK, RSA public only
+        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.pub.jwk", null);
+        assertThat(keys).hasSize(1);
+    }
+
+    @Test
+    public void readKeyResource_scenario16() {
+        // JWKSet (RSA Public)
+
+        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "test2.jwkset", null);
+        assertThat(keys).hasSize(1);
+        assertThat(keys.get(0).getSecretKeyType().getAsymmetricPart()).isEqualTo(AsymmetricPart.PUBLIC);
+
+    }
 }

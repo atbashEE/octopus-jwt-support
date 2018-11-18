@@ -34,6 +34,8 @@ public class KeyReaderJWKSetTest {
             ",{\"d\":\"iRBc2Dct9I-wiASzpNXItm0gBu43dw_rjqdZ8BN5Ukk\",\"crv\":\"P-256\",\"kty\":\"EC\",\"y\":\"sGXT9uFyM_2yn3Z2upj5yV-9EUQEqqB664w7tMGjsnw\",\"x\":\"KISGNk7Q4NvmRlBtzzTQJLTIO1jj78cNvcRvcqrmRaY\",\"kid\":\"secp256r1-key\"}\n" +
             "]}\n";
 
+    private String data2 = "{\"keys\":[{\"kty\":\"RSA\",\"e\":\"AQAB\",\"kid\":\"dc74e5f1-92a3-4f77-b824-d41db51d6ceb\",\"n\":\"7D3dav0yQCF4iKULd1NAIHWJIVhwLAa_b3YPPKmEyYIR8diYvfa1N4joO8tZosRUK_kpJETeeiUuLKVmdV-Ei6Fv3lfAmszO41rp3_3dOQQ4c_ZKp5_VJpfS1Rynd9kTfBxGDeu14sJiQJ9RmN6nTNk2iv9il3MPGG3XFNjxtLtxGzkPn1UZ1zt3mjmH-PkFis4aAFDbYJbbl9moYr_jd5QOmmDnkSqWsXyREneqhPPHMx1UWbISTfDQwjyIW_gdE1FbNNwsXqwoguaH29z9HbnDgWzqK6UiZATHl8etuoRNuZUBymxOQan-mZOxlzo9Z5dGOCFCUoOeGGibY2d_vw\"}]}";
+
     @Test
     public void parseContent() {
 
@@ -50,6 +52,18 @@ public class KeyReaderJWKSetTest {
         }
 
         assertThat(data).containsOnly("rsa.pk.free - RSA - PRIVATE", "secp256r1-key - EC - PUBLIC", "rsa.pk.free - RSA - PUBLIC", "secp256r1-key - EC - PRIVATE");
+
+    }
+
+    @Test
+    public void parseContent2() {
+
+        List<AtbashKey> keys = reader.parseContent(null, null, data2);
+        assertThat(keys).hasSize(1);
+
+        AtbashKey atbashKey = keys.get(0);
+        String data = atbashKey.getKeyId() + " - " + atbashKey.getSecretKeyType().getKeyType().getValue() + " - " + atbashKey.getSecretKeyType().getAsymmetricPart();
+        assertThat(data).isEqualTo("dc74e5f1-92a3-4f77-b824-d41db51d6ceb - RSA - PUBLIC");
 
     }
 }

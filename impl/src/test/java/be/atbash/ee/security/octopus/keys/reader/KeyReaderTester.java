@@ -17,7 +17,9 @@ package be.atbash.ee.security.octopus.keys.reader;
 
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup;
+import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.util.resource.ResourceUtil;
+import com.nimbusds.jose.jwk.RSAKey;
 import org.bouncycastle.openssl.PKCS8Generator;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.bouncycastle.openssl.jcajce.JcaPKCS8Generator;
@@ -30,6 +32,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.security.PrivateKey;
 import java.security.SecureRandom;
+import java.security.interfaces.RSAPublicKey;
 import java.util.List;
 
 /**
@@ -41,12 +44,19 @@ public class KeyReaderTester {
     public static void main(String[] args) throws IOException, OperatorCreationException {
 
         KeyReader keyReader = new KeyReader();
-        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.pk.pem", new TestPasswordLookup("atbash".toCharArray()));
+        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.jwk", new TestPasswordLookup("atbash".toCharArray()));
         for (AtbashKey key : keys) {
             System.out.println("XXXXX");
             System.out.println("Key Id " + key.getKeyId());
             System.out.println("Key Type " + key.getSecretKeyType().getKeyType() + " - " + key.getSecretKeyType().getAsymmetricPart());
             System.out.println("Key" + key.getKey());
+
+            if (key.getSecretKeyType().getAsymmetricPart() == AsymmetricPart.PUBLIC) {
+                RSAKey rsaKey = new RSAKey.Builder((RSAPublicKey) key.getKey())
+                        .keyID("xx")
+                        .build();
+                System.out.println(rsaKey.toJSONObject().toJSONString());
+            }
         }
 
         /*
@@ -71,6 +81,7 @@ public class KeyReaderTester {
     }
 
     private static class TestPasswordLookup implements KeyResourcePasswordLookup {
+        // FIXME Use be.atbash.ee.security.octopus.keys.TestPasswordLookup
         private char[] password;
 
         public TestPasswordLookup(char[] password) {

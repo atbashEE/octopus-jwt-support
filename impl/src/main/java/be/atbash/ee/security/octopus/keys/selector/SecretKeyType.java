@@ -99,6 +99,7 @@ At the moment, only Ed25519 and X25519 curves are supported.
 
 Public keys must contain crv (curve) and x values. Private keys will also contain a value d.
 
+see com.nimbusds.jose.jwk.gen.OctetKeyPairGenerator
          */
         return result;
     }
