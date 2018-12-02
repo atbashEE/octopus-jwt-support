@@ -17,15 +17,8 @@ package be.atbash.ee.security.octopus.keys.reader;
 
 import be.atbash.ee.security.octopus.keys.config.JwtSupportConfiguration;
 import be.atbash.util.CDIUtils;
+import be.atbash.util.resource.ResourceScanner;
 import be.atbash.util.resource.ResourceUtil;
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
-import com.google.common.collect.Iterators;
-import com.google.common.collect.Sets;
-import com.google.common.io.Files;
-import org.reflections.Reflections;
-import org.reflections.scanners.ResourcesScanner;
-import org.reflections.vfs.Vfs;
 import org.slf4j.Logger;
 
 import javax.annotation.PostConstruct;
@@ -42,8 +35,6 @@ import java.util.regex.Pattern;
  * Helps to identify all the key files when directory defined (resource or file system)
  */
 @ApplicationScoped
-// We have already dependency on Guava through org.reflections.
-// FIXME Maybe we should incorporate the relevant code into this project and remove Guava dependency here.
 public class KeyFilesHelper {
 
     private final Object LOCK = new Object();
@@ -59,7 +50,7 @@ public class KeyFilesHelper {
 
     private KeyResourceTypeProvider keyResourceTypeProvider;
 
-    private AtbashResourceScanner scanner;
+    private ResourceScanner scanner;
 
     @PostConstruct
     public void init() {
@@ -81,7 +72,7 @@ public class KeyFilesHelper {
                 // See if it is a resource on the classpath
                 String resourceName = keyConfigParameterValue.substring(ResourceUtil.CLASSPATH_PREFIX.length());
 
-                if (scanner.existsResource(keyConfigParameterValue)) {
+                if (scanner.existsResource(resourceName)) {
                     result.add(keyConfigParameterValue);
                 } else {
                     // It is a directory, get everything in (sub)directory.
@@ -102,7 +93,8 @@ public class KeyFilesHelper {
                 if (file.exists() && file.canRead()) {
                     if (file.isDirectory()) {
                         // directory
-                        for (File f : Files.fileTreeTraverser().preOrderTraversal(file)) {
+
+                        for (File f : defineFiles(file)) {
 
                             if (f.isFile()) {
                                 result.add(ResourceUtil.FILE_PREFIX + f.getAbsoluteFile().toString());
@@ -121,6 +113,22 @@ public class KeyFilesHelper {
                 // When file isn't matched to any of the types -> remove from list
                 iterator.remove();
                 logger.warn(String.format("(OCT-KEY-012) Unable to determine type of '%s'", path));
+            }
+        }
+        return result;
+    }
+
+    private List<File> defineFiles(File file) {
+        List<File> result = new ArrayList<>();
+        File[] files = file.listFiles();
+        if (files == null) {
+            return result;
+        }
+        for (File f : files) {
+            if (f.isDirectory()) {
+                result.addAll(defineFiles(f));
+            } else {
+                result.add(f);
             }
         }
         return result;
@@ -149,36 +157,9 @@ public class KeyFilesHelper {
                     //Because I need something like a resourceScanner but which keeps the 'full' path as key in the store and not only the filename.
                     // So I create an instance of a custom scanner and later I ask the resource files fro the store directly.
 
-                    scanner = new AtbashResourceScanner();
-                    new Reflections("", scanner);
+                    scanner = ResourceScanner.getInstance();
                 }
             }
-        }
-    }
-
-    private static class AtbashResourceScanner extends ResourcesScanner {
-        AtbashResourceScanner() {
-            // Otherwise all classes are also accepted.
-            setResultFilter(Predicates.<String>alwaysFalse());
-        }
-
-        @Override
-        public Object scan(Vfs.File file, Object classObject) {
-            this.getStore().put(file.getRelativePath(), file.getRelativePath());
-            return classObject;
-        }
-
-        public Set<String> getResources(final Pattern pattern) {
-            Predicate<String> predicate = new Predicate<String>() {
-                public boolean apply(String input) {
-                    return pattern.matcher(input).matches();
-                }
-            };
-            return Sets.newHashSet(Iterators.filter(getStore().keySet().iterator(), predicate));
-        }
-
-        public boolean existsResource(String resourceName) {
-            return getStore().keySet().contains(resourceName);
         }
     }
 }
