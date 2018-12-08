@@ -15,6 +15,7 @@
  */
 package be.atbash.ee.security.octopus.keys.subview;
 
+import be.atbash.ee.security.octopus.keys.subview.model.FileExtensionFilters;
 import be.atbash.ee.security.octopus.keys.subview.model.KeyData;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -77,13 +78,9 @@ public class ApplicationMenu extends SubView {
 
     private void onOpenFile() {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Open Cryptographic  File");
+        fileChooser.setTitle("Open Cryptographic File");
 
-        // FIXME Use the suffixed from KeyResourceType
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("JWK Files", "*.jwk")
-                , new FileChooser.ExtensionFilter("JWK Set Files", "*.jwks")
-        );
+        fileChooser.getExtensionFilters().addAll(FileExtensionFilters.getFilters());
 
         File selectedFile = fileChooser.showOpenDialog(primaryStage);
         if (selectedFile != null) {
