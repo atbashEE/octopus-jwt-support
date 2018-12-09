@@ -85,11 +85,13 @@ public class JwkKeyEncoderPublicPart implements KeyEncoder {
 
             X9ECParameters params = org.bouncycastle.asn1.x9.ECNamedCurveTable.getByName(name);
 
-            if (params.getN().equals(ecParameterSpec.getN())
-                    && params.getH().equals(ecParameterSpec.getH())
-                    && params.getCurve().equals(ecParameterSpec.getCurve())
-                    && params.getG().equals(ecParameterSpec.getG())) {
-                return supportedCurve;
+            if (params != null) {
+                if (params.getN().equals(ecParameterSpec.getN())
+                        && params.getH().equals(ecParameterSpec.getH())
+                        && params.getCurve().equals(ecParameterSpec.getCurve())
+                        && params.getG().equals(ecParameterSpec.getG())) {
+                    return supportedCurve;
+                }
             }
         }
 

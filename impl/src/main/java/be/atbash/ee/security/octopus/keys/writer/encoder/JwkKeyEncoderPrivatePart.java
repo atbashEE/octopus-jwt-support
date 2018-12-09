@@ -25,8 +25,10 @@ import com.nimbusds.jose.jwk.RSAKey;
 import org.bouncycastle.asn1.x9.X9ECParameters;
 import org.bouncycastle.jcajce.provider.asymmetric.util.EC5Util;
 import org.bouncycastle.jce.ECNamedCurveTable;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.spec.ECPublicKeySpec;
 import org.bouncycastle.math.ec.ECPoint;
+import sun.security.ec.ECPrivateKeyImpl;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -43,6 +45,10 @@ import static com.nimbusds.jose.jwk.ECKey.SUPPORTED_CURVES;
  */
 
 public class JwkKeyEncoderPrivatePart implements KeyEncoder {
+
+    public JwkKeyEncoderPrivatePart() {
+        Security.addProvider(new BouncyCastleProvider());
+    }
 
     @Override
     public byte[] encodeKey(AtbashKey atbashKey, KeyEncoderParameters parameters) throws IOException {
@@ -89,11 +95,13 @@ public class JwkKeyEncoderPrivatePart implements KeyEncoder {
 
             X9ECParameters params = org.bouncycastle.asn1.x9.ECNamedCurveTable.getByName(name);
 
-            if (params.getN().equals(ecParameterSpec.getN())
-                    && params.getH().equals(ecParameterSpec.getH())
-                    && params.getCurve().equals(ecParameterSpec.getCurve())
-                    && params.getG().equals(ecParameterSpec.getG())) {
-                return supportedCurve;
+            if (params != null) {
+                if (params.getN().equals(ecParameterSpec.getN())
+                        && params.getH().equals(ecParameterSpec.getH())
+                        && params.getCurve().equals(ecParameterSpec.getCurve())
+                        && params.getG().equals(ecParameterSpec.getG())) {
+                    return supportedCurve;
+                }
             }
         }
 
@@ -132,19 +140,36 @@ public class JwkKeyEncoderPrivatePart implements KeyEncoder {
     private PublicKey getPublicKey(Key key, Curve curve) {
 
         if (key instanceof ECPrivateKey) {
-            // TODO Only BC type keys are supported ?
-            try {
-                KeyFactory keyFactory = KeyFactory.getInstance("ECDSA", "BC");
-                org.bouncycastle.jce.spec.ECParameterSpec ecSpec = ECNamedCurveTable.getParameterSpec(curve.getStdName());
+            // TODO Optimize
+            if (key instanceof org.bouncycastle.jce.interfaces.ECPrivateKey) {
+                try {
+                    KeyFactory keyFactory = KeyFactory.getInstance("ECDSA", "BC");
+                    org.bouncycastle.jce.spec.ECParameterSpec ecSpec = ECNamedCurveTable.getParameterSpec(curve.getStdName());
 
-                ECPoint Q = ecSpec.getG().multiply(((org.bouncycastle.jce.interfaces.ECPrivateKey) key).getD());
+                    ECPoint Q = ecSpec.getG().multiply(((org.bouncycastle.jce.interfaces.ECPrivateKey) key).getD());
 
-                ECPublicKeySpec pubSpec = new ECPublicKeySpec(Q, ecSpec);
-                return keyFactory.generatePublic(pubSpec);
-            } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeySpecException e) {
-                throw new AtbashUnexpectedException(e);
+                    ECPublicKeySpec pubSpec = new ECPublicKeySpec(Q, ecSpec);
+                    return keyFactory.generatePublic(pubSpec);
+                } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeySpecException e) {
+                    throw new AtbashUnexpectedException(e);
+                }
             }
 
+            if (key instanceof ECPrivateKeyImpl) {
+
+                try {
+                    KeyFactory keyFactory = KeyFactory.getInstance("ECDSA", "BC");
+                    org.bouncycastle.jce.spec.ECParameterSpec ecSpec = ECNamedCurveTable.getParameterSpec(curve.getStdName());
+
+                    ECPoint Q = ecSpec.getG().multiply(((ECPrivateKeyImpl) key).getS());
+
+                    ECPublicKeySpec pubSpec = new ECPublicKeySpec(Q, ecSpec);
+                    return keyFactory.generatePublic(pubSpec);
+                } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeySpecException e) {
+                    throw new AtbashUnexpectedException(e);
+                }
+
+            }
         }
         throw new UnsupportedOperationException("TODO");
 
