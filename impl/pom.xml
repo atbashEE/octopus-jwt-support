@@ -178,6 +178,7 @@
     <build>
         <plugins>
             <!-- sun.security.ec.ECPrivateKeyImpl data not correct thus disabled for the moment-->
+            <!-- Seems that OpenJDK doesn't have this file, but OracleJDK and Zulu does have it-->
             <!--plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>animal-sniffer-maven-plugin</artifactId>
