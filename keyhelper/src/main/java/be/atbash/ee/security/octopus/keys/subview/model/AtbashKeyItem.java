@@ -18,6 +18,8 @@ package be.atbash.ee.security.octopus.keys.subview.model;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 /**
  *
@@ -25,17 +27,13 @@ import javafx.beans.property.SimpleBooleanProperty;
 
 public class AtbashKeyItem {
 
-    private String kid;
+    private StringProperty kid = new SimpleStringProperty();
     private String keyType;
     private AsymmetricPart asymmetricPart;
     private BooleanProperty selected = new SimpleBooleanProperty(true);
 
-    public String getKid() {
+    public StringProperty kidProperty() {
         return kid;
-    }
-
-    public void setKid(String kid) {
-        this.kid = kid;
     }
 
     public String getKeyType() {

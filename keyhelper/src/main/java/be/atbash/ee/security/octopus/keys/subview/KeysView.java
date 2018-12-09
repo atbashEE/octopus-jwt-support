@@ -24,6 +24,7 @@ import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -70,6 +71,7 @@ public class KeysView extends SubView {
         TableColumn<AtbashKeyItem, Boolean> selectedCol = new TableColumn<>("Selected");
 
         idCol.setCellValueFactory(new PropertyValueFactory<>("kid"));
+        idCol.setCellFactory(TextFieldTableCell.forTableColumn());
         typeCol.setCellValueFactory(new PropertyValueFactory<>("keyType"));
         privateCol.setCellValueFactory(new PropertyValueFactory<>("asymmetricText"));
         selectedCol.setCellValueFactory(new PropertyValueFactory<>("selected"));
@@ -120,7 +122,7 @@ public class KeysView extends SubView {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Confirmation Dialog");
         alert.setHeaderText("Confirm delete");
-        alert.setContentText(String.format("Are you sure you want to delete key with id '%s'?", atbashKeyItem.getKid()));
+        alert.setContentText(String.format("Are you sure you want to delete key with id '%s'?", atbashKeyItem.kidProperty().getValue()));
 
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent()) {

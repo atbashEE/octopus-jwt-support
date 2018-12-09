@@ -21,6 +21,9 @@ import be.atbash.ee.security.octopus.keys.reader.KeyReader;
 import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.StringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -73,12 +76,13 @@ public class KeyData {
 
     private void onAddKey(AtbashKey atbashKey) {
         AtbashKeyItem item = new AtbashKeyItem();
-        item.setKid(atbashKey.getKeyId());
+        item.kidProperty().setValue(atbashKey.getKeyId());
         item.setKeyType(atbashKey.getSecretKeyType().getKeyType().getValue());
         item.setAsymmetricPart(atbashKey.getSecretKeyType().getAsymmetricPart());
 
         keyItems.add(item);
 
+        new KidChangeListener(atbashKey, item.kidProperty());
     }
 
 
@@ -110,7 +114,23 @@ public class KeyData {
     }
 
     private Optional<AtbashKey> findKey(AtbashKeyItem item) {
-        return keys.stream().filter(key -> key.isMatch(item.getKid(), item.getAsymmetricPart()))
+        return keys.stream().filter(key -> key.isMatch(item.kidProperty().getValue(), item.getAsymmetricPart()))
                 .findAny();
+    }
+
+    private class KidChangeListener implements ChangeListener<String> {
+
+        KidChangeListener(AtbashKey atbashKey, StringProperty kidProperty) {
+            kidProperty.addListener((observable, oldValue, newValue) -> {
+                keys.remove(atbashKey);
+                AtbashKey.AtbashKeyBuilder builder = new AtbashKey.AtbashKeyBuilder();
+                keys.add(builder.withKeyId(newValue).withKey(atbashKey.getKey()).build());
+            });
+        }
+
+        @Override
+        public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+
+        }
     }
 }
