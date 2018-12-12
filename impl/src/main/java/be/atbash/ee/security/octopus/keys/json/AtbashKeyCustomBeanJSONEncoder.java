@@ -15,6 +15,7 @@
  */
 package be.atbash.ee.security.octopus.keys.json;
 
+import be.atbash.ee.security.octopus.UnsupportedKeyType;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.json.JSONObject;
 import be.atbash.json.JSONValue;
@@ -68,7 +69,7 @@ public class AtbashKeyCustomBeanJSONEncoder extends CustomBeanBuilderJSONEncoder
                 }
 
                 if (!handled) {
-                    throw new IllegalArgumentException(String.format("KeyType %s not supported.", jwk.getKeyType()));
+                    throw new UnsupportedKeyType(jwk.getKeyType(), "Key JSON deserialization ");
                 }
             } catch (ParseException | JOSEException e) {
                 throw new AtbashUnexpectedException(e);

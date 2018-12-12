@@ -15,6 +15,7 @@
  */
 package be.atbash.ee.security.octopus.jwt.encoder;
 
+import be.atbash.ee.security.octopus.UnsupportedKeyType;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersSigning;
 import be.atbash.util.exception.AtbashUnexpectedException;
 import com.nimbusds.jose.JOSEException;
@@ -67,7 +68,7 @@ public class JWTSignerFactory {
         }
 
         if (result == null) {
-            throw new IllegalArgumentException(String.format("Unsupported value for SecretKeyType : %s", parametersSigning.getKeyType()));
+            throw new UnsupportedKeyType(parametersSigning.getKeyType(), "JWT Signing");
         }
         return result;
     }
@@ -89,7 +90,7 @@ public class JWTSignerFactory {
             result = JWSAlgorithm.ES256; // FIXME Is this always (what about 384 and 512
         }
         if (result == null) {
-            throw new IllegalArgumentException(String.format("Unsupported value for SecretKeyType : %s", parametersSigning.getKeyType()));
+            throw new UnsupportedKeyType(parametersSigning.getKeyType(), "JWT Signing");
         }
 
         return result;

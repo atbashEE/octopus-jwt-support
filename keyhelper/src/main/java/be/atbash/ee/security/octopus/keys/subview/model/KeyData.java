@@ -53,6 +53,9 @@ public class KeyData {
         currentFile = null;
         keys = new ArrayList<>();
         changed.setValue(true);
+
+        keyItems = new ArrayList<>();
+        changed.setValue(false);
     }
 
     public void onOpenFile(File selectedFile) {
@@ -61,7 +64,7 @@ public class KeyData {
         add(keyReader.readKeyResource(selectedFile.getAbsolutePath(), passwordLookup));
 
         currentFile = selectedFile;
-        changed.setValue(false);
+        changed.setValue(true);
     }
 
     public List<AtbashKeyItem> getItems() {

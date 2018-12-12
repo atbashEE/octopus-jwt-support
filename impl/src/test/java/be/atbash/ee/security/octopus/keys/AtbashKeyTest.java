@@ -16,6 +16,7 @@
 package be.atbash.ee.security.octopus.keys;
 
 import be.atbash.ee.security.octopus.keys.fake.FakeRSAPrivate;
+import be.atbash.ee.security.octopus.keys.fake.FakeRSAPublic;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.util.resource.ResourceUtil;
 import org.junit.Test;
@@ -27,7 +28,7 @@ public class AtbashKeyTest {
     @Test
     public void getKeyId() {
 
-        AtbashKey key = new AtbashKey(ResourceUtil.CLASSPATH_PREFIX + "test.pem", null, null);
+        AtbashKey key = new AtbashKey(ResourceUtil.CLASSPATH_PREFIX + "test.pem", null, new FakeRSAPublic());
 
         assertThat(key.getKeyId()).isEqualTo("test");
     }
@@ -35,7 +36,7 @@ public class AtbashKeyTest {
     @Test
     public void getKeyId_multiple_dot() {
 
-        AtbashKey key = new AtbashKey(ResourceUtil.CLASSPATH_PREFIX + "test.pub.pem", null, null);
+        AtbashKey key = new AtbashKey(ResourceUtil.CLASSPATH_PREFIX + "test.pub.pem", null, new FakeRSAPublic());
 
         assertThat(key.getKeyId()).isEqualTo("test.pub");
     }
@@ -43,7 +44,7 @@ public class AtbashKeyTest {
     @Test
     public void getKeyId_no_extension() {
 
-        AtbashKey key = new AtbashKey(ResourceUtil.CLASSPATH_PREFIX + "test", null, null);
+        AtbashKey key = new AtbashKey(ResourceUtil.CLASSPATH_PREFIX + "test", null, new FakeRSAPublic());
 
         assertThat(key.getKeyId()).isEqualTo("test");
 

@@ -15,6 +15,7 @@
  */
 package be.atbash.ee.security.octopus.keys.generator;
 
+import be.atbash.ee.security.octopus.UnsupportedKeyType;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.util.exception.AtbashUnexpectedException;
 import com.nimbusds.jose.jwk.KeyType;
@@ -67,12 +68,15 @@ public class KeyGenerator {
         if (DHGenerationParameters.DH.equals(parameters.getKeyType())) {
             result = generateDHKeys((DHGenerationParameters) parameters);
         }
+        if (result == null) {
+            throw new UnsupportedKeyType(parameters.getKeyType(), "Key generation");
+        }
         return result;
     }
 
     private List<AtbashKey> generateRSAKeys(RSAGenerationParameters generationParameters) {
         try {
-            KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA", "BC");
+            KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA", "BC");  // Do we need BC?
             generator.initialize(generationParameters.getKeySize(), new SecureRandom());
             KeyPair kp = generator.generateKeyPair();
 

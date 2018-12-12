@@ -15,6 +15,7 @@
  */
 package be.atbash.ee.security.octopus.keys.writer.encoder;
 
+import be.atbash.ee.security.octopus.UnsupportedKeyType;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.writer.KeyEncoderParameters;
 import be.atbash.util.exception.AtbashUnexpectedException;
@@ -51,9 +52,8 @@ public class JwkKeyEncoderPublicPart implements KeyEncoder {
         if (KeyType.EC.equals(atbashKey.getSecretKeyType().getKeyType())) {
             return encodeECKey(atbashKey);
         }
-        // FIXME
-        return null;
-
+        // FIXME Support for OCT.
+        throw new UnsupportedKeyType(atbashKey.getSecretKeyType().getKeyType(), "writing JWK");
     }
 
     private byte[] encodeRSAKey(AtbashKey atbashKey) {

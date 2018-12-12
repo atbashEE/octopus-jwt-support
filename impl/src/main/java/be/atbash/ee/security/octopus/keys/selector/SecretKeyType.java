@@ -101,6 +101,9 @@ Public keys must contain crv (curve) and x values. Private keys will also contai
 
 see com.nimbusds.jose.jwk.gen.OctetKeyPairGenerator
          */
+        if (result == null) {
+            throw new IllegalArgumentException(String.format("Unsupported Key instance %s", key.getClass().getName()));
+        }
         return result;
     }
 

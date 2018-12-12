@@ -15,6 +15,7 @@
  */
 package be.atbash.ee.security.octopus.jwt.encoder;
 
+import be.atbash.ee.security.octopus.UnsupportedKeyType;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersEncryption;
 import com.nimbusds.jose.JWEEncrypter;
 import com.nimbusds.jose.crypto.RSAEncrypter;
@@ -36,7 +37,7 @@ public class JWEEncryptionFactory {
         // FIXME EC and AES encryptor
         // Based on password ??
         if (result == null) {
-            throw new IllegalArgumentException(String.format("Unsupported value for SecretKeyType : %s", parametersEncryption.getKeyType()));
+            throw new UnsupportedKeyType(parametersEncryption.getKeyType(), "JWE creation");
         }
         return result;
 

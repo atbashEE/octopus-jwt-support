@@ -26,10 +26,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Insets;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -182,7 +179,10 @@ public class SaveTypeView extends SubView {
             keyWriter.writeKeyResource(selectedKey, keyResourceType, fileName, null, null);
         }
 
-        // FIXME use InfoDialog
+        Alert alert = new Alert(Alert.AlertType.INFORMATION, "File saved", ButtonType.OK);
+        alert.showAndWait();
+
+        new KeysView(primaryStage, rootPane, keyData).initialize();
     }
 
     private String defineFileName(KeyResourceType keyResourceType, String fileName) {
