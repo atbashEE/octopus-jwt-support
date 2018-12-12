@@ -230,6 +230,27 @@ The key id is always required and for EC keys, the curve name is also required.
 
 The generation is performed by the JVM classes itself in case of the RSA and OCT keys, and BouncyCastle in the case of EC keys (_ECDSA_ algorithm)
 
+=== Supported EC Curve names
+
+This is the list of the supported curves (through BouncyCastle)
+
+- prime192v1
+- prime192v2
+- prime192v3
+- prime239v1
+- prime239v2
+- prime239v3
+- prime256v1
+
+- secp192k1
+- secp192r1
+- secp224k1
+- secp224r1 / P-224
+- secp256k1
+- secp256r1 / P-256
+- secp384r1 / P-384
+- secp521r1 / P-521
+
 
 == Writing Cryptographic key
 

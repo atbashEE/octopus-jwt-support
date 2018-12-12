@@ -37,6 +37,15 @@ public class ECGenerationParametersTest {
     }
 
     @Test(expected = KeyGenerationParameterException.class)
+    public void ecGenerationParameters_invalidCurve() {
+         new ECGenerationParameters.ECGenerationParametersBuilder()
+                .withKeyId("kid")
+                .withCurveName("secp256x1")
+                .build();
+
+    }
+
+    @Test(expected = KeyGenerationParameterException.class)
     public void ecGenerationParameters_kidRequired() {
         new ECGenerationParameters.ECGenerationParametersBuilder()
                 .withCurveName("secp256r1")

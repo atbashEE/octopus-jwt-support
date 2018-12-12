@@ -17,6 +17,8 @@ package be.atbash.ee.security.octopus.keys.generator;
 
 import be.atbash.util.StringUtils;
 import com.nimbusds.jose.jwk.KeyType;
+import org.bouncycastle.jce.ECNamedCurveTable;
+import org.bouncycastle.jce.spec.ECParameterSpec;
 
 public class ECGenerationParameters extends GenerationParameters {
 
@@ -45,7 +47,10 @@ public class ECGenerationParameters extends GenerationParameters {
         }
 
         public ECGenerationParametersBuilder withCurveName(String curveName) {
-            // FIXME Check with the supported Curves by nimbus
+            ECParameterSpec ecSpec = ECNamedCurveTable.getParameterSpec(curveName);
+            if (ecSpec == null) {
+                throw new KeyGenerationParameterException(String.format("EC Curve name '%s' unknown", curveName));
+            }
             this.curveName = curveName;
             return this;
         }
