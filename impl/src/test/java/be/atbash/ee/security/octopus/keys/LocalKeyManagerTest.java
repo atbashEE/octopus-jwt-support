@@ -25,7 +25,6 @@ import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLoo
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.keys.selector.SelectorCriteria;
 import be.atbash.util.exception.AtbashIllegalActionException;
-import com.nimbusds.jose.jwk.KeyUse;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -76,8 +75,8 @@ public class LocalKeyManagerTest {
         keys.add("key2");
         when(keyFilesHelperMock.determineKeyFiles(anyString())).thenReturn(keys);
 
-        when(keyReaderMock.readKeyResource("key1", keyResourcePasswordLookupMock)).thenReturn(Collections.singletonList(new AtbashKey("kid2", new ArrayList<KeyUse>(), new FakeRSAPrivate())));
-        when(keyReaderMock.readKeyResource("key2", keyResourcePasswordLookupMock)).thenReturn(Collections.singletonList(new AtbashKey("kid1", new ArrayList<KeyUse>(), new FakeRSAPublic())));
+        when(keyReaderMock.readKeyResource("key1", keyResourcePasswordLookupMock)).thenReturn(Collections.singletonList(new AtbashKey("kid2", new FakeRSAPrivate())));
+        when(keyReaderMock.readKeyResource("key2", keyResourcePasswordLookupMock)).thenReturn(Collections.singletonList(new AtbashKey("kid1", new FakeRSAPublic())));
 
         SelectorCriteria.Builder builder = SelectorCriteria.newBuilder();
         builder.withId("kid1");
@@ -96,8 +95,8 @@ public class LocalKeyManagerTest {
         keys.add("key2");
         when(keyFilesHelperMock.determineKeyFiles(anyString())).thenReturn(keys);
 
-        when(keyReaderMock.readKeyResource("key1", keyResourcePasswordLookupMock)).thenReturn(Collections.singletonList(new AtbashKey("kid1", new ArrayList<KeyUse>(), new FakeRSAPrivate())));
-        when(keyReaderMock.readKeyResource("key2", keyResourcePasswordLookupMock)).thenReturn(Collections.singletonList(new AtbashKey("kid1", new ArrayList<KeyUse>(), new FakeRSAPublic())));
+        when(keyReaderMock.readKeyResource("key1", keyResourcePasswordLookupMock)).thenReturn(Collections.singletonList(new AtbashKey("kid1", new FakeRSAPrivate())));
+        when(keyReaderMock.readKeyResource("key2", keyResourcePasswordLookupMock)).thenReturn(Collections.singletonList(new AtbashKey("kid1", new FakeRSAPublic())));
 
         SelectorCriteria.Builder builder = SelectorCriteria.newBuilder();
         builder.withId("kid1");
@@ -118,8 +117,8 @@ public class LocalKeyManagerTest {
         keys.add("key2");
         when(keyFilesHelperMock.determineKeyFiles(anyString())).thenReturn(keys);
 
-        when(keyReaderMock.readKeyResource("key1", keyResourcePasswordLookupMock)).thenReturn(Collections.singletonList(new AtbashKey("kid2", new ArrayList<KeyUse>(), new FakeRSAPrivate())));
-        when(keyReaderMock.readKeyResource("key2", keyResourcePasswordLookupMock)).thenReturn(Collections.singletonList(new AtbashKey("kid1", new ArrayList<KeyUse>(), new FakeRSAPublic())));
+        when(keyReaderMock.readKeyResource("key1", keyResourcePasswordLookupMock)).thenReturn(Collections.singletonList(new AtbashKey("kid2", new FakeRSAPrivate())));
+        when(keyReaderMock.readKeyResource("key2", keyResourcePasswordLookupMock)).thenReturn(Collections.singletonList(new AtbashKey("kid1", new FakeRSAPublic())));
 
         SelectorCriteria.Builder builder = SelectorCriteria.newBuilder();
         builder.withId("kid1");

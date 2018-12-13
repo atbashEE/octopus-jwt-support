@@ -21,6 +21,7 @@ User manual for Atbash configuration.
 Breaking changes
 
 . KeyManager.retrieveKeys has now **SelectorCriteria** as parameter.
+. KeyUse references are removed leading to some removal of methods, constructors or changed number of parameters.
 
 === 0.9.0
 

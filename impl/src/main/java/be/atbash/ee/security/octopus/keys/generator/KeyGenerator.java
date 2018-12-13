@@ -84,8 +84,8 @@ public class KeyGenerator {
             RSAPrivateKey priv = (RSAPrivateKey) kp.getPrivate();
 
             List<AtbashKey> result = new ArrayList<>();
-            result.add(new AtbashKey(generationParameters.getKid(), generationParameters.getKeyUsage(), pub));
-            result.add(new AtbashKey(generationParameters.getKid(), generationParameters.getKeyUsage(), priv));
+            result.add(new AtbashKey(generationParameters.getKid(), pub));
+            result.add(new AtbashKey(generationParameters.getKid(), priv));
             return result;
         } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
             throw new AtbashUnexpectedException(e);
@@ -107,8 +107,8 @@ public class KeyGenerator {
             DHPrivateKey priv = (DHPrivateKey) kp.getPrivate();
 
             List<AtbashKey> result = new ArrayList<>();
-            result.add(new AtbashKey(generationParameters.getKid(), generationParameters.getKeyUsage(), pub));
-            result.add(new AtbashKey(generationParameters.getKid(), generationParameters.getKeyUsage(), priv));
+            result.add(new AtbashKey(generationParameters.getKid(), pub));
+            result.add(new AtbashKey(generationParameters.getKid(), priv));
             return result;
         } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException e) {
             throw new AtbashUnexpectedException(e);
@@ -126,8 +126,8 @@ public class KeyGenerator {
             ECPrivateKey priv = (ECPrivateKey) kp.getPrivate();
 
             List<AtbashKey> result = new ArrayList<>();
-            result.add(new AtbashKey(generationParameters.getKid(), generationParameters.getKeyUsage(), pub));
-            result.add(new AtbashKey(generationParameters.getKid(), generationParameters.getKeyUsage(), priv));
+            result.add(new AtbashKey(generationParameters.getKid(), pub));
+            result.add(new AtbashKey(generationParameters.getKid(), priv));
             return result;
         } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException | NoSuchProviderException e) {
             throw new AtbashUnexpectedException(e);
@@ -141,7 +141,7 @@ public class KeyGenerator {
         SecretKeySpec secretKey = new SecretKeySpec(bytes, "AES");
 
         List<AtbashKey> result = new ArrayList<>();
-        result.add(new AtbashKey(generationParameters.getKid(), generationParameters.getKeyUsage(), secretKey));
+        result.add(new AtbashKey(generationParameters.getKid(), secretKey));
 
         return result;
     }

@@ -20,45 +20,29 @@ import be.atbash.ee.security.octopus.keys.json.AtbashKeyWriter;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.keys.selector.SecretKeyType;
 import be.atbash.json.parser.MappedBy;
-import be.atbash.util.CollectionUtils;
 import be.atbash.util.exception.AtbashUnexpectedException;
 import be.atbash.util.resource.ResourceUtil;
-import com.nimbusds.jose.jwk.KeyUse;
 
 import java.security.Key;
-import java.util.Arrays;
-import java.util.List;
 
 // Useful info https://www.cem.me/pki/
 @MappedBy(writer = AtbashKeyWriter.class, beanEncoder = AtbashKeyCustomBeanJSONEncoder.class)
 public class AtbashKey {
 
     private String keyId;
-    private List<KeyUse> keyUses;
     private SecretKeyType secretKeyType;
     private Key key;
 
     public AtbashKey(String path, Key key) {
-        this(path, Arrays.asList(KeyUse.ENCRYPTION, KeyUse.SIGNATURE), key);
-    }
 
-    public AtbashKey(String path, List<KeyUse> keyUses, Key key) {
         // FIXME Check key is not null
         this.keyId = defineKeyId(path);
-        this.keyUses = keyUses;
-        if (CollectionUtils.isEmpty(this.keyUses)) {
-            this.keyUses = Arrays.asList(KeyUse.ENCRYPTION, KeyUse.SIGNATURE);
-        }
         this.key = key;
         secretKeyType = SecretKeyType.fromKey(key);
     }
 
     public String getKeyId() {
         return keyId;
-    }
-
-    public List<KeyUse> getKeyUses() {
-        return keyUses;
     }
 
     public SecretKeyType getSecretKeyType() {

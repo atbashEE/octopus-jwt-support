@@ -20,7 +20,6 @@ import be.atbash.json.JSONObject;
 import be.atbash.json.JSONValue;
 import be.atbash.util.base64.Base64Codec;
 import com.nimbusds.jose.Algorithm;
-import com.nimbusds.jose.jwk.KeyUse;
 import com.nimbusds.jose.jwk.OctetSequenceKey;
 import org.junit.Test;
 
@@ -43,14 +42,12 @@ public class EncryptedJSONJWKTest {
         OctetSequenceKey jwk = new OctetSequenceKey.Builder(key)
                 .algorithm(new Algorithm("algo"))
                 .keyID("keyId")
-                .keyUse(KeyUse.SIGNATURE)
                 .build();
 
         String json = EncryptedJSONJWK.encryptedOutput(jwk, PASSWORD);
         // Check all the fields
         assertThat(json).contains("\"alg\":\"algo\"");
         assertThat(json).contains("\"kty\":\"oct\"");
-        assertThat(json).contains("\"use\":\"sig\"");
         assertThat(json).contains("\"kid\":\"keyId\"");
         assertThat(json).contains("\"enc\":\"");
 

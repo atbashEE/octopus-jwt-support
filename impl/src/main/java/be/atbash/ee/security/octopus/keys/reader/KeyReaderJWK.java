@@ -33,7 +33,6 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
@@ -90,22 +89,22 @@ public class KeyReaderJWK {
         if (jwk instanceof AsymmetricJWK) {
             PrivateKey privateKey = ((AsymmetricJWK) jwk).toPrivateKey();
             if (privateKey != null) {
-                result.add(new AtbashKey(jwk.getKeyID(), Collections.singletonList(jwk.getKeyUse()), privateKey));
+                result.add(new AtbashKey(jwk.getKeyID(), privateKey));
             }
             PublicKey publicKey = ((AsymmetricJWK) jwk).toPublicKey();
             if (publicKey != null) {
-                result.add(new AtbashKey(jwk.getKeyID(), Collections.singletonList(jwk.getKeyUse()), publicKey));
+                result.add(new AtbashKey(jwk.getKeyID(), publicKey));
             }
         }
         if (result.isEmpty() && jwk instanceof RSAKey) {
             // Support Payara because it has an old version of Nimbus which uses AssymmetricJWK
             PrivateKey privateKey = ((RSAKey) jwk).toPrivateKey();
             if (privateKey != null) {
-                result.add(new AtbashKey(jwk.getKeyID(), Collections.singletonList(jwk.getKeyUse()), privateKey));
+                result.add(new AtbashKey(jwk.getKeyID(), privateKey));
             }
             PublicKey publicKey = ((RSAKey) jwk).toPublicKey();
             if (publicKey != null) {
-                result.add(new AtbashKey(jwk.getKeyID(), Collections.singletonList(jwk.getKeyUse()), publicKey));
+                result.add(new AtbashKey(jwk.getKeyID(), publicKey));
             }
 
         }

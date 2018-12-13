@@ -15,18 +15,12 @@
  */
 package be.atbash.ee.security.octopus.keys.generator;
 
-import be.atbash.util.CollectionUtils;
 import be.atbash.util.StringUtils;
 import com.nimbusds.jose.jwk.KeyType;
-import com.nimbusds.jose.jwk.KeyUse;
-
-import java.util.Arrays;
-import java.util.List;
 
 public class GenerationParameters {
 
     private String kid;
-    private List<KeyUse> keyUsage;
     private KeyType keyType;
 
     GenerationParameters(GenerationParametersBuilders builder, KeyType keyType) {
@@ -34,19 +28,11 @@ public class GenerationParameters {
         if (StringUtils.isEmpty(builder.kid)) {
             throw new KeyGenerationParameterException("Key id is required");
         }
-        if (CollectionUtils.isEmpty(builder.keyUsage)) {
-            throw new KeyGenerationParameterException("KeyUse information is required");
-        }
         this.kid = builder.kid;
-        this.keyUsage = builder.keyUsage;
     }
 
     public String getKid() {
         return kid;
-    }
-
-    public List<KeyUse> getKeyUsage() {
-        return keyUsage;
     }
 
     public KeyType getKeyType() {
@@ -55,7 +41,6 @@ public class GenerationParameters {
 
     static class GenerationParametersBuilders<T extends GenerationParametersBuilders<T>> {
         private String kid;
-        private List<KeyUse> keyUsage;
 
         public T withKeyId(String kid) {
             this.kid = kid;
@@ -63,9 +48,7 @@ public class GenerationParameters {
         }
 
         protected void applyDefaults() {
-            if (CollectionUtils.isEmpty(keyUsage)) {
-                keyUsage = Arrays.asList(KeyUse.ENCRYPTION, KeyUse.SIGNATURE);
-            }
+
         }
     }
 

@@ -19,16 +19,13 @@ import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup;
 import be.atbash.util.exception.AtbashUnexpectedException;
 import be.atbash.util.resource.ResourceUtil;
-import com.nimbusds.jose.jwk.KeyUse;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -36,9 +33,6 @@ public class KeyReaderKeyStore {
 
     // https://stackoverflow.com/questions/23629246/is-it-possible-to-create-jks-keystore-file-without-a-password
     //https://github.com/jfsulliv/JWK_Extractor/blob/master/src/jwk_extractor/JWK_Handler.java
-
-    // FIXME Verify the KeyUse stuff, List or not (since KeySe.from(Cert) returns only 1.
-    private List<KeyUse> privateKeyUses = Arrays.asList(KeyUse.ENCRYPTION, KeyUse.SIGNATURE);
 
     public List<AtbashKey> readResource(String path, KeyResourcePasswordLookup passwordLookup) {
         List<AtbashKey> result = new ArrayList<>();
@@ -72,17 +66,12 @@ public class KeyReaderKeyStore {
         PrivateKey key = (PrivateKey) keyStore.getKey(alias, password);
         // keyId == alias -> not good, needs to take into account part of the path.
 
-        result.add(new AtbashKey(alias, privateKeyUses, key));
+        result.add(new AtbashKey(alias, key));
 
         Certificate cert = keyStore.getCertificate(alias);
         PublicKey pkey = cert.getPublicKey();
 
-        List<KeyUse> keyUses = new ArrayList<>();
-        if (cert instanceof X509Certificate) {
-            KeyUse keyUse = KeyUse.from((X509Certificate) cert);
-            keyUses.add(keyUse);
-        }
-        result.add(new AtbashKey(alias, keyUses, pkey));
+        result.add(new AtbashKey(alias, pkey));
 
         return result;
     }

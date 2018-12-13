@@ -28,7 +28,7 @@ public class AtbashKeyTest {
     @Test
     public void getKeyId() {
 
-        AtbashKey key = new AtbashKey(ResourceUtil.CLASSPATH_PREFIX + "test.pem", null, new FakeRSAPublic());
+        AtbashKey key = new AtbashKey(ResourceUtil.CLASSPATH_PREFIX + "test.pem", new FakeRSAPublic());
 
         assertThat(key.getKeyId()).isEqualTo("test");
     }
@@ -36,7 +36,7 @@ public class AtbashKeyTest {
     @Test
     public void getKeyId_multiple_dot() {
 
-        AtbashKey key = new AtbashKey(ResourceUtil.CLASSPATH_PREFIX + "test.pub.pem", null, new FakeRSAPublic());
+        AtbashKey key = new AtbashKey(ResourceUtil.CLASSPATH_PREFIX + "test.pub.pem", new FakeRSAPublic());
 
         assertThat(key.getKeyId()).isEqualTo("test.pub");
     }
@@ -44,7 +44,7 @@ public class AtbashKeyTest {
     @Test
     public void getKeyId_no_extension() {
 
-        AtbashKey key = new AtbashKey(ResourceUtil.CLASSPATH_PREFIX + "test", null, new FakeRSAPublic());
+        AtbashKey key = new AtbashKey(ResourceUtil.CLASSPATH_PREFIX + "test", new FakeRSAPublic());
 
         assertThat(key.getKeyId()).isEqualTo("test");
 
@@ -52,19 +52,19 @@ public class AtbashKeyTest {
 
     @Test
     public void getIsMatch_match() {
-        AtbashKey key = new AtbashKey(ResourceUtil.CLASSPATH_PREFIX + "test.pem", null, new FakeRSAPrivate());
+        AtbashKey key = new AtbashKey(ResourceUtil.CLASSPATH_PREFIX + "test.pem", new FakeRSAPrivate());
         assertThat(key.isMatch("test", AsymmetricPart.PRIVATE)).isTrue();
     }
 
     @Test
     public void getIsMatch_differentId() {
-        AtbashKey key = new AtbashKey(ResourceUtil.CLASSPATH_PREFIX + "test.pem", null, new FakeRSAPrivate());
+        AtbashKey key = new AtbashKey(ResourceUtil.CLASSPATH_PREFIX + "test.pem", new FakeRSAPrivate());
         assertThat(key.isMatch("Other", AsymmetricPart.PRIVATE)).isFalse();
     }
 
     @Test
     public void getIsMatch_differentType() {
-        AtbashKey key = new AtbashKey(ResourceUtil.CLASSPATH_PREFIX + "test.pem", null, new FakeRSAPrivate());
+        AtbashKey key = new AtbashKey(ResourceUtil.CLASSPATH_PREFIX + "test.pem", new FakeRSAPrivate());
         assertThat(key.isMatch("test", AsymmetricPart.PUBLIC)).isFalse();
     }
 }
