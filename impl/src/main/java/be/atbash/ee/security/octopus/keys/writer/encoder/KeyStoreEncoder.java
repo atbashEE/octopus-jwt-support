@@ -16,6 +16,7 @@
 package be.atbash.ee.security.octopus.keys.writer.encoder;
 
 import be.atbash.ee.security.octopus.keys.AtbashKey;
+import be.atbash.ee.security.octopus.keys.config.JwtSupportConfiguration;
 import be.atbash.ee.security.octopus.keys.generator.KeyGenerator;
 import be.atbash.ee.security.octopus.keys.generator.RSAGenerationParameters;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
@@ -48,6 +49,12 @@ import java.util.List;
  */
 
 public class KeyStoreEncoder implements KeyEncoder {
+
+    private JwtSupportConfiguration configuration;
+
+    public KeyStoreEncoder() {
+        configuration = JwtSupportConfiguration.getInstance();
+    }
 
     @Override
     public byte[] encodeKey(AtbashKey atbashKey, KeyEncoderParameters parameters) throws IOException {
@@ -88,15 +95,15 @@ public class KeyStoreEncoder implements KeyEncoder {
             Calendar start = Calendar.getInstance();
             Calendar expiry = Calendar.getInstance();
             expiry.add(Calendar.YEAR, 1);
-            X500Name name = new X500Name("CN=localhost"); // FIXME Config
+            X500Name name = new X500Name(configuration.getNameCertificateKeyStore());
             X509v3CertificateBuilder certificateBuilder = new X509v3CertificateBuilder(name, BigInteger.ONE,
                     start.getTime(), expiry.getTime(), name, SubjectPublicKeyInfo.getInstance(publicKey.getEncoded()));
             if (privateKey == null) {
 
                 privateKey = createSigningKey(); // this is the private key to sign the certificate. Has nothing to do with the Certificate and the public key.
             }
-            // FIXME SHA1WithRSA -> Config
-            ContentSigner signer = new JcaContentSignerBuilder("SHA1WithRSA").setProvider(new BouncyCastleProvider()).build(privateKey);
+
+            ContentSigner signer = new JcaContentSignerBuilder(configuration.getCertificateSignatureAlgorithm()).setProvider(new BouncyCastleProvider()).build(privateKey);
             X509CertificateHolder holder = certificateBuilder.build(signer);
             return new JcaX509CertificateConverter().setProvider(new BouncyCastleProvider()).getCertificate(holder);
 

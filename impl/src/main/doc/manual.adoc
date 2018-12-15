@@ -319,3 +319,16 @@ Defines the default PKCS#1 encryption used. Valid values are defined according t
     Examples:
       AES-192-ECB
       DES-EDE3.
+
+=== key.store.certificate.x500name
+
+default : **CN=localhost**
+
+Defines the x500 name for the generated certificate when storing a public key into a Key store file.
+
+=== key.store.signature.algo
+
+default : **SHA1WithRSA**
+
+Defines the algorithm used for singing the certificate which is generated when storing a public key into a Key store file.
+Please note that there will be always an RSA key generated for this, so one is only able to change ther hashing part of the signature.

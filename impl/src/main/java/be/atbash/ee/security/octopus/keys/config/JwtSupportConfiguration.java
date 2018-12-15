@@ -136,6 +136,16 @@ public class JwtSupportConfiguration extends AbstractConfiguration implements Mo
         return getOptionalValue("key.pem.pkcs1.encryption", "DES-EDE3-CBC", String.class);
     }
 
+    @ConfigProperty
+    public String getNameCertificateKeyStore() {
+        return getOptionalValue("key.store.certificate.x500name", "CN=localhost", String.class);
+    }
+
+    @ConfigProperty
+    public String getCertificateSignatureAlgorithm() {
+        return getOptionalValue("key.store.signature.algo", "SHA1WithRSA", String.class);
+    }
+
     // Java SE Support
     private static JwtSupportConfiguration INSTANCE;
 
