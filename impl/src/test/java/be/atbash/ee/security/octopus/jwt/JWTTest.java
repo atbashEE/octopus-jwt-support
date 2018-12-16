@@ -15,14 +15,18 @@
  */
 package be.atbash.ee.security.octopus.jwt;
 
+import be.atbash.ee.security.octopus.UnsupportedECCurveException;
+import be.atbash.ee.security.octopus.UnsupportedKeyType;
 import be.atbash.ee.security.octopus.jwt.decoder.JWTDecoder;
 import be.atbash.ee.security.octopus.jwt.encoder.JWTEncoder;
 import be.atbash.ee.security.octopus.jwt.encoder.testclasses.Payload;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParameters;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersBuilder;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
-import be.atbash.ee.security.octopus.keys.selector.KeySelector;
-import be.atbash.ee.security.octopus.keys.selector.SingleKeySelector;
+import be.atbash.ee.security.octopus.keys.generator.ECGenerationParameters;
+import be.atbash.ee.security.octopus.keys.generator.KeyGenerator;
+import be.atbash.ee.security.octopus.keys.generator.RSAGenerationParameters;
+import be.atbash.ee.security.octopus.keys.selector.*;
 import be.atbash.ee.security.octopus.util.HmacSecretUtil;
 import be.atbash.util.base64.Base64Codec;
 import org.junit.Before;
@@ -30,6 +34,7 @@ import org.junit.Test;
 
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -38,6 +43,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Focusing on no wrapping in JWT, or using signed JWT
  */
 public class JWTTest {
+
+    private static final String KID_SIGN = "sign";
 
     private Payload payload;
 
@@ -104,7 +111,7 @@ public class JWTTest {
     }
 
     @Test(expected = InvalidJWTException.class)
-    public void encodingJWT_TamperedPayload() {
+    public void encodingJWT__hmac_TamperedPayload() {
 
         byte[] secret = new byte[32];
         new SecureRandom().nextBytes(secret);
@@ -116,15 +123,258 @@ public class JWTTest {
                 .build();
         String encoded = new JWTEncoder().encode(payload, parameters);
 
+        String updatedEncoded = tamperWithPayload(encoded);
+
+        KeySelector keySelector = new SingleKeySelector(key);
+        new JWTDecoder().decode(updatedEncoded, Payload.class, keySelector, null);
+    }
+
+    private String tamperWithPayload(String encoded) {
         String[] jwtParts = encoded.split("\\.");
         String content = new String(Base64Codec.decode(jwtParts[1]));
         String updatedContent = content.replaceAll("JUnit", "Spock");
         jwtParts[1] = Base64Codec.encodeToString(updatedContent.getBytes(StandardCharsets.UTF_8), false);
 
-        String updatedEncoded = jwtParts[0] + '.' + jwtParts[1] + '.' + jwtParts[2];
-
-        KeySelector keySelector = new SingleKeySelector(key);
-        new JWTDecoder().decode(updatedEncoded, Payload.class, keySelector, null);
+        return jwtParts[0] + '.' + jwtParts[1] + '.' + jwtParts[2];
     }
-    // Using a RSA key.
+
+    @Test
+    public void encodingJWT_RSA() {
+
+        List<AtbashKey> keys = generateRSAKeys(KID_SIGN);
+
+        ListKeyManager keyManager = new ListKeyManager(keys);
+
+        SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PRIVATE).build();
+        List<AtbashKey> signKeyList = keyManager.retrieveKeys(criteria);
+
+        assertThat(signKeyList).as("We should have 1 Private key for signing").hasSize(1);
+
+        JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS)
+                .withSecretKeyForSigning(signKeyList.get(0))
+                .build();
+
+        String encoded = new JWTEncoder().encode(payload, parameters);
+
+        criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PUBLIC).build();
+        List<AtbashKey> publicList = keyManager.retrieveKeys(criteria);
+
+        KeySelector keySelector = new SingleKeySelector(publicList.get(0));
+        Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector, null).getData();
+
+        assertThat(payload).isEqualToComparingFieldByField(data);
+    }
+
+    @Test(expected = InvalidJWTException.class)
+    public void encodingJWT_RSA_WrongKeyForVerification() {
+
+        List<AtbashKey> keys = generateRSAKeys(KID_SIGN);
+
+        ListKeyManager keyManager = new ListKeyManager(keys);
+
+        SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PRIVATE).build();
+        List<AtbashKey> signKeyList = keyManager.retrieveKeys(criteria);
+
+        assertThat(signKeyList).as("We should have 1 Private key for signing").hasSize(1);
+
+        JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS)
+                .withSecretKeyForSigning(signKeyList.get(0))
+                .build();
+
+        String encoded = new JWTEncoder().encode(payload, parameters);
+
+
+        List<AtbashKey> keysOther = generateRSAKeys(KID_SIGN);
+        keyManager = new ListKeyManager(keysOther);
+
+        criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PUBLIC).build();
+        List<AtbashKey> publicList = keyManager.retrieveKeys(criteria);
+
+        KeySelector keySelector = new SingleKeySelector(publicList.get(0));
+        new JWTDecoder().decode(encoded, Payload.class, keySelector, null);
+    }
+
+    @Test(expected = InvalidJWTException.class)
+    public void encodingJWT_RSA_tamperedPayload() {
+
+        List<AtbashKey> keys = generateRSAKeys(KID_SIGN);
+
+        ListKeyManager keyManager = new ListKeyManager(keys);
+
+        SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PRIVATE).build();
+        List<AtbashKey> signKeyList = keyManager.retrieveKeys(criteria);
+
+        assertThat(signKeyList).as("We should have 1 Private key for signing").hasSize(1);
+
+        JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS)
+                .withSecretKeyForSigning(signKeyList.get(0))
+                .build();
+
+        String encoded = new JWTEncoder().encode(payload, parameters);
+
+        String updatedEncoded = tamperWithPayload(encoded);
+
+        criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PUBLIC).build();
+        List<AtbashKey> publicList = keyManager.retrieveKeys(criteria);
+
+        KeySelector keySelector = new SingleKeySelector(publicList.get(0));
+        new JWTDecoder().decode(updatedEncoded, Payload.class, keySelector, null);
+
+    }
+
+    @Test(expected = UnsupportedKeyType.class)
+    public void encodingJWT_RSA_WrongKeyType() {
+
+        List<AtbashKey> keys = generateRSAKeys(KID_SIGN);
+
+        ListKeyManager keyManager = new ListKeyManager(keys);
+
+        SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PUBLIC).build();
+        List<AtbashKey> signKeyList = keyManager.retrieveKeys(criteria);
+
+        JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS)
+                .withSecretKeyForSigning(signKeyList.get(0))
+                .build();
+
+        new JWTEncoder().encode(payload, parameters);
+
+    }
+
+    @Test
+    public void encodingJWT_EC() {
+
+        List<AtbashKey> keys = generateECKeys(KID_SIGN, "P-256");
+
+        ListKeyManager keyManager = new ListKeyManager(keys);
+
+        SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PRIVATE).build();
+        List<AtbashKey> signKeyList = keyManager.retrieveKeys(criteria);
+
+        assertThat(signKeyList).as("We should have 1 Private key for signing").hasSize(1);
+
+        JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS)
+                .withSecretKeyForSigning(signKeyList.get(0))
+                .build();
+
+        String encoded = new JWTEncoder().encode(payload, parameters);
+
+        criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PUBLIC).build();
+        List<AtbashKey> publicList = keyManager.retrieveKeys(criteria);
+
+        KeySelector keySelector = new SingleKeySelector(publicList.get(0));
+        Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector, null).getData();
+
+        assertThat(payload).isEqualToComparingFieldByField(data);
+    }
+
+    @Test(expected = InvalidJWTException.class)
+    public void encodingJWT_EC_WrongKeyForVerification() {
+
+        List<AtbashKey> keys = generateECKeys(KID_SIGN, "P-256");
+
+        ListKeyManager keyManager = new ListKeyManager(keys);
+
+        SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PRIVATE).build();
+        List<AtbashKey> signKeyList = keyManager.retrieveKeys(criteria);
+
+        assertThat(signKeyList).as("We should have 1 Private key for signing").hasSize(1);
+
+        JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS)
+                .withSecretKeyForSigning(signKeyList.get(0))
+                .build();
+
+        String encoded = new JWTEncoder().encode(payload, parameters);
+
+
+        List<AtbashKey> keysOther = generateECKeys(KID_SIGN, "P-256");
+        keyManager = new ListKeyManager(keysOther);
+
+        criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PUBLIC).build();
+        List<AtbashKey> publicList = keyManager.retrieveKeys(criteria);
+
+        KeySelector keySelector = new SingleKeySelector(publicList.get(0));
+        new JWTDecoder().decode(encoded, Payload.class, keySelector, null);
+    }
+
+    @Test(expected = InvalidJWTException.class)
+    public void encodingJWT_EC_tamperedPayload() {
+
+        List<AtbashKey> keys = generateECKeys(KID_SIGN, "P-256");
+
+        ListKeyManager keyManager = new ListKeyManager(keys);
+
+        SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PRIVATE).build();
+        List<AtbashKey> signKeyList = keyManager.retrieveKeys(criteria);
+
+        assertThat(signKeyList).as("We should have 1 Private key for signing").hasSize(1);
+
+        JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS)
+                .withSecretKeyForSigning(signKeyList.get(0))
+                .build();
+
+        String encoded = new JWTEncoder().encode(payload, parameters);
+
+        String updatedEncoded = tamperWithPayload(encoded);
+
+        criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PUBLIC).build();
+        List<AtbashKey> publicList = keyManager.retrieveKeys(criteria);
+
+        KeySelector keySelector = new SingleKeySelector(publicList.get(0));
+        new JWTDecoder().decode(updatedEncoded, Payload.class, keySelector, null);
+
+    }
+
+    @Test(expected = UnsupportedKeyType.class)
+    public void encodingJWT_EC_WrongKeyType() {
+
+        List<AtbashKey> keys = generateECKeys(KID_SIGN, "P-256");
+
+        ListKeyManager keyManager = new ListKeyManager(keys);
+
+        SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PUBLIC).build();
+        List<AtbashKey> signKeyList = keyManager.retrieveKeys(criteria);
+
+        JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS)
+                .withSecretKeyForSigning(signKeyList.get(0))
+                .build();
+
+        new JWTEncoder().encode(payload, parameters);
+
+    }
+
+    @Test(expected = UnsupportedECCurveException.class)
+    public void encodingJWT_EC_unsupportedCurve() {
+
+        List<AtbashKey> keys = generateECKeys(KID_SIGN, "prime192v1");
+
+        ListKeyManager keyManager = new ListKeyManager(keys);
+
+        SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PRIVATE).build();
+        List<AtbashKey> signKeyList = keyManager.retrieveKeys(criteria);
+
+        assertThat(signKeyList).as("We should have 1 Private key for signing").hasSize(1);
+
+        JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS)
+                .withSecretKeyForSigning(signKeyList.get(0))
+                .build();
+
+        new JWTEncoder().encode(payload, parameters);
+    }
+
+    private List<AtbashKey> generateRSAKeys(String kid) {
+        RSAGenerationParameters generationParameters = new RSAGenerationParameters.RSAGenerationParametersBuilder()
+                .withKeyId(kid)
+                .build();
+        KeyGenerator generator = new KeyGenerator();
+        return generator.generateKeys(generationParameters);
+    }
+
+    private List<AtbashKey> generateECKeys(String kid, String curveName) {
+        ECGenerationParameters generationParameters = new ECGenerationParameters.ECGenerationParametersBuilder()
+                .withKeyId(kid)
+                .withCurveName(curveName)
+                .build();
+        KeyGenerator generator = new KeyGenerator();
+        return generator.generateKeys(generationParameters);
+    }
 }

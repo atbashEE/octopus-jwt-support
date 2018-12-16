@@ -15,6 +15,7 @@
  */
 package be.atbash.ee.security.octopus;
 
+import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.util.exception.AtbashException;
 import com.nimbusds.jose.jwk.KeyType;
 
@@ -22,5 +23,9 @@ public class UnsupportedKeyType extends AtbashException {
 
     public UnsupportedKeyType(KeyType keyType, String action) {
         super(String.format("Unsupported KeyType %s for %s", keyType.getValue(), action));
+    }
+
+    public UnsupportedKeyType(AsymmetricPart asymmetricPart, String action) {
+        super(String.format("%s key required for %s", asymmetricPart.name(), action));
     }
 }

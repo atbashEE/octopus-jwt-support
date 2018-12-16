@@ -18,6 +18,7 @@ package be.atbash.ee.security.octopus.jwt.encoder;
 import be.atbash.ee.security.octopus.UnsupportedECCurveException;
 import be.atbash.ee.security.octopus.UnsupportedKeyType;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersEncryption;
+import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWEEncrypter;
 import com.nimbusds.jose.KeyLengthException;
@@ -38,16 +39,25 @@ public class JWEEncryptionFactory {
         JWEEncrypter result = null;
 
         if (KeyType.RSA.equals(parametersEncryption.getKeyType())) {
-            result = new RSAEncrypter((RSAPublicKey) parametersEncryption.getKey());
+
+            if (parametersEncryption.getKey() instanceof RSAPublicKey) {
+                result = new RSAEncrypter((RSAPublicKey) parametersEncryption.getKey());
+            } else {
+                throw new UnsupportedKeyType(AsymmetricPart.PUBLIC, "JWE creation");
+            }
         }
 
         if (KeyType.EC.equals(parametersEncryption.getKeyType())) {
-            try {
-                result = new ECDHEncrypter((ECPublicKey) parametersEncryption.getKey());
-            } catch (JOSEException e) {
-                // thrown by com.nimbusds.jose.crypto.ECDHCryptoProvider.ECDHCryptoProvider
-                // when EC Key with unsupported curve is found.
-                throw new UnsupportedECCurveException(e.getMessage());
+            if (parametersEncryption.getKey() instanceof ECPublicKey) {
+                try {
+                    result = new ECDHEncrypter((ECPublicKey) parametersEncryption.getKey());
+                } catch (JOSEException e) {
+                    // thrown by com.nimbusds.jose.crypto.ECDHCryptoProvider.ECDHCryptoProvider
+                    // when EC Key with unsupported curve is found.
+                    throw new UnsupportedECCurveException(e.getMessage());
+                }
+            } else {
+                throw new UnsupportedKeyType(AsymmetricPart.PUBLIC, "JWE creation");
             }
         }
 

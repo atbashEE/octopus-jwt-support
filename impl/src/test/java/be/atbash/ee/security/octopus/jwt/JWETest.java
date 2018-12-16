@@ -15,6 +15,8 @@
  */
 package be.atbash.ee.security.octopus.jwt;
 
+import be.atbash.ee.security.octopus.UnsupportedECCurveException;
+import be.atbash.ee.security.octopus.UnsupportedKeyType;
 import be.atbash.ee.security.octopus.jwt.decoder.JWTDecoder;
 import be.atbash.ee.security.octopus.jwt.encoder.JWTEncoder;
 import be.atbash.ee.security.octopus.jwt.encoder.testclasses.Payload;
@@ -36,8 +38,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class JWETest {
 
-    public static final String KID_SIGN = "sign";
-    public static final String KID_ENCRYPT = "encrypt";
+    private static final String KID_SIGN = "sign";
+    private static final String KID_ENCRYPT = "encrypt";
     private Payload payload;
 
     @Before
@@ -112,7 +114,119 @@ public class JWETest {
 
     }
 
-    // FIXME Test with correct BC Curve name but not supported by Nimbus
+    @Test(expected = UnsupportedECCurveException.class)
+    public void encodingJWE_EC_unsupportedCurve() {
+
+        List<AtbashKey> keys = generateECKeys(KID_SIGN, "prime192v1");
+        keys.addAll(generateECKeys(KID_ENCRYPT, "prime192v1"));
+
+        ListKeyManager keyManager = new ListKeyManager(keys);
+
+        SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PRIVATE).build();
+        List<AtbashKey> signKeyList = keyManager.retrieveKeys(criteria);
+
+        assertThat(signKeyList).as("We should have 1 Private key for signing").hasSize(1);
+
+        criteria = SelectorCriteria.newBuilder().withId(KID_ENCRYPT).withAsymmetricPart(AsymmetricPart.PUBLIC).build();
+        List<AtbashKey> encryptKeyList = keyManager.retrieveKeys(criteria);
+
+        assertThat(encryptKeyList).as("We should have 1 Public key for encryption").hasSize(1);
+
+        JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWE)
+                .withSecretKeyForSigning(signKeyList.get(0))
+                .withSecretKeyForEncryption(encryptKeyList.get(0))
+                .build();
+
+        new JWTEncoder().encode(payload, parameters);
+    }
+
+    @Test
+    public void encodingJWE_RSA_EC() {
+
+        List<AtbashKey> keys = generateRSAKeys(KID_SIGN);
+        keys.addAll(generateECKeys(KID_ENCRYPT, "P-256"));
+
+        ListKeyManager keyManager = new ListKeyManager(keys);
+
+        SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PRIVATE).build();
+        List<AtbashKey> signKeyList = keyManager.retrieveKeys(criteria);
+
+        assertThat(signKeyList).as("We should have 1 Private key for signing").hasSize(1);
+
+        criteria = SelectorCriteria.newBuilder().withId(KID_ENCRYPT).withAsymmetricPart(AsymmetricPart.PUBLIC).build();
+        List<AtbashKey> encryptKeyList = keyManager.retrieveKeys(criteria);
+
+        assertThat(encryptKeyList).as("We should have 1 Public key for encryption").hasSize(1);
+
+        JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWE)
+                .withSecretKeyForSigning(signKeyList.get(0))
+                .withSecretKeyForEncryption(encryptKeyList.get(0))
+                .build();
+
+        String encoded = new JWTEncoder().encode(payload, parameters);
+
+        KeySelector keySelector = new TestKeySelector(keyManager);
+        Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector, null).getData();
+        assertThat(data).isEqualToComparingFieldByField(payload);
+
+    }
+
+    @Test
+    public void encodingJWE_EC_RSA() {
+
+        List<AtbashKey> keys = generateECKeys(KID_ENCRYPT, "P-256");
+        keys.addAll(generateRSAKeys(KID_SIGN));
+
+        ListKeyManager keyManager = new ListKeyManager(keys);
+
+        SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PRIVATE).build();
+        List<AtbashKey> signKeyList = keyManager.retrieveKeys(criteria);
+
+        assertThat(signKeyList).as("We should have 1 Private key for signing").hasSize(1);
+
+        criteria = SelectorCriteria.newBuilder().withId(KID_ENCRYPT).withAsymmetricPart(AsymmetricPart.PUBLIC).build();
+        List<AtbashKey> encryptKeyList = keyManager.retrieveKeys(criteria);
+
+        assertThat(encryptKeyList).as("We should have 1 Public key for encryption").hasSize(1);
+
+        JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWE)
+                .withSecretKeyForSigning(signKeyList.get(0))
+                .withSecretKeyForEncryption(encryptKeyList.get(0))
+                .build();
+
+        String encoded = new JWTEncoder().encode(payload, parameters);
+
+        KeySelector keySelector = new TestKeySelector(keyManager);
+        Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector, null).getData();
+        assertThat(data).isEqualToComparingFieldByField(payload);
+
+    }
+
+    @Test(expected = UnsupportedKeyType.class)
+    public void encodingJWE_RSA_WrongKeyType() {
+
+        List<AtbashKey> keys = generateRSAKeys(KID_SIGN);
+        keys.addAll(generateRSAKeys(KID_ENCRYPT));
+
+        ListKeyManager keyManager = new ListKeyManager(keys);
+
+        SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PRIVATE).build();
+        List<AtbashKey> signKeyList = keyManager.retrieveKeys(criteria);
+
+        assertThat(signKeyList).as("We should have 1 Private key for signing").hasSize(1);
+
+        criteria = SelectorCriteria.newBuilder().withId(KID_ENCRYPT).withAsymmetricPart(AsymmetricPart.PRIVATE).build();
+        List<AtbashKey> encryptKeyList = keyManager.retrieveKeys(criteria);
+
+        assertThat(encryptKeyList).as("We should have 1 Public key for encryption").hasSize(1);
+
+        JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWE)
+                .withSecretKeyForSigning(signKeyList.get(0))
+                .withSecretKeyForEncryption(encryptKeyList.get(0))
+                .build();
+
+        new JWTEncoder().encode(payload, parameters);
+    }
 
     @Test
     public void encodingJWE_OCT() {

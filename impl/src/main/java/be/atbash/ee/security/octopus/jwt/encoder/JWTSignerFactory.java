@@ -15,8 +15,10 @@
  */
 package be.atbash.ee.security.octopus.jwt.encoder;
 
+import be.atbash.ee.security.octopus.UnsupportedECCurveException;
 import be.atbash.ee.security.octopus.UnsupportedKeyType;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersSigning;
+import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.util.exception.AtbashUnexpectedException;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -56,14 +58,22 @@ public class JWTSignerFactory {
             }
         }
         if (KeyType.RSA.equals(parametersSigning.getKeyType())) {
-            result = new RSASSASigner((PrivateKey) parametersSigning.getKey());
+            if (parametersSigning.getKey() instanceof PrivateKey) {
+                result = new RSASSASigner((PrivateKey) parametersSigning.getKey());
+            } else {
+                throw new UnsupportedKeyType(AsymmetricPart.PRIVATE, "JWS Signing");
+            }
         }
         if (KeyType.EC.equals(parametersSigning.getKeyType())) {
 
-            try {
-                result = new ECDSASigner((ECPrivateKey) parametersSigning.getKey());
-            } catch (JOSEException e) {
-                throw new AtbashUnexpectedException(e);
+            if (parametersSigning.getKey() instanceof ECPrivateKey) {
+                try {
+                    result = new ECDSASigner((ECPrivateKey) parametersSigning.getKey());
+                } catch (JOSEException e) {
+                    throw new UnsupportedECCurveException(e.getMessage());
+                }
+            } else {
+                throw new UnsupportedKeyType(AsymmetricPart.PRIVATE, "JWS Signing");
             }
         }
 
