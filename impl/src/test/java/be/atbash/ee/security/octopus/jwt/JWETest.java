@@ -21,12 +21,15 @@ import be.atbash.ee.security.octopus.jwt.encoder.testclasses.Payload;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParameters;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersBuilder;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
+import be.atbash.ee.security.octopus.keys.generator.ECGenerationParameters;
 import be.atbash.ee.security.octopus.keys.generator.KeyGenerator;
+import be.atbash.ee.security.octopus.keys.generator.OCTGenerationParameters;
 import be.atbash.ee.security.octopus.keys.generator.RSAGenerationParameters;
 import be.atbash.ee.security.octopus.keys.selector.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -48,7 +51,7 @@ public class JWETest {
     }
 
     @Test
-    public void encodingJWE() {
+    public void encodingJWE_RSA() {
 
         List<AtbashKey> keys = generateRSAKeys(KID_SIGN);
         keys.addAll(generateRSAKeys(KID_ENCRYPT));
@@ -63,7 +66,7 @@ public class JWETest {
         criteria = SelectorCriteria.newBuilder().withId(KID_ENCRYPT).withAsymmetricPart(AsymmetricPart.PUBLIC).build();
         List<AtbashKey> encryptKeyList = keyManager.retrieveKeys(criteria);
 
-        assertThat(signKeyList).as("We should have 1 Public key for signing").hasSize(1);
+        assertThat(encryptKeyList).as("We should have 1 Public key for encryption").hasSize(1);
 
         JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWE)
                 .withSecretKeyForSigning(signKeyList.get(0))
@@ -78,8 +81,88 @@ public class JWETest {
 
     }
 
+    @Test
+    public void encodingJWE_EC() {
+
+        List<AtbashKey> keys = generateECKeys(KID_SIGN, "P-256");
+        keys.addAll(generateECKeys(KID_ENCRYPT, "P-256"));
+
+        ListKeyManager keyManager = new ListKeyManager(keys);
+
+        SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PRIVATE).build();
+        List<AtbashKey> signKeyList = keyManager.retrieveKeys(criteria);
+
+        assertThat(signKeyList).as("We should have 1 Private key for signing").hasSize(1);
+
+        criteria = SelectorCriteria.newBuilder().withId(KID_ENCRYPT).withAsymmetricPart(AsymmetricPart.PUBLIC).build();
+        List<AtbashKey> encryptKeyList = keyManager.retrieveKeys(criteria);
+
+        assertThat(encryptKeyList).as("We should have 1 Public key for encryption").hasSize(1);
+
+        JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWE)
+                .withSecretKeyForSigning(signKeyList.get(0))
+                .withSecretKeyForEncryption(encryptKeyList.get(0))
+                .build();
+
+        String encoded = new JWTEncoder().encode(payload, parameters);
+
+        KeySelector keySelector = new TestKeySelector(keyManager);
+        Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector, null).getData();
+        assertThat(data).isEqualToComparingFieldByField(payload);
+
+    }
+
+    // FIXME Test with correct BC Curve name but not supported by Nimbus
+
+    @Test
+    public void encodingJWE_OCT() {
+
+        List<AtbashKey> signKeyList = generateOCTKeys(KID_SIGN);
+
+        assertThat(signKeyList).as("We should have 1 key for signing").hasSize(1);
+
+        List<AtbashKey> encryptKeyList = generateOCTKeys(KID_ENCRYPT);
+
+        assertThat(encryptKeyList).as("We should have 1 key for encryption").hasSize(1);
+
+        JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWE)
+                .withSecretKeyForSigning(signKeyList.get(0))
+                .withSecretKeyForEncryption(encryptKeyList.get(0))
+                .build();
+
+        String encoded = new JWTEncoder().encode(payload, parameters);
+
+        List<AtbashKey> keys = new ArrayList<>();
+        keys.addAll(signKeyList);
+        keys.addAll(encryptKeyList);
+
+        ListKeyManager keyManager = new ListKeyManager(keys);
+
+        KeySelector keySelector = new TestKeySelector(keyManager);
+        Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector, null).getData();
+        assertThat(data).isEqualToComparingFieldByField(payload);
+
+    }
+
     private List<AtbashKey> generateRSAKeys(String kid) {
         RSAGenerationParameters generationParameters = new RSAGenerationParameters.RSAGenerationParametersBuilder()
+                .withKeyId(kid)
+                .build();
+        KeyGenerator generator = new KeyGenerator();
+        return generator.generateKeys(generationParameters);
+    }
+
+    private List<AtbashKey> generateECKeys(String kid, String curveName) {
+        ECGenerationParameters generationParameters = new ECGenerationParameters.ECGenerationParametersBuilder()
+                .withKeyId(kid)
+                .withCurveName(curveName)
+                .build();
+        KeyGenerator generator = new KeyGenerator();
+        return generator.generateKeys(generationParameters);
+    }
+
+    private List<AtbashKey> generateOCTKeys(String kid) {
+        OCTGenerationParameters generationParameters = new OCTGenerationParameters.OCTGenerationParametersBuilder()
                 .withKeyId(kid)
                 .build();
         KeyGenerator generator = new KeyGenerator();

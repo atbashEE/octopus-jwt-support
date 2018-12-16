@@ -15,13 +15,20 @@
  */
 package be.atbash.ee.security.octopus.jwt.encoder;
 
+import be.atbash.ee.security.octopus.UnsupportedECCurveException;
 import be.atbash.ee.security.octopus.UnsupportedKeyType;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersEncryption;
+import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWEEncrypter;
+import com.nimbusds.jose.KeyLengthException;
+import com.nimbusds.jose.crypto.AESEncrypter;
+import com.nimbusds.jose.crypto.ECDHEncrypter;
 import com.nimbusds.jose.crypto.RSAEncrypter;
 import com.nimbusds.jose.jwk.KeyType;
 
+import javax.crypto.SecretKey;
 import javax.enterprise.context.ApplicationScoped;
+import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 
 @ApplicationScoped
@@ -34,8 +41,24 @@ public class JWEEncryptionFactory {
             result = new RSAEncrypter((RSAPublicKey) parametersEncryption.getKey());
         }
 
-        // FIXME EC and AES encryptor
-        // Based on password ??
+        if (KeyType.EC.equals(parametersEncryption.getKeyType())) {
+            try {
+                result = new ECDHEncrypter((ECPublicKey) parametersEncryption.getKey());
+            } catch (JOSEException e) {
+                // thrown by com.nimbusds.jose.crypto.ECDHCryptoProvider.ECDHCryptoProvider
+                // when EC Key with unsupported curve is found.
+                throw new UnsupportedECCurveException(e.getMessage());
+            }
+        }
+
+        if (KeyType.OCT.equals(parametersEncryption.getKeyType())) {
+            try {
+                result = new AESEncrypter((SecretKey) parametersEncryption.getKey());
+            } catch (KeyLengthException e) {
+                // FIXME
+                e.printStackTrace();
+            }
+        }
         if (result == null) {
             throw new UnsupportedKeyType(parametersEncryption.getKeyType(), "JWE creation");
         }

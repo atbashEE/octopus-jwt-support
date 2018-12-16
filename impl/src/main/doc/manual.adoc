@@ -127,6 +127,24 @@ MPBearerTokenVerifier -> Optional verifier for validating the JWT.
 
 TODO : Describe the default verifications.
 
+== Creating JWE
+
+Creating a JWE, the JWT variant which uses encryption, is very similar in creating a signed version. This is done on purpose so that creating a signed JWT or an encrypted JWT is similar and developers don't need to learn different patterns.
+
+    String encoded = new JWTEncoder().encode(payload, parameters);
+
+The `JWTEncoder` class can also be used for creating a JWE. The difference is the parameter we supply, when encoding. The following example shows the minimal required parameters.
+
+    JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWE)
+            .withSecretKeyForSigning(signKey)
+            .withSecretKeyForEncryption(encryptKey)
+            .build();
+
+When creating a JWE, first a signed JWT is created and then a encryption is done.
+
+The signing key can be of type RSA, EC, or AES. The only requirement is that when decoding the corresponding key is present in the ++KeyManager++.
+
+
 == Keys
 
 Retrieving a certain Cryptographic key can be performed by the class _KeySelector_ through the methods _selectAtbashKey_ and _selectSecretKey_.  You give it a few criteria (like key id, key type like RSA, EC, etc ..) and it tries to find the key which correspond to these values.

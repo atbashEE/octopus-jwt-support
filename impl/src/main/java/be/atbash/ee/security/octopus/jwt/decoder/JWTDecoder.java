@@ -24,10 +24,7 @@ import be.atbash.json.JSONValue;
 import be.atbash.util.StringUtils;
 import be.atbash.util.exception.AtbashIllegalActionException;
 import be.atbash.util.exception.AtbashUnexpectedException;
-import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.JWEDecrypter;
-import com.nimbusds.jose.JWEObject;
-import com.nimbusds.jose.JWSVerifier;
+import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.factories.DefaultJWEDecrypterFactory;
 import com.nimbusds.jose.crypto.factories.DefaultJWSVerifierFactory;
 import com.nimbusds.jose.proc.JWEDecrypterFactory;
@@ -95,6 +92,16 @@ public class JWTDecoder {
 
         SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(keyID).withAsymmetricPart(AsymmetricPart.PRIVATE).build();
         Key key = keySelector.selectSecretKey(criteria);
+
+        if (key == null) {
+            JWEAlgorithm algorithm = jweObject.getHeader().getAlgorithm();
+            if (algorithm.equals(JWEAlgorithm.A256KW)) {  // TODO Test also for other algorithms
+                // We are using a symmetric algo
+                criteria = SelectorCriteria.newBuilder().withId(keyID).build();
+                key = keySelector.selectSecretKey(criteria);
+            }
+        }
+
         if (key == null) {
             throw new InvalidJWTException(String.format("No key found for %s", keyID));
         }
@@ -117,8 +124,19 @@ public class JWTDecoder {
         SelectorCriteria criteria = SelectorCriteria.newBuilder()
                 .withId(keyID)
                 .withJKU(jwkURI)
-                .withAsymmetricPart(AsymmetricPart.PUBLIC).build();
+                .withAsymmetricPart(AsymmetricPart.PUBLIC)
+                .build();
         Key key = keySelector.selectSecretKey(criteria);
+
+        if (key == null) {
+            if (signedJWT.getHeader().getAlgorithm() == JWSAlgorithm.HS256) { // FIXME Other algorithms
+                criteria = SelectorCriteria.newBuilder()
+                        .withId(keyID)
+                        .withJKU(jwkURI)
+                        .build();
+                key = keySelector.selectSecretKey(criteria);
+            }
+        }
         if (key == null) {
             throw new InvalidJWTException(String.format("No key found for %s", keyID));
         }

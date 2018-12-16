@@ -16,11 +16,10 @@
 package be.atbash.ee.security.octopus;
 
 import be.atbash.util.exception.AtbashException;
-import com.nimbusds.jose.jwk.KeyType;
 
-public class UnsupportedKeyType extends AtbashException {
+public class UnsupportedECCurveException extends AtbashException  {
 
-    public UnsupportedKeyType(KeyType keyType, String action) {
-        super(String.format("Unsupported KeyType %s for %s", keyType.getValue(), action));
+    public UnsupportedECCurveException(String message) {
+        super(message);
     }
 }

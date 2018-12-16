@@ -15,12 +15,14 @@
  */
 package be.atbash.ee.security.octopus.jwt.encoder;
 
+import be.atbash.ee.security.octopus.UnsupportedKeyType;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParameters;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersEncryption;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersSigning;
 import be.atbash.json.JSONValue;
 import be.atbash.util.exception.AtbashUnexpectedException;
 import com.nimbusds.jose.*;
+import com.nimbusds.jose.jwk.KeyType;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -64,8 +66,23 @@ public class JWTEncoder {
     }
 
     private String createEncryptedJWE(Object data, JWTParametersEncryption parameters) throws JOSEException {
+
+        JWEAlgorithm jweAlgorithm = null;
+        if (parameters.getKeyType() == KeyType.RSA) {
+            jweAlgorithm = JWEAlgorithm.RSA_OAEP_256;  // TODO Configurable, SPI ?
+        }
+        if (parameters.getKeyType() == KeyType.EC) {
+            jweAlgorithm = JWEAlgorithm.ECDH_ES_A256KW;// TODO Configurable, SPI ?
+        }
+        if (parameters.getKeyType() == KeyType.OCT) {
+            jweAlgorithm = JWEAlgorithm.A256KW;// TODO Configurable, SPI ?
+        }
+
+        if (jweAlgorithm == null) {
+            throw new UnsupportedKeyType(parameters.getKeyType(), "JWE creation");
+        }
         JWEObject jweObject = new JWEObject(
-                new JWEHeader.Builder(JWEAlgorithm.RSA_OAEP_256, EncryptionMethod.A256GCM)
+                new JWEHeader.Builder(jweAlgorithm, EncryptionMethod.A256GCM)
                         .keyID(parameters.getKeyID())
                         .customParams(parameters.getHeaderValues())
                         .contentType("JWT") // required to signal nested JWT
