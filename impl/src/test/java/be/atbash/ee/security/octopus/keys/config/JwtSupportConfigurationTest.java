@@ -17,6 +17,8 @@ package be.atbash.ee.security.octopus.keys.config;
 
 import be.atbash.config.exception.ConfigurationException;
 import be.atbash.config.test.TestConfig;
+import be.atbash.ee.security.octopus.config.JwtSupportConfiguration;
+import be.atbash.ee.security.octopus.config.PemKeyEncryption;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.KeyManager;
 import be.atbash.ee.security.octopus.keys.LocalKeyManager;

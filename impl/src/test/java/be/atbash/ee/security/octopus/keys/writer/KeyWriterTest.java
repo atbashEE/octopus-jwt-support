@@ -15,11 +15,11 @@
  */
 package be.atbash.ee.security.octopus.keys.writer;
 
+import be.atbash.ee.security.octopus.config.JwtSupportConfiguration;
+import be.atbash.ee.security.octopus.config.PemKeyEncryption;
 import be.atbash.ee.security.octopus.exception.MissingPasswordException;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.TestPasswordLookup;
-import be.atbash.ee.security.octopus.keys.config.JwtSupportConfiguration;
-import be.atbash.ee.security.octopus.keys.config.PemKeyEncryption;
 import be.atbash.ee.security.octopus.keys.reader.KeyReader;
 import be.atbash.ee.security.octopus.keys.reader.KeyResourceType;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;

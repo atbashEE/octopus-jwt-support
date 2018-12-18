@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.ee.security.octopus.keys.config;
+package be.atbash.ee.security.octopus.config;
 
 /**
  *

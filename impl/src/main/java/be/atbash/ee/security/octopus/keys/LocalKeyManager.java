@@ -16,7 +16,7 @@
 package be.atbash.ee.security.octopus.keys;
 
 import be.atbash.config.exception.ConfigurationException;
-import be.atbash.ee.security.octopus.keys.config.JwtSupportConfiguration;
+import be.atbash.ee.security.octopus.config.JwtSupportConfiguration;
 import be.atbash.ee.security.octopus.keys.reader.KeyFilesHelper;
 import be.atbash.ee.security.octopus.keys.reader.KeyReader;
 import be.atbash.ee.security.octopus.keys.reader.KeyReaderJWKSet;

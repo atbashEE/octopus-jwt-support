@@ -16,9 +16,9 @@
 package be.atbash.ee.security.octopus.keys.selector;
 
 import be.atbash.config.logging.StartupLogging;
+import be.atbash.ee.security.octopus.config.JwtSupportConfiguration;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.KeyManager;
-import be.atbash.ee.security.octopus.keys.config.JwtSupportConfiguration;
 import be.atbash.util.CDIUtils;
 
 import javax.annotation.PostConstruct;
