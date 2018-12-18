@@ -15,8 +15,8 @@
  */
 package be.atbash.ee.security.octopus.jwt;
 
-import be.atbash.ee.security.octopus.UnsupportedECCurveException;
 import be.atbash.ee.security.octopus.UnsupportedKeyType;
+import be.atbash.ee.security.octopus.exception.UnsupportedECCurveException;
 import be.atbash.ee.security.octopus.jwt.decoder.JWTDecoder;
 import be.atbash.ee.security.octopus.jwt.encoder.JWTEncoder;
 import be.atbash.ee.security.octopus.jwt.encoder.testclasses.Payload;

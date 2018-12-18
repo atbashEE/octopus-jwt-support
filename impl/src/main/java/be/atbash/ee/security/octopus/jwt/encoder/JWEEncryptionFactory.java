@@ -15,8 +15,9 @@
  */
 package be.atbash.ee.security.octopus.jwt.encoder;
 
-import be.atbash.ee.security.octopus.UnsupportedECCurveException;
 import be.atbash.ee.security.octopus.UnsupportedKeyType;
+import be.atbash.ee.security.octopus.exception.UnsupportedECCurveException;
+import be.atbash.ee.security.octopus.exception.UnsupportedKeyLengthException;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersEncryption;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import com.nimbusds.jose.JOSEException;
@@ -65,8 +66,7 @@ public class JWEEncryptionFactory {
             try {
                 result = new AESEncrypter((SecretKey) parametersEncryption.getKey());
             } catch (KeyLengthException e) {
-                // FIXME
-                e.printStackTrace();
+                throw new UnsupportedKeyLengthException("Unsupported Key length");
             }
         }
         if (result == null) {

@@ -15,7 +15,7 @@
  */
 package be.atbash.ee.security.octopus.keys.writer;
 
-import be.atbash.ee.security.octopus.MissingPasswordException;
+import be.atbash.ee.security.octopus.exception.MissingPasswordException;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.config.JwtSupportConfiguration;
 import be.atbash.ee.security.octopus.keys.config.PemKeyEncryption;
@@ -39,7 +39,7 @@ import java.security.cert.CertificateException;
 import java.text.ParseException;
 import java.util.Scanner;
 
-import static be.atbash.ee.security.octopus.MissingPasswordException.ObjectType.STORE;
+import static be.atbash.ee.security.octopus.exception.MissingPasswordException.ObjectType.STORE;
 
 /**
  *

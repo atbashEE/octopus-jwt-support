@@ -15,7 +15,7 @@
  */
 package be.atbash.ee.security.octopus.keys.writer;
 
-import be.atbash.ee.security.octopus.MissingPasswordException;
+import be.atbash.ee.security.octopus.exception.MissingPasswordException;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.TestPasswordLookup;
 import be.atbash.ee.security.octopus.keys.config.JwtSupportConfiguration;

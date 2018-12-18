@@ -15,8 +15,8 @@
  */
 package be.atbash.ee.security.octopus.util;
 
-import be.atbash.ee.security.octopus.DecryptionFailedException;
-import be.atbash.ee.security.octopus.MissingPasswordException;
+import be.atbash.ee.security.octopus.exception.DecryptionFailedException;
+import be.atbash.ee.security.octopus.exception.MissingPasswordException;
 import be.atbash.util.StringUtils;
 import be.atbash.util.base64.Base64Codec;
 import be.atbash.util.exception.AtbashUnexpectedException;

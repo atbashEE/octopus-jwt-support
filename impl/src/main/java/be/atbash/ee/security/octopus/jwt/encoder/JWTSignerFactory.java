@@ -15,8 +15,8 @@
  */
 package be.atbash.ee.security.octopus.jwt.encoder;
 
-import be.atbash.ee.security.octopus.UnsupportedECCurveException;
 import be.atbash.ee.security.octopus.UnsupportedKeyType;
+import be.atbash.ee.security.octopus.exception.UnsupportedECCurveException;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersSigning;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.util.exception.AtbashUnexpectedException;

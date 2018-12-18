@@ -15,7 +15,7 @@
  */
 package be.atbash.ee.security.octopus.util;
 
-import be.atbash.ee.security.octopus.DecryptionFailedException;
+import be.atbash.ee.security.octopus.exception.DecryptionFailedException;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import org.junit.Test;
 

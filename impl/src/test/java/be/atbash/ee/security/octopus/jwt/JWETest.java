@@ -15,8 +15,9 @@
  */
 package be.atbash.ee.security.octopus.jwt;
 
-import be.atbash.ee.security.octopus.UnsupportedECCurveException;
 import be.atbash.ee.security.octopus.UnsupportedKeyType;
+import be.atbash.ee.security.octopus.exception.UnsupportedECCurveException;
+import be.atbash.ee.security.octopus.exception.UnsupportedKeyLengthException;
 import be.atbash.ee.security.octopus.jwt.decoder.JWTDecoder;
 import be.atbash.ee.security.octopus.jwt.encoder.JWTEncoder;
 import be.atbash.ee.security.octopus.jwt.encoder.testclasses.Payload;
@@ -243,11 +244,11 @@ public class JWETest {
     @Test
     public void encodingJWE_OCT() {
 
-        List<AtbashKey> signKeyList = generateOCTKeys(KID_SIGN);
+        List<AtbashKey> signKeyList = generateOCTKeys(KID_SIGN, 256);
 
         assertThat(signKeyList).as("We should have 1 key for signing").hasSize(1);
 
-        List<AtbashKey> encryptKeyList = generateOCTKeys(KID_ENCRYPT);
+        List<AtbashKey> encryptKeyList = generateOCTKeys(KID_ENCRYPT, 256);
 
         assertThat(encryptKeyList).as("We should have 1 key for encryption").hasSize(1);
 
@@ -313,6 +314,25 @@ public class JWETest {
 
     }
 
+    @Test(expected = UnsupportedKeyLengthException.class)
+    public void encodingJWE_OCT_wrongKeyLength() {
+
+        List<AtbashKey> signKeyList = generateOCTKeys(KID_SIGN, 256);
+
+        assertThat(signKeyList).as("We should have 1 key for signing").hasSize(1);
+
+        List<AtbashKey> encryptKeyList = generateOCTKeys(KID_ENCRYPT, 224);
+
+        assertThat(encryptKeyList).as("We should have 1 key for encryption").hasSize(1);
+
+        JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWE)
+                .withSecretKeyForSigning(signKeyList.get(0))
+                .withSecretKeyForEncryption(encryptKeyList.get(0))
+                .build();
+
+        new JWTEncoder().encode(payload, parameters);
+    }
+
     private List<AtbashKey> generateRSAKeys(String kid) {
         RSAGenerationParameters generationParameters = new RSAGenerationParameters.RSAGenerationParametersBuilder()
                 .withKeyId(kid)
@@ -330,9 +350,10 @@ public class JWETest {
         return generator.generateKeys(generationParameters);
     }
 
-    private List<AtbashKey> generateOCTKeys(String kid) {
+    private List<AtbashKey> generateOCTKeys(String kid, int keySize) {
         OCTGenerationParameters generationParameters = new OCTGenerationParameters.OCTGenerationParametersBuilder()
                 .withKeyId(kid)
+                .withKeySize(keySize)
                 .build();
         KeyGenerator generator = new KeyGenerator();
         return generator.generateKeys(generationParameters);
