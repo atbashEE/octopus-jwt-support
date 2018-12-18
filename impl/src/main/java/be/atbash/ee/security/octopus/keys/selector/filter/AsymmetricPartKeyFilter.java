@@ -23,15 +23,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * FIXME Support for symmetric keys
+ *
  */
-
 public class AsymmetricPartKeyFilter implements KeyFilter {
 
     private AsymmetricPart asymmetricPart;
 
     public AsymmetricPartKeyFilter(AsymmetricPart asymmetricPart) {
-        // In the case of the symmetric keys, null is allowed. (or we need to have something equivalent)
         this.asymmetricPart = asymmetricPart;
     }
 

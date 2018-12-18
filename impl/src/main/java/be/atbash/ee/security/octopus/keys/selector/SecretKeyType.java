@@ -36,7 +36,7 @@ public class SecretKeyType {
     private AsymmetricPart asymmetricPart;
 
     public SecretKeyType(KeyType keyType) {
-        this(keyType, null);
+        this(keyType, AsymmetricPart.SYMMETRIC);
     }
 
     public SecretKeyType(KeyType keyType, AsymmetricPart asymmetricPart) {
@@ -44,12 +44,12 @@ public class SecretKeyType {
             throw new AtbashIllegalActionException("(OCT-DEV-107) Parameter KeyType can't be null");
         }
         if (keyType == KeyType.OCT) {
-            if (asymmetricPart != null) {
+            if (asymmetricPart != AsymmetricPart.SYMMETRIC) {
                 throw new AtbashIllegalActionException("(OCT-DEV-109) AsymmetricPart can't be specified for a symmetric key type");
             }
         } else {
 
-            if (asymmetricPart == null) {
+            if (asymmetricPart == null || asymmetricPart == AsymmetricPart.SYMMETRIC) {
                 throw new AtbashIllegalActionException("(OCT-DEV-108) Parameter AsymmetricPart is required for a asymmetric key type");
             }
         }
@@ -66,7 +66,7 @@ public class SecretKeyType {
     }
 
     public boolean isAsymmetric() {
-        return asymmetricPart != null;
+        return asymmetricPart != null && asymmetricPart != AsymmetricPart.SYMMETRIC;
     }
 
     public boolean isPrivate() {

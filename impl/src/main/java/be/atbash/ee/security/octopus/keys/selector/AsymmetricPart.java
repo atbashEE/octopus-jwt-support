@@ -17,5 +17,5 @@ package be.atbash.ee.security.octopus.keys.selector;
 
 public enum AsymmetricPart {
 
-    PUBLIC, PRIVATE
+    PUBLIC, PRIVATE, SYMMETRIC
 }

@@ -71,7 +71,7 @@ public class SecretKeyTypeTest {
         assertThat(keyType).isNotNull();
         assertThat(keyType.getKeyType()).isEqualTo(KeyType.OCT);
         assertThat(keyType.isAsymmetric()).isFalse();
-        assertThat(keyType.getAsymmetricPart()).isNull();
+        assertThat(keyType.getAsymmetricPart()).isEqualTo(AsymmetricPart.SYMMETRIC);
     }
 
     @Test(expected = AtbashIllegalActionException.class)
@@ -83,7 +83,7 @@ public class SecretKeyTypeTest {
     @Test
     public void init_2() {
         // OCT type, no asymmetric
-        new SecretKeyType(KeyType.OCT, null);
+        new SecretKeyType(KeyType.OCT, AsymmetricPart.SYMMETRIC);
         new SecretKeyType(KeyType.OCT);
     }
 

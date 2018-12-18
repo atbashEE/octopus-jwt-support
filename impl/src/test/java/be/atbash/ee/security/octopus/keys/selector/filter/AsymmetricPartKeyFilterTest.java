@@ -17,6 +17,7 @@ package be.atbash.ee.security.octopus.keys.selector.filter;
 
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.generator.KeyGenerator;
+import be.atbash.ee.security.octopus.keys.generator.OCTGenerationParameters;
 import be.atbash.ee.security.octopus.keys.generator.RSAGenerationParameters;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.util.exception.AtbashIllegalActionException;
@@ -36,6 +37,7 @@ public class AsymmetricPartKeyFilterTest {
 
     private static AtbashKey key1;
     private static AtbashKey key2;
+    private static AtbashKey key3;
 
     private AsymmetricPartKeyFilter keyFilter;
 
@@ -43,14 +45,20 @@ public class AsymmetricPartKeyFilterTest {
     public static void defineKeys() {
         KeyGenerator generator = new KeyGenerator();
 
-        RSAGenerationParameters generationParameters1 = new RSAGenerationParameters.RSAGenerationParametersBuilder()
+        RSAGenerationParameters generationParameters = new RSAGenerationParameters.RSAGenerationParametersBuilder()
                 .withKeyId("rsa")
                 .build();
-        List<AtbashKey> keys = generator.generateKeys(generationParameters1);
+        List<AtbashKey> keys = generator.generateKeys(generationParameters);
 
         key1 = keys.get(1); // We need the private key
 
         key2 = keys.get(0); // We need the public key
+
+        OCTGenerationParameters octGenerationParameters = new OCTGenerationParameters.OCTGenerationParametersBuilder()
+                .withKeyId("oct")
+                .build();
+
+        key3 = generator.generateKeys(octGenerationParameters).get(0);
     }
 
     @Test
@@ -60,6 +68,7 @@ public class AsymmetricPartKeyFilterTest {
         List<AtbashKey> keys = new ArrayList<>();
         keys.add(key1);
         keys.add(key2);
+        keys.add(key3);
 
         List<AtbashKey> data = keyFilter.filter(keys);
 
@@ -69,11 +78,28 @@ public class AsymmetricPartKeyFilterTest {
     }
 
     @Test
+    public void filter_symmetric() {
+        keyFilter = new AsymmetricPartKeyFilter(AsymmetricPart.SYMMETRIC);
+
+        List<AtbashKey> keys = new ArrayList<>();
+        keys.add(key1);
+        keys.add(key2);
+        keys.add(key3);
+
+        List<AtbashKey> data = keyFilter.filter(keys);
+
+        assertThat(data).hasSize(1);
+        assertThat(data.get(0)).isEqualTo(key3);
+
+    }
+
+    @Test
     public void filter_NoMatch() {
         keyFilter = new AsymmetricPartKeyFilter(AsymmetricPart.PUBLIC);
 
         List<AtbashKey> keys = new ArrayList<>();
         keys.add(key1);
+        keys.add(key3);
 
         List<AtbashKey> data = keyFilter.filter(keys);
 
