@@ -67,4 +67,14 @@ public class AtbashKeyTest {
         AtbashKey key = new AtbashKey(ResourceUtil.CLASSPATH_PREFIX + "test.pem", new FakeRSAPrivate());
         assertThat(key.isMatch("test", AsymmetricPart.PUBLIC)).isFalse();
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void create_missingPath() {
+        new AtbashKey(null, new FakeRSAPrivate());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void create_missingKey() {
+        new AtbashKey(ResourceUtil.CLASSPATH_PREFIX + "test.pem", null);
+    }
 }

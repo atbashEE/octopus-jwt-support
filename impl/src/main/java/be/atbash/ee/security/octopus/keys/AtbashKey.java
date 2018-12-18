@@ -20,7 +20,6 @@ import be.atbash.ee.security.octopus.keys.json.AtbashKeyWriter;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.keys.selector.SecretKeyType;
 import be.atbash.json.parser.MappedBy;
-import be.atbash.util.exception.AtbashUnexpectedException;
 import be.atbash.util.resource.ResourceUtil;
 
 import java.security.Key;
@@ -35,7 +34,13 @@ public class AtbashKey {
 
     public AtbashKey(String path, Key key) {
 
-        // FIXME Check key is not null
+        if (key == null) {
+            throw new IllegalArgumentException("Parameter key cannot be null");
+        }
+        if (path == null) {
+            throw new IllegalArgumentException("Parameter path cannot be null");
+        }
+
         this.keyId = defineKeyId(path);
         this.key = key;
         secretKeyType = SecretKeyType.fromKey(key);
@@ -54,9 +59,6 @@ public class AtbashKey {
     }
 
     private String defineKeyId(String value) {
-        if (value == null) {
-            throw new AtbashUnexpectedException("Parameter cannot be null");
-        }
         String result = value;
         if (value.startsWith(ResourceUtil.CLASSPATH_PREFIX)) {
             int prefixStart = result.lastIndexOf('.');
