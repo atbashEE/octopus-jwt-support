@@ -29,8 +29,12 @@ import be.atbash.ee.security.octopus.keys.generator.RSAGenerationParameters;
 import be.atbash.ee.security.octopus.keys.selector.*;
 import be.atbash.ee.security.octopus.util.HmacSecretUtil;
 import be.atbash.util.base64.Base64Codec;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import uk.org.lidalia.slf4jext.Level;
+import uk.org.lidalia.slf4jtest.TestLogger;
+import uk.org.lidalia.slf4jtest.TestLoggerFactory;
 
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
@@ -46,6 +50,7 @@ public class JWTTest {
 
     private static final String KID_SIGN = "sign";
 
+    private TestLogger logger;
     private Payload payload;
 
     @Before
@@ -56,6 +61,12 @@ public class JWTTest {
         payload.getMyList().add("permission1");
         payload.getMyList().add("permission2");
 
+        logger = TestLoggerFactory.getTestLogger(KeySelector.class);
+    }
+
+    @After
+    public void teardown() {
+        TestLoggerFactory.clear();
     }
 
     @Test
@@ -72,10 +83,7 @@ public class JWTTest {
     @Test
     public void encodingJWT_HMAC() {
 
-        byte[] secret = new byte[32];
-        new SecureRandom().nextBytes(secret);
-
-        AtbashKey key = HmacSecretUtil.generateSecretKey("hmacID", secret);
+        AtbashKey key = generateOCTKey();
 
         JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS)
                 .withSecretKeyForSigning(key)
@@ -113,10 +121,7 @@ public class JWTTest {
     @Test(expected = InvalidJWTException.class)
     public void encodingJWT__hmac_TamperedPayload() {
 
-        byte[] secret = new byte[32];
-        new SecureRandom().nextBytes(secret);
-
-        AtbashKey key = HmacSecretUtil.generateSecretKey("hmacID", secret);
+        AtbashKey key = generateOCTKey();
 
         JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS)
                 .withSecretKeyForSigning(key)
@@ -359,6 +364,47 @@ public class JWTTest {
                 .build();
 
         new JWTEncoder().encode(payload, parameters);
+    }
+
+    @Test(expected = InvalidJWTException.class)
+    public void encodingJWT_noKeyMatch() {
+
+        List<AtbashKey> keys = generateRSAKeys(KID_SIGN);
+
+        ListKeyManager keyManager = new ListKeyManager(keys);
+
+        SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PRIVATE).build();
+        List<AtbashKey> signKeyList = keyManager.retrieveKeys(criteria);
+
+        assertThat(signKeyList).as("We should have 1 Private key for signing").hasSize(1);
+
+        JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS)
+                .withSecretKeyForSigning(signKeyList.get(0))
+                .build();
+
+        String encoded = new JWTEncoder().encode(payload, parameters);
+
+        keys.clear();  // remove all keys
+        KeySelector keySelector = new TestKeySelector(keyManager);
+        try {
+            new JWTDecoder().decode(encoded, Payload.class, keySelector, null);
+        } finally {
+
+            assertThat(logger.getLoggingEvents()).hasSize(1);
+            assertThat(logger.getLoggingEvents().get(0).getLevel()).isEqualTo(Level.ERROR);
+            assertThat(logger.getLoggingEvents().get(0).getMessage()).isEqualTo("(OCT-KEY-010) No or multiple keys found for criteria :\n" +
+                    " KeySelectorCriteria{\n" +
+                    "     KeyFilter{keyId='sign'}\n" +
+                    "     KeyFilter{part='PUBLIC'}\n" +
+                    "}");
+        }
+    }
+
+    private AtbashKey generateOCTKey() {
+        byte[] secret = new byte[32];
+        new SecureRandom().nextBytes(secret);
+
+        return HmacSecretUtil.generateSecretKey("hmacID", secret);
     }
 
     private List<AtbashKey> generateRSAKeys(String kid) {

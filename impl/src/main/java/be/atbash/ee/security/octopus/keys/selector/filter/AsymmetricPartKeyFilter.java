@@ -49,4 +49,10 @@ public class AsymmetricPartKeyFilter implements KeyFilter {
         }
         return result;
     }
+
+    @Override
+    public String describe() {
+        return String.format("KeyFilter{part='%s'}", asymmetricPart.name());
+    }
+
 }

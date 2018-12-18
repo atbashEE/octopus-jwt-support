@@ -30,6 +30,8 @@ import com.nimbusds.jose.crypto.factories.DefaultJWSVerifierFactory;
 import com.nimbusds.jose.proc.JWEDecrypterFactory;
 import com.nimbusds.jose.proc.JWSVerifierFactory;
 import com.nimbusds.jwt.SignedJWT;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import java.net.URI;
@@ -41,6 +43,8 @@ import java.text.ParseException;
  */
 @ApplicationScoped
 public class JWTDecoder {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(KeySelector.class);
 
     // TODO Do we ever need some customer factory implementations? Should we made these configurable?
     private JWSVerifierFactory jwsVerifierFactory = new DefaultJWSVerifierFactory();
@@ -71,6 +75,9 @@ public class JWTDecoder {
                     result = readSignedJWT(data, keySelector, classType, verifier);
                     break;
                 case JWE:
+                    if (keySelector == null) {
+                        throw new AtbashIllegalActionException("(OCT-DEV-101) keySelector required for decoding a JWE encoded value");
+                    }
                     result = readEncryptedJWT(data, keySelector, classType, verifier);
                     break;
                 default:
@@ -103,6 +110,8 @@ public class JWTDecoder {
         }
 
         if (key == null) {
+            LOGGER.error(String.format("(OCT-KEY-010) No or multiple keys found for criteria :\n %s", criteria.toString()));
+
             throw new InvalidJWTException(String.format("No key found for %s", keyID));
         }
 
@@ -138,7 +147,9 @@ public class JWTDecoder {
             }
         }
         if (key == null) {
-            throw new InvalidJWTException(String.format("No key found for %s", keyID));
+
+            LOGGER.error(String.format("(OCT-KEY-010) No or multiple keys found for criteria :\n %s", criteria.toString()));
+            throw new InvalidJWTException(String.format("No key found for keyId '%s'", keyID));
         }
 
         JWSVerifier jwsVerifier = jwsVerifierFactory.createJWSVerifier(signedJWT.getHeader(), key);

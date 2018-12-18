@@ -52,4 +52,10 @@ public class SecretKeyTypeKeyFilter implements KeyFilter {
         }
         return result;
     }
+
+    @Override
+    public String describe() {
+        return String.format("KeyFilter{keyType='%s',part='%s'}", secretKeyType.getKeyType().getValue(), secretKeyType.getAsymmetricPart().name());
+    }
+
 }

@@ -50,4 +50,9 @@ public class IdKeyFilter implements KeyFilter {
         }
         return result;
     }
+
+    @Override
+    public String describe() {
+        return String.format("KeyFilter{keyId='%s'}", keyId);
+    }
 }

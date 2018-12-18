@@ -27,4 +27,12 @@ public interface KeyFilter {
 
     List<AtbashKey> filter(List<AtbashKey> keys);
 
+    /**
+     * When no Key is found by the KeyManager, the information of the KeyFilter(s) in used can be used to log
+     * what was tried.
+     *
+     * @return The Description fo the keyFilter
+     */
+    String describe();
+
 }

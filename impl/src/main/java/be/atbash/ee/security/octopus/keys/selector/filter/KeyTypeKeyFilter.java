@@ -52,4 +52,9 @@ public class KeyTypeKeyFilter implements KeyFilter {
         }
         return result;
     }
+
+    @Override
+    public String describe() {
+        return String.format("KeyFilter{keyType='%s'}", keyType.getValue());
+    }
 }

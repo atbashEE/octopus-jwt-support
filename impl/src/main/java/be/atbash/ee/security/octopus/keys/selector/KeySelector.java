@@ -20,8 +20,6 @@ import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.KeyManager;
 import be.atbash.ee.security.octopus.keys.config.JwtSupportConfiguration;
 import be.atbash.util.CDIUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
@@ -35,8 +33,6 @@ import java.util.List;
 public class KeySelector {
 
     private static final Object LOCK = new Object();
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(KeySelector.class);
 
     private KeyManager keyManager;
 
@@ -63,12 +59,7 @@ public class KeySelector {
 
         List<AtbashKey> keys = keyManager.retrieveKeys(selectorCriteria);
 
-        if (keys.isEmpty()) {
-            LOGGER.warn("(OCT-KEY-010) No key found for criteria"); // FIXME log selectorCriteria
-            return null;
-        }
-        if (keys.size() > 1) {
-            LOGGER.warn("(OCT-KEY-011) Multiple keys found for criteria"); // FIXME log selectorCriteria
+        if (keys.isEmpty() || keys.size() > 1) {
             return null;
         }
         return keys.get(0);

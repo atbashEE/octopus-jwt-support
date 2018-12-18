@@ -26,8 +26,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import uk.org.lidalia.slf4jext.Level;
-import uk.org.lidalia.slf4jtest.TestLogger;
 import uk.org.lidalia.slf4jtest.TestLoggerFactory;
 
 import java.security.Key;
@@ -42,8 +40,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class KeySelectorTest {
 
     private KeySelector keySelector = new KeySelector();
-
-    private TestLogger logger;
 
     private static AtbashKey key1;
     private static AtbashKey key2;
@@ -66,8 +62,6 @@ public class KeySelectorTest {
         // configure KeyManager
         TestConfig.registerDefaultConverters();
         TestConfig.addConfigValue("key.manager.class", FakeKeyManager.class.getName());
-
-        logger = TestLoggerFactory.getTestLogger(KeySelector.class);
     }
 
     @After
@@ -269,34 +263,6 @@ public class KeySelectorTest {
         AsymmetricPart value3 = TestReflectionUtils.getValueOf(filter, "asymmetricPart");
         assertThat(value3).isNotNull();
         assertThat(value3).isEqualTo(AsymmetricPart.PUBLIC);
-
-    }
-
-    @Test
-    public void selectAtbashKey_NoMatch() {
-
-        SelectorCriteria criteria = SelectorCriteria.newBuilder().build();
-        AtbashKey key = keySelector.selectAtbashKey(criteria);
-        assertThat(key).isNull();
-
-        assertThat(logger.getLoggingEvents()).hasSize(1);
-        assertThat(logger.getLoggingEvents().get(0).getLevel()).isEqualTo(Level.WARN);
-        assertThat(logger.getLoggingEvents().get(0).getMessage()).startsWith("(OCT-KEY-010)");
-
-    }
-
-    @Test
-    public void selectAtbashKey_multipleMatch() {
-        FakeKeyManager.keys.add(key1);
-        FakeKeyManager.keys.add(key2);
-
-        SelectorCriteria criteria = SelectorCriteria.newBuilder().build();
-        AtbashKey key = keySelector.selectAtbashKey(criteria);
-        assertThat(key).isNull();
-
-        assertThat(logger.getLoggingEvents()).hasSize(1);
-        assertThat(logger.getLoggingEvents().get(0).getLevel()).isEqualTo(Level.WARN);
-        assertThat(logger.getLoggingEvents().get(0).getMessage()).startsWith("(OCT-KEY-011)");
 
     }
 

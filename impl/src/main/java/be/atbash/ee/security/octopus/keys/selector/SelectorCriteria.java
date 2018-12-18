@@ -80,6 +80,18 @@ public class SelectorCriteria {
         return result;
     }
 
+    @Override
+    public String toString() {
+
+        StringBuilder result = new StringBuilder();
+        result.append("KeySelectorCriteria{");
+        for (KeyFilter keyFilter : asKeyFilters()) {
+            result.append("\n     ").append(keyFilter.describe());
+        }
+        result.append("\n}");
+        return result.toString();
+    }
+
     public static Builder newBuilder() {
         return new Builder();
     }
