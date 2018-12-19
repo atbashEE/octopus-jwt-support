@@ -350,3 +350,9 @@ default : **SHA1WithRSA**
 
 Defines the algorithm used for singing the certificate which is generated when storing a public key into a Key store file.
 Please note that there will be always an RSA key generated for this, so one is only able to change ther hashing part of the signature.
+
+=== jwt.sign.rsa.algo
+
+default : **RS256**
+
+Defines the algorithm used for signing the JWT in case we use RSA keys. Valid values are _RS256_, _RS384_, _RS512_, _PS256_, _PS384_, and _PS512_.

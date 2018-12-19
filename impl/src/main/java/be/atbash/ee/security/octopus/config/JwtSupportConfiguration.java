@@ -30,9 +30,12 @@ import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLoo
 import be.atbash.util.StringUtils;
 import be.atbash.util.reflection.CDICheck;
 import be.atbash.util.reflection.ClassUtils;
+import com.nimbusds.jose.JWSAlgorithm;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import javax.enterprise.context.ApplicationScoped;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  *
@@ -40,6 +43,9 @@ import javax.enterprise.context.ApplicationScoped;
 @ApplicationScoped
 @ModuleConfigName("Octopus JWT Support Configuration")
 public class JwtSupportConfiguration extends AbstractConfiguration implements ModuleConfig {
+
+    private static final List<JWSAlgorithm> RSA_SUPPORTED_ALGOS = Arrays.asList(JWSAlgorithm.RS256, JWSAlgorithm.RS384
+            , JWSAlgorithm.RS512, JWSAlgorithm.PS256, JWSAlgorithm.PS384, JWSAlgorithm.PS512);
 
     /**
      * The return value can also be a directory where multiple files are located (and retrieved).
@@ -144,6 +150,21 @@ public class JwtSupportConfiguration extends AbstractConfiguration implements Mo
     @ConfigProperty
     public String getCertificateSignatureAlgorithm() {
         return getOptionalValue("key.store.signature.algo", "SHA1WithRSA", String.class);
+    }
+
+    @ConfigProperty
+    public JWSAlgorithm getJWSAlgorithmForRSA() {
+        String value = getOptionalValue("jwt.sign.rsa.algo", "RS256", String.class);
+        JWSAlgorithm result = null;
+        for (JWSAlgorithm algo : RSA_SUPPORTED_ALGOS) {
+            if (algo.getName().equals(value)) {
+                result = algo;
+            }
+        }
+        if (result == null) {
+            throw new ConfigurationException(String.format("Unsupported algorithm name %s for RSA signing", value));
+        }
+        return result;
     }
 
     // Java SE Support

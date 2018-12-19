@@ -15,6 +15,7 @@
  */
 package be.atbash.ee.security.octopus.jwt;
 
+import be.atbash.config.test.TestConfig;
 import be.atbash.ee.security.octopus.UnsupportedKeyType;
 import be.atbash.ee.security.octopus.exception.UnsupportedECCurveException;
 import be.atbash.ee.security.octopus.jwt.decoder.JWTDecoder;
@@ -67,6 +68,7 @@ public class JWTTest {
     @After
     public void teardown() {
         TestLoggerFactory.clear();
+        TestConfig.resetConfig();
     }
 
     @Test
@@ -160,6 +162,42 @@ public class JWTTest {
                 .build();
 
         String encoded = new JWTEncoder().encode(payload, parameters);
+
+        // Check algo in header
+        String header = new String(Base64Codec.decode(encoded.split("\\.")[0]));
+        assertThat(header).contains("\"alg\":\"RS256\"");
+
+        criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PUBLIC).build();
+        List<AtbashKey> publicList = keyManager.retrieveKeys(criteria);
+
+        KeySelector keySelector = new SingleKeySelector(publicList.get(0));
+        Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector, null).getData();
+
+        assertThat(payload).isEqualToComparingFieldByField(data);
+    }
+
+    @Test
+    public void encodingJWT_RSA_otherAlgo() {
+        TestConfig.addConfigValue("jwt.sign.rsa.algo", "PS512");
+
+        List<AtbashKey> keys = generateRSAKeys(KID_SIGN);
+
+        ListKeyManager keyManager = new ListKeyManager(keys);
+
+        SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PRIVATE).build();
+        List<AtbashKey> signKeyList = keyManager.retrieveKeys(criteria);
+
+        assertThat(signKeyList).as("We should have 1 Private key for signing").hasSize(1);
+
+        JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS)
+                .withSecretKeyForSigning(signKeyList.get(0))
+                .build();
+
+        String encoded = new JWTEncoder().encode(payload, parameters);
+
+        // Check algo in header
+        String header = new String(Base64Codec.decode(encoded.split("\\.")[0]));
+        assertThat(header).contains("\"alg\":\"PS512\"");
 
         criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PUBLIC).build();
         List<AtbashKey> publicList = keyManager.retrieveKeys(criteria);
@@ -262,6 +300,41 @@ public class JWTTest {
                 .build();
 
         String encoded = new JWTEncoder().encode(payload, parameters);
+
+        // check algo in header
+        String header = new String(Base64Codec.decode(encoded.split("\\.")[0]));
+        assertThat(header).contains("\"alg\":\"ES256\"");
+
+        criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PUBLIC).build();
+        List<AtbashKey> publicList = keyManager.retrieveKeys(criteria);
+
+        KeySelector keySelector = new SingleKeySelector(publicList.get(0));
+        Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector, null).getData();
+
+        assertThat(payload).isEqualToComparingFieldByField(data);
+    }
+
+    @Test
+    public void encodingJWT_EC_customAlgo() {
+
+        List<AtbashKey> keys = generateECKeys(KID_SIGN, "P-521");
+
+        ListKeyManager keyManager = new ListKeyManager(keys);
+
+        SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PRIVATE).build();
+        List<AtbashKey> signKeyList = keyManager.retrieveKeys(criteria);
+
+        assertThat(signKeyList).as("We should have 1 Private key for signing").hasSize(1);
+
+        JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS)
+                .withSecretKeyForSigning(signKeyList.get(0))
+                .build();
+
+        String encoded = new JWTEncoder().encode(payload, parameters);
+
+        // check algo in header
+        String header = new String(Base64Codec.decode(encoded.split("\\.")[0]));
+        assertThat(header).contains("\"alg\":\"ES512\"");
 
         criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PUBLIC).build();
         List<AtbashKey> publicList = keyManager.retrieveKeys(criteria);

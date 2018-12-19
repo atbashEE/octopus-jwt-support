@@ -16,6 +16,7 @@
 package be.atbash.ee.security.octopus.jwt.encoder;
 
 import be.atbash.ee.security.octopus.UnsupportedKeyType;
+import be.atbash.ee.security.octopus.config.JwtSupportConfiguration;
 import be.atbash.ee.security.octopus.exception.UnsupportedECCurveException;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersSigning;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
@@ -27,12 +28,15 @@ import com.nimbusds.jose.KeyLengthException;
 import com.nimbusds.jose.crypto.ECDSASigner;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.RSASSASigner;
+import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.jwk.KeyType;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.security.PrivateKey;
+import java.security.interfaces.ECKey;
 import java.security.interfaces.ECPrivateKey;
+import java.security.spec.ECParameterSpec;
 
 /**
  *
@@ -42,6 +46,9 @@ public class JWTSignerFactory {
 
     @Inject
     private HMACAlgorithmFactory hmacAlgorithmFactory;
+
+    @Inject
+    private JwtSupportConfiguration jwtSupportConfiguration;
 
     public JWSSigner createSigner(JWTParametersSigning parametersSigning) {
         JWSSigner result = null;
@@ -94,10 +101,15 @@ public class JWTSignerFactory {
         }
         if (KeyType.RSA.equals(parametersSigning.getKeyType())) {
 
-            result = JWSAlgorithm.RS256; // FIXME Is this always (what about 384 and 512
+            result = jwtSupportConfiguration.getJWSAlgorithmForRSA();
         }
         if (KeyType.EC.equals(parametersSigning.getKeyType())) {
-            result = JWSAlgorithm.ES256; // FIXME Is this always (what about 384 and 512
+
+            try {
+                result = resolveAlgorithm((ECKey) parametersSigning.getKey());
+            } catch (JOSEException e) {
+                throw new UnsupportedECCurveException(e.getMessage());
+            }
         }
         if (result == null) {
             throw new UnsupportedKeyType(parametersSigning.getKeyType(), "JWT Signing");
@@ -106,10 +118,40 @@ public class JWTSignerFactory {
         return result;
     }
 
+    /* Copied from com.nimbusds.jose.crypto.ECDSA which has package scope */
+    private JWSAlgorithm resolveAlgorithm(final ECKey ecKey)
+            throws JOSEException {
+
+        ECParameterSpec ecParameterSpec = ecKey.getParams();
+        return resolveAlgorithm(Curve.forECParameterSpec(ecParameterSpec));
+    }
+
+    private JWSAlgorithm resolveAlgorithm(final Curve curve)
+            throws JOSEException {
+
+        if (curve == null) {
+            throw new JOSEException("The EC key curve is not supported, must be P-256, P-384 or P-521");
+        } else if (Curve.P_256.equals(curve)) {
+            return JWSAlgorithm.ES256;
+        } else if (Curve.P_256K.equals(curve)) {
+            return JWSAlgorithm.ES256K;
+        } else if (Curve.P_384.equals(curve)) {
+            return JWSAlgorithm.ES384;
+        } else if (Curve.P_521.equals(curve)) {
+            return JWSAlgorithm.ES512;
+        } else {
+            throw new JOSEException("Unexpected curve: " + curve);
+        }
+    }
+
     private void checkDependencies() {
         // We have CDI injected dependencies, but in a Java SE environment it is possible that they are empty.
         if (hmacAlgorithmFactory == null) {
             hmacAlgorithmFactory = new HMACAlgorithmFactory();
+        }
+
+        if (jwtSupportConfiguration == null) {
+            jwtSupportConfiguration = JwtSupportConfiguration.getInstance();
         }
     }
 
