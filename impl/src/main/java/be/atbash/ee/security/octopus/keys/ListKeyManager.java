@@ -13,16 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.ee.security.octopus.keys.selector;
+package be.atbash.ee.security.octopus.keys;
 
-import be.atbash.ee.security.octopus.keys.AtbashKey;
-import be.atbash.ee.security.octopus.keys.KeyManager;
+import be.atbash.ee.security.octopus.keys.selector.SelectorCriteria;
 import be.atbash.ee.security.octopus.keys.selector.filter.KeyFilter;
+import be.atbash.util.PublicAPI;
 import be.atbash.util.exception.AtbashIllegalActionException;
 
+import javax.enterprise.inject.Vetoed;
 import java.util.ArrayList;
 import java.util.List;
 
+@Vetoed
+@PublicAPI
 public class ListKeyManager implements KeyManager {
 
     private List<AtbashKey> keys;

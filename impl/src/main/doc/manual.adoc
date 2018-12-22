@@ -42,8 +42,10 @@ Breaking changes (although 0.5.0 was an alfa release and thus changes are expect
 
 == Introduction
 
-A first attempt for converting Java beans to and from a JWT.
-The code will be improved when Atbash Octopus has full support for MP JWT Auth spec and OAuth2/OpenId Connect.
+Code around handling all types of Cryptographic Keys (RSA, EC, OCT / AES secret Keys, Diffie Hellman), reading and writing it in different formats (PEM with PKCS1, PKCS8 and unencoded, JWK, JWKSet and KeyStore (JKS) ).
+
+It allows creating signed or encrypted JWT objects from a Java Object.
+
 
 == Standard usage JWT Serialization
 
@@ -212,6 +214,21 @@ Therefor we can pass some kind of _discriminator_ object to the SelectorCriteria
 Password are by default read from configuration (parameter _lookup.password.class_ define the class)
 
 KeyResourceTypeProvider -> defines mapping between file extension and type of key (PEM, JKS, ...)
+
+=== Filter Keys
+
+The preferred way to retrieve a Key from some source is the use of the _KeyManager_ as described above. However, there are situations where you want to select a certain key from a set of keys.
+
+The classic use case is that you have generated a key pair (using the _KeyGenerator_ class) but want to retrieve the public key from this pair. since the generated key pair is not available within the KeyManager, another way must be available to retrieve the key (which is more high level then just checking which key implements the PrivateKey interface)
+
+The **ListKeyManager** is created specially for this purpose. It is also a _KeyManager_ implementation but you supply the set of keys it own through the constructor (and thus the KeyManager doesn't retrieve his keys from the environment in some way.
+
+The following snippets retrieves the public key.
+
+    ListKeyManager keyManager = new ListKeyManager(keys);
+    SelectorCriteria criteria = SelectorCriteria.newBuilder().withAsymmetricPart(AsymmetricPart.PUBLIC).build();
+    List<AtbashKey> keyList = keyManager.retrieveKeys(criteria);
+
 
 == Supported Key Formats
 
