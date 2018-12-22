@@ -29,20 +29,11 @@ import java.nio.charset.StandardCharsets;
 
 public class PemKeyEncoderPrivatePartNotEncrypted implements KeyEncoder {
 
-    // FIXME Left over of initial version to define header. But probably not needed.
-    // So also no specific versions for RSA en EC required.
-    private String keyType;
-
-    public PemKeyEncoderPrivatePartNotEncrypted(String keyType) {
-        this.keyType = keyType;
-    }
-
     @Override
     public byte[] encodeKey(AtbashKey atbashKey, KeyEncoderParameters parameters) throws IOException {
         StringWriter out = new StringWriter();
         JcaPEMWriter pemWriter = new JcaPEMWriter(out);
 
-        //pemWriter.writeObject(new PemObject(keyType + " PRIVATE KEY", atbashKey.getKey().getEncoded()));
         pemWriter.writeObject(atbashKey.getKey());
 
         pemWriter.close();

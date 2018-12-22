@@ -29,9 +29,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  *
@@ -39,7 +37,7 @@ import java.util.Map;
 @ApplicationScoped
 public class KeyWriterFactory {
 
-    private Map<String, KeyEncoder> notEncryptedEncoder;
+    private PemKeyEncoderPrivatePartNotEncrypted notEncryptedEncoder;
 
     private PemKeyEncoderPublicPart publicPartEncoder;
 
@@ -53,9 +51,7 @@ public class KeyWriterFactory {
 
     @PostConstruct
     public void init() {
-        notEncryptedEncoder = new HashMap<>();
-        notEncryptedEncoder.put("RSA", new PemKeyEncoderPrivatePartNotEncrypted("RSA"));
-        notEncryptedEncoder.put("EC", new PemKeyEncoderPrivatePartNotEncrypted("EC"));
+        notEncryptedEncoder = new PemKeyEncoderPrivatePartNotEncrypted();
         publicPartEncoder = new PemKeyEncoderPublicPart();
 
         privatePartPKCS1Encoder = new PemKeyEncoderPrivatePartPKCS1();
@@ -86,8 +82,7 @@ public class KeyWriterFactory {
             PemKeyEncryption pemKeyEncryption = parameters.getValue(PemKeyEncryption.class);
             switch (pemKeyEncryption) {
                 case NONE:
-                    result = notEncryptedEncoder.get(atbashKey.getSecretKeyType().getKeyType().getValue())
-                            .encodeKey(atbashKey, parameters);
+                    result = notEncryptedEncoder.encodeKey(atbashKey, parameters);
                     break;
                 case PKCS8:
                     result = privatePartPKCS8Encoder.encodeKey(atbashKey, parameters);
