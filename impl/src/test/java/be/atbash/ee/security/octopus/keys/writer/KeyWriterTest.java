@@ -162,6 +162,8 @@ public class KeyWriterTest {
     @Test
     public void writeKeyResource_scenario7() throws IOException {
         // scenario 7 RSA private key as KeyStore
+        when(jwtSupportConfigurationMock.getKeyStoreType()).thenReturn("jks");
+
         List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.jwk", null);
 
         AtbashKey privateKey = filterKeys(keys, AsymmetricPart.PRIVATE);
@@ -177,6 +179,8 @@ public class KeyWriterTest {
     @Test(expected = MissingPasswordException.class)
     public void writeKeyResource_scenario7_missingKeyPassword() {
         // scenario 7 RSA private key as KeyStore
+        when(jwtSupportConfigurationMock.getKeyStoreType()).thenReturn("jks");
+
         List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.jwk", null);
 
         AtbashKey privateKey = filterKeys(keys, AsymmetricPart.PRIVATE);
@@ -188,6 +192,8 @@ public class KeyWriterTest {
     @Test(expected = MissingPasswordException.class)
     public void writeKeyResource_scenario7_missingFilePassword() {
         // scenario 7 RSA private key as KeyStore
+        when(jwtSupportConfigurationMock.getKeyStoreType()).thenReturn("jks");
+
         List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.jwk", null);
 
         AtbashKey privateKey = filterKeys(keys, AsymmetricPart.PRIVATE);

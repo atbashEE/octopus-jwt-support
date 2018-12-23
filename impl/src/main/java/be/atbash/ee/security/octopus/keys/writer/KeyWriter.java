@@ -135,11 +135,11 @@ public class KeyWriter {
     }
 
     private KeyStore loadExistingKeyStore(String target, char[] filePassword) throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
-        KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+        KeyStore keyStore = KeyStore.getInstance(jwtSupportConfiguration.getKeyStoreType());
 
-        InputStream inputStream = resourceUtil.getStream(target);
-        if (inputStream != null) {
+        if (resourceUtil.resourceExists(target)) {
 
+            InputStream inputStream = resourceUtil.getStream(target);
             keyStore.load(inputStream, filePassword);
         } else {
 
@@ -171,7 +171,7 @@ public class KeyWriter {
                     result = writeKeyAsPEM(atbashKey, keyPassword);
                     break;
                 case KEYSTORE:
-                    KeyStore keyStore = KeyStore.getInstance("JKS");
+                    KeyStore keyStore = KeyStore.getInstance(jwtSupportConfiguration.getKeyStoreType());
                     keyStore.load(null, null);
 
                     result = writeKeyAsKeyStore(atbashKey, keyPassword, filePassword, keyStore);

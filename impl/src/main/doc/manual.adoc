@@ -23,6 +23,10 @@ Breaking changes
 . KeyManager.retrieveKeys has now **SelectorCriteria** as parameter.
 . KeyUse references are removed leading to some removal of methods, constructors or changed number of parameters.
 
+Known issues
+
+. There are several issues and limitations when creating a KeyStore (only single private or public key, OCT/AES key only in PKCS12, etc ...)
+
 === 0.9.0
 
 . Support for reading and writing multiple formats (PEM, KeyStore, JWK and JWKSet)
@@ -223,7 +227,7 @@ The classic use case is that you have generated a key pair (using the _KeyGenera
 
 The **ListKeyManager** is created specially for this purpose. It is also a _KeyManager_ implementation but you supply the set of keys it own through the constructor (and thus the KeyManager doesn't retrieve his keys from the environment in some way.
 
-The following snippets retrieves the public key.
+The following snippet retrieves the public key.
 
     ListKeyManager keyManager = new ListKeyManager(keys);
     SelectorCriteria criteria = SelectorCriteria.newBuilder().withAsymmetricPart(AsymmetricPart.PUBLIC).build();
@@ -367,6 +371,12 @@ default : **SHA1WithRSA**
 
 Defines the algorithm used for singing the certificate which is generated when storing a public key into a Key store file.
 Please note that there will be always an RSA key generated for this, so one is only able to change ther hashing part of the signature.
+
+=== key.store.type
+
+default : **PKCS12**
+
+The default type of the created keyStores. This overwrites the default which is set by the JRE config.
 
 === jwt.sign.rsa.algo
 

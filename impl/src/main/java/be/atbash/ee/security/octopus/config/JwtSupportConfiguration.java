@@ -153,6 +153,11 @@ public class JwtSupportConfiguration extends AbstractConfiguration implements Mo
     }
 
     @ConfigProperty
+    public String getKeyStoreType() {
+        return getOptionalValue("key.store.type", "pkcs12", String.class);
+    }
+
+    @ConfigProperty
     public JWSAlgorithm getJWSAlgorithmForRSA() {
         String value = getOptionalValue("jwt.sign.rsa.algo", "RS256", String.class);
         JWSAlgorithm result = null;

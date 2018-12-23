@@ -33,6 +33,7 @@ import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
+import javax.crypto.SecretKey;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -68,12 +69,18 @@ public class KeyStoreEncoder implements KeyEncoder {
                 X509Certificate certificate = generateCertificate(getPublicKey(key), key);
                 KeyStore.Entry entry = new KeyStore.PrivateKeyEntry(key, new X509Certificate[]{certificate});
                 keyStore.setEntry(atbashKey.getKeyId(), entry, new KeyStore.PasswordProtection(parameters.getKeyPassword()));
-            } else {
+            }
+            if (atbashKey.getSecretKeyType().getAsymmetricPart() == AsymmetricPart.PUBLIC) {
                 PublicKey key = (PublicKey) atbashKey.getKey();
                 X509Certificate certificate = generateCertificate(key, null);
                 KeyStore.Entry entry = new KeyStore.TrustedCertificateEntry(certificate);
                 keyStore.setEntry(atbashKey.getKeyId(), entry, null);
 
+            }
+            if (atbashKey.getSecretKeyType().getAsymmetricPart() == AsymmetricPart.SYMMETRIC) {
+                SecretKey key = (SecretKey) atbashKey.getKey();
+
+                keyStore.setKeyEntry(atbashKey.getKeyId(), key, parameters.getKeyPassword(), null);
             }
         } catch (KeyStoreException e) {
             throw new AtbashUnexpectedException(e);
