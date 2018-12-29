@@ -45,12 +45,16 @@ public final class EncryptionHelper {
     }
 
     public static String encode(String value, char[] password) {
+        return encode(value.getBytes(StandardCharsets.UTF_8), password);
+    }
+
+    public static String encode(byte[] value, char[] password) {
         if (StringUtils.isEmpty(password)) {
             throw new MissingPasswordException(MissingPasswordException.ObjectType.ENCRYPTION);
         }
 
         // generate correct cipher key for AES, based on the supplied PW.
-        byte saltBytes[] = new byte[20];
+        byte[] saltBytes = new byte[20];
         random.nextBytes(saltBytes);
 
         try {
@@ -65,7 +69,7 @@ public final class EncryptionHelper {
             cipher.init(Cipher.ENCRYPT_MODE, secret);
             AlgorithmParameters params = cipher.getParameters();
             byte[] ivBytes = params.getParameterSpec(IvParameterSpec.class).getIV();
-            byte[] encryptedTextBytes = cipher.doFinal(value.getBytes(StandardCharsets.UTF_8));
+            byte[] encryptedTextBytes = cipher.doFinal(value);
 
             //prepend salt and vi
             byte[] buffer = new byte[saltBytes.length + ivBytes.length + encryptedTextBytes.length];
@@ -114,8 +118,12 @@ public final class EncryptionHelper {
     }
 
     public static String encode(String value, SecretKey secretKey) {
+        return encode(value.getBytes(StandardCharsets.UTF_8), secretKey);
+    }
 
-        byte saltBytes[] = new byte[20];
+    public static String encode(byte[] value, SecretKey secretKey) {
+
+        byte[] saltBytes = new byte[20];
         random.nextBytes(saltBytes);
 
         try {
@@ -125,7 +133,7 @@ public final class EncryptionHelper {
             cipher.init(Cipher.ENCRYPT_MODE, secretKey);
             AlgorithmParameters params = cipher.getParameters();
             byte[] ivBytes = params.getParameterSpec(IvParameterSpec.class).getIV();
-            byte[] encryptedTextBytes = cipher.doFinal(value.getBytes(StandardCharsets.UTF_8));
+            byte[] encryptedTextBytes = cipher.doFinal(value);
 
             //prepend salt and vi
             byte[] buffer = new byte[saltBytes.length + ivBytes.length + encryptedTextBytes.length];
