@@ -51,6 +51,10 @@ public class IdKeyFilter implements KeyFilter {
         return result;
     }
 
+    public String getKeyId() {
+        return keyId;
+    }
+
     @Override
     public String describe() {
         return String.format("KeyFilter{keyId='%s'}", keyId);
