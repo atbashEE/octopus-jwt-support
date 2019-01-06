@@ -23,7 +23,9 @@ import be.atbash.json.JSONValue;
 import be.atbash.util.exception.AtbashUnexpectedException;
 import be.atbash.util.resource.ResourceUtil;
 import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.crypto.bc.BouncyCastleProviderSingleton;
 import com.nimbusds.jose.jwk.AsymmetricJWK;
+import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.RSAKey;
 
@@ -87,7 +89,14 @@ public class KeyReaderJWK {
     private List<AtbashKey> processJWK(JWK jwk) throws JOSEException {
         List<AtbashKey> result = new ArrayList<>();
         if (jwk instanceof AsymmetricJWK) {
-            PrivateKey privateKey = ((AsymmetricJWK) jwk).toPrivateKey();
+
+            PrivateKey privateKey;
+            if (jwk instanceof ECKey) {
+                // We need to use the BouncyCastle p^^ovider, otherwise we have a EC P¨¨ivate Key based on sun packages!
+                privateKey = ((ECKey) jwk).toECPrivateKey(BouncyCastleProviderSingleton.getInstance());
+            } else {
+                privateKey = ((AsymmetricJWK) jwk).toPrivateKey();
+            }
             if (privateKey != null) {
                 result.add(new AtbashKey(jwk.getKeyID(), privateKey));
             }

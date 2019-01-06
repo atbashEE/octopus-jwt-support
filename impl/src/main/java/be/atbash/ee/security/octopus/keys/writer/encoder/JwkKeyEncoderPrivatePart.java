@@ -29,7 +29,6 @@ import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.spec.ECPublicKeySpec;
 import org.bouncycastle.math.ec.ECPoint;
-import sun.security.ec.ECPrivateKeyImpl;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -154,23 +153,6 @@ public class JwkKeyEncoderPrivatePart implements KeyEncoder {
                 } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeySpecException e) {
                     throw new AtbashUnexpectedException(e);
                 }
-            }
-
-            // ECPrivateKeyImpl is sun package -> Oracle Only. But no replacement in OpenJDK (yet?)
-            if (key instanceof ECPrivateKeyImpl) {
-
-                try {
-                    KeyFactory keyFactory = KeyFactory.getInstance("ECDSA", "BC");
-                    org.bouncycastle.jce.spec.ECParameterSpec ecSpec = ECNamedCurveTable.getParameterSpec(curve.getStdName());
-
-                    ECPoint q = ecSpec.getG().multiply(((ECPrivateKeyImpl) key).getS());
-
-                    ECPublicKeySpec pubSpec = new ECPublicKeySpec(q, ecSpec);
-                    return keyFactory.generatePublic(pubSpec);
-                } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeySpecException e) {
-                    throw new AtbashUnexpectedException(e);
-                }
-
             }
         }
         throw new UnsupportedOperationException("TODO");

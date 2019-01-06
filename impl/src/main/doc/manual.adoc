@@ -26,6 +26,7 @@ Breaking changes
 Known issues
 
 . There are several issues and limitations when creating a KeyStore (only single private or public key, OCT/AES key only in PKCS12, etc ...)
+. Writing an EC Private Key to JWK will only be possible when private key is Bouncy Castle Based.
 
 === 0.9.0
 

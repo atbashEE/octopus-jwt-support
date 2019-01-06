@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright 2017-2018 Rudy De Busscher (https://www.atbash.be)
+    Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -177,9 +177,7 @@
 
     <build>
         <plugins>
-            <!-- sun.security.ec.ECPrivateKeyImpl data not correct thus disabled for the moment-->
-            <!-- Seems that OpenJDK doesn't have this file, but OracleJDK and Zulu does have it-->
-            <!--plugin>
+            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>animal-sniffer-maven-plugin</artifactId>
                 <version>1.16</version>
