@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -147,24 +147,25 @@ public class JwkKeyEncoderPrivatePart implements KeyEncoder {
                     KeyFactory keyFactory = KeyFactory.getInstance("ECDSA", "BC");
                     org.bouncycastle.jce.spec.ECParameterSpec ecSpec = ECNamedCurveTable.getParameterSpec(curve.getStdName());
 
-                    ECPoint Q = ecSpec.getG().multiply(((org.bouncycastle.jce.interfaces.ECPrivateKey) key).getD());
+                    ECPoint q = ecSpec.getG().multiply(((org.bouncycastle.jce.interfaces.ECPrivateKey) key).getD());
 
-                    ECPublicKeySpec pubSpec = new ECPublicKeySpec(Q, ecSpec);
+                    ECPublicKeySpec pubSpec = new ECPublicKeySpec(q, ecSpec);
                     return keyFactory.generatePublic(pubSpec);
                 } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeySpecException e) {
                     throw new AtbashUnexpectedException(e);
                 }
             }
 
+            // ECPrivateKeyImpl is sun package -> Oracle Only. But no replacement in OpenJDK (yet?)
             if (key instanceof ECPrivateKeyImpl) {
 
                 try {
                     KeyFactory keyFactory = KeyFactory.getInstance("ECDSA", "BC");
                     org.bouncycastle.jce.spec.ECParameterSpec ecSpec = ECNamedCurveTable.getParameterSpec(curve.getStdName());
 
-                    ECPoint Q = ecSpec.getG().multiply(((ECPrivateKeyImpl) key).getS());
+                    ECPoint q = ecSpec.getG().multiply(((ECPrivateKeyImpl) key).getS());
 
-                    ECPublicKeySpec pubSpec = new ECPublicKeySpec(Q, ecSpec);
+                    ECPublicKeySpec pubSpec = new ECPublicKeySpec(q, ecSpec);
                     return keyFactory.generatePublic(pubSpec);
                 } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeySpecException e) {
                     throw new AtbashUnexpectedException(e);

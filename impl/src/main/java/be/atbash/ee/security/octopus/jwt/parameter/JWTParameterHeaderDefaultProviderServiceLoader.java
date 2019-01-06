@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,6 @@ import java.util.ServiceLoader;
 
 final class JWTParameterHeaderDefaultProviderServiceLoader {
 
-    private static final Object LOCK = new Object();
-
     private static JWTParameterHeaderDefaultProviderServiceLoader INSTANCE;
 
     private List<JWTParameterHeaderDefaultProvider> defaultProviders;
@@ -40,13 +38,10 @@ final class JWTParameterHeaderDefaultProviderServiceLoader {
         Collections.sort(defaultProviders, new OrderComparator());
     }
 
-    static List<JWTParameterHeaderDefaultProvider> getDefaultProviders() {
+    static synchronized List<JWTParameterHeaderDefaultProvider> getDefaultProviders() {
+        // Synchronize methods are not so bad for performance anymore and since only 1 synchronized static there are no side effects
         if (INSTANCE == null) {
-            synchronized (LOCK) {
-                if (INSTANCE == null) {
-                    INSTANCE = new JWTParameterHeaderDefaultProviderServiceLoader();
-                }
-            }
+            INSTANCE = new JWTParameterHeaderDefaultProviderServiceLoader();
         }
         return INSTANCE.defaultProviders;
     }

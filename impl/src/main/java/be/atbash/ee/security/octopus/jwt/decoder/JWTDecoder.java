@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -110,8 +110,9 @@ public class JWTDecoder {
         }
 
         if (key == null) {
-            LOGGER.error(String.format("(OCT-KEY-010) No or multiple keys found for criteria :\n %s", criteria.toString()));
-
+            if (LOGGER.isErrorEnabled()) {
+                LOGGER.error(String.format("(OCT-KEY-010) No or multiple keys found for criteria :%n %s", criteria.toString()));
+            }
             throw new InvalidJWTException(String.format("No key found for %s", keyID));
         }
 
@@ -147,8 +148,9 @@ public class JWTDecoder {
             }
         }
         if (key == null) {
-
-            LOGGER.error(String.format("(OCT-KEY-010) No or multiple keys found for criteria :\n %s", criteria.toString()));
+            if (LOGGER.isErrorEnabled()) {
+                LOGGER.error(String.format("(OCT-KEY-010) No or multiple keys found for criteria :%n %s", criteria.toString()));
+            }
             throw new InvalidJWTException(String.format("No key found for keyId '%s'", keyID));
         }
 

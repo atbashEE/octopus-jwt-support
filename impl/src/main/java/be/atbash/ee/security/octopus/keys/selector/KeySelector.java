@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,8 +32,6 @@ import java.util.List;
 @ApplicationScoped
 public class KeySelector {
 
-    private static final Object LOCK = new Object();
-
     private KeyManager keyManager;
 
     @PostConstruct
@@ -65,15 +63,10 @@ public class KeySelector {
         return keys.get(0);
     }
 
-    private void checkDependencies() {
+    private synchronized void checkDependencies() {
         if (keyManager == null) {
             // lazy init, Java SE
-            synchronized (LOCK) {
-                if (keyManager == null) {
-
-                    keyManager = getKeyManager();
-                }
-            }
+            keyManager = getKeyManager();
         }
     }
 

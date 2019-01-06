@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,8 +36,6 @@ import java.util.regex.Pattern;
  */
 @ApplicationScoped
 public class KeyFilesHelper {
-
-    private final Object LOCK = new Object();
 
     @Inject
     private Logger logger;
@@ -112,7 +110,9 @@ public class KeyFilesHelper {
             if (keyResourceTypeProvider.determineKeyResourceType(path) == null) {
                 // When file isn't matched to any of the types -> remove from list
                 iterator.remove();
-                logger.warn(String.format("(OCT-KEY-012) Unable to determine type of '%s'", path));
+                if (logger.isWarnEnabled()) {
+                    logger.warn(String.format("(OCT-KEY-012) Unable to determine type of '%s'", path));
+                }
             }
         }
         return result;
@@ -147,19 +147,10 @@ public class KeyFilesHelper {
         }
     }
 
-    private void performScanning() {
+    private synchronized void performScanning() {
         // Make sure we only scan from a single thread.
         if (scanner == null) {
-            synchronized (LOCK) {
-                if (scanner == null) {
-
-                    // We are using reflection a bit different.
-                    //Because I need something like a resourceScanner but which keeps the 'full' path as key in the store and not only the filename.
-                    // So I create an instance of a custom scanner and later I ask the resource files fro the store directly.
-
-                    scanner = ResourceScanner.getInstance();
-                }
-            }
+            scanner = ResourceScanner.getInstance();
         }
     }
 }

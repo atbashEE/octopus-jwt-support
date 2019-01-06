@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -175,17 +175,12 @@ public class JwtSupportConfiguration extends AbstractConfiguration implements Mo
     // Java SE Support
     private static JwtSupportConfiguration INSTANCE;
 
-    private static final Object LOCK = new Object();
-
-    public static JwtSupportConfiguration getInstance() {
+    public static synchronized JwtSupportConfiguration getInstance() {
+        // Synchronize methods are not so bad for performance anymore and since only 1 synchronized static there are no side effects
         if (INSTANCE == null) {
-            synchronized (LOCK) {
-                if (INSTANCE == null) {
-                    INSTANCE = new JwtSupportConfiguration();
-                    if (!CDICheck.withinContainer()) {
-                        StartupLogging.logConfiguration(INSTANCE);
-                    }
-                }
+            INSTANCE = new JwtSupportConfiguration();
+            if (!CDICheck.withinContainer()) {
+                StartupLogging.logConfiguration(INSTANCE);
             }
         }
         return INSTANCE;

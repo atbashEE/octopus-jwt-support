@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,8 @@ import java.security.interfaces.RSAPublicKey;
 @ApplicationScoped
 public class JWEEncryptionFactory {
 
+    private static final String JWE_CREATION = "JWE creation";
+
     public JWEEncrypter createEncryptor(JWTParametersEncryption parametersEncryption) {
         JWEEncrypter result = null;
 
@@ -44,7 +46,7 @@ public class JWEEncryptionFactory {
             if (parametersEncryption.getKey() instanceof RSAPublicKey) {
                 result = new RSAEncrypter((RSAPublicKey) parametersEncryption.getKey());
             } else {
-                throw new UnsupportedKeyType(AsymmetricPart.PUBLIC, "JWE creation");
+                throw new UnsupportedKeyType(AsymmetricPart.PUBLIC, JWE_CREATION);
             }
         }
 
@@ -58,7 +60,7 @@ public class JWEEncryptionFactory {
                     throw new UnsupportedECCurveException(e.getMessage());
                 }
             } else {
-                throw new UnsupportedKeyType(AsymmetricPart.PUBLIC, "JWE creation");
+                throw new UnsupportedKeyType(AsymmetricPart.PUBLIC, JWE_CREATION);
             }
         }
 
@@ -70,7 +72,7 @@ public class JWEEncryptionFactory {
             }
         }
         if (result == null) {
-            throw new UnsupportedKeyType(parametersEncryption.getKeyType(), "JWE creation");
+            throw new UnsupportedKeyType(parametersEncryption.getKeyType(), JWE_CREATION);
         }
         return result;
 
