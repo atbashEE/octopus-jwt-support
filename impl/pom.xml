@@ -196,7 +196,55 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin-->
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>clirr-maven-plugin</artifactId>
+                <version>2.8</version>
+                <configuration>
+                    <ignored>
+                        <!-- Should not be used outside the library -->
+                        <difference>
+                            <className>**/parameter/JWTParametersEncryption</className>
+                            <differenceType>7002</differenceType>
+                            <method>java.security.Key getJWK()</method>
+                        </difference>
+                        <!-- Removal of KeyUse -->
+                        <difference>
+                            <className>**/keys/AtbashKey</className>
+                            <differenceType>7002</differenceType>
+                            <method>AtbashKey(java.lang.String, java.util.List, java.security.Key)</method>
+                        </difference>
+                        <difference>
+                            <className>**/keys/AtbashKey</className>
+                            <differenceType>7002</differenceType>
+                            <method>java.util.List getKeyUses()</method>
+                        </difference>
+                        <difference>
+                            <className>**/generator/GenerationParameters</className>
+                            <differenceType>7002</differenceType>
+                            <method>java.util.List getKeyUsage()</method>
+                        </difference>
+
+                        <!-- documented in Breaking changes -->
+                        <difference>
+                            <className>**/keys/KeyManager</className>
+                            <differenceType>7005</differenceType>
+                            <method>*</method>
+                            <to>*</to>
+                        </difference>
+                        <!-- internal class -->
+                        <difference>
+                            <className>**/keys/LocalKeyManager</className>
+                            <differenceType>7005</differenceType>
+                            <method>*</method>
+                            <to>*</to>
+                        </difference>
+                    </ignored>
+
+                </configuration>
+            </plugin>
 
             <plugin>
                 <groupId>org.asciidoctor</groupId>
