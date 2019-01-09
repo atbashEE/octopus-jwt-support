@@ -23,6 +23,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class ConfigKeyResourcePasswordLookup implements KeyResourcePasswordLookup {
 
@@ -164,7 +165,7 @@ public class ConfigKeyResourcePasswordLookup implements KeyResourcePasswordLooku
             if (!path.equals(configKey.path)) {
                 return false;
             }
-            return keyId != null ? keyId.equals(configKey.keyId) : configKey.keyId == null;
+            return Objects.equals(keyId, configKey.keyId);
         }
 
         @Override
