@@ -216,6 +216,7 @@
                     <attributes>
                         <sourcedir>${project.build.sourceDirectory}</sourcedir>
                     </attributes>
+                    <skip>${documentation.skip}</skip>
                 </configuration>
                 <executions>
                     <execution>
