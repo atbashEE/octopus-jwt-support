@@ -15,9 +15,11 @@
  */
 package be.atbash.ee.security.octopus.keys.generator;
 
+import be.atbash.util.PublicAPI;
 import be.atbash.util.StringUtils;
 import com.nimbusds.jose.jwk.KeyType;
 
+@PublicAPI
 public class GenerationParameters {
 
     private String kid;

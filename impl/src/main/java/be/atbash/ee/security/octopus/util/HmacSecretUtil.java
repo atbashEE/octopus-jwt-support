@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package be.atbash.ee.security.octopus.util;
 
 import be.atbash.ee.security.octopus.keys.AtbashKey;
+import be.atbash.util.PublicAPI;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -23,7 +24,7 @@ import javax.crypto.spec.SecretKeySpec;
 /**
  * Creates an AES key from a Byte Array.
  */
-
+@PublicAPI
 public final class HmacSecretUtil {
 
     private HmacSecretUtil() {

@@ -15,11 +15,13 @@
  */
 package be.atbash.ee.security.octopus.exception;
 
+import be.atbash.util.PublicAPI;
 import be.atbash.util.exception.AtbashException;
 
 /**
  *
  */
+@PublicAPI
 public class MissingPasswordException extends AtbashException {
 
     public MissingPasswordException(ObjectType objectType) {

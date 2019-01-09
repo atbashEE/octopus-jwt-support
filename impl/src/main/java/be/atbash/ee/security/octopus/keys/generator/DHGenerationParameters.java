@@ -15,11 +15,13 @@
  */
 package be.atbash.ee.security.octopus.keys.generator;
 
+import be.atbash.util.PublicAPI;
 import com.nimbusds.jose.Requirement;
 import com.nimbusds.jose.jwk.KeyType;
 
 import javax.crypto.spec.DHParameterSpec;
 
+@PublicAPI
 public class DHGenerationParameters extends GenerationParameters {
 
     public static final KeyType DH = new KeyType("DH", Requirement.OPTIONAL);

@@ -15,8 +15,10 @@
  */
 package be.atbash.ee.security.octopus.keys.generator;
 
+import be.atbash.util.PublicAPI;
 import com.nimbusds.jose.jwk.KeyType;
 
+@PublicAPI
 public class RSAGenerationParameters extends GenerationParameters {
 
     private int keySize;  // in bits

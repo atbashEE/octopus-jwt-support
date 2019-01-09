@@ -21,6 +21,7 @@ import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.keys.selector.KeySelector;
 import be.atbash.ee.security.octopus.keys.selector.SelectorCriteria;
 import be.atbash.json.JSONValue;
+import be.atbash.util.PublicAPI;
 import be.atbash.util.StringUtils;
 import be.atbash.util.exception.AtbashIllegalActionException;
 import be.atbash.util.exception.AtbashUnexpectedException;
@@ -41,6 +42,7 @@ import java.text.ParseException;
 /**
  *
  */
+@PublicAPI
 @ApplicationScoped
 public class JWTDecoder {
 

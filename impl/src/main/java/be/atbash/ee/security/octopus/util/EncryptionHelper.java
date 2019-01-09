@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package be.atbash.ee.security.octopus.util;
 
 import be.atbash.ee.security.octopus.exception.DecryptionFailedException;
 import be.atbash.ee.security.octopus.exception.MissingPasswordException;
+import be.atbash.util.PublicAPI;
 import be.atbash.util.StringUtils;
 import be.atbash.util.base64.Base64Codec;
 import be.atbash.util.exception.AtbashUnexpectedException;
@@ -31,13 +32,15 @@ import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.InvalidParameterSpecException;
 
+@PublicAPI
 public final class EncryptionHelper {
 
     private static final String PBKDF_ALGO = "PBKDF2WithHmacSHA1";
     private static final int ITERATION_COUNT = 65556;
     private static final int KEYSIZE = 256;
     private static final String AES = "AES";
-    private static final String AES_ALGO = "AES/CBC/PKCS5Padding"; // TODO Config?
+    private static final String AES_ALGO = "AES/CBC/PKCS5Padding"; // TODO Config
+                  // This is maybe a bit better AES/GCM/NoPadding -> for 1.0 version as breaking change.
 
     private static final SecureRandom random = new SecureRandom();
 

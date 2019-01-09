@@ -21,6 +21,7 @@ import be.atbash.ee.security.octopus.exception.MissingPasswordException;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.reader.KeyResourceType;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
+import be.atbash.util.PublicAPI;
 import be.atbash.util.StringUtils;
 import be.atbash.util.exception.AtbashUnexpectedException;
 import be.atbash.util.resource.ResourceUtil;
@@ -44,6 +45,7 @@ import static be.atbash.ee.security.octopus.exception.MissingPasswordException.O
 /**
  *
  */
+@PublicAPI
 @ApplicationScoped
 public class KeyWriter {
 
