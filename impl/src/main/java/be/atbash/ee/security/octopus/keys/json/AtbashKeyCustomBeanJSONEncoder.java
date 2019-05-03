@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.json.JSONObject;
 import be.atbash.json.JSONValue;
 import be.atbash.json.writer.CustomBeanBuilderJSONEncoder;
-import be.atbash.util.base64.Base64Codec;
 import be.atbash.util.exception.AtbashUnexpectedException;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.crypto.bc.BouncyCastleProviderSingleton;
@@ -30,6 +29,7 @@ import com.nimbusds.jose.jwk.KeyType;
 import com.nimbusds.jose.jwk.RSAKey;
 
 import java.text.ParseException;
+import java.util.Base64;
 
 public class AtbashKeyCustomBeanJSONEncoder extends CustomBeanBuilderJSONEncoder<AtbashKey, AtbashKey.AtbashKeyBuilder> {
 
@@ -43,7 +43,7 @@ public class AtbashKeyCustomBeanJSONEncoder extends CustomBeanBuilderJSONEncoder
             atbashKeyBuilder.withKeyId(value.toString());
         }
         if ("key".equals(key)) {
-            JSONObject jsonObject = (JSONObject) JSONValue.parse(new String(Base64Codec.decode(value.toString())));
+            JSONObject jsonObject = (JSONObject) JSONValue.parse(new String(Base64.getDecoder().decode(value.toString())));
             try {
                 JWK jwk = JWK.parse(jsonObject.toJSONString());
 

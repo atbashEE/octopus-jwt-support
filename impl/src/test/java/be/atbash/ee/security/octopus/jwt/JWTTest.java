@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,6 @@ import be.atbash.ee.security.octopus.keys.generator.KeyGenerator;
 import be.atbash.ee.security.octopus.keys.generator.RSAGenerationParameters;
 import be.atbash.ee.security.octopus.keys.selector.*;
 import be.atbash.ee.security.octopus.util.HmacSecretUtil;
-import be.atbash.util.base64.Base64Codec;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,6 +39,7 @@ import uk.org.lidalia.slf4jtest.TestLoggerFactory;
 
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
+import java.util.Base64;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -139,9 +139,9 @@ public class JWTTest {
 
     private String tamperWithPayload(String encoded) {
         String[] jwtParts = encoded.split("\\.");
-        String content = new String(Base64Codec.decode(jwtParts[1]));
+        String content = new String(Base64.getDecoder().decode(jwtParts[1]));
         String updatedContent = content.replaceAll("JUnit", "Spock");
-        jwtParts[1] = Base64Codec.encodeToString(updatedContent.getBytes(StandardCharsets.UTF_8), false);
+        jwtParts[1] = Base64.getEncoder().encodeToString(updatedContent.getBytes(StandardCharsets.UTF_8));
 
         return jwtParts[0] + '.' + jwtParts[1] + '.' + jwtParts[2];
     }
@@ -165,7 +165,7 @@ public class JWTTest {
         String encoded = new JWTEncoder().encode(payload, parameters);
 
         // Check algo in header
-        String header = new String(Base64Codec.decode(encoded.split("\\.")[0]));
+        String header = new String(Base64.getDecoder().decode(encoded.split("\\.")[0]));
         assertThat(header).contains("\"alg\":\"RS256\"");
 
         criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PUBLIC).build();
@@ -197,7 +197,7 @@ public class JWTTest {
         String encoded = new JWTEncoder().encode(payload, parameters);
 
         // Check algo in header
-        String header = new String(Base64Codec.decode(encoded.split("\\.")[0]));
+        String header = new String(Base64.getDecoder().decode(encoded.split("\\.")[0]));
         assertThat(header).contains("\"alg\":\"PS512\"");
 
         criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PUBLIC).build();
@@ -303,7 +303,7 @@ public class JWTTest {
         String encoded = new JWTEncoder().encode(payload, parameters);
 
         // check algo in header
-        String header = new String(Base64Codec.decode(encoded.split("\\.")[0]));
+        String header = new String(Base64.getDecoder().decode(encoded.split("\\.")[0]));
         assertThat(header).contains("\"alg\":\"ES256\"");
 
         criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PUBLIC).build();
@@ -334,7 +334,7 @@ public class JWTTest {
         String encoded = new JWTEncoder().encode(payload, parameters);
 
         // check algo in header
-        String header = new String(Base64Codec.decode(encoded.split("\\.")[0]));
+        String header = new String(Base64.getDecoder().decode(encoded.split("\\.")[0]));
         assertThat(header).contains("\"alg\":\"ES512\"");
 
         criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PUBLIC).build();

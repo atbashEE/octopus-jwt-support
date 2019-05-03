@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -103,7 +103,8 @@ public class KeySelectorTest {
         KeyFilter filter = FakeKeyManager.keyFilters.get(0);
         assertThat(filter).isInstanceOf(IdKeyFilter.class);
 
-        assertThat(TestReflectionUtils.getValueOf(filter, "keyId")).isEqualTo("kid");
+        String keyId = TestReflectionUtils.getValueOf(filter, "keyId");
+        assertThat(keyId).isEqualTo("kid");
 
     }
 
@@ -183,7 +184,8 @@ public class KeySelectorTest {
         KeyFilter filter = FakeKeyManager.keyFilters.get(0);
         assertThat(filter).isInstanceOf(IdKeyFilter.class);
 
-        assertThat(TestReflectionUtils.getValueOf(filter, "keyId")).isEqualTo("kid");
+        String keyId = TestReflectionUtils.getValueOf(filter, "keyId");
+        assertThat(keyId).isEqualTo("kid");
 
         filter = FakeKeyManager.keyFilters.get(1);
         assertThat(filter).isInstanceOf(KeyTypeKeyFilter.class);
@@ -209,7 +211,8 @@ public class KeySelectorTest {
         KeyFilter filter = FakeKeyManager.keyFilters.get(0);
         assertThat(filter).isInstanceOf(IdKeyFilter.class);
 
-        assertThat(TestReflectionUtils.getValueOf(filter, "keyId")).isEqualTo("kid");
+        String keyId = TestReflectionUtils.getValueOf(filter, "keyId");
+        assertThat(keyId).isEqualTo("kid");
 
         filter = FakeKeyManager.keyFilters.get(1);
         assertThat(filter).isInstanceOf(KeyTypeKeyFilter.class);
@@ -237,7 +240,8 @@ public class KeySelectorTest {
         KeyFilter filter = FakeKeyManager.keyFilters.get(0);
         assertThat(filter).isInstanceOf(IdKeyFilter.class);
 
-        assertThat(TestReflectionUtils.getValueOf(filter, "keyId")).isEqualTo("kid");
+        String keyId = TestReflectionUtils.getValueOf(filter, "keyId");
+        assertThat(keyId).isEqualTo("kid");
 
         // Secret Key Type
         filter = FakeKeyManager.keyFilters.get(1);

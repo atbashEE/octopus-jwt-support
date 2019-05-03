@@ -19,7 +19,6 @@ import be.atbash.ee.security.octopus.exception.DecryptionFailedException;
 import be.atbash.ee.security.octopus.exception.MissingPasswordException;
 import be.atbash.util.PublicAPI;
 import be.atbash.util.StringUtils;
-import be.atbash.util.base64.Base64Codec;
 import be.atbash.util.exception.AtbashUnexpectedException;
 
 import javax.crypto.*;
@@ -31,6 +30,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.InvalidParameterSpecException;
+import java.util.Base64;
 
 @PublicAPI
 public final class EncryptionHelper {
@@ -79,7 +79,7 @@ public final class EncryptionHelper {
             System.arraycopy(saltBytes, 0, buffer, 0, saltBytes.length);
             System.arraycopy(ivBytes, 0, buffer, saltBytes.length, ivBytes.length);
             System.arraycopy(encryptedTextBytes, 0, buffer, saltBytes.length + ivBytes.length, encryptedTextBytes.length);
-            return Base64Codec.encodeToString(buffer, false);
+            return Base64.getEncoder().encodeToString(buffer);
         } catch (NoSuchAlgorithmException | InvalidKeySpecException | InvalidKeyException | NoSuchPaddingException | IllegalBlockSizeException | InvalidParameterSpecException | BadPaddingException e) {
             throw new AtbashUnexpectedException(e);
         }
@@ -94,7 +94,7 @@ public final class EncryptionHelper {
         try {
             Cipher cipher = Cipher.getInstance(AES_ALGO);
             //strip off the salt and iv
-            ByteBuffer buffer = ByteBuffer.wrap(Base64Codec.decode(encryptedText));
+            ByteBuffer buffer = ByteBuffer.wrap(Base64.getDecoder().decode(encryptedText));
             byte[] saltBytes = new byte[20];
             buffer.get(saltBytes, 0, saltBytes.length);
             byte[] ivBytes = new byte[cipher.getBlockSize()];
@@ -143,7 +143,7 @@ public final class EncryptionHelper {
             System.arraycopy(saltBytes, 0, buffer, 0, saltBytes.length);
             System.arraycopy(ivBytes, 0, buffer, saltBytes.length, ivBytes.length);
             System.arraycopy(encryptedTextBytes, 0, buffer, saltBytes.length + ivBytes.length, encryptedTextBytes.length);
-            return Base64Codec.encodeToString(buffer, true);
+            return Base64.getUrlEncoder().withoutPadding().encodeToString(buffer);
         } catch (NoSuchAlgorithmException | InvalidKeyException | NoSuchPaddingException | IllegalBlockSizeException | InvalidParameterSpecException | BadPaddingException e) {
             throw new AtbashUnexpectedException(e);
         }
@@ -155,7 +155,7 @@ public final class EncryptionHelper {
         try {
             Cipher cipher = Cipher.getInstance(AES_ALGO);
             //strip off the salt and iv
-            ByteBuffer buffer = ByteBuffer.wrap(Base64Codec.decode(encryptedText));
+            ByteBuffer buffer = ByteBuffer.wrap(Base64.getUrlDecoder().decode(encryptedText));
             byte[] saltBytes = new byte[20];
             buffer.get(saltBytes, 0, saltBytes.length);
             byte[] ivBytes = new byte[cipher.getBlockSize()];
