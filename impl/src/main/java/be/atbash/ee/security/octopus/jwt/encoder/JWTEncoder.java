@@ -19,7 +19,7 @@ import be.atbash.ee.security.octopus.UnsupportedKeyType;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParameters;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersEncryption;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersSigning;
-import be.atbash.json.JSONValue;
+import be.atbash.ee.security.octopus.keys.json.AtbashKeyWriter;
 import be.atbash.util.PublicAPI;
 import be.atbash.util.exception.AtbashUnexpectedException;
 import com.nimbusds.jose.*;
@@ -27,6 +27,9 @@ import com.nimbusds.jose.jwk.KeyType;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.json.bind.Jsonb;
+import javax.json.bind.JsonbBuilder;
+import javax.json.bind.JsonbConfig;
 
 /**
  *
@@ -125,7 +128,12 @@ public class JWTEncoder {
     }
 
     private String createJSONString(Object data) {
-        return JSONValue.toJSONString(data);
+        // FIXME Verify if this needs to be a dependency where some writers can be registered.
+        JsonbConfig config = new JsonbConfig();
+        AtbashKeyWriter serializer = new AtbashKeyWriter();
+        config.withSerializers(serializer);
+        Jsonb jsonb = JsonbBuilder.create(config);
+        return jsonb.toJson(data);
     }
 
     private void checkDependencies() {

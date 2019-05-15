@@ -18,8 +18,6 @@ package be.atbash.ee.security.octopus.keys.reader;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup;
 import be.atbash.ee.security.octopus.util.EncryptionHelper;
-import be.atbash.json.JSONObject;
-import be.atbash.json.JSONValue;
 import be.atbash.util.exception.AtbashUnexpectedException;
 import be.atbash.util.resource.ResourceUtil;
 import com.nimbusds.jose.JOSEException;
@@ -29,6 +27,11 @@ import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.RSAKey;
 
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
+import javax.json.bind.Jsonb;
+import javax.json.bind.JsonbBuilder;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.PrivateKey;
@@ -52,8 +55,7 @@ public class KeyReaderJWK {
 
             String fileContent = new Scanner(inputStream).useDelimiter("\\Z").next();
 
-            JSONObject jsonObject = (JSONObject) JSONValue.parse(fileContent);
-            result = parse(jsonObject, path, passwordLookup);
+            result = parse(fileContent, path, passwordLookup);
         } catch (ParseException | JOSEException | IOException e) {
             throw new AtbashUnexpectedException(e);
         } finally {
@@ -70,18 +72,28 @@ public class KeyReaderJWK {
 
     }
 
-    protected List<AtbashKey> parse(JSONObject jsonObject, String path, KeyResourcePasswordLookup passwordLookup) throws ParseException, JOSEException {
+
+    protected List<AtbashKey> parse(String json, String path, KeyResourcePasswordLookup passwordLookup) throws ParseException, JOSEException {
+
+        Jsonb jsonb = JsonbBuilder.create();
+        JsonObject jwkJsonObject = jsonb.fromJson(json, JsonObject.class);
+
         JWK jwk;
-        if (jsonObject.get("enc") == null) {
+        if (jwkJsonObject.get("enc") == null) {
             // not encrypted
-            jwk = JWK.parse(jsonObject.toJSONString());
+            jwk = JWK.parse(json);
 
         } else {
-            char[] password = passwordLookup.getKeyPassword(path, jsonObject.getAsString("kid"));
-            String decoded = EncryptionHelper.decode(jsonObject.getAsString("enc"), password);
-            JSONObject decodedJSON = (JSONObject) JSONValue.parse(decoded);
-            decodedJSON.merge(jsonObject);
-            jwk = JWK.parse(decodedJSON.toJSONString());
+            char[] password = passwordLookup.getKeyPassword(path, jwkJsonObject.getString("kid"));
+            String decoded = EncryptionHelper.decode(jwkJsonObject.getString("enc"), password);
+
+            JsonObject decodedJSON = jsonb.fromJson(decoded, JsonObject.class);
+
+            JsonObjectBuilder merged = Json.createObjectBuilder();
+            decodedJSON.forEach(merged::add);
+            jwkJsonObject.forEach(merged::add);
+
+            jwk = JWK.parse(merged.build().toString());
         }
         return processJWK(jwk);
     }

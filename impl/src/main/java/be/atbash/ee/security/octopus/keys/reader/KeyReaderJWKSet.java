@@ -17,13 +17,14 @@ package be.atbash.ee.security.octopus.keys.reader;
 
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup;
-import be.atbash.json.JSONArray;
-import be.atbash.json.JSONObject;
-import be.atbash.json.JSONValue;
 import be.atbash.util.exception.AtbashUnexpectedException;
 import be.atbash.util.resource.ResourceUtil;
 import com.nimbusds.jose.JOSEException;
 
+import javax.json.JsonArray;
+import javax.json.JsonObject;
+import javax.json.bind.Jsonb;
+import javax.json.bind.JsonbBuilder;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
@@ -58,27 +59,31 @@ public class KeyReaderJWKSet extends KeyReaderJWK {
 
     public List<AtbashKey> parseContent(String path, KeyResourcePasswordLookup passwordLookup, String fileContent) {
         List<AtbashKey> result = new ArrayList<>();
-        JSONObject jsonObject = (JSONObject) JSONValue.parse(fileContent);
-        JSONArray keys = (JSONArray) jsonObject.get("keys");
+
+        Jsonb jsonb = JsonbBuilder.create();
+        JsonObject jsonObject = jsonb.fromJson(fileContent, JsonObject.class);
+
+        JsonArray keys = jsonObject.getJsonArray("keys");
         try {
             Set<String> kids = new HashSet<>();
             for (Object key : keys) {
-                if (!(key instanceof JSONObject)) {
+                if (!(key instanceof JsonObject)) {
                     throw new InvalidJWKSetFormatException("The \"keys\" JSON array must contain JSON objects only");
                 }
 
-                JSONObject jwkJson = (JSONObject) key;
-                String kid = jwkJson.getAsString("kid");
+                JsonObject jwkJson = (JsonObject) key;
+                String kid = jwkJson.getString("kid");
                 if (kids.contains(kid)) {
                     throw new InvalidJWKSetFormatException(String.format("The kid '%s' was found multiple times in the resource '%s'", kid, path));
                 }
                 kids.add(kid);
-                result.addAll(parse(jwkJson, path, passwordLookup));
+                result.addAll(parse(jwkJson.toString(), path, passwordLookup));
             }
         } catch (ParseException | JOSEException e) {
             // TODO We need another exception, indicating that loading failed
             throw new AtbashUnexpectedException(e);
         }
+
         return result;
     }
 

@@ -18,32 +18,41 @@ package be.atbash.ee.security.octopus.keys.json;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.writer.KeyEncoderParameters;
 import be.atbash.ee.security.octopus.keys.writer.KeyWriterFactory;
-import be.atbash.json.JSONObject;
-import be.atbash.json.writer.JSONWriter;
 
+import javax.json.Json;
+import javax.json.JsonBuilderFactory;
+import javax.json.bind.serializer.JsonbSerializer;
+import javax.json.bind.serializer.SerializationContext;
+import javax.json.stream.JsonGenerator;
 import java.io.IOException;
 import java.util.Base64;
 
-public class AtbashKeyWriter implements JSONWriter<AtbashKey> {
+public class AtbashKeyWriter implements JsonbSerializer<AtbashKey> {
 
     private KeyWriterFactory keyWriterFactory;
+    private JsonBuilderFactory factory;
 
     public AtbashKeyWriter() {
         keyWriterFactory = new KeyWriterFactory();
         keyWriterFactory.init();
-
+        factory = Json.createBuilderFactory(null);
     }
 
     @Override
-    public <E extends AtbashKey> void writeJSONString(E value, Appendable out) throws IOException {
+    public void serialize(AtbashKey atbashKey, JsonGenerator jsonGenerator, SerializationContext serializationContext) {
         KeyEncoderParameters parameters = new KeyEncoderParameters();
 
-        byte[] bytes = keyWriterFactory.writeKeyAsJWK(value, parameters);
+        byte[] bytes = new byte[0];
+        try {
+            bytes = keyWriterFactory.writeKeyAsJWK(atbashKey, parameters);
+        } catch (IOException e) {
+            e.printStackTrace(); // FIXME
+        }
 
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.appendField("kid", value.getKeyId());
-        jsonObject.appendField("key", Base64.getUrlEncoder().withoutPadding().encodeToString(bytes));
-        out.append(jsonObject.toJSONString());
+        jsonGenerator.writeStartObject()
+                .writeKey("kid").write(atbashKey.getKeyId())
+                .writeKey("key").write(Base64.getUrlEncoder().withoutPadding().encodeToString(bytes))
+                .writeEnd();
 
     }
 }

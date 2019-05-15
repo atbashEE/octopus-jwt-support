@@ -27,10 +27,10 @@ import be.atbash.ee.security.octopus.keys.generator.KeyGenerator;
 import be.atbash.ee.security.octopus.keys.generator.RSAGenerationParameters;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.keys.selector.SelectorCriteria;
-import be.atbash.json.JSONArray;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.math.BigDecimal;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
@@ -97,9 +97,9 @@ public class JWTEncoderTest {
 
         Map<String, Object> content = getJson(jwtParts[1]);
         assertThat(content).hasSize(3);
-        assertThat(content).containsEntry("number", 42);
+        assertThat(content).containsEntry("number", BigDecimal.valueOf(42));
         assertThat(content).containsKey("myList");
-        JSONArray list = (JSONArray) content.get("myList");
+        List<String> list = (List<String>) content.get("myList");
         assertThat(list).containsOnly("permission1", "permission2");
         assertThat(content).containsEntry("value", "JUnit");
     }

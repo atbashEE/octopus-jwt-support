@@ -23,8 +23,6 @@ import be.atbash.ee.security.octopus.keys.TestPasswordLookup;
 import be.atbash.ee.security.octopus.keys.reader.KeyReader;
 import be.atbash.ee.security.octopus.keys.reader.KeyResourceType;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
-import be.atbash.json.JSONObject;
-import be.atbash.json.JSONValue;
 import be.atbash.util.TestReflectionUtils;
 import be.atbash.util.resource.ResourceUtil;
 import com.nimbusds.jose.jwk.JWKSet;
@@ -32,6 +30,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import javax.json.JsonObject;
+import javax.json.bind.Jsonb;
+import javax.json.bind.JsonbBuilder;
 import java.io.*;
 import java.text.ParseException;
 import java.util.List;
@@ -150,12 +151,14 @@ public class KeyWriterTest {
 
         String jwk = new String(bytes);
 
-        JSONObject data = JSONValue.parse(jwk, JSONObject.class);
+        Jsonb jsonb = JsonbBuilder.create();
 
-        JSONObject expected = JSONValue.parse(readFile("/rsa.jwk"), JSONObject.class);
+        JsonObject data = jsonb.fromJson(jwk, JsonObject.class);
+
+        JsonObject expected = jsonb.fromJson(readFile("/rsa.jwk"), JsonObject.class);
 
         for (String key : expected.keySet()) {
-            assertThat(expected.getAsString(key)).isEqualTo(data.getAsString(key));
+            assertThat(expected.getString(key)).isEqualTo(data.getString(key));
         }
     }
 
@@ -212,14 +215,16 @@ public class KeyWriterTest {
         byte[] bytes = keyWriter.writeKeyResource(privateKey, KeyResourceType.JWKSET, null, null);
 
         JWKSet jwkSet = JWKSet.parse(new String(bytes));
-
-        JSONObject expected = JSONValue.parse(readFile("/rsa.jwk"), JSONObject.class);
-
         assertThat(jwkSet.getKeys()).hasSize(1);
-        net.minidev.json.JSONObject data = jwkSet.getKeys().get(0).toJSONObject();
+
+        Jsonb jsonb = JsonbBuilder.create();
+        JsonObject dataAsSet = jsonb.fromJson(new String(bytes), JsonObject.class);
+        JsonObject data = dataAsSet.getJsonArray("keys").getJsonObject(0);
+
+        JsonObject expected = jsonb.fromJson(readFile("/rsa.jwk"), JsonObject.class);
 
         for (String key : expected.keySet()) {
-            assertThat(expected.getAsString(key)).isEqualTo(data.getAsString(key));
+            assertThat(expected.getString(key)).isEqualTo(data.getString(key));
         }
 
     }

@@ -17,10 +17,10 @@ package be.atbash.ee.security.octopus.jwt.decoder;
 
 import be.atbash.ee.security.octopus.jwt.InvalidJWTException;
 import be.atbash.ee.security.octopus.jwt.JWTEncoding;
+import be.atbash.ee.security.octopus.keys.json.AtbashKeyReader;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.keys.selector.KeySelector;
 import be.atbash.ee.security.octopus.keys.selector.SelectorCriteria;
-import be.atbash.json.JSONValue;
 import be.atbash.util.PublicAPI;
 import be.atbash.util.StringUtils;
 import be.atbash.util.exception.AtbashIllegalActionException;
@@ -35,6 +35,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.json.bind.Jsonb;
+import javax.json.bind.JsonbBuilder;
+import javax.json.bind.JsonbConfig;
 import java.net.URI;
 import java.security.Key;
 import java.text.ParseException;
@@ -177,7 +180,14 @@ public class JWTDecoder {
     }
 
     private <T> JWTData<T> readJSONString(String data, Class<T> classType, MetaJWTData metaJWTData) {
-        return new JWTData<>(JSONValue.parse(data, classType), metaJWTData);
+        JsonbConfig config = new JsonbConfig();
+        AtbashKeyReader serializer = new AtbashKeyReader();
+        config.withDeserializers(serializer);
+
+        Jsonb jsonb = JsonbBuilder.create(config);
+        // FIXME How can we define custom decoder
+        return new JWTData<>(jsonb.fromJson(data, classType), metaJWTData);
+
     }
 
     private JWTEncoding determineEncoding(String data) {

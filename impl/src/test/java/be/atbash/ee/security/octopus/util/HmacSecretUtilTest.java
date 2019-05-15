@@ -59,7 +59,7 @@ public class HmacSecretUtilTest {
 
     }
 
-    private static class SomeToken {
+    public static class SomeToken {
         private String stringProperty;
         private int intProperty;
 

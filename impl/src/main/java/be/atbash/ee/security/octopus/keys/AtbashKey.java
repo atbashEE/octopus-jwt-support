@@ -15,18 +15,14 @@
  */
 package be.atbash.ee.security.octopus.keys;
 
-import be.atbash.ee.security.octopus.keys.json.AtbashKeyCustomBeanJSONEncoder;
-import be.atbash.ee.security.octopus.keys.json.AtbashKeyWriter;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.keys.selector.SecretKeyType;
-import be.atbash.json.parser.MappedBy;
 import be.atbash.util.PublicAPI;
 import be.atbash.util.resource.ResourceUtil;
 
 import java.security.Key;
 
 // Useful info https://www.cem.me/pki/
-@MappedBy(writer = AtbashKeyWriter.class, beanEncoder = AtbashKeyCustomBeanJSONEncoder.class)
 @PublicAPI
 public class AtbashKey {
 

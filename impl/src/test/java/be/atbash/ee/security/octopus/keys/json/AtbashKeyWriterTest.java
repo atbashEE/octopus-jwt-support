@@ -25,10 +25,11 @@ import be.atbash.ee.security.octopus.keys.generator.KeyGenerator;
 import be.atbash.ee.security.octopus.keys.generator.RSAGenerationParameters;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.keys.selector.SelectorCriteria;
-import be.atbash.json.JSONObject;
-import be.atbash.json.JSONValue;
 import org.junit.Test;
 
+import javax.json.JsonObject;
+import javax.json.bind.Jsonb;
+import javax.json.bind.JsonbBuilder;
 import java.util.Base64;
 import java.util.List;
 
@@ -52,13 +53,14 @@ public class AtbashKeyWriterTest {
         JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.NONE).build();
         String json = new JWTEncoder().encode(keyList.get(0), parameters);
 
-        JSONObject data = (JSONObject) JSONValue.parse(json);
+        Jsonb jsonb = JsonbBuilder.create();
+        JsonObject data = jsonb.fromJson(json, JsonObject.class);
 
-        assertThat(data.getAsString("kid")).isEqualTo(KID);
+        assertThat(data.getString("kid")).isEqualTo(KID);
 
-        String key = new String(Base64.getDecoder().decode(data.getAsString("key")));
+        String key = new String(Base64.getDecoder().decode(data.getString("key")));
 
-        data = (JSONObject) JSONValue.parse(key);
+        data = jsonb.fromJson(key, JsonObject.class);
 
         assertThat(data.keySet()).containsOnly("p", "kty", "q", "d", "e", "kid", "qi", "dp", "dq", "n");
 

@@ -16,12 +16,13 @@
 package be.atbash.ee.security.octopus.jwk;
 
 import be.atbash.ee.security.octopus.util.EncryptionHelper;
-import be.atbash.json.JSONObject;
-import be.atbash.json.JSONValue;
 import com.nimbusds.jose.Algorithm;
 import com.nimbusds.jose.jwk.OctetSequenceKey;
 import org.junit.Test;
 
+import javax.json.JsonObject;
+import javax.json.bind.Jsonb;
+import javax.json.bind.JsonbBuilder;
 import java.security.SecureRandom;
 import java.util.Base64;
 
@@ -51,15 +52,17 @@ public class EncryptedJSONJWKTest {
         assertThat(json).contains("\"kid\":\"keyId\"");
         assertThat(json).contains("\"enc\":\"");
 
-        JSONObject jsonObject = (JSONObject) JSONValue.parse(json);
+        Jsonb jsonb = JsonbBuilder.create();
+        JsonObject jsonObject = jsonb.fromJson(json, JsonObject.class);
+
         // Get the value of field enc, and decrypt it with the password
-        String encJson = EncryptionHelper.decode(jsonObject.getAsString("enc"), PASSWORD);
+        String encJson = EncryptionHelper.decode(jsonObject.getString("enc"), PASSWORD);
 
         // decrypted value is a json again
-        JSONObject secureJson = (JSONObject) JSONValue.parse(encJson);
+        JsonObject secureJson = jsonb.fromJson(encJson, JsonObject.class);
         assertThat(secureJson.keySet()).containsOnly("k");
         // check if value is same as the byteArray we started with
-        assertThat(secureJson.getAsString("k")).isEqualTo(Base64.getUrlEncoder().withoutPadding().encodeToString(key));
+        assertThat(secureJson.getString("k")).isEqualTo(Base64.getUrlEncoder().withoutPadding().encodeToString(key));
 
     }
 }
