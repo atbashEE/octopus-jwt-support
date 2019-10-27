@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,11 @@ package be.atbash.ee.security.octopus.keys.writer.encoder;
 import be.atbash.ee.security.octopus.UnsupportedKeyType;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.writer.KeyEncoderParameters;
+import be.atbash.ee.security.octopus.nimbus.jose.jwk.Curve;
+import be.atbash.ee.security.octopus.nimbus.jose.jwk.ECKey;
+import be.atbash.ee.security.octopus.nimbus.jose.jwk.KeyType;
+import be.atbash.ee.security.octopus.nimbus.jose.jwk.RSAKey;
 import be.atbash.util.exception.AtbashUnexpectedException;
-import com.nimbusds.jose.jwk.Curve;
-import com.nimbusds.jose.jwk.ECKey;
-import com.nimbusds.jose.jwk.KeyType;
-import com.nimbusds.jose.jwk.RSAKey;
 import org.bouncycastle.asn1.x9.X9ECParameters;
 import org.bouncycastle.jcajce.provider.asymmetric.util.EC5Util;
 
@@ -34,7 +34,8 @@ import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.ECParameterSpec;
 
-import static com.nimbusds.jose.jwk.ECKey.SUPPORTED_CURVES;
+import static be.atbash.ee.security.octopus.nimbus.jose.jwk.ECKey.SUPPORTED_CURVES;
+
 
 /**
  *
@@ -60,7 +61,7 @@ public class JwkKeyEncoderPublicPart implements KeyEncoder {
         RSAKey rsaKey = new RSAKey.Builder((RSAPublicKey) atbashKey.getKey()).keyID(atbashKey.getKeyId())
                 .build();
 
-        return rsaKey.toJSONObject().toJSONString().getBytes(StandardCharsets.UTF_8);
+        return rsaKey.toJSONObject().build().toString().getBytes(StandardCharsets.UTF_8);
     }
 
     private byte[] encodeECKey(AtbashKey atbashKey) {
@@ -74,7 +75,7 @@ public class JwkKeyEncoderPublicPart implements KeyEncoder {
         ECKey ecKey = new ECKey.Builder(curve, (ECPublicKey) atbashKey.getKey()).keyID(atbashKey.getKeyId())
                 .build();
 
-        return ecKey.toJSONObject().toJSONString().getBytes(StandardCharsets.UTF_8);
+        return ecKey.toJSONObject().build().toString().getBytes(StandardCharsets.UTF_8);
     }
 
     private Curve deriveCurve(org.bouncycastle.jce.spec.ECParameterSpec ecParameterSpec) throws GeneralSecurityException {

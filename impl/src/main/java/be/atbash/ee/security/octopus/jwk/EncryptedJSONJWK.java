@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,14 @@
 package be.atbash.ee.security.octopus.jwk;
 
 import be.atbash.ee.security.octopus.exception.MissingPasswordException;
+import be.atbash.ee.security.octopus.nimbus.jose.jwk.JWK;
 import be.atbash.ee.security.octopus.util.EncryptionHelper;
 import be.atbash.util.StringUtils;
-import com.nimbusds.jose.jwk.JWK;
-import net.minidev.json.JSONObject;
 
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
+import javax.json.JsonValue;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -40,22 +43,22 @@ public final class EncryptedJSONJWK {
         if (StringUtils.isEmpty(password)) {
             throw new MissingPasswordException(MissingPasswordException.ObjectType.ENCRYPTION, null);
         }
-        JSONObject fullJWK = jwk.toJSONObject();
+        JsonObject fullJWK = jwk.toJSONObject().build();
 
-        JSONObject encryptedJWK = new JSONObject();
-        JSONObject sensitiveProperties = new JSONObject();
+        JsonObjectBuilder encryptedJWK = Json.createObjectBuilder();
+        JsonObjectBuilder sensitiveProperties = Json.createObjectBuilder();
 
-        for (Map.Entry<String, Object> entry : fullJWK.entrySet()) {
+        for (Map.Entry<String, JsonValue> entry : fullJWK.entrySet()) {
             if (GENERAL_NAMES.contains(entry.getKey())) {
-                encryptedJWK.appendField(entry.getKey(), entry.getValue());
+                encryptedJWK.add(entry.getKey(), entry.getValue());
             } else {
-                sensitiveProperties.appendField(entry.getKey(), entry.getValue());
+                sensitiveProperties.add(entry.getKey(), entry.getValue());
             }
         }
 
-        String json = sensitiveProperties.toJSONString();
-        encryptedJWK.appendField("enc", EncryptionHelper.encode(json, password));
+        String json = sensitiveProperties.build().toString();
+        encryptedJWK.add("enc", EncryptionHelper.encode(json, password));
 
-        return encryptedJWK.toJSONString();
+        return encryptedJWK.build().toString();
     }
 }

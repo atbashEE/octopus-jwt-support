@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,9 @@ import be.atbash.ee.security.octopus.config.PemKeyEncryption;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.keys.writer.encoder.*;
+import be.atbash.ee.security.octopus.nimbus.jose.jwk.JWK;
+import be.atbash.ee.security.octopus.nimbus.jose.jwk.JWKSet;
 import be.atbash.util.exception.AtbashUnexpectedException;
-import com.nimbusds.jose.jwk.JWK;
-import com.nimbusds.jose.jwk.JWKSet;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
@@ -110,7 +110,7 @@ public class KeyWriterFactory {
             jwks.addAll(parameters.getJwkSet().getKeys());
 
             JWKSet jwkSet = new JWKSet(jwks);
-            result = jwkSet.toJSONObject(false).toJSONString().getBytes(StandardCharsets.UTF_8);
+            result = jwkSet.toJSONObject(false).toString().getBytes(StandardCharsets.UTF_8);
         } catch (ParseException e) {
             // This can never happen as the String is a JSON representation of an actual JWK instance.
             throw new AtbashUnexpectedException(e);

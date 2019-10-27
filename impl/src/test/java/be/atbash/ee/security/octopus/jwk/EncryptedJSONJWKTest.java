@@ -15,9 +15,9 @@
  */
 package be.atbash.ee.security.octopus.jwk;
 
+import be.atbash.ee.security.octopus.nimbus.jose.Algorithm;
+import be.atbash.ee.security.octopus.nimbus.jose.jwk.OctetSequenceKey;
 import be.atbash.ee.security.octopus.util.EncryptionHelper;
-import com.nimbusds.jose.Algorithm;
-import com.nimbusds.jose.jwk.OctetSequenceKey;
 import org.junit.Test;
 
 import javax.json.JsonObject;

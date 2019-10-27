@@ -20,10 +20,10 @@ import be.atbash.ee.security.octopus.jwt.parameter.JWTParameters;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersEncryption;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersSigning;
 import be.atbash.ee.security.octopus.keys.json.AtbashKeyWriter;
+import be.atbash.ee.security.octopus.nimbus.jose.*;
+import be.atbash.ee.security.octopus.nimbus.jose.jwk.KeyType;
 import be.atbash.util.PublicAPI;
 import be.atbash.util.exception.AtbashUnexpectedException;
-import com.nimbusds.jose.*;
-import com.nimbusds.jose.jwk.KeyType;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;

@@ -15,9 +15,9 @@
  */
 package be.atbash.ee.security.octopus.jwt.decoder;
 
+import be.atbash.ee.security.octopus.nimbus.jose.JWSHeader;
+import be.atbash.ee.security.octopus.nimbus.jwt.JWTClaimsSet;
 import be.atbash.util.PublicAPI;
-import com.nimbusds.jose.JWSHeader;
-import com.nimbusds.jwt.JWTClaimsSet;
 
 /**
  *

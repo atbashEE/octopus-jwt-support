@@ -17,9 +17,9 @@ package be.atbash.ee.security.octopus.keys.reader;
 
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup;
+import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.util.exception.AtbashUnexpectedException;
 import be.atbash.util.resource.ResourceUtil;
-import com.nimbusds.jose.JOSEException;
 
 import javax.json.JsonArray;
 import javax.json.JsonObject;

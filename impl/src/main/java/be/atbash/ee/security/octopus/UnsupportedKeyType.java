@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 package be.atbash.ee.security.octopus;
 
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
+import be.atbash.ee.security.octopus.nimbus.jose.jwk.KeyType;
 import be.atbash.util.exception.AtbashException;
-import com.nimbusds.jose.jwk.KeyType;
 
 public class UnsupportedKeyType extends AtbashException {
 

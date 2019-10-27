@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ package be.atbash.ee.security.octopus.keys.reader;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
+import be.atbash.ee.security.octopus.nimbus.jose.jwk.RSAKey;
 import be.atbash.util.resource.ResourceUtil;
-import com.nimbusds.jose.jwk.RSAKey;
 import org.bouncycastle.openssl.PKCS8Generator;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.bouncycastle.openssl.jcajce.JcaPKCS8Generator;
@@ -55,7 +55,7 @@ public class KeyReaderTester {
                 RSAKey rsaKey = new RSAKey.Builder((RSAPublicKey) key.getKey())
                         .keyID("xx")
                         .build();
-                System.out.println(rsaKey.toJSONObject().toJSONString());
+                System.out.println(rsaKey.toJSONObject().build().toString());
             }
         }
 

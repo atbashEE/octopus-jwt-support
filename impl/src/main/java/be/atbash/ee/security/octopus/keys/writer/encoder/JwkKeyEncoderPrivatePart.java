@@ -18,11 +18,11 @@ package be.atbash.ee.security.octopus.keys.writer.encoder;
 import be.atbash.ee.security.octopus.UnsupportedKeyType;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.writer.KeyEncoderParameters;
+import be.atbash.ee.security.octopus.nimbus.jose.jwk.Curve;
+import be.atbash.ee.security.octopus.nimbus.jose.jwk.ECKey;
+import be.atbash.ee.security.octopus.nimbus.jose.jwk.KeyType;
+import be.atbash.ee.security.octopus.nimbus.jose.jwk.RSAKey;
 import be.atbash.util.exception.AtbashUnexpectedException;
-import com.nimbusds.jose.jwk.Curve;
-import com.nimbusds.jose.jwk.ECKey;
-import com.nimbusds.jose.jwk.KeyType;
-import com.nimbusds.jose.jwk.RSAKey;
 import org.bouncycastle.asn1.x9.X9ECParameters;
 import org.bouncycastle.jcajce.provider.asymmetric.util.EC5Util;
 import org.bouncycastle.jce.ECNamedCurveTable;
@@ -38,7 +38,7 @@ import java.security.spec.ECParameterSpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
 
-import static com.nimbusds.jose.jwk.ECKey.SUPPORTED_CURVES;
+import static be.atbash.ee.security.octopus.nimbus.jose.jwk.ECKey.SUPPORTED_CURVES;
 
 /**
  *
@@ -69,7 +69,7 @@ public class JwkKeyEncoderPrivatePart implements KeyEncoder {
                 .privateKey((RSAPrivateKey) atbashKey.getKey())
                 .build();
 
-        return rsaKey.toJSONObject().toJSONString().getBytes(StandardCharsets.UTF_8);
+        return rsaKey.toJSONObject().build().toString().getBytes(StandardCharsets.UTF_8);
     }
 
     private byte[] encodeECKey(AtbashKey atbashKey) {
@@ -83,7 +83,7 @@ public class JwkKeyEncoderPrivatePart implements KeyEncoder {
                 .privateKey((ECPrivateKey) atbashKey.getKey())
                 .build();
 
-        return jwk.toJSONObject().toJSONString().getBytes(StandardCharsets.UTF_8);
+        return jwk.toJSONObject().build().toString().getBytes(StandardCharsets.UTF_8);
     }
 
     // Duplicated

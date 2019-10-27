@@ -6,8 +6,8 @@ Wrap Java Objects as JWT and Sign or encrypt. Also support JWT tokens.
 
 Support library for Atbash Octopus, Atbash Config Server and others.
 
-Not production ready yet.
-
-Support for Java 7 and 8
+Support for Java 8
 
 Does have issues on OpenJDK with EC keys (not with Oracle JDK and Azul Zulu)
+
+Since 1.0.0, parts of the **Nimbus JOSE + JWT** (version 8.2) are integrated to have JSONP/JSONB support and allows for an optimized usage.
