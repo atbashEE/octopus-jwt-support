@@ -1,6 +1,6 @@
 = Atbash Octopus JWT Support
 Rudy De Busscher <rdebusscher@gmail.com>
-v0.9.1, 09/01/2019
+v1.0.0, ??/??/20??
 :example-caption!:
 ifndef::imagesdir[:imagesdir: images]
 ifndef::sourcedir[:sourcedir: ../../main/java]
@@ -8,6 +8,8 @@ ifndef::sourcedir[:sourcedir: ../../main/java]
 User manual for Atbash configuration.
 
 == Release Notes
+
+=== 1.0.0
 
 === 0.9.1
 
@@ -314,6 +316,13 @@ The 2 last parameters are used depending on the type of the format.
 
 * keyPassword: Used for encryption of the key, when this is used in the format or requested through a config parameter (for PEM format for example)
 * filePassword: Used for the encryption of the file when file is encrypted as a whole (like with Java Key store). This password is also used for reading it first if the file already exists.
+
+== Define Serializer
+
+When a custom JSON serializer is required
+
+- Create a class implementing `javax.json.bind.serializer.JsonbSerializer`
+- Define the class (FQCN) through the ServiceLoader mechanism (`META-INF/service/javax.json.bind.serializer.JsonbSerializer`)
 
 == Configuration
 
