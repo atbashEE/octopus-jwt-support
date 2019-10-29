@@ -324,6 +324,13 @@ When a custom JSON serializer is required
 - Create a class implementing `javax.json.bind.serializer.JsonbSerializer`
 - Define the class (FQCN) through the ServiceLoader mechanism (`META-INF/service/javax.json.bind.serializer.JsonbSerializer`)
 
+When the class has Jackson JSonProperty annotation on the fields, the `AbstractJacksonJsonSerializer` can be used to create a serializer without the need for coding.
+
+Define a Class as this and define the FQCN in the service loader file.
+
+    public class TestAbstractJacksonJsonSerializer extends AbstractJacksonJsonSerializer<MainClass> implements JsonbSerializer<MainClass> {
+    }
+
 == Configuration
 
 === key.manager.class
