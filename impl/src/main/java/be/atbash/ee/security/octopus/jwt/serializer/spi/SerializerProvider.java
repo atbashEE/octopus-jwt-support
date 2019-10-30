@@ -15,6 +15,7 @@
  */
 package be.atbash.ee.security.octopus.jwt.serializer.spi;
 
+import javax.json.bind.serializer.JsonbDeserializer;
 import javax.json.bind.serializer.JsonbSerializer;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,14 +26,22 @@ public final class SerializerProvider {
     private static final SerializerProvider INSTANCE = new SerializerProvider();
 
     private List<JsonbSerializer> serializers;
+    private List<JsonbDeserializer> deserializers;
 
     private SerializerProvider() {
         serializers = new ArrayList<>();
         ServiceLoader.load(JsonbSerializer.class).forEach(s -> serializers.add(s));
+
+        deserializers = new ArrayList<>();
+        ServiceLoader.load(JsonbDeserializer.class).forEach(s -> deserializers.add(s));
     }
 
     public JsonbSerializer[] getSerializers() {
         return serializers.toArray(new JsonbSerializer[0]);
+    }
+
+    public JsonbDeserializer[] getDeserializers() {
+        return deserializers.toArray(new JsonbDeserializer[0]);
     }
 
     public static SerializerProvider getInstance() {

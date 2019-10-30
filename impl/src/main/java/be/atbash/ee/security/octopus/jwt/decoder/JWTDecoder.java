@@ -17,6 +17,7 @@ package be.atbash.ee.security.octopus.jwt.decoder;
 
 import be.atbash.ee.security.octopus.jwt.InvalidJWTException;
 import be.atbash.ee.security.octopus.jwt.JWTEncoding;
+import be.atbash.ee.security.octopus.jwt.serializer.spi.SerializerProvider;
 import be.atbash.ee.security.octopus.keys.json.AtbashKeyReader;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.keys.selector.KeySelector;
@@ -181,11 +182,11 @@ public class JWTDecoder {
 
     private <T> JWTData<T> readJSONString(String data, Class<T> classType, MetaJWTData metaJWTData) {
         JsonbConfig config = new JsonbConfig();
-        AtbashKeyReader serializer = new AtbashKeyReader();
-        config.withDeserializers(serializer);
+
+        config.withDeserializers(SerializerProvider.getInstance().getDeserializers());
 
         Jsonb jsonb = JsonbBuilder.create(config);
-        // FIXME How can we define custom decoder
+
         return new JWTData<>(jsonb.fromJson(data, classType), metaJWTData);
 
     }

@@ -331,6 +331,13 @@ Define a Class as this and define the FQCN in the service loader file.
     public class TestAbstractJacksonJsonSerializer extends AbstractJacksonJsonSerializer<MainClass> implements JsonbSerializer<MainClass> {
     }
 
+== Define Deserializer
+
+When a custom JSON deserializer is required
+
+- Create a class implementing `javax.json.bind.serializer.JsonbDeserializer`
+- Define the class (FQCN) through the ServiceLoader mechanism (`META-INF/service/javax.json.bind.serializer.JsonbDeserializer`)
+
 == Configuration
 
 === key.manager.class
