@@ -29,7 +29,6 @@ import be.atbash.ee.security.octopus.nimbus.util.X509CertChainUtils;
 
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
-import javax.json.JsonValue;
 import java.net.URI;
 import java.text.ParseException;
 import java.util.*;
@@ -1160,7 +1159,7 @@ public final class JWEHeader extends CommonJWTHeader {
             } else if ("enc".equals(name)) {
                 // skip
             } else if ("typ".equals(name)) {
-                if (jsonObject.get(name).getValueType() != JsonValue.ValueType.NULL) {
+                if (JSONObjectUtils.hasValue(jsonObject, name)) {
                     String typValue = jsonObject.getString(name);
                     if (typValue != null) {
                         header = header.type(new JOSEObjectType(typValue));
@@ -1176,7 +1175,7 @@ public final class JWEHeader extends CommonJWTHeader {
             } else if ("jku".equals(name)) {
                 header = header.jwkURL(JSONObjectUtils.getURI(jsonObject, name));
             } else if ("jwk".equals(name)) {
-                if (jsonObject.get(name).getValueType() != JsonValue.ValueType.NULL) {
+                if (JSONObjectUtils.hasValue(jsonObject, name)) {
                     JsonObject jwkObject = jsonObject.getJsonObject(name);
                     if (jwkObject != null) {
                         header = header.jwk(JWK.parse(jwkObject));
@@ -1195,7 +1194,7 @@ public final class JWEHeader extends CommonJWTHeader {
             } else if ("epk".equals(name)) {
                 header = header.ephemeralPublicKey(JWK.parse(jsonObject.getJsonObject(name)));
             } else if ("zip".equals(name)) {
-                if (jsonObject.get(name).getValueType() != JsonValue.ValueType.NULL) {
+                if (JSONObjectUtils.hasValue(jsonObject, name)) {
                     String zipValue = jsonObject.getString(name);
                     if (zipValue != null) {
                         header = header.compressionAlgorithm(new CompressionAlgorithm(zipValue));

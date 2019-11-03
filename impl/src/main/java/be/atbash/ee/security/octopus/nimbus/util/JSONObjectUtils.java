@@ -97,19 +97,22 @@ public class JSONObjectUtils {
     public static URI getURI(JsonObject jsonObject, String key)
             throws ParseException {
 
-        String value = jsonObject.getString(key);
+        if (JSONObjectUtils.hasValue(jsonObject, key)) {
+            String value = jsonObject.getString(key);
 
-        if (value == null) {
-            return null;
+            if (value == null) {
+                return null;
+            }
+
+            try {
+                return new URI(value);
+
+            } catch (URISyntaxException e) {
+
+                throw new ParseException(e.getMessage(), 0);
+            }
         }
-
-        try {
-            return new URI(value);
-
-        } catch (URISyntaxException e) {
-
-            throw new ParseException(e.getMessage(), 0);
-        }
+        return null;
     }
 
 
@@ -124,7 +127,7 @@ public class JSONObjectUtils {
     public static List<String> getStringList(JsonObject jsonObject, String key) throws ParseException {
 
         // FIXME Test what happens when using other values as Strings.
-        if (jsonObject.get(key).getValueType() == JsonValue.ValueType.NULL) {
+        if (!hasValue(jsonObject, key)) {
             return null;
         }
         JsonArray jsonArray = jsonObject.getJsonArray(key);

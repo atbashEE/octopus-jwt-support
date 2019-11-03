@@ -20,7 +20,6 @@ import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.ee.security.octopus.nimbus.util.JSONObjectUtils;
 
 import javax.json.JsonObject;
-import javax.json.JsonValue;
 import java.text.ParseException;
 import java.util.*;
 
@@ -384,7 +383,7 @@ public final class PlainHeader extends Header {
             if ("alg".equals(name)) {
                 // skip
             } else if ("typ".equals(name)) {
-                if (jsonObject.get(name).getValueType() != JsonValue.ValueType.NULL) {
+                if (JSONObjectUtils.hasValue(jsonObject, name)) {
                     String typValue = jsonObject.getString(name);
                     if (typValue != null) {
                         header = header.type(new JOSEObjectType(typValue));
