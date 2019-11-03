@@ -16,9 +16,14 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto;
 
 
-import be.atbash.ee.security.octopus.nimbus.jose.*;
+import be.atbash.ee.security.octopus.nimbus.jose.CriticalHeaderParamsAware;
+import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
+import be.atbash.ee.security.octopus.nimbus.jose.KeyLengthException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.*;
 import be.atbash.ee.security.octopus.nimbus.jose.jwk.OctetSequenceKey;
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEDecrypter;
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEHeader;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 
 import javax.crypto.SecretKey;
@@ -27,7 +32,7 @@ import java.util.Set;
 
 
 /**
- * AES and AES GCM key wrap decrypter of {@link be.atbash.ee.security.octopus.nimbus.jose.JWEObject JWE
+ * AES and AES GCM key wrap decrypter of {@link JWEObject JWE
  * objects}. Expects an AES key.
  *
  * <p>Unwraps the encrypted Content Encryption Key (CEK) with the specified AES
@@ -42,25 +47,25 @@ import java.util.Set;
  * <p>Supports the following key management algorithms:
  *
  * <ul>
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWEAlgorithm#A128KW}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWEAlgorithm#A192KW}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWEAlgorithm#A256KW}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWEAlgorithm#A128GCMKW}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWEAlgorithm#A192GCMKW}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWEAlgorithm#A256GCMKW}
+ *     <li>{@link JWEAlgorithm#A128KW}
+ *     <li>{@link JWEAlgorithm#A192KW}
+ *     <li>{@link JWEAlgorithm#A256KW}
+ *     <li>{@link JWEAlgorithm#A128GCMKW}
+ *     <li>{@link JWEAlgorithm#A192GCMKW}
+ *     <li>{@link JWEAlgorithm#A256GCMKW}
  * </ul>
  *
  * <p>Supports the following content encryption algorithms:
  *
  * <ul>
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A128CBC_HS256}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A192CBC_HS384}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A256CBC_HS512}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A128GCM}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A192GCM}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A256GCM}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A128CBC_HS256_DEPRECATED}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A256CBC_HS512_DEPRECATED}
+ *     <li>{@link EncryptionMethod#A128CBC_HS256}
+ *     <li>{@link EncryptionMethod#A192CBC_HS384}
+ *     <li>{@link EncryptionMethod#A256CBC_HS512}
+ *     <li>{@link EncryptionMethod#A128GCM}
+ *     <li>{@link EncryptionMethod#A192GCM}
+ *     <li>{@link EncryptionMethod#A256GCM}
+ *     <li>{@link EncryptionMethod#A128CBC_HS256_DEPRECATED}
+ *     <li>{@link EncryptionMethod#A256CBC_HS512_DEPRECATED}
  * </ul>
  *
  * @author Melisa Halsband
@@ -133,7 +138,7 @@ public class AESDecrypter extends AESCryptoProvider implements JWEDecrypter, Cri
      *                       processing, empty set or {@code null} if none.
      * @throws KeyLengthException If the KEK length is invalid.
      */
-    public AESDecrypter(SecretKey kek, final Set<String> defCritHeaders)
+    public AESDecrypter(SecretKey kek, Set<String> defCritHeaders)
             throws KeyLengthException {
 
         super(kek);
@@ -183,7 +188,7 @@ public class AESDecrypter extends AESCryptoProvider implements JWEDecrypter, Cri
         JWEAlgorithm alg = header.getAlgorithm();
         int keyLength = header.getEncryptionMethod().cekBitLength();
 
-        final SecretKey cek;
+        SecretKey cek;
 
         if (alg.equals(JWEAlgorithm.A128KW) ||
                 alg.equals(JWEAlgorithm.A192KW) ||

@@ -16,9 +16,10 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto;
 
 
-import be.atbash.ee.security.octopus.nimbus.jose.*;
+import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.*;
 import be.atbash.ee.security.octopus.nimbus.jose.jwk.RSAKey;
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.*;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 
 import javax.crypto.SecretKey;
@@ -26,7 +27,7 @@ import java.security.interfaces.RSAPublicKey;
 
 
 /**
- * RSA encrypter of {@link be.atbash.ee.security.octopus.nimbus.jose.JWEObject JWE objects}. Expects a
+ * RSA encrypter of {@link JWEObject JWE objects}. Expects a
  * public RSA key.
  *
  * <p>Encrypts the plain text with a generated AES key (the Content Encryption
@@ -42,22 +43,22 @@ import java.security.interfaces.RSAPublicKey;
  * <p>Supports the following key management algorithms:
  *
  * <ul>
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWEAlgorithm#RSA_OAEP_256}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWEAlgorithm#RSA_OAEP} (deprecated)
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWEAlgorithm#RSA1_5} (deprecated)
+ *     <li>{@link JWEAlgorithm#RSA_OAEP_256}
+ *     <li>{@link JWEAlgorithm#RSA_OAEP} (deprecated)
+ *     <li>{@link JWEAlgorithm#RSA1_5} (deprecated)
  * </ul>
  *
  * <p>Supports the following content encryption algorithms:
  *
  * <ul>
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A128CBC_HS256}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A192CBC_HS384}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A256CBC_HS512}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A128GCM}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A192GCM}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A256GCM}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A128CBC_HS256_DEPRECATED}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A256CBC_HS512_DEPRECATED}
+ *     <li>{@link EncryptionMethod#A128CBC_HS256}
+ *     <li>{@link EncryptionMethod#A192CBC_HS384}
+ *     <li>{@link EncryptionMethod#A256CBC_HS512}
+ *     <li>{@link EncryptionMethod#A128GCM}
+ *     <li>{@link EncryptionMethod#A192GCM}
+ *     <li>{@link EncryptionMethod#A256GCM}
+ *     <li>{@link EncryptionMethod#A128CBC_HS256_DEPRECATED}
+ *     <li>{@link EncryptionMethod#A256CBC_HS512_DEPRECATED}
  * </ul>
  *
  * @author David Ortiz
@@ -152,11 +153,11 @@ public class RSAEncrypter extends RSACryptoProvider implements JWEEncrypter {
     public JWECryptoParts encrypt(JWEHeader header, byte[] clearText)
             throws JOSEException {
 
-        final JWEAlgorithm alg = header.getAlgorithm();
-        final EncryptionMethod enc = header.getEncryptionMethod();
+        JWEAlgorithm alg = header.getAlgorithm();
+        EncryptionMethod enc = header.getEncryptionMethod();
 
         // Generate and encrypt the CEK according to the enc method
-        final SecretKey cek;
+        SecretKey cek;
         if (contentEncryptionKey != null) {
             // Use externally supplied CEK
             cek = contentEncryptionKey;
@@ -165,7 +166,7 @@ public class RSAEncrypter extends RSACryptoProvider implements JWEEncrypter {
             cek = ContentCryptoProvider.generateCEK(enc, getJCAContext().getSecureRandom());
         }
 
-        final Base64URLValue encryptedKey; // The second JWE part
+        Base64URLValue encryptedKey; // The second JWE part
 
         if (alg.equals(JWEAlgorithm.RSA1_5)) {
 

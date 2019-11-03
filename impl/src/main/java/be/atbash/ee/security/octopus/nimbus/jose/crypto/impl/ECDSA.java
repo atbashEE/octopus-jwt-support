@@ -17,8 +17,8 @@ package be.atbash.ee.security.octopus.nimbus.jose.crypto.impl;
 
 
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
-import be.atbash.ee.security.octopus.nimbus.jose.JWSAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jose.jwk.Curve;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
@@ -91,7 +91,7 @@ public final class ECDSA {
      *                       created.
      */
     public static Signature getSignerAndVerifier(JWSAlgorithm alg,
-                                                 final Provider jcaProvider)
+                                                 Provider jcaProvider)
             throws JOSEException {
 
         String jcaAlg;
@@ -209,7 +209,7 @@ public final class ECDSA {
             throw new JOSEException("Invalid ECDSA signature format");
         }
 
-        final byte[] concatSignature = new byte[2 * rawLen];
+        byte[] concatSignature = new byte[2 * rawLen];
 
         System.arraycopy(derSignature, (offset + 2 + rLength) - i, concatSignature, rawLen - i, i);
         System.arraycopy(derSignature, (offset + 2 + rLength + 2 + sLength) - j, concatSignature, 2 * rawLen - j, j);
@@ -267,7 +267,7 @@ public final class ECDSA {
 
         int offset;
 
-        final byte[] derSignature;
+        byte[] derSignature;
 
         if (len < 128) {
             derSignature = new byte[2 + 2 + j + 2 + l];

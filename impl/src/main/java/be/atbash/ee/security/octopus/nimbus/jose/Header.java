@@ -16,6 +16,10 @@
 package be.atbash.ee.security.octopus.nimbus.jose;
 
 
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEHeader;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.ee.security.octopus.nimbus.util.JSONObjectUtils;
 
@@ -104,11 +108,11 @@ public abstract class Header implements Serializable {
      * @param parsedBase64URL The parsed Base64URL, {@code null} if the
      *                        header is created from scratch.
      */
-    protected Header(final Algorithm alg,
-                     final JOSEObjectType typ,
-                     final String cty, Set<String> crit,
-                     final Map<String, Object> customParams,
-                     final Base64URLValue parsedBase64URL) {
+    protected Header(Algorithm alg,
+                     JOSEObjectType typ,
+                     String cty, Set<String> crit,
+                     Map<String, Object> customParams,
+                     Base64URLValue parsedBase64URL) {
 
         if (alg == null) {
             throw new IllegalArgumentException("The algorithm \"alg\" header parameter must not be null");
@@ -142,7 +146,7 @@ public abstract class Header implements Serializable {
      *
      * @param header The header to copy. Must not be {@code null}.
      */
-    protected Header(final Header header) {
+    protected Header(Header header) {
 
         this(
                 header.getAlgorithm(),
@@ -276,7 +280,8 @@ public abstract class Header implements Serializable {
 
         // Include custom parameters, they will be overwritten if their
         // names match specified registered ones
-        JsonObjectBuilder result = Json.createObjectBuilder(customParams);
+        JsonObjectBuilder result = Json.createObjectBuilder();
+        customParams.forEach((key, value) -> JSONObjectUtils.addValue(result, key, value));
 
         // Alg is always defined
         result.add("alg", alg.toString());
@@ -335,45 +340,6 @@ public abstract class Header implements Serializable {
 
 
     /**
-     * Parses an algorithm ({@code alg}) parameter from the specified
-     * header JSON object. Intended for initial parsing of unsecured
-     * (plain), JWS and JWE headers.
-     *
-     * <p>The algorithm type (none, JWS or JWE) is determined by inspecting
-     * the algorithm name for "none" and the presence of an "enc"
-     * parameter.
-     *
-     * @param json The JSON object to parse. Must not be {@code null}.
-     * @return The algorithm, an instance of {@link Algorithm#NONE},
-     * {@link JWSAlgorithm} or {@link JWEAlgorithm}. {@code null}
-     * if not found.
-     * @throws ParseException If the {@code alg} parameter couldn't be
-     *                        parsed.
-     */
-    public static Algorithm parseAlgorithm(final JsonObject json)
-            throws ParseException {
-
-        String algName = json.getString("alg");
-
-        if (algName == null) {
-            throw new ParseException("Missing \"alg\" in header JSON object", 0);
-        }
-
-        // Infer algorithm type
-        if (algName.equals(Algorithm.NONE.getName())) {
-            // Plain
-            return Algorithm.NONE;
-        } else if (json.containsKey("enc")) {
-            // JWE
-            return JWEAlgorithm.parse(algName);
-        } else {
-            // JWS
-            return JWSAlgorithm.parse(algName);
-        }
-    }
-
-
-    /**
      * Parses a {@link PlainHeader}, {@link JWSHeader} or {@link JWEHeader}
      * from the specified JSON object.
      *
@@ -383,7 +349,7 @@ public abstract class Header implements Serializable {
      * @throws ParseException If the specified JSON object doesn't
      *                        represent a valid header.
      */
-    public static Header parse(final JsonObject jsonObject)
+    public static Header parse(JsonObject jsonObject)
             throws ParseException {
 
         return parse(jsonObject, null);
@@ -402,11 +368,11 @@ public abstract class Header implements Serializable {
      * @throws ParseException If the specified JSON object doesn't
      *                        represent a valid header.
      */
-    public static Header parse(final JsonObject jsonObject,
-                               final Base64URLValue parsedBase64URL)
+    public static Header parse(JsonObject jsonObject,
+                               Base64URLValue parsedBase64URL)
             throws ParseException {
 
-        Algorithm alg = parseAlgorithm(jsonObject);
+        Algorithm alg = Algorithm.parseAlgorithm(jsonObject);
 
         if (alg.equals(Algorithm.NONE)) {
 
@@ -426,6 +392,7 @@ public abstract class Header implements Serializable {
         }
     }
 
+    // FIXME Are these parse() methods used  ??
 
     /**
      * Parses a {@link PlainHeader}, {@link JWSHeader} or {@link JWEHeader}
@@ -437,7 +404,7 @@ public abstract class Header implements Serializable {
      * @throws ParseException If the specified JSON object string doesn't
      *                        represent a valid header.
      */
-    public static Header parse(final String jsonString)
+    public static Header parse(String jsonString)
             throws ParseException {
 
         return parse(jsonString, null);
@@ -456,8 +423,8 @@ public abstract class Header implements Serializable {
      * @throws ParseException If the specified JSON object string doesn't
      *                        represent a valid header.
      */
-    public static Header parse(final String jsonString,
-                               final Base64URLValue parsedBase64URL)
+    public static Header parse(String jsonString,
+                               Base64URLValue parsedBase64URL)
             throws ParseException {
 
         JsonObject jsonObject = JSONObjectUtils.parse(jsonString);
@@ -475,7 +442,7 @@ public abstract class Header implements Serializable {
      * @throws ParseException If the specified Base64URL doesn't represent
      *                        a valid header.
      */
-    public static Header parse(final Base64URLValue base64URL)
+    public static Header parse(Base64URLValue base64URL)
             throws ParseException {
 
         return parse(base64URL.decodeToString(), base64URL);

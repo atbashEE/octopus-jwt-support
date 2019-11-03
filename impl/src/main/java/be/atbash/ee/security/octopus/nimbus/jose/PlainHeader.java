@@ -20,6 +20,7 @@ import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.ee.security.octopus.nimbus.util.JSONObjectUtils;
 
 import javax.json.JsonObject;
+import javax.json.JsonValue;
 import java.text.ParseException;
 import java.util.*;
 
@@ -67,14 +68,14 @@ public final class PlainHeader extends Header {
      * Initialises the registered parameter name set.
      */
     static {
-        Set<String> p = new HashSet<>();
+        Set<String> claims = new HashSet<>();
 
-        p.add("alg");
-        p.add("typ");
-        p.add("cty");
-        p.add("crit");
+        claims.add("alg");
+        claims.add("typ");
+        claims.add("cty");
+        claims.add("crit");
 
-        REGISTERED_PARAMETER_NAMES = Collections.unmodifiableSet(p);
+        REGISTERED_PARAMETER_NAMES = Collections.unmodifiableSet(claims);
     }
 
 
@@ -138,7 +139,7 @@ public final class PlainHeader extends Header {
          * @param plainHeader The unsecured header to use. Must not be
          *                    {@code null}.
          */
-        public Builder(final PlainHeader plainHeader) {
+        public Builder(PlainHeader plainHeader) {
 
             typ = plainHeader.getType();
             cty = plainHeader.getContentType();
@@ -154,7 +155,7 @@ public final class PlainHeader extends Header {
          *            specified.
          * @return This builder.
          */
-        public Builder type(final JOSEObjectType typ) {
+        public Builder type(JOSEObjectType typ) {
 
             this.typ = typ;
             return this;
@@ -168,7 +169,7 @@ public final class PlainHeader extends Header {
          *            specified.
          * @return This builder.
          */
-        public Builder contentType(final String cty) {
+        public Builder contentType(String cty) {
 
             this.cty = cty;
             return this;
@@ -183,7 +184,7 @@ public final class PlainHeader extends Header {
          *             empty set or {@code null} if none.
          * @return This builder.
          */
-        public Builder criticalParams(final Set<String> crit) {
+        public Builder criticalParams(Set<String> crit) {
 
             this.crit = crit;
             return this;
@@ -204,7 +205,7 @@ public final class PlainHeader extends Header {
          *                                  name matches a registered
          *                                  parameter name.
          */
-        public Builder customParam(final String name, final Object value) {
+        public Builder customParam(String name, Object value) {
 
             if (getRegisteredParameterNames().contains(name)) {
                 throw new IllegalArgumentException("The parameter name \"" + name + "\" matches a registered name");
@@ -228,7 +229,7 @@ public final class PlainHeader extends Header {
          *                         {@code null} if none.
          * @return This builder.
          */
-        public Builder customParams(final Map<String, Object> customParameters) {
+        public Builder customParams(Map<String, Object> customParameters) {
 
             this.customParams = customParameters;
             return this;
@@ -242,7 +243,7 @@ public final class PlainHeader extends Header {
          *                  header is created from scratch.
          * @return This builder.
          */
-        public Builder parsedBase64URL(final Base64URLValue base64URL) {
+        public Builder parsedBase64URL(Base64URLValue base64URL) {
 
             this.parsedBase64URL = base64URL;
             return this;
@@ -287,11 +288,11 @@ public final class PlainHeader extends Header {
      * @param parsedBase64URL The parsed Base64URL, {@code null} if the
      *                        header is created from scratch.
      */
-    public PlainHeader(final JOSEObjectType typ,
-                       final String cty,
-                       final Set<String> crit,
-                       final Map<String, Object> customParams,
-                       final Base64URLValue parsedBase64URL) {
+    public PlainHeader(JOSEObjectType typ,
+                       String cty,
+                       Set<String> crit,
+                       Map<String, Object> customParams,
+                       Base64URLValue parsedBase64URL) {
 
         super(Algorithm.NONE, typ, cty, crit, customParams, parsedBase64URL);
     }
@@ -303,7 +304,7 @@ public final class PlainHeader extends Header {
      * @param plainHeader The unsecured header to copy. Must not be
      *                    {@code null}.
      */
-    public PlainHeader(final PlainHeader plainHeader) {
+    public PlainHeader(PlainHeader plainHeader) {
 
         this(
                 plainHeader.getType(),
@@ -346,7 +347,7 @@ public final class PlainHeader extends Header {
      * @throws ParseException If the specified JSON object doesn't
      *                        represent a valid unsecured header.
      */
-    public static PlainHeader parse(final JsonObject jsonObject)
+    public static PlainHeader parse(JsonObject jsonObject)
             throws ParseException {
 
         return parse(jsonObject, null);
@@ -364,12 +365,12 @@ public final class PlainHeader extends Header {
      * @throws ParseException If the specified JSON object doesn't
      *                        represent a valid unsecured header.
      */
-    public static PlainHeader parse(final JsonObject jsonObject,
-                                    final Base64URLValue parsedBase64URL)
+    public static PlainHeader parse(JsonObject jsonObject,
+                                    Base64URLValue parsedBase64URL)
             throws ParseException {
 
         // Get the "alg" parameter
-        Algorithm alg = Header.parseAlgorithm(jsonObject);
+        Algorithm alg = Algorithm.parseAlgorithm(jsonObject);
 
         if (alg != Algorithm.NONE) {
             throw new ParseException("The algorithm \"alg\" header parameter must be \"none\"", 0);
@@ -378,14 +379,16 @@ public final class PlainHeader extends Header {
         PlainHeader.Builder header = new Builder().parsedBase64URL(parsedBase64URL);
 
         // Parse optional + custom parameters
-        for (final String name : jsonObject.keySet()) {
+        for (String name : jsonObject.keySet()) {
 
             if ("alg".equals(name)) {
                 // skip
             } else if ("typ".equals(name)) {
-                String typValue = jsonObject.getString(name);
-                if (typValue != null) {
-                    header = header.type(new JOSEObjectType(typValue));
+                if (jsonObject.get(name).getValueType() != JsonValue.ValueType.NULL) {
+                    String typValue = jsonObject.getString(name);
+                    if (typValue != null) {
+                        header = header.type(new JOSEObjectType(typValue));
+                    }
                 }
             } else if ("cty".equals(name)) {
                 header = header.contentType(jsonObject.getString(name));
@@ -395,7 +398,7 @@ public final class PlainHeader extends Header {
                     header = header.criticalParams(new HashSet<>(critValues));
                 }
             } else {
-                header = header.customParam(name, jsonObject.get(name));
+                header = header.customParam(name, JSONObjectUtils.getJsonValueAsObject(jsonObject.get(name)));
             }
         }
 
@@ -412,7 +415,7 @@ public final class PlainHeader extends Header {
      * @throws ParseException If the specified JSON string doesn't
      *                        represent a valid unsecured header.
      */
-    public static PlainHeader parse(final String jsonString)
+    public static PlainHeader parse(String jsonString)
             throws ParseException {
 
         return parse(jsonString, null);
@@ -430,8 +433,8 @@ public final class PlainHeader extends Header {
      * @throws ParseException If the specified JSON string doesn't
      *                        represent a valid unsecured header.
      */
-    public static PlainHeader parse(final String jsonString,
-                                    final Base64URLValue parsedBase64URL)
+    public static PlainHeader parse(String jsonString,
+                                    Base64URLValue parsedBase64URL)
             throws ParseException {
 
         return parse(JSONObjectUtils.parse(jsonString), parsedBase64URL);
@@ -446,7 +449,7 @@ public final class PlainHeader extends Header {
      * @throws ParseException If the specified Base64URL doesn't represent
      *                        a valid unsecured header.
      */
-    public static PlainHeader parse(final Base64URLValue base64URL)
+    public static PlainHeader parse(Base64URLValue base64URL)
             throws ParseException {
 
         return parse(base64URL.decodeToString(), base64URL);

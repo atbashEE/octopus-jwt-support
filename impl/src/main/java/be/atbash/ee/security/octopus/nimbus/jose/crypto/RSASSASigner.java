@@ -17,12 +17,14 @@ package be.atbash.ee.security.octopus.nimbus.jose.crypto;
 
 
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
-import be.atbash.ee.security.octopus.nimbus.jose.JWSHeader;
-import be.atbash.ee.security.octopus.nimbus.jose.JWSSigner;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.RSAKeyUtils;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.RSASSA;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.RSASSAProvider;
 import be.atbash.ee.security.octopus.nimbus.jose.jwk.RSAKey;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSObject;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSSigner;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 
 import java.security.InvalidKeyException;
@@ -33,7 +35,7 @@ import java.security.SignatureException;
 
 /**
  * RSA Signature-Scheme-with-Appendix (RSASSA) signer of
- * {@link be.atbash.ee.security.octopus.nimbus.jose.JWSObject JWS objects}. Expects a private RSA key.
+ * {@link JWSObject JWS objects}. Expects a private RSA key.
  *
  * <p>See RFC 7518, sections
  * <a href="https://tools.ietf.org/html/rfc7518#section-3.3">3.3</a> and
@@ -45,12 +47,12 @@ import java.security.SignatureException;
  * <p>Supports the following algorithms:
  *
  * <ul>
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWSAlgorithm#RS256}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWSAlgorithm#RS384}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWSAlgorithm#RS512}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWSAlgorithm#PS256}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWSAlgorithm#PS384}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWSAlgorithm#PS512}
+ *     <li>{@link JWSAlgorithm#RS256}
+ *     <li>{@link JWSAlgorithm#RS384}
+ *     <li>{@link JWSAlgorithm#RS512}
+ *     <li>{@link JWSAlgorithm#PS256}
+ *     <li>{@link JWSAlgorithm#PS384}
+ *     <li>{@link JWSAlgorithm#PS512}
  * </ul>
  *
  * @author Vladimir Dzhuvinov
@@ -105,7 +107,7 @@ public class RSASSASigner extends RSASSAProvider implements JWSSigner {
      * @param allowWeakKey {@code true} to allow an RSA key shorter than
      *                     2048 bits.
      */
-    public RSASSASigner(PrivateKey privateKey, final boolean allowWeakKey) {
+    public RSASSASigner(PrivateKey privateKey, boolean allowWeakKey) {
 
         if (!"RSA".equalsIgnoreCase(privateKey.getAlgorithm())) {
             throw new IllegalArgumentException("The private key algorithm must be RSA");

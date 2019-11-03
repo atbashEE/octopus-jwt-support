@@ -18,14 +18,13 @@ package be.atbash.ee.security.octopus.nimbus.jose.crypto;
 
 import be.atbash.ee.security.octopus.nimbus.jose.CriticalHeaderParamsAware;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
-import be.atbash.ee.security.octopus.nimbus.jose.JWEDecrypter;
-import be.atbash.ee.security.octopus.nimbus.jose.JWEHeader;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.CriticalHeaderParamsDeferral;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.ECDH;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.ECDHCryptoProvider;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.utils.ECChecks;
 import be.atbash.ee.security.octopus.nimbus.jose.jwk.Curve;
 import be.atbash.ee.security.octopus.nimbus.jose.jwk.ECKey;
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.*;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 
 import javax.crypto.SecretKey;
@@ -39,7 +38,7 @@ import java.util.Set;
 
 /**
  * Elliptic Curve Diffie-Hellman decrypter of
- * {@link be.atbash.ee.security.octopus.nimbus.jose.JWEObject JWE objects} for curves using EC JWK
+ * {@link JWEObject JWE objects} for curves using EC JWK
  * keys. Expects a private EC key (with a P-256, P-384 or P-521 curve).
  *
  * <p>See RFC 7518
@@ -53,10 +52,10 @@ import java.util.Set;
  * <p>Supports the following key management algorithms:
  *
  * <ul>
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWEAlgorithm#ECDH_ES}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWEAlgorithm#ECDH_ES_A128KW}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWEAlgorithm#ECDH_ES_A192KW}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWEAlgorithm#ECDH_ES_A256KW}
+ *     <li>{@link JWEAlgorithm#ECDH_ES}
+ *     <li>{@link JWEAlgorithm#ECDH_ES_A128KW}
+ *     <li>{@link JWEAlgorithm#ECDH_ES_A192KW}
+ *     <li>{@link JWEAlgorithm#ECDH_ES_A256KW}
  * </ul>
  *
  * <p>Supports the following elliptic curves:
@@ -70,14 +69,14 @@ import java.util.Set;
  * <p>Supports the following content encryption algorithms:
  *
  * <ul>
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A128CBC_HS256}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A192CBC_HS384}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A256CBC_HS512}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A128GCM}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A192GCM}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A256GCM}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A128CBC_HS256_DEPRECATED}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A256CBC_HS512_DEPRECATED}
+ *     <li>{@link EncryptionMethod#A128CBC_HS256}
+ *     <li>{@link EncryptionMethod#A192CBC_HS384}
+ *     <li>{@link EncryptionMethod#A256CBC_HS512}
+ *     <li>{@link EncryptionMethod#A128GCM}
+ *     <li>{@link EncryptionMethod#A192GCM}
+ *     <li>{@link EncryptionMethod#A256GCM}
+ *     <li>{@link EncryptionMethod#A128CBC_HS256_DEPRECATED}
+ *     <li>{@link EncryptionMethod#A256CBC_HS512_DEPRECATED}
  * </ul>
  *
  * @author Vladimir Dzhuvinov

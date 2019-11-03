@@ -18,13 +18,15 @@ package be.atbash.ee.security.octopus.nimbus.jose.crypto;
 
 import be.atbash.ee.security.octopus.nimbus.jose.CriticalHeaderParamsAware;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
-import be.atbash.ee.security.octopus.nimbus.jose.JWSHeader;
-import be.atbash.ee.security.octopus.nimbus.jose.JWSVerifier;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.CriticalHeaderParamsDeferral;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.HMAC;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.MACProvider;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.utils.ConstantTimeUtils;
 import be.atbash.ee.security.octopus.nimbus.jose.jwk.OctetSequenceKey;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSObject;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSVerifier;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 
 import javax.crypto.SecretKey;
@@ -35,7 +37,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Message Authentication Code (MAC) verifier of
- * {@link be.atbash.ee.security.octopus.nimbus.jose.JWSObject JWS objects}. Expects a secret key.
+ * {@link JWSObject JWS objects}. Expects a secret key.
  *
  * <p>See RFC 7518
  * <a href="https://tools.ietf.org/html/rfc7518#section-3.2">section 3.2</a>
@@ -46,9 +48,9 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * <p>Supports the following algorithms:
  *
  * <ul>
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWSAlgorithm#HS256}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWSAlgorithm#HS384}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWSAlgorithm#HS512}
+ *     <li>{@link JWSAlgorithm#HS256}
+ *     <li>{@link JWSAlgorithm#HS384}
+ *     <li>{@link JWSAlgorithm#HS512}
  * </ul>
  *
  * @author Vladimir Dzhuvinov

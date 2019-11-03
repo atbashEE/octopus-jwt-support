@@ -17,6 +17,8 @@ package be.atbash.ee.security.octopus.nimbus.util;
 
 
 import javax.json.JsonArray;
+import javax.json.JsonString;
+import javax.json.JsonValue;
 import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.util.LinkedList;
@@ -40,7 +42,7 @@ public class X509CertChainUtils {
      * @return The Base64 list, {@code null} if not specified.
      * @throws ParseException If parsing failed.
      */
-    public static List<Base64Value> toBase64List(final JsonArray jsonArray)
+    public static List<Base64Value> toBase64List(JsonArray jsonArray)
             throws ParseException {
 
         if (jsonArray == null)
@@ -50,17 +52,17 @@ public class X509CertChainUtils {
 
         for (int i = 0; i < jsonArray.size(); i++) {
 
-            Object item = jsonArray.get(i);
+            JsonValue item = jsonArray.get(i);
 
             if (item == null) {
                 throw new ParseException("The X.509 certificate at position " + i + " must not be null", 0);
             }
 
-            if (!(item instanceof String)) {
+            if (!item.getValueType().equals(JsonValue.ValueType.STRING)) {
                 throw new ParseException("The X.509 certificate at position " + i + " must be encoded as a Base64 string", 0);
             }
 
-            chain.add(new Base64Value((String) item));
+            chain.add(new Base64Value(((JsonString) item).getString()));
         }
 
         return chain;
@@ -75,7 +77,7 @@ public class X509CertChainUtils {
      * @return The X.509 certificate chain, {@code null} if not specified.
      * @throws ParseException If parsing failed.
      */
-    public static List<X509Certificate> parse(final List<Base64Value> b64List)
+    public static List<X509Certificate> parse(List<Base64Value> b64List)
             throws ParseException {
 
         if (b64List == null)

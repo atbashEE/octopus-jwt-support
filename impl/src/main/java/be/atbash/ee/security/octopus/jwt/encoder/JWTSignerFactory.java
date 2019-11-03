@@ -21,14 +21,14 @@ import be.atbash.ee.security.octopus.exception.UnsupportedECCurveException;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersSigning;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
-import be.atbash.ee.security.octopus.nimbus.jose.JWSAlgorithm;
-import be.atbash.ee.security.octopus.nimbus.jose.JWSSigner;
 import be.atbash.ee.security.octopus.nimbus.jose.KeyLengthException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.ECDSASigner;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.MACSigner;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.RSASSASigner;
 import be.atbash.ee.security.octopus.nimbus.jose.jwk.Curve;
 import be.atbash.ee.security.octopus.nimbus.jose.jwk.KeyType;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSSigner;
 import be.atbash.util.exception.AtbashUnexpectedException;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -119,14 +119,14 @@ public class JWTSignerFactory {
     }
 
     /* Copied from com.nimbusds.jose.crypto.ECDSA which has package scope */
-    private JWSAlgorithm resolveAlgorithm(final ECKey ecKey)
+    private JWSAlgorithm resolveAlgorithm(ECKey ecKey)
             throws JOSEException {
 
         ECParameterSpec ecParameterSpec = ecKey.getParams();
         return resolveAlgorithm(Curve.forECParameterSpec(ecParameterSpec));
     }
 
-    private JWSAlgorithm resolveAlgorithm(final Curve curve)
+    private JWSAlgorithm resolveAlgorithm(Curve curve)
             throws JOSEException {
 
         if (curve == null) {

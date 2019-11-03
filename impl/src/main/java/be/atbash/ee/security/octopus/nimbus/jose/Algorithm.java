@@ -16,12 +16,16 @@
 package be.atbash.ee.security.octopus.nimbus.jose;
 
 
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
+
+import javax.json.JsonObject;
 import java.io.Serializable;
+import java.text.ParseException;
 
 
 /**
- * The base class for algorithm names, with optional implementation
- * requirement. This class is immutable.
+ * The base class for algorithm names. This class is immutable.
  *
  * <p>Includes constants for the following standard algorithm names:
  *
@@ -115,5 +119,42 @@ public class Algorithm implements Serializable {
         return name;
     }
 
+    /**
+     * Parses an algorithm ({@code alg}) parameter from the specified
+     * header JSON object. Intended for initial parsing of unsecured
+     * (plain), JWS and JWE headers.
+     *
+     * <p>The algorithm type (none, JWS or JWE) is determined by inspecting
+     * the algorithm name for "none" and the presence of an "enc"
+     * parameter.
+     *
+     * @param json The JSON object to parse. Must not be {@code null}.
+     * @return The algorithm, an instance of {@link Algorithm#NONE},
+     * {@link JWSAlgorithm} or {@link JWEAlgorithm}. {@code null}
+     * if not found.
+     * @throws ParseException If the {@code alg} parameter couldn't be
+     *                        parsed.
+     */
+    public static Algorithm parseAlgorithm(JsonObject json)
+            throws ParseException {
+
+        if (!json.containsKey("alg")) {
+            throw new ParseException("Missing \"alg\" in JSON object", 0);
+        }
+
+        String algName = json.getString("alg");
+
+        // Infer algorithm type
+        if (algName.equals(Algorithm.NONE.getName())) {
+            // Plain
+            return Algorithm.NONE;
+        } else if (json.containsKey("enc")) {
+            // JWE
+            return JWEAlgorithm.parse(algName);
+        } else {
+            // JWS
+            return JWSAlgorithm.parse(algName);
+        }
+    }
 
 }

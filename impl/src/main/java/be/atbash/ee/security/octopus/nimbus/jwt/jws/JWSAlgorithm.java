@@ -13,8 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.ee.security.octopus.nimbus.jose;
+package be.atbash.ee.security.octopus.nimbus.jwt.jws;
 
+
+import be.atbash.ee.security.octopus.nimbus.jose.Algorithm;
+import be.atbash.ee.security.octopus.nimbus.jose.AlgorithmFamily;
 
 /**
  * JSON Web Signature (JWS) algorithm name, represents the {@code alg} header
@@ -181,7 +184,7 @@ public final class JWSAlgorithm extends Algorithm {
          * @param algs The JWS algorithms of the family. Must not be
          *             {@code null}.
          */
-        public Family(final JWSAlgorithm... algs) {
+        public Family(JWSAlgorithm... algs) {
             super(algs);
         }
     }
@@ -201,42 +204,42 @@ public final class JWSAlgorithm extends Algorithm {
     /**
      * Parses a JWS algorithm from the specified string.
      *
-     * @param s The string to parse. Must not be {@code null}.
+     * @param value The string to parse. Must not be {@code null}.
      * @return The JWS algorithm (matching standard algorithm constant, else
      * a newly created algorithm).
      */
-    public static JWSAlgorithm parse(final String s) {
+    public static JWSAlgorithm parse(String value) {
 
-        if (s.equals(HS256.getName())) {
+        if (value.equals(HS256.getName())) {
             return HS256;
-        } else if (s.equals(HS384.getName())) {
+        } else if (value.equals(HS384.getName())) {
             return HS384;
-        } else if (s.equals(HS512.getName())) {
+        } else if (value.equals(HS512.getName())) {
             return HS512;
-        } else if (s.equals(RS256.getName())) {
+        } else if (value.equals(RS256.getName())) {
             return RS256;
-        } else if (s.equals(RS384.getName())) {
+        } else if (value.equals(RS384.getName())) {
             return RS384;
-        } else if (s.equals(RS512.getName())) {
+        } else if (value.equals(RS512.getName())) {
             return RS512;
-        } else if (s.equals(ES256.getName())) {
+        } else if (value.equals(ES256.getName())) {
             return ES256;
-        } else if (s.equals(ES256K.getName())) {
+        } else if (value.equals(ES256K.getName())) {
             return ES256K;
-        } else if (s.equals(ES384.getName())) {
+        } else if (value.equals(ES384.getName())) {
             return ES384;
-        } else if (s.equals(ES512.getName())) {
+        } else if (value.equals(ES512.getName())) {
             return ES512;
-        } else if (s.equals(PS256.getName())) {
+        } else if (value.equals(PS256.getName())) {
             return PS256;
-        } else if (s.equals(PS384.getName())) {
+        } else if (value.equals(PS384.getName())) {
             return PS384;
-        } else if (s.equals(PS512.getName())) {
+        } else if (value.equals(PS512.getName())) {
             return PS512;
-        } else if (s.equals(EdDSA.getName())) {
+        } else if (value.equals(EdDSA.getName())) {
             return EdDSA;
         } else {
-            return new JWSAlgorithm(s);
+            return new JWSAlgorithm(value);
         }
     }
 }

@@ -29,7 +29,7 @@
     </parent>
 
     <artifactId>octopus-jwt-support</artifactId>
-    <version>1.0.0.-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <inceptionYear>2017</inceptionYear>
@@ -103,21 +103,19 @@
             <version>${atbash-utils.version}</version>
         </dependency>
 
-        <!--dependency>
-            <groupId>be.atbash.json</groupId>
-            <artifactId>octopus-json-smart</artifactId>
-            <version>${atbash-json.version}</version>
-        </dependency-->
-
         <dependency>
+            <!-- FIXME, This means we require Java EE 8, is it needed ? -->
             <groupId>javax.json.bind</groupId>
             <artifactId>javax.json.bind-api</artifactId>
             <version>${javax.json.bind.version}</version>
+            <scope>provided</scope>
         </dependency>
+
         <dependency>
             <groupId>javax.json</groupId>
             <artifactId>javax.json-api</artifactId>
             <version>${javax.json.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- CDI API 1.1 has dependency on interceptor 1.1 which is wrong -->
@@ -181,6 +179,14 @@
             <groupId>org.glassfish</groupId>
             <artifactId>javax.json</artifactId>
             <version>1.1</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <!-- required for AbstractJacksonJsonSerializerTest -->
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>2.5.5</version>
             <scope>test</scope>
         </dependency>
 

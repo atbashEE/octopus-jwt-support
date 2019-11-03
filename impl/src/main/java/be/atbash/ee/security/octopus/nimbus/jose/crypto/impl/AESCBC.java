@@ -17,8 +17,8 @@ package be.atbash.ee.security.octopus.nimbus.jose.crypto.impl;
 
 
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
-import be.atbash.ee.security.octopus.nimbus.jose.JWEHeader;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.utils.ConstantTimeUtils;
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEHeader;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.ee.security.octopus.nimbus.util.ByteUtils;
 

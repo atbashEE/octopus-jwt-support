@@ -31,6 +31,7 @@ import java.util.Set;
  * @author Vladimir Dzhuvinov
  * @version 2015-04-21
  */
+// FIXME unused as interface
 public interface CriticalHeaderParamsAware {
 
 

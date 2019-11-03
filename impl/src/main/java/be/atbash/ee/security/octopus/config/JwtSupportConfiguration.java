@@ -27,7 +27,7 @@ import be.atbash.ee.security.octopus.keys.reader.DefaultKeyResourceTypeProvider;
 import be.atbash.ee.security.octopus.keys.reader.KeyResourceTypeProvider;
 import be.atbash.ee.security.octopus.keys.reader.password.ConfigKeyResourcePasswordLookup;
 import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup;
-import be.atbash.ee.security.octopus.nimbus.jose.JWSAlgorithm;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import be.atbash.util.StringUtils;
 import be.atbash.util.reflection.CDICheck;
 import be.atbash.util.reflection.ClassUtils;

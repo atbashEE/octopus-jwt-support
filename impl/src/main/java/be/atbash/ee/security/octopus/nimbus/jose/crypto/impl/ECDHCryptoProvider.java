@@ -16,8 +16,12 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto.impl;
 
 
-import be.atbash.ee.security.octopus.nimbus.jose.*;
+import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.jwk.Curve;
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod;
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWECryptoParts;
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEHeader;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 
 import javax.crypto.SecretKey;
@@ -28,15 +32,15 @@ import java.util.Set;
 
 /**
  * The base abstract class for Elliptic Curve Diffie-Hellman encrypters and
- * decrypters of {@link be.atbash.ee.security.octopus.nimbus.jose.JWEObject JWE objects}.
+ * decrypters of {@link JWEObject JWE objects}.
  *
  * <p>Supports the following key management algorithms:
  *
  * <ul>
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWEAlgorithm#ECDH_ES}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWEAlgorithm#ECDH_ES_A128KW}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWEAlgorithm#ECDH_ES_A192KW}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWEAlgorithm#ECDH_ES_A256KW}
+ *     <li>{@link JWEAlgorithm#ECDH_ES}
+ *     <li>{@link JWEAlgorithm#ECDH_ES_A128KW}
+ *     <li>{@link JWEAlgorithm#ECDH_ES_A192KW}
+ *     <li>{@link JWEAlgorithm#ECDH_ES_A256KW}
  * </ul>
  *
  * <p>Supports the following elliptic curves:
@@ -51,14 +55,14 @@ import java.util.Set;
  * <p>Supports the following content encryption algorithms:
  *
  * <ul>
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A128CBC_HS256}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A192CBC_HS384}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A256CBC_HS512}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A128GCM}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A192GCM}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A256GCM}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A128CBC_HS256_DEPRECATED}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A256CBC_HS512_DEPRECATED}
+ *     <li>{@link EncryptionMethod#A128CBC_HS256}
+ *     <li>{@link EncryptionMethod#A192CBC_HS384}
+ *     <li>{@link EncryptionMethod#A256CBC_HS512}
+ *     <li>{@link EncryptionMethod#A128GCM}
+ *     <li>{@link EncryptionMethod#A192GCM}
+ *     <li>{@link EncryptionMethod#A256GCM}
+ *     <li>{@link EncryptionMethod#A128CBC_HS256_DEPRECATED}
+ *     <li>{@link EncryptionMethod#A256CBC_HS512_DEPRECATED}
  * </ul>
  *
  * @author Tim McLean
@@ -179,16 +183,16 @@ public abstract class ECDHCryptoProvider extends BaseJWEProvider {
                                           SecretKey contentEncryptionKey)
             throws JOSEException {
 
-        final JWEAlgorithm alg = header.getAlgorithm();
-        final ECDH.AlgorithmMode algMode = ECDH.resolveAlgorithmMode(alg);
-        final EncryptionMethod enc = header.getEncryptionMethod();
+        JWEAlgorithm alg = header.getAlgorithm();
+        ECDH.AlgorithmMode algMode = ECDH.resolveAlgorithmMode(alg);
+        EncryptionMethod enc = header.getEncryptionMethod();
 
         // Derive shared key via concat KDF
         getConcatKDF().getJCAContext().setProvider(getJCAContext().getMACProvider()); // update before concat
         SecretKey sharedKey = ECDH.deriveSharedKey(header, Z, getConcatKDF());
 
-        final SecretKey cek;
-        final Base64URLValue encryptedKey; // The CEK encrypted (second JWE part)
+        SecretKey cek;
+        Base64URLValue encryptedKey; // The CEK encrypted (second JWE part)
 
         if (algMode.equals(ECDH.AlgorithmMode.DIRECT)) {
             cek = sharedKey;
@@ -219,14 +223,14 @@ public abstract class ECDHCryptoProvider extends BaseJWEProvider {
                                   Base64URLValue authTag)
             throws JOSEException {
 
-        final JWEAlgorithm alg = header.getAlgorithm();
-        final ECDH.AlgorithmMode algMode = ECDH.resolveAlgorithmMode(alg);
+        JWEAlgorithm alg = header.getAlgorithm();
+        ECDH.AlgorithmMode algMode = ECDH.resolveAlgorithmMode(alg);
 
         // Derive shared key via concat KDF
         getConcatKDF().getJCAContext().setProvider(getJCAContext().getMACProvider()); // update before concat
         SecretKey sharedKey = ECDH.deriveSharedKey(header, Z, getConcatKDF());
 
-        final SecretKey cek;
+        SecretKey cek;
 
         if (algMode.equals(ECDH.AlgorithmMode.DIRECT)) {
             cek = sharedKey;

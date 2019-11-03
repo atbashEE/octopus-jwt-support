@@ -16,12 +16,18 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto.factories;
 
 
-import be.atbash.ee.security.octopus.nimbus.jose.*;
+import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
+import be.atbash.ee.security.octopus.nimbus.jose.KeyLengthException;
+import be.atbash.ee.security.octopus.nimbus.jose.KeyTypeException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.AESDecrypter;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.ECDHDecrypter;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.RSADecrypter;
 import be.atbash.ee.security.octopus.nimbus.jose.jca.JWEJCAContext;
 import be.atbash.ee.security.octopus.nimbus.jose.proc.JWEDecrypterFactory;
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod;
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEDecrypter;
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEHeader;
 
 import javax.crypto.SecretKey;
 import java.security.Key;
@@ -103,10 +109,10 @@ public class DefaultJWEDecrypterFactory implements JWEDecrypterFactory {
 
 
     @Override
-    public JWEDecrypter createJWEDecrypter(JWEHeader header, final Key key)
+    public JWEDecrypter createJWEDecrypter(JWEHeader header, Key key)
             throws JOSEException {
 
-        final JWEDecrypter decrypter;
+        JWEDecrypter decrypter;
 
         if (RSADecrypter.SUPPORTED_ALGORITHMS.contains(header.getAlgorithm()) &&
                 RSADecrypter.SUPPORTED_ENCRYPTION_METHODS.contains(header.getEncryptionMethod())) {

@@ -16,10 +16,10 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto.impl;
 
 
-import be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod;
-import be.atbash.ee.security.octopus.nimbus.jose.JWEAlgorithm;
-import be.atbash.ee.security.octopus.nimbus.jose.JWSAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jose.jwk.Curve;
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod;
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 
 import java.util.Collection;
 

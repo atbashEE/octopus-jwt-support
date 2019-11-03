@@ -13,9 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.ee.security.octopus.nimbus.jose;
+package be.atbash.ee.security.octopus.nimbus.jwt.jws;
 
 
+import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
+import be.atbash.ee.security.octopus.nimbus.jose.JOSEObject;
+import be.atbash.ee.security.octopus.nimbus.jose.Payload;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 
 import java.text.ParseException;
@@ -98,7 +101,7 @@ public class JWSObject extends JOSEObject {
      * @param header  The JWS header. Must not be {@code null}.
      * @param payload The payload. Must not be {@code null}.
      */
-    public JWSObject(final JWSHeader header, final Payload payload) {
+    public JWSObject(JWSHeader header, Payload payload) {
 
         if (header == null) {
 
@@ -138,7 +141,7 @@ public class JWSObject extends JOSEObject {
      *                   Must not be {@code null}.
      * @throws ParseException If parsing of the serialised parts failed.
      */
-    public JWSObject(final Base64URLValue firstPart, final Base64URLValue secondPart, final Base64URLValue thirdPart)
+    public JWSObject(Base64URLValue firstPart, Base64URLValue secondPart, Base64URLValue thirdPart)
             throws ParseException {
 
         if (firstPart == null) {
@@ -197,7 +200,7 @@ public class JWSObject extends JOSEObject {
      *                   Must not be {@code null}.
      * @return The signing input string.
      */
-    private static String composeSigningInput(final Base64URLValue firstPart, final Base64URLValue secondPart) {
+    private static String composeSigningInput(Base64URLValue firstPart, Base64URLValue secondPart) {
 
         return firstPart.toString() + '.' + secondPart.toString();
     }
@@ -279,7 +282,7 @@ public class JWSObject extends JOSEObject {
      *
      * @throws JOSEException If the JWS algorithm is not supported.
      */
-    private void ensureJWSSignerSupport(final JWSSigner signer)
+    private void ensureJWSSignerSupport(JWSSigner signer)
             throws JOSEException {
 
         if (!signer.supportedJWSAlgorithms().contains(getHeader().getAlgorithm())) {
@@ -299,7 +302,7 @@ public class JWSObject extends JOSEObject {
      *                               {@link State#UNSIGNED unsigned state}.
      * @throws JOSEException         If the JWS object couldn't be signed.
      */
-    public synchronized void sign(final JWSSigner signer)
+    public synchronized void sign(JWSSigner signer)
             throws JOSEException {
 
         ensureUnsignedState();
@@ -337,7 +340,7 @@ public class JWSObject extends JOSEObject {
      * @throws JOSEException         If the JWS object couldn't be
      *                               verified.
      */
-    public synchronized boolean verify(final JWSVerifier verifier)
+    public synchronized boolean verify(JWSVerifier verifier)
             throws JOSEException {
 
         ensureSignedOrVerifiedState();
@@ -402,7 +405,7 @@ public class JWSObject extends JOSEObject {
      * @throws IllegalStateException If the JOSE object is not in a state
      *                               that permits serialisation.
      */
-    public String serialize(final boolean detachedPayload) {
+    public String serialize(boolean detachedPayload) {
         ensureSignedOrVerifiedState();
 
         if (detachedPayload) {
@@ -416,15 +419,15 @@ public class JWSObject extends JOSEObject {
      * Parses a JWS object from the specified string in compact format. The
      * parsed JWS object will be given a {@link State#SIGNED} state.
      *
-     * @param s The string to parse. Must not be {@code null}.
+     * @param value The string to parse. Must not be {@code null}.
      * @return The JWS object.
      * @throws ParseException If the string couldn't be parsed to a valid
      *                        JWS object.
      */
-    public static JWSObject parse(final String s)
+    public static JWSObject parse(String value)
             throws ParseException {
 
-        Base64URLValue[] parts = JOSEObject.split(s);
+        Base64URLValue[] parts = JOSEObject.split(value);
 
         if (parts.length != 3) {
 

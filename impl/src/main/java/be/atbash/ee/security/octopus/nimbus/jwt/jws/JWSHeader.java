@@ -13,10 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.ee.security.octopus.nimbus.jose;
+package be.atbash.ee.security.octopus.nimbus.jwt.jws;
 
 
+import be.atbash.ee.security.octopus.nimbus.jose.Algorithm;
+import be.atbash.ee.security.octopus.nimbus.jose.JOSEObjectType;
+import be.atbash.ee.security.octopus.nimbus.jose.PlainHeader;
 import be.atbash.ee.security.octopus.nimbus.jose.jwk.JWK;
+import be.atbash.ee.security.octopus.nimbus.jwt.CommonJWTHeader;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.ee.security.octopus.nimbus.util.Base64Value;
 import be.atbash.ee.security.octopus.nimbus.util.JSONObjectUtils;
@@ -63,7 +67,7 @@ import java.util.*;
  * @author Vladimir Dzhuvinov
  * @version 2019-10-04
  */
-public final class JWSHeader extends CommonSEHeader {
+public final class JWSHeader extends CommonJWTHeader {
 
 
     private static final long serialVersionUID = 1L;
@@ -79,21 +83,21 @@ public final class JWSHeader extends CommonSEHeader {
      * Initialises the registered parameter name set.
      */
     static {
-        Set<String> p = new HashSet<>();
+        Set<String> claims = new HashSet<>();
 
-        p.add("alg");
-        p.add("jku");
-        p.add("jwk");
-        p.add("x5u");
-        p.add("x5t");
-        p.add("x5t#S256");
-        p.add("x5c");
-        p.add("kid");
-        p.add("typ");
-        p.add("cty");
-        p.add("crit");
+        claims.add("alg");
+        claims.add("jku");
+        claims.add("jwk");
+        claims.add("x5u");
+        claims.add("x5t");
+        claims.add("x5t#S256");
+        claims.add("x5c");
+        claims.add("kid");
+        claims.add("typ");
+        claims.add("cty");
+        claims.add("crit");
 
-        REGISTERED_PARAMETER_NAMES = Collections.unmodifiableSet(p);
+        REGISTERED_PARAMETER_NAMES = Collections.unmodifiableSet(claims);
     }
 
 
@@ -198,7 +202,7 @@ public final class JWSHeader extends CommonSEHeader {
          * @param alg The JWS algorithm ({@code alg}) parameter. Must
          *            not be "none" or {@code null}.
          */
-        public Builder(final JWSAlgorithm alg) {
+        public Builder(JWSAlgorithm alg) {
 
             if (alg.getName().equals(Algorithm.NONE.getName())) {
                 throw new IllegalArgumentException("The JWS algorithm \"alg\" cannot be \"none\"");
@@ -215,7 +219,7 @@ public final class JWSHeader extends CommonSEHeader {
          * @param jwsHeader The JWS header to use. Must not not be
          *                  {@code null}.
          */
-        public Builder(final JWSHeader jwsHeader) {
+        public Builder(JWSHeader jwsHeader) {
 
             this(jwsHeader.getAlgorithm());
 
@@ -241,7 +245,7 @@ public final class JWSHeader extends CommonSEHeader {
          *            specified.
          * @return This builder.
          */
-        public Builder type(final JOSEObjectType typ) {
+        public Builder type(JOSEObjectType typ) {
 
             this.typ = typ;
             return this;
@@ -255,7 +259,7 @@ public final class JWSHeader extends CommonSEHeader {
          *            specified.
          * @return This builder.
          */
-        public Builder contentType(final String cty) {
+        public Builder contentType(String cty) {
 
             this.cty = cty;
             return this;
@@ -270,7 +274,7 @@ public final class JWSHeader extends CommonSEHeader {
          *             empty set or {@code null} if none.
          * @return This builder.
          */
-        public Builder criticalParams(final Set<String> crit) {
+        public Builder criticalParams(Set<String> crit) {
 
             this.crit = crit;
             return this;
@@ -284,7 +288,7 @@ public final class JWSHeader extends CommonSEHeader {
          *            {@code null} if not specified.
          * @return This builder.
          */
-        public Builder jwkURL(final URI jku) {
+        public Builder jwkURL(URI jku) {
 
             this.jku = jku;
             return this;
@@ -298,7 +302,7 @@ public final class JWSHeader extends CommonSEHeader {
          *            {@code null} if not specified.
          * @return This builder.
          */
-        public Builder jwk(final JWK jwk) {
+        public Builder jwk(JWK jwk) {
 
             this.jwk = jwk;
             return this;
@@ -312,7 +316,7 @@ public final class JWSHeader extends CommonSEHeader {
          *            if not specified.
          * @return This builder.
          */
-        public Builder x509CertURL(final URI x5u) {
+        public Builder x509CertURL(URI x5u) {
 
             this.x5u = x5u;
             return this;
@@ -358,7 +362,7 @@ public final class JWSHeader extends CommonSEHeader {
          *            {@code null} if not specified.
          * @return This builder.
          */
-        public Builder x509CertChain(final List<Base64Value> x5c) {
+        public Builder x509CertChain(List<Base64Value> x5c) {
 
             this.x5c = x5c;
             return this;
@@ -372,7 +376,7 @@ public final class JWSHeader extends CommonSEHeader {
          *            specified.
          * @return This builder.
          */
-        public Builder keyID(final String kid) {
+        public Builder keyID(String kid) {
 
             this.kid = kid;
             return this;
@@ -393,7 +397,7 @@ public final class JWSHeader extends CommonSEHeader {
          *                                  name matches a registered
          *                                  parameter name.
          */
-        public Builder customParam(final String name, final Object value) {
+        public Builder customParam(String name, Object value) {
 
             if (getRegisteredParameterNames().contains(name)) {
                 throw new IllegalArgumentException("The parameter name \"" + name + "\" matches a registered name");
@@ -417,7 +421,7 @@ public final class JWSHeader extends CommonSEHeader {
          *                         {@code null} if none.
          * @return This builder.
          */
-        public Builder customParams(final Map<String, Object> customParameters) {
+        public Builder customParams(Map<String, Object> customParameters) {
 
             this.customParams = customParameters;
             return this;
@@ -462,7 +466,7 @@ public final class JWSHeader extends CommonSEHeader {
      * @param alg The JWS algorithm ({@code alg}) parameter. Must not be
      *            "none" or {@code null}.
      */
-    public JWSHeader(final JWSAlgorithm alg) {
+    public JWSHeader(JWSAlgorithm alg) {
 
         this(alg, null, null, null, null, null, null, null, null, null, null, null, null);
     }
@@ -504,19 +508,19 @@ public final class JWSHeader extends CommonSEHeader {
      * @param parsedBase64URL The parsed Base64URL, {@code null} if the
      *                        header is created from scratch.
      */
-    public JWSHeader(final JWSAlgorithm alg,
-                     final JOSEObjectType typ,
-                     final String cty,
-                     final Set<String> crit,
-                     final URI jku,
-                     final JWK jwk,
-                     final URI x5u,
-                     final Base64URLValue x5t,
-                     final Base64URLValue x5t256,
-                     final List<Base64Value> x5c,
-                     final String kid,
-                     final Map<String, Object> customParams,
-                     final Base64URLValue parsedBase64URL) {
+    public JWSHeader(JWSAlgorithm alg,
+                     JOSEObjectType typ,
+                     String cty,
+                     Set<String> crit,
+                     URI jku,
+                     JWK jwk,
+                     URI x5u,
+                     Base64URLValue x5t,
+                     Base64URLValue x5t256,
+                     List<Base64Value> x5c,
+                     String kid,
+                     Map<String, Object> customParams,
+                     Base64URLValue parsedBase64URL) {
 
         super(alg, typ, cty, crit, jku, jwk, x5u, x5t, x5t256, x5c, kid, customParams, parsedBase64URL);
 
@@ -531,7 +535,7 @@ public final class JWSHeader extends CommonSEHeader {
      *
      * @param jwsHeader The JWS header to copy. Must not be {@code null}.
      */
-    public JWSHeader(final JWSHeader jwsHeader) {
+    public JWSHeader(JWSHeader jwsHeader) {
 
         this(
                 jwsHeader.getAlgorithm(),
@@ -601,12 +605,12 @@ public final class JWSHeader extends CommonSEHeader {
      * @throws ParseException If the specified JSON object doesn't
      *                        represent a valid JWS header.
      */
-    public static JWSHeader parse(final JsonObject jsonObject,
-                                  final Base64URLValue parsedBase64URL)
+    public static JWSHeader parse(JsonObject jsonObject,
+                                  Base64URLValue parsedBase64URL)
             throws ParseException {
 
         // Get the "alg" parameter
-        Algorithm alg = Header.parseAlgorithm(jsonObject);
+        Algorithm alg = Algorithm.parseAlgorithm(jsonObject);
 
         if (!(alg instanceof JWSAlgorithm)) {
             throw new ParseException("The algorithm \"alg\" header parameter must be for signatures", 0);
@@ -620,12 +624,16 @@ public final class JWSHeader extends CommonSEHeader {
             if ("alg".equals(name)) {
                 // skip
             } else if ("typ".equals(name)) {
-                String typValue = jsonObject.getString(name);
-                if (typValue != null) {
-                    header = header.type(new JOSEObjectType(typValue));
+                if (JSONObjectUtils.hasValue(jsonObject, name)) {
+                    String typValue = jsonObject.getString(name);
+                    if (typValue != null) {
+                        header = header.type(new JOSEObjectType(typValue));
+                    }
                 }
             } else if ("cty".equals(name)) {
-                header = header.contentType(jsonObject.getString(name));
+                if (JSONObjectUtils.hasValue(jsonObject, name)) {
+                    header = header.contentType(jsonObject.getString(name));
+                }
             } else if ("crit".equals(name)) {
                 List<String> critValues = JSONObjectUtils.getStringList(jsonObject, name);
                 if (critValues != null) {
@@ -634,9 +642,11 @@ public final class JWSHeader extends CommonSEHeader {
             } else if ("jku".equals(name)) {
                 header = header.jwkURL(JSONObjectUtils.getURI(jsonObject, name));
             } else if ("jwk".equals(name)) {
-                JsonObject jwkObject = jsonObject.getJsonObject(name);
-                if (jwkObject != null) {
-                    header = header.jwk(JWK.parse(jwkObject));
+                if (JSONObjectUtils.hasValue(jsonObject, name)) {
+                    JsonObject jwkObject = jsonObject.getJsonObject(name);
+                    if (jwkObject != null) {
+                        header = header.jwk(JWK.parse(jwkObject));
+                    }
                 }
             } else if ("x5u".equals(name)) {
                 header = header.x509CertURL(JSONObjectUtils.getURI(jsonObject, name));
@@ -649,7 +659,7 @@ public final class JWSHeader extends CommonSEHeader {
             } else if ("kid".equals(name)) {
                 header = header.keyID(jsonObject.getString(name));
             } else {
-                header = header.customParam(name, jsonObject.get(name));
+                header = header.customParam(name, JSONObjectUtils.getJsonValueAsObject(jsonObject.get(name)));
             }
         }
 
@@ -666,7 +676,7 @@ public final class JWSHeader extends CommonSEHeader {
      * @throws ParseException If the specified JSON object string doesn't
      *                        represent a valid JWS header.
      */
-    public static JWSHeader parse(final String jsonString)
+    public static JWSHeader parse(String jsonString)
             throws ParseException {
 
         return parse(jsonString, null);
@@ -684,8 +694,8 @@ public final class JWSHeader extends CommonSEHeader {
      * @throws ParseException If the specified JSON object string doesn't
      *                        represent a valid JWS header.
      */
-    public static JWSHeader parse(final String jsonString,
-                                  final Base64URLValue parsedBase64URL)
+    public static JWSHeader parse(String jsonString,
+                                  Base64URLValue parsedBase64URL)
             throws ParseException {
 
         return parse(JSONObjectUtils.parse(jsonString), parsedBase64URL);
@@ -700,7 +710,7 @@ public final class JWSHeader extends CommonSEHeader {
      * @throws ParseException If the specified Base64URL doesn't represent
      *                        a valid JWS header.
      */
-    public static JWSHeader parse(final Base64URLValue base64URL)
+    public static JWSHeader parse(Base64URLValue base64URL)
             throws ParseException {
 
         return parse(base64URL.decodeToString(), base64URL);

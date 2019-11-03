@@ -16,12 +16,16 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto.factories;
 
 
-import be.atbash.ee.security.octopus.nimbus.jose.*;
+import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
+import be.atbash.ee.security.octopus.nimbus.jose.KeyTypeException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.ECDSAVerifier;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.MACVerifier;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.RSASSAVerifier;
 import be.atbash.ee.security.octopus.nimbus.jose.jca.JCAContext;
 import be.atbash.ee.security.octopus.nimbus.jose.proc.JWSVerifierFactory;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSVerifier;
 
 import javax.crypto.SecretKey;
 import java.security.Key;

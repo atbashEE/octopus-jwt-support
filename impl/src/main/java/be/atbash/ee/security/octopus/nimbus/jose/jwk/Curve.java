@@ -16,7 +16,7 @@
 package be.atbash.ee.security.octopus.nimbus.jose.jwk;
 
 
-import be.atbash.ee.security.octopus.nimbus.jose.JWSAlgorithm;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 
 import java.io.Serializable;
 import java.security.spec.ECParameterSpec;
@@ -136,7 +136,7 @@ public final class Curve implements Serializable {
      * @param name The JOSE name of the cryptographic curve. Must not be
      *             {@code null}.
      */
-    public Curve(final String name) {
+    public Curve(String name) {
 
         this(name, null, null);
     }
@@ -153,7 +153,7 @@ public final class Curve implements Serializable {
      * @param oid     The object identifier (OID) of the cryptographic
      *                curve, {@code null} if not specified.
      */
-    public Curve(final String name, final String stdName, final String oid) {
+    public Curve(String name, String stdName, String oid) {
 
         if (name == null) {
             throw new IllegalArgumentException("The JOSE cryptographic curve name must not be null");
@@ -224,7 +224,7 @@ public final class Curve implements Serializable {
 
 
     @Override
-    public boolean equals(final Object object) {
+    public boolean equals(Object object) {
 
         return object instanceof Curve &&
                 this.toString().equals(object.toString());
@@ -237,7 +237,7 @@ public final class Curve implements Serializable {
      * @param s The string to parse. Must not be {@code null} or empty.
      * @return The cryptographic curve.
      */
-    public static Curve parse(final String s) {
+    public static Curve parse(String s) {
 
         if (s == null || s.trim().isEmpty()) {
             throw new IllegalArgumentException("The cryptographic curve string must not be null or empty");
@@ -272,7 +272,7 @@ public final class Curve implements Serializable {
      * @param stdName The standard curve name. May be {@code null}.
      * @return The curve, {@code null} if it cannot be determined.
      */
-    public static Curve forStdName(final String stdName) {
+    public static Curve forStdName(String stdName) {
         if ("secp256r1".equals(stdName) || "prime256v1".equals(stdName)) {
             return P_256;
         } else if ("secp256k1".equals(stdName)) {
@@ -302,7 +302,7 @@ public final class Curve implements Serializable {
      * @param oid The object OID. May be {@code null}.
      * @return The curve, {@code null} if it cannot be determined.
      */
-    public static Curve forOID(final String oid) {
+    public static Curve forOID(String oid) {
 
         if (P_256.getOID().equals(oid)) {
             return P_256;

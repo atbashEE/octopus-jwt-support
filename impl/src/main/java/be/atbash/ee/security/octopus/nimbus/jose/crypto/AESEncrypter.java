@@ -16,9 +16,11 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto;
 
 
-import be.atbash.ee.security.octopus.nimbus.jose.*;
+import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
+import be.atbash.ee.security.octopus.nimbus.jose.KeyLengthException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.*;
 import be.atbash.ee.security.octopus.nimbus.jose.jwk.OctetSequenceKey;
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.*;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.ee.security.octopus.nimbus.util.ByteUtils;
 import be.atbash.ee.security.octopus.nimbus.util.Container;
@@ -28,7 +30,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 
 /**
- * AES and AES GCM key wrap encrypter of {@link be.atbash.ee.security.octopus.nimbus.jose.JWEObject JWE
+ * AES and AES GCM key wrap encrypter of {@link JWEObject JWE
  * objects}. Expects an AES key.
  *
  * <p>Encrypts the plain text with a generated AES key (the Content Encryption
@@ -44,25 +46,25 @@ import javax.crypto.spec.SecretKeySpec;
  * <p>Supports the following key management algorithms:
  *
  * <ul>
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWEAlgorithm#A128KW}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWEAlgorithm#A192KW}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWEAlgorithm#A256KW}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWEAlgorithm#A128GCMKW}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWEAlgorithm#A192GCMKW}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWEAlgorithm#A256GCMKW}
+ *     <li>{@link JWEAlgorithm#A128KW}
+ *     <li>{@link JWEAlgorithm#A192KW}
+ *     <li>{@link JWEAlgorithm#A256KW}
+ *     <li>{@link JWEAlgorithm#A128GCMKW}
+ *     <li>{@link JWEAlgorithm#A192GCMKW}
+ *     <li>{@link JWEAlgorithm#A256GCMKW}
  * </ul>
  *
  * <p>Supports the following content encryption algorithms:
  *
  * <ul>
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A128CBC_HS256}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A192CBC_HS384}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A256CBC_HS512}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A128GCM}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A192GCM}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A256GCM}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A128CBC_HS256_DEPRECATED}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A256CBC_HS512_DEPRECATED}
+ *     <li>{@link EncryptionMethod#A128CBC_HS256}
+ *     <li>{@link EncryptionMethod#A192CBC_HS384}
+ *     <li>{@link EncryptionMethod#A256CBC_HS512}
+ *     <li>{@link EncryptionMethod#A128GCM}
+ *     <li>{@link EncryptionMethod#A192GCM}
+ *     <li>{@link EncryptionMethod#A256GCM}
+ *     <li>{@link EncryptionMethod#A128CBC_HS256_DEPRECATED}
+ *     <li>{@link EncryptionMethod#A256CBC_HS512_DEPRECATED}
  * </ul>
  *
  * @author Melisa Halsband
@@ -131,10 +133,10 @@ public class AESEncrypter extends AESCryptoProvider implements JWEEncrypter {
     public JWECryptoParts encrypt(JWEHeader header, byte[] clearText)
             throws JOSEException {
 
-        final JWEAlgorithm alg = header.getAlgorithm();
+        JWEAlgorithm alg = header.getAlgorithm();
 
         // Check the AES key size and determine the algorithm family
-        final AlgFamily algFamily;
+        AlgFamily algFamily;
 
         if (alg.equals(JWEAlgorithm.A128KW)) {
 
@@ -184,12 +186,12 @@ public class AESEncrypter extends AESCryptoProvider implements JWEEncrypter {
         }
 
 
-        final JWEHeader updatedHeader; // We need to work on the header
-        final Base64URLValue encryptedKey; // The second JWE part
+        JWEHeader updatedHeader; // We need to work on the header
+        Base64URLValue encryptedKey; // The second JWE part
 
         // Generate and encrypt the CEK according to the enc method
-        final EncryptionMethod enc = header.getEncryptionMethod();
-        final SecretKey cek = ContentCryptoProvider.generateCEK(enc, getJCAContext().getSecureRandom());
+        EncryptionMethod enc = header.getEncryptionMethod();
+        SecretKey cek = ContentCryptoProvider.generateCEK(enc, getJCAContext().getSecureRandom());
 
         if (AlgFamily.AESKW.equals(algFamily)) {
 
@@ -198,8 +200,8 @@ public class AESEncrypter extends AESCryptoProvider implements JWEEncrypter {
 
         } else if (AlgFamily.AESGCMKW.equals(algFamily)) {
 
-            final Container<byte[]> keyIV = new Container<>(AESGCM.generateIV(getJCAContext().getSecureRandom()));
-            final AuthenticatedCipherText authCiphCEK = AESGCMKW.encryptCEK(cek, keyIV, getKey(), getJCAContext().getKeyEncryptionProvider());
+            Container<byte[]> keyIV = new Container<>(AESGCM.generateIV(getJCAContext().getSecureRandom()));
+            AuthenticatedCipherText authCiphCEK = AESGCMKW.encryptCEK(cek, keyIV, getKey(), getJCAContext().getKeyEncryptionProvider());
             encryptedKey = Base64URLValue.encode(authCiphCEK.getCipherText());
 
             // Add iv and tag to the header

@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.ee.security.octopus.nimbus.jose;
+package be.atbash.ee.security.octopus.nimbus.jwt.jwe;
 
 
+import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 
 /**
@@ -48,10 +49,10 @@ public interface JWEDecrypter extends JWEProvider {
      *                       application, or if decryption failed for some
      *                       other reason.
      */
-    byte[] decrypt(final JWEHeader header,
-                   final Base64URLValue encryptedKey,
-                   final Base64URLValue iv,
-                   final Base64URLValue cipherText,
-                   final Base64URLValue authTag)
+    byte[] decrypt(JWEHeader header,
+                   Base64URLValue encryptedKey,
+                   Base64URLValue iv,
+                   Base64URLValue cipherText,
+                   Base64URLValue authTag)
             throws JOSEException;
 }

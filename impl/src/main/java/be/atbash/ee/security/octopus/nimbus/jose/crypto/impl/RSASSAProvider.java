@@ -16,7 +16,8 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto.impl;
 
 
-import be.atbash.ee.security.octopus.nimbus.jose.JWSAlgorithm;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSObject;
 
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -25,17 +26,17 @@ import java.util.Set;
 
 /**
  * The base abstract class for RSA signers and verifiers of {@link
- * be.atbash.ee.security.octopus.nimbus.jose.JWSObject JWS objects}.
+ * JWSObject JWS objects}.
  *
  * <p>Supports the following algorithms:
  *
  * <ul>
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWSAlgorithm#RS256}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWSAlgorithm#RS384}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWSAlgorithm#RS512}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWSAlgorithm#PS256}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWSAlgorithm#PS384}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWSAlgorithm#PS512}
+ *     <li>{@link JWSAlgorithm#RS256}
+ *     <li>{@link JWSAlgorithm#RS384}
+ *     <li>{@link JWSAlgorithm#RS512}
+ *     <li>{@link JWSAlgorithm#PS256}
+ *     <li>{@link JWSAlgorithm#PS384}
+ *     <li>{@link JWSAlgorithm#PS512}
  * </ul>
  *
  * @author Vladimir Dzhuvinov

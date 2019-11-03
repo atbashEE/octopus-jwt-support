@@ -17,7 +17,7 @@ package be.atbash.ee.security.octopus.nimbus.jose.crypto.impl;
 
 
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
-import be.atbash.ee.security.octopus.nimbus.jose.JWSAlgorithm;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
@@ -51,7 +51,7 @@ public class RSASSA {
 
         // The JCE crypto provider uses different alg names
 
-        final String jcaAlg;
+        String jcaAlg;
 
         PSSParameterSpec pssSpec = null;
 
@@ -77,7 +77,7 @@ public class RSASSA {
             throw new JOSEException(AlgorithmSupportMessage.unsupportedJWSAlgorithm(alg, RSASSAProvider.SUPPORTED_ALGORITHMS));
         }
 
-        final Signature signature;
+        Signature signature;
         try {
             if (provider != null) {
                 signature = Signature.getInstance(jcaAlg, provider);

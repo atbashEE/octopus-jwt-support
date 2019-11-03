@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.ee.security.octopus.nimbus.jose;
+package be.atbash.ee.security.octopus.nimbus.jwt.jws;
 
 
+import be.atbash.ee.security.octopus.nimbus.jose.JOSEProvider;
 import be.atbash.ee.security.octopus.nimbus.jose.jca.JCAAware;
 import be.atbash.ee.security.octopus.nimbus.jose.jca.JCAContext;
 

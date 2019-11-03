@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.ee.security.octopus.nimbus.jose;
+package be.atbash.ee.security.octopus.nimbus.jwt.jwe;
 
 
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
@@ -73,10 +73,10 @@ public final class JWECryptoParts {
      *                          JWE algorithm provides built-in integrity
      *                          check.
      */
-    public JWECryptoParts(final Base64URLValue encryptedKey,
-                          final Base64URLValue iv,
-                          final Base64URLValue cipherText,
-                          final Base64URLValue authenticationTag) {
+    public JWECryptoParts(Base64URLValue encryptedKey,
+                          Base64URLValue iv,
+                          Base64URLValue cipherText,
+                          Base64URLValue authenticationTag) {
 
         this(null, encryptedKey, iv, cipherText, authenticationTag);
     }
@@ -97,11 +97,11 @@ public final class JWECryptoParts {
      *                          JWE algorithm provides built-in integrity
      *                          check.
      */
-    public JWECryptoParts(final JWEHeader header,
-                          final Base64URLValue encryptedKey,
-                          final Base64URLValue iv,
-                          final Base64URLValue cipherText,
-                          final Base64URLValue authenticationTag) {
+    public JWECryptoParts(JWEHeader header,
+                          Base64URLValue encryptedKey,
+                          Base64URLValue iv,
+                          Base64URLValue cipherText,
+                          Base64URLValue authenticationTag) {
 
         this.header = header;
 

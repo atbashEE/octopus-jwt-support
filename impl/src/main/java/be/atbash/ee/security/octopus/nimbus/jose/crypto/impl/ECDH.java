@@ -16,12 +16,12 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto.impl;
 
 
-import be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
-import be.atbash.ee.security.octopus.nimbus.jose.JWEAlgorithm;
-import be.atbash.ee.security.octopus.nimbus.jose.JWEHeader;
 import be.atbash.ee.security.octopus.nimbus.jose.jwk.Curve;
 import be.atbash.ee.security.octopus.nimbus.jose.jwk.OctetKeyPair;
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod;
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEHeader;
 
 import javax.crypto.KeyAgreement;
 import javax.crypto.SecretKey;
@@ -207,10 +207,10 @@ public final class ECDH {
             throw new JOSEException("Expected private key OKP with crv=X25519");
         }
 
-        final byte[] privateKeyBytes = privateKey.getDecodedD();
-        final byte[] publicKeyBytes = publicKey.getDecodedX();
+        byte[] privateKeyBytes = privateKey.getDecodedD();
+        byte[] publicKeyBytes = publicKey.getDecodedX();
 
-        final byte[] sharedSecretBytes;
+        byte[] sharedSecretBytes;
         //try {
         throw new UnsupportedOperationException("Import from Google Crypto ");
         //sharedSecretBytes = X25519.computeSharedSecret(privateKeyBytes, publicKeyBytes);
@@ -239,12 +239,12 @@ public final class ECDH {
                                             ConcatKDF concatKDF)
             throws JOSEException {
 
-        final int sharedKeyLength = sharedKeyLength(header.getAlgorithm(), header.getEncryptionMethod());
+        int sharedKeyLength = sharedKeyLength(header.getAlgorithm(), header.getEncryptionMethod());
 
         // Set the alg ID for the concat KDF
         AlgorithmMode algMode = resolveAlgorithmMode(header.getAlgorithm());
 
-        final String algID;
+        String algID;
 
         if (algMode == AlgorithmMode.DIRECT) {
             // algID = enc

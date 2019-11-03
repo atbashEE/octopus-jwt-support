@@ -19,7 +19,7 @@ package be.atbash.ee.security.octopus.nimbus.jose.crypto.impl;
 import be.atbash.ee.security.octopus.nimbus.jose.CriticalHeaderParamsAware;
 import be.atbash.ee.security.octopus.nimbus.jose.Header;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
-import be.atbash.ee.security.octopus.nimbus.jose.JWEHeader;
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEHeader;
 
 import java.util.Collections;
 import java.util.Set;

@@ -23,7 +23,6 @@ package be.atbash.ee.security.octopus.nimbus.jose;
  * @version 2012-09-15
  */
 public class JOSEException extends Exception {
-// FIXME AtbashException
 
     private static final long serialVersionUID = 1L;
 
@@ -33,7 +32,7 @@ public class JOSEException extends Exception {
      *
      * @param message The exception message.
      */
-    public JOSEException(final String message) {
+    public JOSEException(String message) {
 
         super(message);
     }
@@ -45,7 +44,7 @@ public class JOSEException extends Exception {
      * @param message The exception message.
      * @param cause   The exception cause.
      */
-    public JOSEException(final String message, final Throwable cause) {
+    public JOSEException(String message, Throwable cause) {
 
         super(message, cause);
     }

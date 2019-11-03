@@ -16,7 +16,7 @@
 package be.atbash.ee.security.octopus.jwt.encoder;
 
 import be.atbash.config.exception.ConfigurationException;
-import be.atbash.ee.security.octopus.nimbus.jose.JWSAlgorithm;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import org.junit.Test;
 
 import java.security.SecureRandom;

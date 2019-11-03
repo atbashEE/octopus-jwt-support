@@ -16,8 +16,8 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto.impl;
 
 
-import be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod;
 import be.atbash.ee.security.octopus.nimbus.util.IntegerUtils;
 
 import javax.crypto.SecretKey;
@@ -109,9 +109,9 @@ public final class LegacyConcatKDF {
             baos.write(cmkBytes);
 
             // Append [CEK-bit-length...]
-            final int cmkBitLength = cmkBytes.length * 8;
+            int cmkBitLength = cmkBytes.length * 8;
             hashBitLength = cmkBitLength;
-            final int cekBitLength = cmkBitLength / 2;
+            int cekBitLength = cmkBitLength / 2;
             byte[] cekBitLengthBytes = IntegerUtils.toBytes(cekBitLength);
             baos.write(cekBitLengthBytes);
 
@@ -203,7 +203,7 @@ public final class LegacyConcatKDF {
             baos.write(cmkBytes);
 
             // Append [CIK-bit-length...]
-            final int cmkBitLength = cmkBytes.length * 8;
+            int cmkBitLength = cmkBytes.length * 8;
             hashBitLength = cmkBitLength;
             cikBitLength = cmkBitLength;
             byte[] cikBitLengthBytes = IntegerUtils.toBytes(cikBitLength);

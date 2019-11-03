@@ -17,7 +17,8 @@ package be.atbash.ee.security.octopus.nimbus.jose.crypto.impl;
 
 
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
-import be.atbash.ee.security.octopus.nimbus.jose.JWSAlgorithm;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSObject;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -27,16 +28,16 @@ import java.util.Set;
 
 /**
  * The base abstract class for Elliptic Curve Digital Signature Algorithm
- * (ECDSA) signers and validators of {@link be.atbash.ee.security.octopus.nimbus.jose.JWSObject JWS
+ * (ECDSA) signers and validators of {@link JWSObject JWS
  * objects}.
  *
  * <p>Supports the following algorithms:
  *
  * <ul>
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWSAlgorithm#ES256}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWSAlgorithm#ES256K}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWSAlgorithm#ES384}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWSAlgorithm#ES512}
+ *     <li>{@link JWSAlgorithm#ES256}
+ *     <li>{@link JWSAlgorithm#ES256K}
+ *     <li>{@link JWSAlgorithm#ES384}
+ *     <li>{@link JWSAlgorithm#ES512}
  * </ul>
  *
  * @author Axel Nennker

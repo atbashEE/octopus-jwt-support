@@ -13,9 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.ee.security.octopus.nimbus.jose;
+package be.atbash.ee.security.octopus.nimbus.jwt;
 
 
+import be.atbash.ee.security.octopus.nimbus.jose.Algorithm;
+import be.atbash.ee.security.octopus.nimbus.jose.Header;
+import be.atbash.ee.security.octopus.nimbus.jose.JOSEObjectType;
 import be.atbash.ee.security.octopus.nimbus.jose.jwk.JWK;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.ee.security.octopus.nimbus.util.Base64Value;
@@ -50,7 +53,7 @@ import java.util.*;
  * @author Vladimir Dzhuvinov
  * @version 2017-04-09
  */
-abstract class CommonSEHeader extends Header {
+abstract public class CommonJWTHeader extends Header {
 
 
     private static final long serialVersionUID = 1L;
@@ -132,19 +135,19 @@ abstract class CommonSEHeader extends Header {
      * @param parsedBase64URL The parsed Base64URL, {@code null} if the
      *                        header is created from scratch.
      */
-    protected CommonSEHeader(final Algorithm alg,
-                             final JOSEObjectType typ,
-                             final String cty,
-                             final Set<String> crit,
-                             final URI jku,
-                             final JWK jwk,
-                             final URI x5u,
-                             final Base64URLValue x5t,
-                             final Base64URLValue x5t256,
-                             final List<Base64Value> x5c,
-                             final String kid,
-                             final Map<String, Object> customParams,
-                             final Base64URLValue parsedBase64URL) {
+    protected CommonJWTHeader(Algorithm alg,
+                              JOSEObjectType typ,
+                              String cty,
+                              Set<String> crit,
+                              URI jku,
+                              JWK jwk,
+                              URI x5u,
+                              Base64URLValue x5t,
+                              Base64URLValue x5t256,
+                              List<Base64Value> x5c,
+                              String kid,
+                              Map<String, Object> customParams,
+                              Base64URLValue parsedBase64URL) {
 
         super(alg, typ, cty, crit, customParams, parsedBase64URL);
 

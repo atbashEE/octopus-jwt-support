@@ -16,11 +16,16 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto;
 
 
-import be.atbash.ee.security.octopus.nimbus.jose.*;
+import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
+import be.atbash.ee.security.octopus.nimbus.jose.KeyLengthException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.AlgorithmSupportMessage;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.HMAC;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.MACProvider;
 import be.atbash.ee.security.octopus.nimbus.jose.jwk.OctetSequenceKey;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSObject;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSSigner;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.ee.security.octopus.nimbus.util.ByteUtils;
 
@@ -34,7 +39,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Message Authentication Code (MAC) signer of
- * {@link be.atbash.ee.security.octopus.nimbus.jose.JWSObject JWS objects}. Expects a secret key.
+ * {@link JWSObject JWS objects}. Expects a secret key.
  *
  * <p>See RFC 7518
  * <a href="https://tools.ietf.org/html/rfc7518#section-3.2">section 3.2</a>
@@ -45,9 +50,9 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * <p>Supports the following algorithms:
  *
  * <ul>
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWSAlgorithm#HS256}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWSAlgorithm#HS384}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWSAlgorithm#HS512}
+ *     <li>{@link JWSAlgorithm#HS256}
+ *     <li>{@link JWSAlgorithm#HS384}
+ *     <li>{@link JWSAlgorithm#HS512}
  * </ul>
  *
  * @author Vladimir Dzhuvinov

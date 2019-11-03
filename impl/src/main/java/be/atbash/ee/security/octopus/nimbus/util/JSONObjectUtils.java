@@ -16,8 +16,7 @@
 package be.atbash.ee.security.octopus.nimbus.util;
 
 
-import javax.json.JsonArray;
-import javax.json.JsonObject;
+import javax.json.*;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
@@ -25,7 +24,7 @@ import javax.json.bind.JsonbException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 
@@ -41,7 +40,7 @@ public class JSONObjectUtils {
     /**
      * Parses a JSON object.
      *
-     * <p>Specific JSON to Java entity mapping (as per JSON Smart):
+     * <p>Specific JSON to Java entity mapping (as per JSON Smart): FIXME javadoc correction
      *
      * <ul>
      *     <li>JSON true|false map to {@code java.lang.Boolean}.
@@ -115,51 +114,94 @@ public class JSONObjectUtils {
 
 
     /**
-     * Gets a string array member of a JSON object.
-     *
-     * @param jsonObject The JSON object. Must not be {@code null}.
-     * @param key        The JSON object member key. Must not be {@code null}.
-     * @return The JSON object member value, may be {@code null}.
-     * @throws ParseException If the value is not of the expected type.
-     */
-    public static String[] getStringArray(JsonObject jsonObject, String key)
-            throws ParseException {
-
-        JsonArray jsonArray = jsonObject.getJsonArray(key);
-
-        if (jsonArray == null) {
-            return null;
-        }
-
-        try {
-            return jsonArray.toArray(new String[0]);
-
-        } catch (ArrayStoreException e) {
-
-            throw new ParseException("JSON object member with key \"" + key + "\" is not an array of strings", 0);
-        }
-    }
-
-
-    /**
      * Gets a string list member of a JSON object
      *
-     * @param o   The JSON object. Must not be {@code null}.
+     * @param jsonObject   The JSON object. Must not be {@code null}.
      * @param key The JSON object member key. Must not be {@code null}.
      * @return The JSON object member value, may be {@code null}.
      * @throws ParseException If the value is not of the expected type.
      */
-    public static List<String> getStringList(final JsonObject o, final String key) throws ParseException {
+    public static List<String> getStringList(JsonObject jsonObject, String key) throws ParseException {
 
-        String[] array = getStringArray(o, key);
-
-        if (array == null) {
+        // FIXME Test what happens when using other values as Strings.
+        if (jsonObject.get(key).getValueType() == JsonValue.ValueType.NULL) {
             return null;
         }
+        JsonArray jsonArray = jsonObject.getJsonArray(key);
 
-        return Arrays.asList(array);
+        return jsonArray.getValuesAs(JsonString::getString);
+
     }
 
+    public static Object getJsonValueAsObject(JsonValue value) {
+        Object result = null;
+        switch (value.getValueType()) {
+
+            case ARRAY:
+                // TODO We assume List of String
+                JsonArray jsonArray = (JsonArray) value;
+                result = jsonArray.getValuesAs(JsonString::getString);
+                break;
+            case OBJECT:
+                /*
+                JsonObject jsonObject = (JsonObject) value;
+                result = jsonObject.entrySet().stream().collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        e -> getJsonValueAsObject(e.getValue())));
+                        */
+                result = value;
+                break;
+            case STRING:
+                result = ((JsonString) value).getString();
+                break;
+            case NUMBER:
+                JsonNumber jsonNumber = (JsonNumber) value;
+                if (jsonNumber.isIntegral()) {
+                    result = jsonNumber.longValue();
+                } else {
+                    result = jsonNumber.doubleValue();
+                }
+                break;
+            case TRUE:
+                result = Boolean.TRUE;
+                break;
+            case FALSE:
+                result = Boolean.FALSE;
+                break;
+            case NULL:
+                break;
+        }
+        return result;
+    }
+
+    public static void addValue(JsonObjectBuilder builder, String key, Object value) {
+        if (value instanceof JsonObject) {
+            builder.add(key, (JsonObject) value);
+        }
+        if (value instanceof String) {
+            builder.add(key, Json.createValue(value.toString()));
+        }
+        if (value instanceof Integer) {
+            builder.add(key, Json.createValue((Integer) value));
+        }
+        if (value instanceof Boolean) {
+            builder.add(key, Json.createValue(((Boolean) value).toString()));
+        }
+        if (value instanceof Collection) {
+            // We assume collection of String
+            Collection<?> collection = (Collection<?>) value;
+            JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
+            for (Object item : collection) {
+                arrayBuilder.add(item.toString());
+            }
+            builder.add(key, arrayBuilder.build());
+        }
+        // FIXME Other types
+    }
+
+    public static boolean hasValue(JsonObject jsonObject, String key) {
+        return jsonObject.containsKey(key) && jsonObject.get(key).getValueType() != JsonValue.ValueType.NULL;
+    }
     /**
      * Prevents public instantiation.
      */

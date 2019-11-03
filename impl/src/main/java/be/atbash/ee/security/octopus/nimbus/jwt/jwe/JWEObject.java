@@ -13,9 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.ee.security.octopus.nimbus.jose;
+package be.atbash.ee.security.octopus.nimbus.jwt.jwe;
 
 
+import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
+import be.atbash.ee.security.octopus.nimbus.jose.JOSEObject;
+import be.atbash.ee.security.octopus.nimbus.jose.Payload;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 
 import java.text.ParseException;
@@ -103,7 +106,7 @@ public class JWEObject extends JOSEObject {
      * @param header  The JWE header. Must not be {@code null}.
      * @param payload The payload. Must not be {@code null}.
      */
-    public JWEObject(final JWEHeader header, final Payload payload) {
+    public JWEObject(JWEHeader header, Payload payload) {
 
         if (header == null) {
 
@@ -145,11 +148,11 @@ public class JWEObject extends JOSEObject {
      *                   authentication tag. Empty of {@code null} if none.
      * @throws ParseException If parsing of the serialised parts failed.
      */
-    public JWEObject(final Base64URLValue firstPart,
-                     final Base64URLValue secondPart,
-                     final Base64URLValue thirdPart,
-                     final Base64URLValue fourthPart,
-                     final Base64URLValue fifthPart)
+    public JWEObject(Base64URLValue firstPart,
+                     Base64URLValue secondPart,
+                     Base64URLValue thirdPart,
+                     Base64URLValue fourthPart,
+                     Base64URLValue fifthPart)
             throws ParseException {
 
         if (firstPart == null) {
@@ -322,7 +325,7 @@ public class JWEObject extends JOSEObject {
      *
      * @throws JOSEException If the JWE algorithms are not supported.
      */
-    private void ensureJWEEncrypterSupport(final JWEEncrypter encrypter)
+    private void ensureJWEEncrypterSupport(JWEEncrypter encrypter)
             throws JOSEException {
 
         if (!encrypter.supportedJWEAlgorithms().contains(getHeader().getAlgorithm())) {
@@ -350,7 +353,7 @@ public class JWEObject extends JOSEObject {
      * @throws JOSEException         If the JWE object couldn't be
      *                               encrypted.
      */
-    public synchronized void encrypt(final JWEEncrypter encrypter)
+    public synchronized void encrypt(JWEEncrypter encrypter)
             throws JOSEException {
 
         ensureUnencryptedState();
@@ -398,7 +401,7 @@ public class JWEObject extends JOSEObject {
      * @throws JOSEException         If the JWE object couldn't be
      *                               decrypted.
      */
-    public synchronized void decrypt(final JWEDecrypter decrypter)
+    public synchronized void decrypt(JWEDecrypter decrypter)
             throws JOSEException {
 
         ensureEncryptedState();
@@ -480,15 +483,15 @@ public class JWEObject extends JOSEObject {
      * Parses a JWE object from the specified string in compact form. The
      * parsed JWE object will be given an {@link State#ENCRYPTED} state.
      *
-     * @param s The string to parse. Must not be {@code null}.
+     * @param value The string to parse. Must not be {@code null}.
      * @return The JWE object.
      * @throws ParseException If the string couldn't be parsed to a valid
      *                        JWE object.
      */
-    public static JWEObject parse(final String s)
+    public static JWEObject parse(String value)
             throws ParseException {
 
-        Base64URLValue[] parts = JOSEObject.split(s);
+        Base64URLValue[] parts = JOSEObject.split(value);
 
         if (parts.length != 5) {
 

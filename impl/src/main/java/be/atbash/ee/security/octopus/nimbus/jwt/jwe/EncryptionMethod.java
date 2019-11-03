@@ -13,8 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.ee.security.octopus.nimbus.jose;
+package be.atbash.ee.security.octopus.nimbus.jwt.jwe;
 
+
+import be.atbash.ee.security.octopus.nimbus.jose.Algorithm;
+import be.atbash.ee.security.octopus.nimbus.jose.AlgorithmFamily;
 
 /**
  * Encryption method name, represents the {@code enc} header parameter in JSON
@@ -141,7 +144,7 @@ public final class EncryptionMethod extends Algorithm {
          * @param encs The encryption methods of the family. Must not
          *             be {@code null}.
          */
-        public Family(final EncryptionMethod... encs) {
+        public Family(EncryptionMethod... encs) {
             super(encs);
         }
     }
@@ -155,7 +158,7 @@ public final class EncryptionMethod extends Algorithm {
      * @param cekBitLength The Content Encryption Key (CEK) bit length,
      *                     zero if not specified.
      */
-    public EncryptionMethod(final String name, final int cekBitLength) {
+    public EncryptionMethod(String name, int cekBitLength) {
 
         super(name);
 
@@ -170,7 +173,7 @@ public final class EncryptionMethod extends Algorithm {
      * @param name The encryption method name. Must not be {@code null}.
      */
 
-    public EncryptionMethod(final String name) {
+    public EncryptionMethod(String name) {
 
         this(name, 0);
     }
@@ -191,47 +194,47 @@ public final class EncryptionMethod extends Algorithm {
     /**
      * Parses an encryption method from the specified string.
      *
-     * @param s The string to parse. Must not be {@code null}.
+     * @param value The string to parse. Must not be {@code null}.
      * @return The encryption method  (matching standard algorithm
      * constant, else a newly created algorithm).
      */
-    public static EncryptionMethod parse(final String s) {
+    public static EncryptionMethod parse(String value) {
 
-        if (s.equals(A128CBC_HS256.getName())) {
+        if (value.equals(A128CBC_HS256.getName())) {
 
             return A128CBC_HS256;
 
-        } else if (s.equals(A192CBC_HS384.getName())) {
+        } else if (value.equals(A192CBC_HS384.getName())) {
 
             return A192CBC_HS384;
 
-        } else if (s.equals(A256CBC_HS512.getName())) {
+        } else if (value.equals(A256CBC_HS512.getName())) {
 
             return A256CBC_HS512;
 
-        } else if (s.equals(A128GCM.getName())) {
+        } else if (value.equals(A128GCM.getName())) {
 
             return A128GCM;
 
-        } else if (s.equals(A192GCM.getName())) {
+        } else if (value.equals(A192GCM.getName())) {
 
             return A192GCM;
 
-        } else if (s.equals(A256GCM.getName())) {
+        } else if (value.equals(A256GCM.getName())) {
 
             return A256GCM;
 
-        } else if (s.equals(A128CBC_HS256_DEPRECATED.getName())) {
+        } else if (value.equals(A128CBC_HS256_DEPRECATED.getName())) {
 
             return A128CBC_HS256_DEPRECATED;
 
-        } else if (s.equals(A256CBC_HS512_DEPRECATED.getName())) {
+        } else if (value.equals(A256CBC_HS512_DEPRECATED.getName())) {
 
             return A256CBC_HS512_DEPRECATED;
 
         } else {
 
-            return new EncryptionMethod(s);
+            return new EncryptionMethod(value);
         }
     }
 }

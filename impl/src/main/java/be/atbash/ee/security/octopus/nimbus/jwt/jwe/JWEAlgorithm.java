@@ -13,8 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.ee.security.octopus.nimbus.jose;
+package be.atbash.ee.security.octopus.nimbus.jwt.jwe;
 
+
+import be.atbash.ee.security.octopus.nimbus.jose.Algorithm;
+import be.atbash.ee.security.octopus.nimbus.jose.AlgorithmFamily;
 
 /**
  * JSON Web Encryption (JWE) algorithm name, represents the {@code alg} header
@@ -226,7 +229,7 @@ public final class JWEAlgorithm extends Algorithm {
          * @param algs The JWE algorithms of the family. Must not be
          *             {@code null}.
          */
-        public Family(final JWEAlgorithm... algs) {
+        public Family(JWEAlgorithm... algs) {
             super(algs);
         }
     }
@@ -245,48 +248,48 @@ public final class JWEAlgorithm extends Algorithm {
     /**
      * Parses a JWE algorithm from the specified string.
      *
-     * @param s The string to parse. Must not be {@code null}.
+     * @param value The string to parse. Must not be {@code null}.
      * @return The JWE algorithm (matching standard algorithm constant, else
      * a newly created algorithm).
      */
-    public static JWEAlgorithm parse(final String s) {
+    public static JWEAlgorithm parse(String value) {
 
-        if (s.equals(RSA1_5.getName())) {
+        if (value.equals(RSA1_5.getName())) {
             return RSA1_5;
-        } else if (s.equals(RSA_OAEP.getName())) {
+        } else if (value.equals(RSA_OAEP.getName())) {
             return RSA_OAEP;
-        } else if (s.equals(RSA_OAEP_256.getName())) {
+        } else if (value.equals(RSA_OAEP_256.getName())) {
             return RSA_OAEP_256;
-        } else if (s.equals(A128KW.getName())) {
+        } else if (value.equals(A128KW.getName())) {
             return A128KW;
-        } else if (s.equals(A192KW.getName())) {
+        } else if (value.equals(A192KW.getName())) {
             return A192KW;
-        } else if (s.equals(A256KW.getName())) {
+        } else if (value.equals(A256KW.getName())) {
             return A256KW;
-        } else if (s.equals(DIR.getName())) {
+        } else if (value.equals(DIR.getName())) {
             return DIR;
-        } else if (s.equals(ECDH_ES.getName())) {
+        } else if (value.equals(ECDH_ES.getName())) {
             return ECDH_ES;
-        } else if (s.equals(ECDH_ES_A128KW.getName())) {
+        } else if (value.equals(ECDH_ES_A128KW.getName())) {
             return ECDH_ES_A128KW;
-        } else if (s.equals(ECDH_ES_A192KW.getName())) {
+        } else if (value.equals(ECDH_ES_A192KW.getName())) {
             return ECDH_ES_A192KW;
-        } else if (s.equals(ECDH_ES_A256KW.getName())) {
+        } else if (value.equals(ECDH_ES_A256KW.getName())) {
             return ECDH_ES_A256KW;
-        } else if (s.equals(A128GCMKW.getName())) {
+        } else if (value.equals(A128GCMKW.getName())) {
             return A128GCMKW;
-        } else if (s.equals(A192GCMKW.getName())) {
+        } else if (value.equals(A192GCMKW.getName())) {
             return A192GCMKW;
-        } else if (s.equals(A256GCMKW.getName())) {
+        } else if (value.equals(A256GCMKW.getName())) {
             return A256GCMKW;
-        } else if (s.equals(PBES2_HS256_A128KW.getName())) {
+        } else if (value.equals(PBES2_HS256_A128KW.getName())) {
             return PBES2_HS256_A128KW;
-        } else if (s.equals(PBES2_HS384_A192KW.getName())) {
+        } else if (value.equals(PBES2_HS384_A192KW.getName())) {
             return PBES2_HS384_A192KW;
-        } else if (s.equals(PBES2_HS512_A256KW.getName())) {
+        } else if (value.equals(PBES2_HS512_A256KW.getName())) {
             return PBES2_HS512_A256KW;
         } else {
-            return new JWEAlgorithm(s);
+            return new JWEAlgorithm(value);
         }
     }
 }

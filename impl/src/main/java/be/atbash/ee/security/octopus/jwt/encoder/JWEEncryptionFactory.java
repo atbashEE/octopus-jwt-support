@@ -21,12 +21,12 @@ import be.atbash.ee.security.octopus.exception.UnsupportedKeyLengthException;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersEncryption;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
-import be.atbash.ee.security.octopus.nimbus.jose.JWEEncrypter;
 import be.atbash.ee.security.octopus.nimbus.jose.KeyLengthException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.AESEncrypter;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.ECDHEncrypter;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.RSAEncrypter;
 import be.atbash.ee.security.octopus.nimbus.jose.jwk.KeyType;
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEEncrypter;
 
 import javax.crypto.SecretKey;
 import javax.enterprise.context.ApplicationScoped;

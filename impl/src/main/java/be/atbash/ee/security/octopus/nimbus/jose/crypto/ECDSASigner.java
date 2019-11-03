@@ -17,14 +17,15 @@ package be.atbash.ee.security.octopus.nimbus.jose.crypto;
 
 
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
-import be.atbash.ee.security.octopus.nimbus.jose.JWSAlgorithm;
-import be.atbash.ee.security.octopus.nimbus.jose.JWSHeader;
-import be.atbash.ee.security.octopus.nimbus.jose.JWSSigner;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.AlgorithmSupportMessage;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.ECDSA;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.ECDSAProvider;
 import be.atbash.ee.security.octopus.nimbus.jose.jwk.Curve;
 import be.atbash.ee.security.octopus.nimbus.jose.jwk.ECKey;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSObject;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSSigner;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 
 import java.security.InvalidKeyException;
@@ -36,7 +37,7 @@ import java.security.interfaces.ECPrivateKey;
 
 /**
  * Elliptic Curve Digital Signature Algorithm (ECDSA) signer of
- * {@link be.atbash.ee.security.octopus.nimbus.jose.JWSObject JWS objects}. Expects a private EC key
+ * {@link JWSObject JWS objects}. Expects a private EC key
  * (with a P-256, P-384 or P-521 curve).
  *
  * <p>See RFC 7518
@@ -48,9 +49,9 @@ import java.security.interfaces.ECPrivateKey;
  * <p>Supports the following algorithms:
  *
  * <ul>
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWSAlgorithm#ES256}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWSAlgorithm#ES384}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWSAlgorithm#ES512}
+ *     <li>{@link JWSAlgorithm#ES256}
+ *     <li>{@link JWSAlgorithm#ES384}
+ *     <li>{@link JWSAlgorithm#ES512}
  * </ul>
  *
  * @author Axel Nennker
@@ -153,7 +154,7 @@ public class ECDSASigner extends ECDSAProvider implements JWSSigner {
     public Base64URLValue sign(JWSHeader header, byte[] signingInput)
             throws JOSEException {
 
-        final JWSAlgorithm alg = header.getAlgorithm();
+        JWSAlgorithm alg = header.getAlgorithm();
 
         if (!supportedJWSAlgorithms().contains(alg)) {
             throw new JOSEException(AlgorithmSupportMessage.unsupportedJWSAlgorithm(alg, supportedJWSAlgorithms()));
@@ -161,7 +162,7 @@ public class ECDSASigner extends ECDSAProvider implements JWSSigner {
 
         // DER-encoded signature, according to JCA spec
         // (sequence of two integers - R + S)
-        final byte[] jcaSignature;
+        byte[] jcaSignature;
 
         try {
             Signature dsa = ECDSA.getSignerAndVerifier(alg, getJCAContext().getProvider());
@@ -174,8 +175,8 @@ public class ECDSASigner extends ECDSAProvider implements JWSSigner {
             throw new JOSEException(e.getMessage(), e);
         }
 
-        final int rsByteArrayLength = ECDSA.getSignatureByteArrayLength(header.getAlgorithm());
-        final byte[] jwsSignature = ECDSA.transcodeSignatureToConcat(jcaSignature, rsByteArrayLength);
+        int rsByteArrayLength = ECDSA.getSignatureByteArrayLength(header.getAlgorithm());
+        byte[] jwsSignature = ECDSA.transcodeSignatureToConcat(jcaSignature, rsByteArrayLength);
         return Base64URLValue.encode(jwsSignature);
     }
 }

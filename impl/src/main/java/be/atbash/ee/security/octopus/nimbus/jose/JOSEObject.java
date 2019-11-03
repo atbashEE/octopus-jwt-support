@@ -16,6 +16,10 @@
 package be.atbash.ee.security.octopus.nimbus.jose;
 
 
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEObject;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSObject;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.ee.security.octopus.nimbus.util.JSONObjectUtils;
 
@@ -75,19 +79,6 @@ public abstract class JOSEObject implements Serializable {
         parsedParts = null;
     }
 
-
-    /**
-     * Creates a new JOSE object with the specified payload.
-     *
-     * @param payload The payload, {@code null} if not available (e.g for
-     *                an encrypted JWE object).
-     */
-    protected JOSEObject(final Payload payload) {
-
-        this.payload = payload;
-    }
-
-
     /**
      * Returns the header of this JOSE object.
      *
@@ -102,7 +93,7 @@ public abstract class JOSEObject implements Serializable {
      * @param payload The payload, {@code null} if not available (e.g. for
      *                an encrypted JWE object).
      */
-    protected void setPayload(final Payload payload) {
+    protected void setPayload(Payload payload) {
 
         this.payload = payload;
     }
@@ -129,7 +120,7 @@ public abstract class JOSEObject implements Serializable {
      *              scratch. The individual parts may be empty or
      *              {@code null} to indicate a missing part.
      */
-    protected void setParsedParts(final Base64URLValue... parts) {
+    protected void setParsedParts(Base64URLValue... parts) {
 
         parsedParts = parts;
     }
@@ -195,35 +186,35 @@ public abstract class JOSEObject implements Serializable {
      * Splits a compact serialised JOSE object into its Base64URL-encoded
      * parts.
      *
-     * @param s The compact serialised JOSE object to split. Must not be
+     * @param value The compact serialised JOSE object to split. Must not be
      *          {@code null}.
      * @return The JOSE Base64URL-encoded parts (three for unsecured and
      * JWS objects, five for JWE objects).
      * @throws ParseException If the specified string couldn't be split
      *                        into three or five Base64URL-encoded parts.
      */
-    public static Base64URLValue[] split(final String s)
+    public static Base64URLValue[] split(String value)
             throws ParseException {
 
-        final String t = s.trim();
+        String t = value.trim();
 
         // We must have 2 (JWS) or 4 dots (JWE)
 
         // String.split() cannot handle empty parts
-        final int dot1 = t.indexOf(".");
+        int dot1 = t.indexOf(".");
 
         if (dot1 == -1) {
             throw new ParseException("Invalid serialized unsecured/JWS/JWE object: Missing part delimiters", 0);
         }
 
-        final int dot2 = t.indexOf(".", dot1 + 1);
+        int dot2 = t.indexOf(".", dot1 + 1);
 
         if (dot2 == -1) {
             throw new ParseException("Invalid serialized unsecured/JWS/JWE object: Missing second delimiter", 0);
         }
 
         // Third dot for JWE only
-        final int dot3 = t.indexOf(".", dot2 + 1);
+        int dot3 = t.indexOf(".", dot2 + 1);
 
         if (dot3 == -1) {
 
@@ -236,13 +227,13 @@ public abstract class JOSEObject implements Serializable {
         }
 
         // Fourth final dot for JWE
-        final int dot4 = t.indexOf(".", dot3 + 1);
+        int dot4 = t.indexOf(".", dot3 + 1);
 
         if (dot4 == -1) {
             throw new ParseException("Invalid serialized JWE object: Missing fourth delimiter", 0);
         }
 
-        if (dot4 != -1 && t.indexOf(".", dot4 + 1) != -1) {
+        if (t.indexOf(".", dot4 + 1) != -1) {
             throw new ParseException("Invalid serialized unsecured/JWS/JWE object: Too many part delimiters", 0);
         }
 
@@ -260,16 +251,16 @@ public abstract class JOSEObject implements Serializable {
     /**
      * Parses a JOSE object from the specified string in compact format.
      *
-     * @param s The string to parse. Must not be {@code null}.
+     * @param value The string to parse. Must not be {@code null}.
      * @return The corresponding {@link PlainObject}, {@link JWSObject} or
      * {@link JWEObject} instance.
      * @throws ParseException If the string couldn't be parsed to a valid
      *                        unsecured, JWS or JWE object.
      */
-    public static JOSEObject parse(final String s)
+    public static JOSEObject parse(String value)
             throws ParseException {
 
-        Base64URLValue[] parts = split(s);
+        Base64URLValue[] parts = split(value);
 
         JsonObject jsonObject;
 
@@ -281,14 +272,14 @@ public abstract class JOSEObject implements Serializable {
             throw new ParseException("Invalid unsecured/JWS/JWE header: " + e.getMessage(), 0);
         }
 
-        Algorithm alg = Header.parseAlgorithm(jsonObject);
+        Algorithm alg = Algorithm.parseAlgorithm(jsonObject);
 
         if (alg.equals(Algorithm.NONE)) {
-            return PlainObject.parse(s);
+            return PlainObject.parse(value);
         } else if (alg instanceof JWSAlgorithm) {
-            return JWSObject.parse(s);
+            return JWSObject.parse(value);
         } else if (alg instanceof JWEAlgorithm) {
-            return JWEObject.parse(s);
+            return JWEObject.parse(value);
         } else {
             throw new AssertionError("Unexpected algorithm type: " + alg);
         }

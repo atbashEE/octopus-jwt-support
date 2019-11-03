@@ -18,12 +18,14 @@ package be.atbash.ee.security.octopus.nimbus.jose.crypto;
 
 import be.atbash.ee.security.octopus.nimbus.jose.CriticalHeaderParamsAware;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
-import be.atbash.ee.security.octopus.nimbus.jose.JWSHeader;
-import be.atbash.ee.security.octopus.nimbus.jose.JWSVerifier;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.CriticalHeaderParamsDeferral;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.RSASSA;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.RSASSAProvider;
 import be.atbash.ee.security.octopus.nimbus.jose.jwk.RSAKey;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSObject;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSVerifier;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 
 import java.security.InvalidKeyException;
@@ -35,7 +37,7 @@ import java.util.Set;
 
 /**
  * RSA Signature-Scheme-with-Appendix (RSASSA) verifier of
- * {@link be.atbash.ee.security.octopus.nimbus.jose.JWSObject JWS objects}. Expects a public RSA key.
+ * {@link JWSObject JWS objects}. Expects a public RSA key.
  *
  * <p>See RFC 7518, sections
  * <a href="https://tools.ietf.org/html/rfc7518#section-3.3">3.3</a> and
@@ -47,12 +49,12 @@ import java.util.Set;
  * <p>Supports the following algorithms:
  *
  * <ul>
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWSAlgorithm#RS256}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWSAlgorithm#RS384}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWSAlgorithm#RS512}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWSAlgorithm#PS256}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWSAlgorithm#PS384}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWSAlgorithm#PS512}
+ *     <li>{@link JWSAlgorithm#RS256}
+ *     <li>{@link JWSAlgorithm#RS384}
+ *     <li>{@link JWSAlgorithm#RS512}
+ *     <li>{@link JWSAlgorithm#PS256}
+ *     <li>{@link JWSAlgorithm#PS384}
+ *     <li>{@link JWSAlgorithm#PS512}
  * </ul>
  *
  * @author Vladimir Dzhuvinov
@@ -153,7 +155,7 @@ public class RSASSAVerifier extends RSASSAProvider implements JWSVerifier, Criti
             return false;
         }
 
-        final Signature verifier = RSASSA.getSignerAndVerifier(header.getAlgorithm(), getJCAContext().getProvider());
+        Signature verifier = RSASSA.getSignerAndVerifier(header.getAlgorithm(), getJCAContext().getProvider());
 
         try {
             verifier.initVerify(publicKey);

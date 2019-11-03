@@ -17,8 +17,9 @@ package be.atbash.ee.security.octopus.nimbus.jose.crypto.impl;
 
 
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
-import be.atbash.ee.security.octopus.nimbus.jose.JWSAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jose.KeyLengthException;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSObject;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -31,14 +32,14 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * The base abstract class for Message Authentication Code (MAC) signers and
- * verifiers of {@link be.atbash.ee.security.octopus.nimbus.jose.JWSObject JWS objects}.
+ * verifiers of {@link JWSObject JWS objects}.
  *
  * <p>Supports the following algorithms:
  *
  * <ul>
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWSAlgorithm#HS256}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWSAlgorithm#HS384}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWSAlgorithm#HS512}
+ *     <li>{@link JWSAlgorithm#HS256}
+ *     <li>{@link JWSAlgorithm#HS384}
+ *     <li>{@link JWSAlgorithm#HS512}
  * </ul>
  *
  * @author Vladimir Dzhuvinov

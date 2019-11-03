@@ -16,7 +16,8 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto;
 
 
-import be.atbash.ee.security.octopus.nimbus.jose.*;
+import be.atbash.ee.security.octopus.nimbus.jose.CriticalHeaderParamsAware;
+import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.AlgorithmSupportMessage;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.CriticalHeaderParamsDeferral;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.ECDSA;
@@ -24,6 +25,10 @@ import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.ECDSAProvider;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.utils.ECChecks;
 import be.atbash.ee.security.octopus.nimbus.jose.jwk.Curve;
 import be.atbash.ee.security.octopus.nimbus.jose.jwk.ECKey;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSObject;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSVerifier;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 
 import java.security.InvalidKeyException;
@@ -35,7 +40,7 @@ import java.util.Set;
 
 /**
  * Elliptic Curve Digital Signature Algorithm (ECDSA) verifier of
- * {@link be.atbash.ee.security.octopus.nimbus.jose.JWSObject JWS objects}. Expects a public EC key
+ * {@link JWSObject JWS objects}. Expects a public EC key
  * (with a P-256, P-384 or P-521 curve).
  *
  * <p>See RFC 7518
@@ -47,9 +52,9 @@ import java.util.Set;
  * <p>Supports the following algorithms:
  *
  * <ul>
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWSAlgorithm#ES256}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWSAlgorithm#ES384}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWSAlgorithm#ES512}
+ *     <li>{@link JWSAlgorithm#ES256}
+ *     <li>{@link JWSAlgorithm#ES384}
+ *     <li>{@link JWSAlgorithm#ES512}
  * </ul>
  *
  * @author Axel Nennker
@@ -157,7 +162,7 @@ public class ECDSAVerifier extends ECDSAProvider implements JWSVerifier, Critica
                           Base64URLValue signature)
             throws JOSEException {
 
-        final JWSAlgorithm alg = header.getAlgorithm();
+        JWSAlgorithm alg = header.getAlgorithm();
 
         if (!supportedJWSAlgorithms().contains(alg)) {
             throw new JOSEException(AlgorithmSupportMessage.unsupportedJWSAlgorithm(alg, supportedJWSAlgorithms()));
@@ -167,9 +172,9 @@ public class ECDSAVerifier extends ECDSAProvider implements JWSVerifier, Critica
             return false;
         }
 
-        final byte[] jwsSignature = signature.decode();
+        byte[] jwsSignature = signature.decode();
 
-        final byte[] derSignature;
+        byte[] derSignature;
 
         try {
             derSignature = ECDSA.transcodeSignatureToDER(jwsSignature);

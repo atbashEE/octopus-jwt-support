@@ -18,7 +18,7 @@ package be.atbash.ee.security.octopus.nimbus.jose.crypto.impl;
 
 import be.atbash.ee.security.octopus.nimbus.jose.CompressionAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
-import be.atbash.ee.security.octopus.nimbus.jose.JWEHeader;
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEHeader;
 import be.atbash.ee.security.octopus.nimbus.util.DeflateUtils;
 
 /**

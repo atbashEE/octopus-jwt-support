@@ -30,7 +30,7 @@ public class KeyException extends JOSEException {
      *
      * @param message The exception message.
      */
-    public KeyException(final String message) {
+    public KeyException(String message) {
 
         super(message);
     }

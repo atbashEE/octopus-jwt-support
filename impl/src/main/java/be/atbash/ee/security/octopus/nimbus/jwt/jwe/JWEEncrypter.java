@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.ee.security.octopus.nimbus.jose;
+package be.atbash.ee.security.octopus.nimbus.jwt.jwe;
 
+
+import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 
 /**
  * JSON Web Encryption (JWE) encrypter.
@@ -37,6 +39,6 @@ public interface JWEEncrypter extends JWEProvider {
      *                       supported or if encryption failed for some
      *                       other internal reason.
      */
-    JWECryptoParts encrypt(final JWEHeader header, final byte[] clearText)
+    JWECryptoParts encrypt(JWEHeader header, byte[] clearText)
             throws JOSEException;
 }

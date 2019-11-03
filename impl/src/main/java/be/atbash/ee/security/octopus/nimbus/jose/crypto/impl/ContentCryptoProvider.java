@@ -16,8 +16,12 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto.impl;
 
 
-import be.atbash.ee.security.octopus.nimbus.jose.*;
+import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
+import be.atbash.ee.security.octopus.nimbus.jose.KeyLengthException;
 import be.atbash.ee.security.octopus.nimbus.jose.jca.JWEJCAContext;
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod;
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWECryptoParts;
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEHeader;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.ee.security.octopus.nimbus.util.ByteUtils;
 import be.atbash.ee.security.octopus.nimbus.util.Container;
@@ -102,7 +106,7 @@ public class ContentCryptoProvider {
             throw new JOSEException(AlgorithmSupportMessage.unsupportedEncryptionMethod(enc, SUPPORTED_ENCRYPTION_METHODS));
         }
 
-        final byte[] cekMaterial = new byte[ByteUtils.byteLength(enc.cekBitLength())];
+        byte[] cekMaterial = new byte[ByteUtils.byteLength(enc.cekBitLength())];
 
         randomGen.nextBytes(cekMaterial);
 
@@ -156,14 +160,14 @@ public class ContentCryptoProvider {
         checkCEKLength(cek, header.getEncryptionMethod());
 
         // Apply compression if instructed
-        final byte[] plainText = DeflateHelper.applyCompression(header, clearText);
+        byte[] plainText = DeflateHelper.applyCompression(header, clearText);
 
         // Compose the AAD
-        final byte[] aad = AAD.compute(header);
+        byte[] aad = AAD.compute(header);
 
         // Encrypt the plain text according to the JWE enc
-        final byte[] iv;
-        final AuthenticatedCipherText authCipherText;
+        byte[] iv;
+        AuthenticatedCipherText authCipherText;
 
         if (header.getEncryptionMethod().equals(EncryptionMethod.A128CBC_HS256) ||
                 header.getEncryptionMethod().equals(EncryptionMethod.A192CBC_HS384) ||

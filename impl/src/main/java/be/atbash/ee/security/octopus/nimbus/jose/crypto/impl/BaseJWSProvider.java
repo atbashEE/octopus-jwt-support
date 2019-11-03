@@ -16,9 +16,9 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto.impl;
 
 
-import be.atbash.ee.security.octopus.nimbus.jose.JWSAlgorithm;
-import be.atbash.ee.security.octopus.nimbus.jose.JWSProvider;
 import be.atbash.ee.security.octopus.nimbus.jose.jca.JCAContext;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSProvider;
 
 import java.util.Collections;
 import java.util.Set;

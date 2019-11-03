@@ -13,10 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.ee.security.octopus.nimbus.jose;
+package be.atbash.ee.security.octopus.nimbus.jwt.jwe;
 
 
+import be.atbash.ee.security.octopus.nimbus.jose.Algorithm;
+import be.atbash.ee.security.octopus.nimbus.jose.CompressionAlgorithm;
+import be.atbash.ee.security.octopus.nimbus.jose.JOSEObjectType;
+import be.atbash.ee.security.octopus.nimbus.jose.PlainHeader;
 import be.atbash.ee.security.octopus.nimbus.jose.jwk.JWK;
+import be.atbash.ee.security.octopus.nimbus.jwt.CommonJWTHeader;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.ee.security.octopus.nimbus.util.Base64Value;
 import be.atbash.ee.security.octopus.nimbus.util.JSONObjectUtils;
@@ -24,6 +29,7 @@ import be.atbash.ee.security.octopus.nimbus.util.X509CertChainUtils;
 
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
+import javax.json.JsonValue;
 import java.net.URI;
 import java.text.ParseException;
 import java.util.*;
@@ -73,7 +79,7 @@ import java.util.*;
  * @author Vladimir Dzhuvinov
  * @version 2019-10-04
  */
-public final class JWEHeader extends CommonSEHeader {
+public final class JWEHeader extends CommonJWTHeader {
 
 
     private static final long serialVersionUID = 1L;
@@ -89,30 +95,30 @@ public final class JWEHeader extends CommonSEHeader {
      * Initialises the registered parameter name set.
      */
     static {
-        Set<String> p = new HashSet<>();
+        Set<String> claims = new HashSet<>();
 
-        p.add("alg");
-        p.add("enc");
-        p.add("epk");
-        p.add("zip");
-        p.add("jku");
-        p.add("jwk");
-        p.add("x5u");
-        p.add("x5t");
-        p.add("x5t#S256");
-        p.add("x5c");
-        p.add("kid");
-        p.add("typ");
-        p.add("cty");
-        p.add("crit");
-        p.add("apu");
-        p.add("apv");
-        p.add("p2s");
-        p.add("p2c");
-        p.add("iv");
-        p.add("authTag");
+        claims.add("alg");
+        claims.add("enc");
+        claims.add("epk");
+        claims.add("zip");
+        claims.add("jku");
+        claims.add("jwk");
+        claims.add("x5u");
+        claims.add("x5t");
+        claims.add("x5t#S256");
+        claims.add("x5c");
+        claims.add("kid");
+        claims.add("typ");
+        claims.add("cty");
+        claims.add("crit");
+        claims.add("apu");
+        claims.add("apv");
+        claims.add("p2s");
+        claims.add("p2c");
+        claims.add("iv");
+        claims.add("authTag");
 
-        REGISTERED_PARAMETER_NAMES = Collections.unmodifiableSet(p);
+        REGISTERED_PARAMETER_NAMES = Collections.unmodifiableSet(claims);
     }
 
 
@@ -272,7 +278,7 @@ public final class JWEHeader extends CommonSEHeader {
          *            not be "none" or {@code null}.
          * @param enc The encryption method. Must not be {@code null}.
          */
-        public Builder(final JWEAlgorithm alg, final EncryptionMethod enc) {
+        public Builder(JWEAlgorithm alg, EncryptionMethod enc) {
 
             if (alg.getName().equals(Algorithm.NONE.getName())) {
                 throw new IllegalArgumentException("The JWE algorithm \"alg\" cannot be \"none\"");
@@ -295,7 +301,7 @@ public final class JWEHeader extends CommonSEHeader {
          * @param jweHeader The JWE header to use. Must not not be
          *                  {@code null}.
          */
-        public Builder(final JWEHeader jweHeader) {
+        public Builder(JWEHeader jweHeader) {
 
             this(jweHeader.getAlgorithm(), jweHeader.getEncryptionMethod());
 
@@ -332,7 +338,7 @@ public final class JWEHeader extends CommonSEHeader {
          *            specified.
          * @return This builder.
          */
-        public Builder type(final JOSEObjectType typ) {
+        public Builder type(JOSEObjectType typ) {
 
             this.typ = typ;
             return this;
@@ -346,7 +352,7 @@ public final class JWEHeader extends CommonSEHeader {
          *            specified.
          * @return This builder.
          */
-        public Builder contentType(final String cty) {
+        public Builder contentType(String cty) {
 
             this.cty = cty;
             return this;
@@ -361,7 +367,7 @@ public final class JWEHeader extends CommonSEHeader {
          *             empty set or {@code null} if none.
          * @return This builder.
          */
-        public Builder criticalParams(final Set<String> crit) {
+        public Builder criticalParams(Set<String> crit) {
 
             this.crit = crit;
             return this;
@@ -375,7 +381,7 @@ public final class JWEHeader extends CommonSEHeader {
          *            {@code null} if not specified.
          * @return This builder.
          */
-        public Builder jwkURL(final URI jku) {
+        public Builder jwkURL(URI jku) {
 
             this.jku = jku;
             return this;
@@ -389,7 +395,7 @@ public final class JWEHeader extends CommonSEHeader {
          *            {@code null} if not specified.
          * @return This builder.
          */
-        public Builder jwk(final JWK jwk) {
+        public Builder jwk(JWK jwk) {
 
             this.jwk = jwk;
             return this;
@@ -403,7 +409,7 @@ public final class JWEHeader extends CommonSEHeader {
          *            if not specified.
          * @return This builder.
          */
-        public Builder x509CertURL(final URI x5u) {
+        public Builder x509CertURL(URI x5u) {
 
             this.x5u = x5u;
             return this;
@@ -419,7 +425,7 @@ public final class JWEHeader extends CommonSEHeader {
          * @return This builder.
          */
         @Deprecated
-        public Builder x509CertThumbprint(final Base64URLValue x5t) {
+        public Builder x509CertThumbprint(Base64URLValue x5t) {
 
             this.x5t = x5t;
             return this;
@@ -434,7 +440,7 @@ public final class JWEHeader extends CommonSEHeader {
          *               parameter, {@code null} if not specified.
          * @return This builder.
          */
-        public Builder x509CertSHA256Thumbprint(final Base64URLValue x5t256) {
+        public Builder x509CertSHA256Thumbprint(Base64URLValue x5t256) {
 
             this.x5t256 = x5t256;
             return this;
@@ -449,7 +455,7 @@ public final class JWEHeader extends CommonSEHeader {
          *            {@code null} if not specified.
          * @return This builder.
          */
-        public Builder x509CertChain(final List<Base64Value> x5c) {
+        public Builder x509CertChain(List<Base64Value> x5c) {
 
             this.x5c = x5c;
             return this;
@@ -463,7 +469,7 @@ public final class JWEHeader extends CommonSEHeader {
          *            specified.
          * @return This builder.
          */
-        public Builder keyID(final String kid) {
+        public Builder keyID(String kid) {
 
             this.kid = kid;
             return this;
@@ -477,7 +483,7 @@ public final class JWEHeader extends CommonSEHeader {
          *            if not specified.
          * @return This builder.
          */
-        public Builder ephemeralPublicKey(final JWK epk) {
+        public Builder ephemeralPublicKey(JWK epk) {
 
             this.epk = epk;
             return this;
@@ -491,7 +497,7 @@ public final class JWEHeader extends CommonSEHeader {
          *            if not specified.
          * @return This builder.
          */
-        public Builder compressionAlgorithm(final CompressionAlgorithm zip) {
+        public Builder compressionAlgorithm(CompressionAlgorithm zip) {
 
             this.zip = zip;
             return this;
@@ -505,7 +511,7 @@ public final class JWEHeader extends CommonSEHeader {
          *            if not specified.
          * @return This builder.
          */
-        public Builder agreementPartyUInfo(final Base64URLValue apu) {
+        public Builder agreementPartyUInfo(Base64URLValue apu) {
 
             this.apu = apu;
             return this;
@@ -519,7 +525,7 @@ public final class JWEHeader extends CommonSEHeader {
          *            if not specified.
          * @return This builder.
          */
-        public Builder agreementPartyVInfo(final Base64URLValue apv) {
+        public Builder agreementPartyVInfo(Base64URLValue apv) {
 
             this.apv = apv;
             return this;
@@ -533,7 +539,7 @@ public final class JWEHeader extends CommonSEHeader {
          *            specified.
          * @return This builder.
          */
-        public Builder pbes2Salt(final Base64URLValue p2s) {
+        public Builder pbes2Salt(Base64URLValue p2s) {
 
             this.p2s = p2s;
             return this;
@@ -547,7 +553,7 @@ public final class JWEHeader extends CommonSEHeader {
          *            Must not be negative.
          * @return This builder.
          */
-        public Builder pbes2Count(final int p2c) {
+        public Builder pbes2Count(int p2c) {
 
             if (p2c < 0)
                 throw new IllegalArgumentException("The PBES2 count parameter must not be negative");
@@ -564,7 +570,7 @@ public final class JWEHeader extends CommonSEHeader {
          *           specified.
          * @return This builder.
          */
-        public Builder iv(final Base64URLValue iv) {
+        public Builder iv(Base64URLValue iv) {
 
             this.iv = iv;
             return this;
@@ -578,7 +584,7 @@ public final class JWEHeader extends CommonSEHeader {
          *            specified.
          * @return This builder.
          */
-        public Builder authTag(final Base64URLValue tag) {
+        public Builder authTag(Base64URLValue tag) {
 
             this.tag = tag;
             return this;
@@ -599,7 +605,7 @@ public final class JWEHeader extends CommonSEHeader {
          *                                  name matches a registered
          *                                  parameter name.
          */
-        public Builder customParam(final String name, final Object value) {
+        public Builder customParam(String name, Object value) {
 
             if (getRegisteredParameterNames().contains(name)) {
                 throw new IllegalArgumentException("The parameter name \"" + name + "\" matches a registered name");
@@ -623,7 +629,7 @@ public final class JWEHeader extends CommonSEHeader {
          *                         {@code null} if none.
          * @return This builder.
          */
-        public Builder customParams(final Map<String, Object> customParameters) {
+        public Builder customParams(Map<String, Object> customParameters) {
 
             this.customParams = customParameters;
             return this;
@@ -637,7 +643,7 @@ public final class JWEHeader extends CommonSEHeader {
          *                  header is created from scratch.
          * @return This builder.
          */
-        public Builder parsedBase64URL(final Base64URLValue base64URL) {
+        public Builder parsedBase64URL(Base64URLValue base64URL) {
 
             this.parsedBase64URL = base64URL;
             return this;
@@ -726,7 +732,7 @@ public final class JWEHeader extends CommonSEHeader {
      * @param enc The encryption method parameter. Must not be
      *            {@code null}.
      */
-    public JWEHeader(final JWEAlgorithm alg, final EncryptionMethod enc) {
+    public JWEHeader(JWEAlgorithm alg, EncryptionMethod enc) {
 
         this(
                 alg, enc,
@@ -791,28 +797,28 @@ public final class JWEHeader extends CommonSEHeader {
      * @param parsedBase64URL The parsed Base64URL, {@code null} if the
      *                        header is created from scratch.
      */
-    public JWEHeader(final Algorithm alg,
-                     final EncryptionMethod enc,
-                     final JOSEObjectType typ,
-                     final String cty,
-                     final Set<String> crit,
-                     final URI jku,
-                     final JWK jwk,
-                     final URI x5u,
-                     final Base64URLValue x5t,
-                     final Base64URLValue x5t256,
-                     final List<Base64Value> x5c,
-                     final String kid,
-                     final JWK epk,
-                     final CompressionAlgorithm zip,
-                     final Base64URLValue apu,
-                     final Base64URLValue apv,
-                     final Base64URLValue p2s,
-                     final int p2c,
-                     final Base64URLValue iv,
-                     final Base64URLValue tag,
-                     final Map<String, Object> customParams,
-                     final Base64URLValue parsedBase64URL) {
+    public JWEHeader(Algorithm alg,
+                     EncryptionMethod enc,
+                     JOSEObjectType typ,
+                     String cty,
+                     Set<String> crit,
+                     URI jku,
+                     JWK jwk,
+                     URI x5u,
+                     Base64URLValue x5t,
+                     Base64URLValue x5t256,
+                     List<Base64Value> x5c,
+                     String kid,
+                     JWK epk,
+                     CompressionAlgorithm zip,
+                     Base64URLValue apu,
+                     Base64URLValue apv,
+                     Base64URLValue p2s,
+                     int p2c,
+                     Base64URLValue iv,
+                     Base64URLValue tag,
+                     Map<String, Object> customParams,
+                     Base64URLValue parsedBase64URL) {
 
         super(alg, typ, cty, crit, jku, jwk, x5u, x5t, x5t256, x5c, kid, customParams, parsedBase64URL);
 
@@ -846,7 +852,7 @@ public final class JWEHeader extends CommonSEHeader {
      *
      * @param jweHeader The JWE header to copy. Must not be {@code null}.
      */
-    public JWEHeader(final JWEHeader jweHeader) {
+    public JWEHeader(JWEHeader jweHeader) {
 
         this(
                 jweHeader.getAlgorithm(),
@@ -1097,7 +1103,7 @@ public final class JWEHeader extends CommonSEHeader {
      * @param json The JSON object to parse. Must not be {@code null}.
      * @return The encryption method.
      */
-    private static EncryptionMethod parseEncryptionMethod(final JsonObject json) {
+    private static EncryptionMethod parseEncryptionMethod(JsonObject json) {
 
         return EncryptionMethod.parse(json.getString("enc"));
     }
@@ -1112,7 +1118,7 @@ public final class JWEHeader extends CommonSEHeader {
      * @throws ParseException If the specified JSON object doesn't
      *                        represent a valid JWE header.
      */
-    public static JWEHeader parse(final JsonObject jsonObject)
+    public static JWEHeader parse(JsonObject jsonObject)
             throws ParseException {
 
         return parse(jsonObject, null);
@@ -1130,12 +1136,12 @@ public final class JWEHeader extends CommonSEHeader {
      * @throws ParseException If the specified JSON object doesn't
      *                        represent a valid JWE header.
      */
-    public static JWEHeader parse(final JsonObject jsonObject,
-                                  final Base64URLValue parsedBase64URL)
+    public static JWEHeader parse(JsonObject jsonObject,
+                                  Base64URLValue parsedBase64URL)
             throws ParseException {
 
         // Get the "alg" parameter
-        Algorithm alg = Header.parseAlgorithm(jsonObject);
+        Algorithm alg = Algorithm.parseAlgorithm(jsonObject);
 
         if (!(alg instanceof JWEAlgorithm)) {
             throw new ParseException("The algorithm \"alg\" header parameter must be for encryption", 0);
@@ -1147,16 +1153,18 @@ public final class JWEHeader extends CommonSEHeader {
         JWEHeader.Builder header = new Builder((JWEAlgorithm) alg, enc).parsedBase64URL(parsedBase64URL);
 
         // Parse optional + custom parameters
-        for (final String name : jsonObject.keySet()) {
+        for (String name : jsonObject.keySet()) {
 
             if ("alg".equals(name)) {
                 // skip
             } else if ("enc".equals(name)) {
                 // skip
             } else if ("typ".equals(name)) {
-                String typValue = jsonObject.getString(name);
-                if (typValue != null) {
-                    header = header.type(new JOSEObjectType(typValue));
+                if (jsonObject.get(name).getValueType() != JsonValue.ValueType.NULL) {
+                    String typValue = jsonObject.getString(name);
+                    if (typValue != null) {
+                        header = header.type(new JOSEObjectType(typValue));
+                    }
                 }
             } else if ("cty".equals(name)) {
                 header = header.contentType(jsonObject.getString(name));
@@ -1168,9 +1176,11 @@ public final class JWEHeader extends CommonSEHeader {
             } else if ("jku".equals(name)) {
                 header = header.jwkURL(JSONObjectUtils.getURI(jsonObject, name));
             } else if ("jwk".equals(name)) {
-                JsonObject jwkObject = jsonObject.getJsonObject(name);
-                if (jwkObject != null) {
-                    header = header.jwk(JWK.parse(jwkObject));
+                if (jsonObject.get(name).getValueType() != JsonValue.ValueType.NULL) {
+                    JsonObject jwkObject = jsonObject.getJsonObject(name);
+                    if (jwkObject != null) {
+                        header = header.jwk(JWK.parse(jwkObject));
+                    }
                 }
             } else if ("x5u".equals(name)) {
                 header = header.x509CertURL(JSONObjectUtils.getURI(jsonObject, name));
@@ -1185,9 +1195,11 @@ public final class JWEHeader extends CommonSEHeader {
             } else if ("epk".equals(name)) {
                 header = header.ephemeralPublicKey(JWK.parse(jsonObject.getJsonObject(name)));
             } else if ("zip".equals(name)) {
-                String zipValue = jsonObject.getString(name);
-                if (zipValue != null) {
-                    header = header.compressionAlgorithm(new CompressionAlgorithm(zipValue));
+                if (jsonObject.get(name).getValueType() != JsonValue.ValueType.NULL) {
+                    String zipValue = jsonObject.getString(name);
+                    if (zipValue != null) {
+                        header = header.compressionAlgorithm(new CompressionAlgorithm(zipValue));
+                    }
                 }
             } else if ("apu".equals(name)) {
                 header = header.agreementPartyUInfo(Base64URLValue.from(jsonObject.getString(name)));
@@ -1202,7 +1214,7 @@ public final class JWEHeader extends CommonSEHeader {
             } else if ("tag".equals(name)) {
                 header = header.authTag(Base64URLValue.from(jsonObject.getString(name)));
             } else {
-                header = header.customParam(name, jsonObject.get(name));
+                header = header.customParam(name, JSONObjectUtils.getJsonValueAsObject(jsonObject.get(name)));
             }
         }
 
@@ -1218,7 +1230,7 @@ public final class JWEHeader extends CommonSEHeader {
      * @throws ParseException If the specified JSON object string doesn't
      *                        represent a valid JWE header.
      */
-    public static JWEHeader parse(final String jsonString)
+    public static JWEHeader parse(String jsonString)
             throws ParseException {
 
         return parse(JSONObjectUtils.parse(jsonString), null);
@@ -1236,8 +1248,8 @@ public final class JWEHeader extends CommonSEHeader {
      * @throws ParseException If the specified JSON object string doesn't
      *                        represent a valid JWE header.
      */
-    public static JWEHeader parse(final String jsonString,
-                                  final Base64URLValue parsedBase64URL)
+    public static JWEHeader parse(String jsonString,
+                                  Base64URLValue parsedBase64URL)
             throws ParseException {
 
         return parse(JSONObjectUtils.parse(jsonString), parsedBase64URL);
@@ -1252,7 +1264,7 @@ public final class JWEHeader extends CommonSEHeader {
      * @throws ParseException If the specified Base64URL doesn't represent
      *                        a valid JWE header.
      */
-    public static JWEHeader parse(final Base64URLValue base64URL)
+    public static JWEHeader parse(Base64URLValue base64URL)
             throws ParseException {
 
         return parse(base64URL.decodeToString(), base64URL);

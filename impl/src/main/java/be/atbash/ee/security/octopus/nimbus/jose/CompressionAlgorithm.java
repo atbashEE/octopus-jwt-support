@@ -59,7 +59,7 @@ public final class CompressionAlgorithm implements Serializable {
      *
      * @param name The compression algorithm name. Must not be {@code null}.
      */
-    public CompressionAlgorithm(final String name) {
+    public CompressionAlgorithm(String name) {
 
         if (name == null) {
             throw new IllegalArgumentException("The compression algorithm name must not be null");
@@ -100,7 +100,7 @@ public final class CompressionAlgorithm implements Serializable {
      * {@code false}.
      */
     @Override
-    public boolean equals(final Object object) {
+    public boolean equals(Object object) {
 
         return object instanceof CompressionAlgorithm &&
                 this.toString().equals(object.toString());
@@ -119,16 +119,4 @@ public final class CompressionAlgorithm implements Serializable {
         return name;
     }
 
-
-    /**
-     * Returns the JSON string representation of this compression algorithm.
-     *
-     * @return The JSON string representation.
-     */
-
-    public String toJSONString() {
-        // FIXME
-        //return "\"" + JSONObject.escape(name) + '"';
-        return "\"" + name + '"';
-    }
 }

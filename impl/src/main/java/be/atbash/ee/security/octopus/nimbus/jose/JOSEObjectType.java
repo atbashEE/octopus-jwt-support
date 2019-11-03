@@ -37,7 +37,7 @@ import java.io.Serializable;
  * @author Vladimir Dzhuvinov
  * @version 2019-10-14
  */
-public final class JOSEObjectType implements /*JSONAware,*/ Serializable {
+public final class JOSEObjectType implements Serializable {
 
 
     private static final long serialVersionUID = 1L;
@@ -72,7 +72,7 @@ public final class JOSEObjectType implements /*JSONAware,*/ Serializable {
      *
      * @param type The object type. Must not be {@code null}.
      */
-    public JOSEObjectType(final String type) {
+    public JOSEObjectType(String type) {
 
         if (type == null) {
             throw new IllegalArgumentException("The object type must not be null");
@@ -113,7 +113,7 @@ public final class JOSEObjectType implements /*JSONAware,*/ Serializable {
      * {@code false}.
      */
     @Override
-    public boolean equals(final Object object) {
+    public boolean equals(Object object) {
 
         return object instanceof JOSEObjectType &&
                 this.type.toLowerCase().equals(((JOSEObjectType) object).type.toLowerCase());

@@ -16,8 +16,9 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto.impl;
 
 
-import be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod;
-import be.atbash.ee.security.octopus.nimbus.jose.JWEAlgorithm;
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod;
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEObject;
 
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -26,27 +27,27 @@ import java.util.Set;
 
 /**
  * The base abstract class for RSA encrypters and decrypters of
- * {@link be.atbash.ee.security.octopus.nimbus.jose.JWEObject JWE objects}.
+ * {@link JWEObject JWE objects}.
  *
  * <p>Supports the following key management algorithms:
  *
  * <ul>
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWEAlgorithm#RSA1_5}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWEAlgorithm#RSA_OAEP}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWEAlgorithm#RSA_OAEP_256}
+ *     <li>{@link JWEAlgorithm#RSA1_5}
+ *     <li>{@link JWEAlgorithm#RSA_OAEP}
+ *     <li>{@link JWEAlgorithm#RSA_OAEP_256}
  * </ul>
  *
  * <p>Supports the following content encryption algorithms:
  *
  * <ul>
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A128CBC_HS256}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A192CBC_HS384}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A256CBC_HS512}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A128GCM}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A192GCM}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A256GCM}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A128CBC_HS256_DEPRECATED}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A256CBC_HS512_DEPRECATED}
+ *     <li>{@link EncryptionMethod#A128CBC_HS256}
+ *     <li>{@link EncryptionMethod#A192CBC_HS384}
+ *     <li>{@link EncryptionMethod#A256CBC_HS512}
+ *     <li>{@link EncryptionMethod#A128GCM}
+ *     <li>{@link EncryptionMethod#A192GCM}
+ *     <li>{@link EncryptionMethod#A256GCM}
+ *     <li>{@link EncryptionMethod#A128CBC_HS256_DEPRECATED}
+ *     <li>{@link EncryptionMethod#A256CBC_HS512_DEPRECATED}
  * </ul>
  *
  * @author David Ortiz

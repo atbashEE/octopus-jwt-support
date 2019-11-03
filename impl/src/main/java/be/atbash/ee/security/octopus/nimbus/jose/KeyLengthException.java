@@ -42,7 +42,7 @@ public class KeyLengthException extends KeyException {
      *
      * @param message The exception message.
      */
-    public KeyLengthException(final String message) {
+    public KeyLengthException(String message) {
 
         super(message);
         expectedLength = 0;
@@ -55,7 +55,7 @@ public class KeyLengthException extends KeyException {
      *
      * @param alg The JOSE algorithm, {@code null} if not specified.
      */
-    public KeyLengthException(final Algorithm alg) {
+    public KeyLengthException(Algorithm alg) {
 
         this(0, alg);
     }
@@ -69,7 +69,7 @@ public class KeyLengthException extends KeyException {
      * @param alg            The JOSE algorithm, {@code null} if not
      *                       specified.
      */
-    public KeyLengthException(final int expectedLength, final Algorithm alg) {
+    public KeyLengthException(int expectedLength, Algorithm alg) {
 
         super((
                 (expectedLength > 0) ? "The expected key length is " + expectedLength + " bits" : "Unexpected key length") +

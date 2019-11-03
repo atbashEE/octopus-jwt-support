@@ -34,7 +34,7 @@ public class KeyTypeException extends KeyException {
      * @param expectedKeyClass The expected key class. Should not be
      *                         {@code null}.
      */
-    public KeyTypeException(final Class<? extends Key> expectedKeyClass) {
+    public KeyTypeException(Class<? extends Key> expectedKeyClass) {
 
         super("Invalid key: Must be an instance of " + expectedKeyClass);
     }

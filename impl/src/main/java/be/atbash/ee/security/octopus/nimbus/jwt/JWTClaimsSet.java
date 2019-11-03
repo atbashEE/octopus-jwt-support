@@ -150,7 +150,7 @@ public final class JWTClaimsSet implements Serializable {
          * @param jwtClaimsSet The JWT claims set to use. Must not be
          *                     {@code null}.
          */
-        public Builder(final JWTClaimsSet jwtClaimsSet) {
+        public Builder(JWTClaimsSet jwtClaimsSet) {
 
             claims.putAll(jwtClaimsSet.claims);
         }
@@ -162,7 +162,7 @@ public final class JWTClaimsSet implements Serializable {
          * @param iss The issuer claim, {@code null} if not specified.
          * @return This builder.
          */
-        public Builder issuer(final String iss) {
+        public Builder issuer(String iss) {
 
             claims.put(ISSUER_CLAIM, iss);
             return this;
@@ -175,7 +175,7 @@ public final class JWTClaimsSet implements Serializable {
          * @param sub The subject claim, {@code null} if not specified.
          * @return This builder.
          */
-        public Builder subject(final String sub) {
+        public Builder subject(String sub) {
 
             claims.put(SUBJECT_CLAIM, sub);
             return this;
@@ -189,7 +189,7 @@ public final class JWTClaimsSet implements Serializable {
          *            specified.
          * @return This builder.
          */
-        public Builder audience(final List<String> aud) {
+        public Builder audience(List<String> aud) {
 
             claims.put(AUDIENCE_CLAIM, aud);
             return this;
@@ -203,7 +203,7 @@ public final class JWTClaimsSet implements Serializable {
          *            specified.
          * @return This builder.
          */
-        public Builder audience(final String aud) {
+        public Builder audience(String aud) {
 
             if (aud == null) {
                 claims.put(AUDIENCE_CLAIM, null);
@@ -221,7 +221,7 @@ public final class JWTClaimsSet implements Serializable {
          *            specified.
          * @return This builder.
          */
-        public Builder expirationTime(final Date exp) {
+        public Builder expirationTime(Date exp) {
 
             claims.put(EXPIRATION_TIME_CLAIM, exp);
             return this;
@@ -235,7 +235,7 @@ public final class JWTClaimsSet implements Serializable {
          *            specified.
          * @return This builder.
          */
-        public Builder notBeforeTime(final Date nbf) {
+        public Builder notBeforeTime(Date nbf) {
 
             claims.put(NOT_BEFORE_CLAIM, nbf);
             return this;
@@ -249,7 +249,7 @@ public final class JWTClaimsSet implements Serializable {
          *            specified.
          * @return This builder.
          */
-        public Builder issueTime(final Date iat) {
+        public Builder issueTime(Date iat) {
 
             claims.put(ISSUED_AT_CLAIM, iat);
             return this;
@@ -262,7 +262,7 @@ public final class JWTClaimsSet implements Serializable {
          * @param jti The JWT ID claim, {@code null} if not specified.
          * @return This builder.
          */
-        public Builder jwtID(final String jti) {
+        public Builder jwtID(String jti) {
 
             claims.put(JWT_ID_CLAIM, jti);
             return this;
@@ -278,7 +278,7 @@ public final class JWTClaimsSet implements Serializable {
          *              not specified. Should map to a JSON entity.
          * @return This builder.
          */
-        public Builder claim(final String name, final Object value) {
+        public Builder claim(String name, Object value) {
 
             claims.put(name, value);
             return this;
@@ -308,7 +308,7 @@ public final class JWTClaimsSet implements Serializable {
      *
      * @param claims The JWT claims set as a map. Must not be {@code null}.
      */
-    private JWTClaimsSet(final Map<String, Object> claims) {
+    private JWTClaimsSet(Map<String, Object> claims) {
 
         this.claims.putAll(claims);
     }
@@ -445,7 +445,7 @@ public final class JWTClaimsSet implements Serializable {
      * @param name The name of the claim. Must not be {@code null}.
      * @return The value of the claim, {@code null} if not specified.
      */
-    public Object getClaim(final String name) {
+    public Object getClaim(String name) {
 
         return claims.get(name);
     }
@@ -460,7 +460,7 @@ public final class JWTClaimsSet implements Serializable {
      * @throws ParseException If the claim value is not of the required
      *                        type.
      */
-    public String getStringClaim(final String name)
+    public String getStringClaim(String name)
             throws ParseException {
 
         Object value = getClaim(name);
@@ -482,7 +482,7 @@ public final class JWTClaimsSet implements Serializable {
      * @throws ParseException If the claim value is not of the required
      *                        type.
      */
-    public String[] getStringArrayClaim(final String name)
+    public String[] getStringArrayClaim(String name)
             throws ParseException {
 
         Object value = getClaim(name);
@@ -524,7 +524,7 @@ public final class JWTClaimsSet implements Serializable {
      * @throws ParseException If the claim value is not of the required
      *                        type.
      */
-    public List<String> getStringListClaim(final String name)
+    public List<String> getStringListClaim(String name)
             throws ParseException {
 
         String[] stringArray = getStringArrayClaim(name);
@@ -545,7 +545,7 @@ public final class JWTClaimsSet implements Serializable {
      * @return The value of the claim, {@code null} if not specified.
      * @throws ParseException If the claim couldn't be parsed to a URI.
      */
-    public URI getURIClaim(final String name)
+    public URI getURIClaim(String name)
             throws ParseException {
 
         String uriString = getStringClaim(name);
@@ -571,7 +571,7 @@ public final class JWTClaimsSet implements Serializable {
      * @throws ParseException If the claim value is not of the required
      *                        type.
      */
-    public Boolean getBooleanClaim(final String name)
+    public Boolean getBooleanClaim(String name)
             throws ParseException {
 
         Object value = getClaim(name);
@@ -593,7 +593,7 @@ public final class JWTClaimsSet implements Serializable {
      * @throws ParseException If the claim value is not of the required
      *                        type.
      */
-    public Integer getIntegerClaim(final String name)
+    public Integer getIntegerClaim(String name)
             throws ParseException {
 
         Object value = getClaim(name);
@@ -617,7 +617,7 @@ public final class JWTClaimsSet implements Serializable {
      * @throws ParseException If the claim value is not of the required
      *                        type.
      */
-    public Long getLongClaim(final String name)
+    public Long getLongClaim(String name)
             throws ParseException {
 
         Object value = getClaim(name);
@@ -642,7 +642,7 @@ public final class JWTClaimsSet implements Serializable {
      * @throws ParseException If the claim value is not of the required
      *                        type.
      */
-    public Date getDateClaim(final String name)
+    public Date getDateClaim(String name)
             throws ParseException {
 
         Object value = getClaim(name);
@@ -668,7 +668,7 @@ public final class JWTClaimsSet implements Serializable {
      * @throws ParseException If the claim value is not of the required
      *                        type.
      */
-    public Float getFloatClaim(final String name)
+    public Float getFloatClaim(String name)
             throws ParseException {
 
         Object value = getClaim(name);
@@ -692,7 +692,7 @@ public final class JWTClaimsSet implements Serializable {
      * @throws ParseException If the claim value is not of the required
      *                        type.
      */
-    public Double getDoubleClaim(final String name)
+    public Double getDoubleClaim(String name)
             throws ParseException {
 
         Object value = getClaim(name);
@@ -798,9 +798,7 @@ public final class JWTClaimsSet implements Serializable {
                 }
 
             } else if (claim.getValue() != null) {
-                // FIXME
-                throw new UnsupportedOperationException("Can't just add Object");
-                //result.add(claim.getKey(),  claim.getValue());
+                JSONObjectUtils.addValue(result, claim.getKey(), claim.getValue());
             } else if (includeClaimsWithNullValues) {
                 result.add(claim.getKey(), "");
             }
@@ -826,13 +824,13 @@ public final class JWTClaimsSet implements Serializable {
      * @throws ParseException If the specified JSON object doesn't
      *                        represent a valid JWT claims set.
      */
-    public static JWTClaimsSet parse(final JsonObject json)
+    public static JWTClaimsSet parse(JsonObject json)
             throws ParseException {
 
         JWTClaimsSet.Builder builder = new JWTClaimsSet.Builder();
 
         // Parse registered + custom params
-        for (final String name : json.keySet()) {
+        for (String name : json.keySet()) {
 
             switch (name) {
                 case ISSUER_CLAIM:
@@ -899,7 +897,7 @@ public final class JWTClaimsSet implements Serializable {
      * @throws ParseException If the specified JSON object string doesn't
      *                        represent a valid JWT claims set.
      */
-    public static JWTClaimsSet parse(final String s)
+    public static JWTClaimsSet parse(String s)
             throws ParseException {
 
         return parse(JSONObjectUtils.parse(s));

@@ -17,9 +17,9 @@ package be.atbash.ee.security.octopus.nimbus.jose.proc;
 
 
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
-import be.atbash.ee.security.octopus.nimbus.jose.JWSHeader;
-import be.atbash.ee.security.octopus.nimbus.jose.JWSProvider;
-import be.atbash.ee.security.octopus.nimbus.jose.JWSVerifier;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSProvider;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSVerifier;
 
 import java.security.Key;
 

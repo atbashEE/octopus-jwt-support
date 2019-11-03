@@ -16,7 +16,7 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto.impl;
 
 
-import be.atbash.ee.security.octopus.nimbus.jose.JWEHeader;
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEHeader;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.ee.security.octopus.nimbus.util.ByteUtils;
 import be.atbash.ee.security.octopus.nimbus.util.IntegerOverflowException;
@@ -76,7 +76,7 @@ public class AAD {
     public static byte[] computeLength(byte[] aad)
             throws IntegerOverflowException {
 
-        final int bitLength = ByteUtils.safeBitLength(aad);
+        int bitLength = ByteUtils.safeBitLength(aad);
         return ByteBuffer.allocate(8).putLong(bitLength).array();
     }
 }

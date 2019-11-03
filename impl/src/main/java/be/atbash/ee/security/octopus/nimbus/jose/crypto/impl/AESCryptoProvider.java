@@ -16,9 +16,10 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto.impl;
 
 
-import be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod;
-import be.atbash.ee.security.octopus.nimbus.jose.JWEAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jose.KeyLengthException;
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod;
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEObject;
 import be.atbash.ee.security.octopus.nimbus.util.ByteUtils;
 
 import javax.crypto.SecretKey;
@@ -27,30 +28,30 @@ import java.util.*;
 
 /**
  * The base abstract class for AES and AES GCM key wrap encrypters and
- * decrypters of {@link be.atbash.ee.security.octopus.nimbus.jose.JWEObject JWE objects}.
+ * decrypters of {@link JWEObject JWE objects}.
  *
  * <p>Supports the following key management algorithms:
  *
  * <ul>
- *      <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWEAlgorithm#A128KW}
- *      <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWEAlgorithm#A192KW}
- *      <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWEAlgorithm#A256KW}
- *      <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWEAlgorithm#A128GCMKW}
- *      <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWEAlgorithm#A192GCMKW}
- *      <li>{@link be.atbash.ee.security.octopus.nimbus.jose.JWEAlgorithm#A256GCMKW}
+ *      <li>{@link JWEAlgorithm#A128KW}
+ *      <li>{@link JWEAlgorithm#A192KW}
+ *      <li>{@link JWEAlgorithm#A256KW}
+ *      <li>{@link JWEAlgorithm#A128GCMKW}
+ *      <li>{@link JWEAlgorithm#A192GCMKW}
+ *      <li>{@link JWEAlgorithm#A256GCMKW}
  * </ul>
  *
  * <p>Supports the following content encryption algorithms:
  *
  * <ul>
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A128CBC_HS256}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A192CBC_HS384}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A256CBC_HS512}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A128GCM}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A192GCM}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A256GCM}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A128CBC_HS256_DEPRECATED}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.EncryptionMethod#A256CBC_HS512_DEPRECATED}
+ *     <li>{@link EncryptionMethod#A128CBC_HS256}
+ *     <li>{@link EncryptionMethod#A192CBC_HS384}
+ *     <li>{@link EncryptionMethod#A256CBC_HS512}
+ *     <li>{@link EncryptionMethod#A128GCM}
+ *     <li>{@link EncryptionMethod#A192GCM}
+ *     <li>{@link EncryptionMethod#A256GCM}
+ *     <li>{@link EncryptionMethod#A128CBC_HS256_DEPRECATED}
+ *     <li>{@link EncryptionMethod#A256CBC_HS512_DEPRECATED}
  * </ul>
  *
  * @author Melisa Halsband

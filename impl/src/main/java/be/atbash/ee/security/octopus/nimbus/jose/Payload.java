@@ -17,6 +17,7 @@ package be.atbash.ee.security.octopus.nimbus.jose;
 
 
 import be.atbash.ee.security.octopus.nimbus.jwt.SignedJWT;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSObject;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.ee.security.octopus.nimbus.util.JSONObjectUtils;
 
@@ -113,7 +114,7 @@ public final class Payload implements Serializable {
     /**
      * The string representation.
      */
-    private final String string;
+    private final String stringPayload;
 
 
     /**
@@ -146,7 +147,7 @@ public final class Payload implements Serializable {
      * @param bytes The byte array to convert. May be {@code null}.
      * @return The resulting string, {@code null} if conversion failed.
      */
-    private static String byteArrayToString(final byte[] bytes) {
+    private static String byteArrayToString(byte[] bytes) {
 
         return bytes != null ? new String(bytes, UTF_8) : null;
     }
@@ -158,7 +159,7 @@ public final class Payload implements Serializable {
      * @param string The string to convert. May be {@code null}.
      * @return The resulting byte array, {@code null} if conversion failed.
      */
-    private static byte[] stringToByteArray(final String string) {
+    private static byte[] stringToByteArray(String string) {
 
         return string != null ? string.getBytes(UTF_8) : null;
     }
@@ -170,14 +171,14 @@ public final class Payload implements Serializable {
      * @param jsonObject The JSON object representing the payload. Must not
      *                   be {@code null}.
      */
-    public Payload(final JsonObject jsonObject) {
+    public Payload(JsonObject jsonObject) {
 
         if (jsonObject == null) {
             throw new IllegalArgumentException("The JSON object must not be null");
         }
 
         this.jsonObject = jsonObject;
-        string = null;
+        stringPayload = null;
         bytes = null;
         base64URL = null;
         jwsObject = null;
@@ -190,17 +191,17 @@ public final class Payload implements Serializable {
     /**
      * Creates a new payload from the specified string.
      *
-     * @param string The string representing the payload. Must not be
+     * @param payload The string representing the payload. Must not be
      *               {@code null}.
      */
-    public Payload(final String string) {
+    public Payload(String payload) {
 
-        if (string == null) {
-            throw new IllegalArgumentException("The string must not be null");
+        if (payload == null) {
+            throw new IllegalArgumentException("The payload must not be null");
         }
 
         jsonObject = null;
-        this.string = string;
+        this.stringPayload = payload;
         bytes = null;
         base64URL = null;
         jwsObject = null;
@@ -216,14 +217,14 @@ public final class Payload implements Serializable {
      * @param bytes The byte array representing the payload. Must not be
      *              {@code null}.
      */
-    public Payload(final byte[] bytes) {
+    public Payload(byte[] bytes) {
 
         if (bytes == null) {
             throw new IllegalArgumentException("The byte array must not be null");
         }
 
         jsonObject = null;
-        string = null;
+        stringPayload = null;
         this.bytes = bytes;
         base64URL = null;
         jwsObject = null;
@@ -239,14 +240,14 @@ public final class Payload implements Serializable {
      * @param base64URL The Base64URL-encoded object representing the
      *                  payload. Must not be {@code null}.
      */
-    public Payload(final Base64URLValue base64URL) {
+    public Payload(Base64URLValue base64URL) {
 
         if (base64URL == null) {
             throw new IllegalArgumentException("The Base64URL-encoded object must not be null");
         }
 
         jsonObject = null;
-        string = null;
+        stringPayload = null;
         bytes = null;
         this.base64URL = base64URL;
         jwsObject = null;
@@ -263,7 +264,7 @@ public final class Payload implements Serializable {
      * @param jwsObject The JWS object representing the payload. Must be in
      *                  a signed state and not {@code null}.
      */
-    public Payload(final JWSObject jwsObject) {
+    public Payload(JWSObject jwsObject) {
 
         if (jwsObject == null) {
             throw new IllegalArgumentException("The JWS object must not be null");
@@ -274,7 +275,7 @@ public final class Payload implements Serializable {
         }
 
         jsonObject = null;
-        string = null;
+        stringPayload = null;
         bytes = null;
         base64URL = null;
         this.jwsObject = jwsObject;
@@ -291,7 +292,7 @@ public final class Payload implements Serializable {
      * @param signedJWT The signed JWT representing the payload. Must be in
      *                  a signed state and not {@code null}.
      */
-    public Payload(final SignedJWT signedJWT) {
+    public Payload(SignedJWT signedJWT) {
 
         if (signedJWT == null) {
             throw new IllegalArgumentException("The signed JWT must not be null");
@@ -302,7 +303,7 @@ public final class Payload implements Serializable {
         }
 
         jsonObject = null;
-        string = null;
+        stringPayload = null;
         bytes = null;
         base64URL = null;
         this.signedJWT = signedJWT;
@@ -337,15 +338,15 @@ public final class Payload implements Serializable {
 
         // Convert
 
-        String s = toString();
+        String json = toString();
 
-        if (s == null) {
+        if (json == null) {
             // to string conversion failed
             return null;
         }
 
         try {
-            return JSONObjectUtils.parse(s);
+            return JSONObjectUtils.parse(json);
 
         } catch (ParseException e) {
             // Payload not a JSON object
@@ -362,9 +363,9 @@ public final class Payload implements Serializable {
     @Override
     public String toString() {
 
-        if (string != null) {
+        if (stringPayload != null) {
 
-            return string;
+            return stringPayload;
         }
 
         // Convert
