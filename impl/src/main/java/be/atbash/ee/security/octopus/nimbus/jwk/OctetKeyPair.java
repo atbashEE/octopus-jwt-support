@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.ee.security.octopus.nimbus.jose.jwk;
+package be.atbash.ee.security.octopus.nimbus.jwk;
 
 
 import be.atbash.ee.security.octopus.nimbus.jose.Algorithm;
@@ -679,7 +679,7 @@ public class OctetKeyPair extends JWK implements AsymmetricJWK, CurveBasedJWK {
 
 
     @Override
-    public LinkedHashMap<String, ?> getRequiredParams() {
+    public LinkedHashMap<String, String> getRequiredParams() {
 
         // Put mandatory params in sorted order
         LinkedHashMap<String, String> requiredParams = new LinkedHashMap<>();

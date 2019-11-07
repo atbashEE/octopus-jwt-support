@@ -20,7 +20,7 @@ import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.RSAKeyUtils;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.RSASSA;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.RSASSAProvider;
-import be.atbash.ee.security.octopus.nimbus.jose.jwk.RSAKey;
+import be.atbash.ee.security.octopus.nimbus.jwk.RSAKey;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSObject;

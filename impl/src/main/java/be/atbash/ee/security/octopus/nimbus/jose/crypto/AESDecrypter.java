@@ -20,7 +20,7 @@ import be.atbash.ee.security.octopus.nimbus.jose.CriticalHeaderParamsAware;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.KeyLengthException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.*;
-import be.atbash.ee.security.octopus.nimbus.jose.jwk.OctetSequenceKey;
+import be.atbash.ee.security.octopus.nimbus.jwk.OctetSequenceKey;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEDecrypter;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEHeader;

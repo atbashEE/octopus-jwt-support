@@ -16,7 +16,7 @@
 package be.atbash.ee.security.octopus;
 
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
-import be.atbash.ee.security.octopus.nimbus.jose.jwk.KeyType;
+import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import be.atbash.util.exception.AtbashException;
 
 public class UnsupportedKeyType extends AtbashException {

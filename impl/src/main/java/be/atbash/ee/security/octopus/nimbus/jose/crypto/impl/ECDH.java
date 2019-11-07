@@ -17,8 +17,8 @@ package be.atbash.ee.security.octopus.nimbus.jose.crypto.impl;
 
 
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
-import be.atbash.ee.security.octopus.nimbus.jose.jwk.Curve;
-import be.atbash.ee.security.octopus.nimbus.jose.jwk.OctetKeyPair;
+import be.atbash.ee.security.octopus.nimbus.jwk.Curve;
+import be.atbash.ee.security.octopus.nimbus.jwk.OctetKeyPair;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEHeader;

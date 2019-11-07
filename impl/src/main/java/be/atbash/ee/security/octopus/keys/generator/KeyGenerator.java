@@ -17,7 +17,7 @@ package be.atbash.ee.security.octopus.keys.generator;
 
 import be.atbash.ee.security.octopus.UnsupportedKeyType;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
-import be.atbash.ee.security.octopus.nimbus.jose.jwk.KeyType;
+import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import be.atbash.util.PublicAPI;
 import be.atbash.util.exception.AtbashUnexpectedException;
 import org.bouncycastle.jce.ECNamedCurveTable;

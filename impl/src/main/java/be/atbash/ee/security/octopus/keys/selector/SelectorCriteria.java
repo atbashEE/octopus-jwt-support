@@ -16,7 +16,7 @@
 package be.atbash.ee.security.octopus.keys.selector;
 
 import be.atbash.ee.security.octopus.keys.selector.filter.*;
-import be.atbash.ee.security.octopus.nimbus.jose.jwk.KeyType;
+import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import be.atbash.util.PublicAPI;
 import be.atbash.util.StringUtils;
 

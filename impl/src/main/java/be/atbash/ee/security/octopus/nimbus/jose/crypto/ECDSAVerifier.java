@@ -23,8 +23,8 @@ import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.CriticalHeaderParam
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.ECDSA;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.ECDSAProvider;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.utils.ECChecks;
-import be.atbash.ee.security.octopus.nimbus.jose.jwk.Curve;
-import be.atbash.ee.security.octopus.nimbus.jose.jwk.ECKey;
+import be.atbash.ee.security.octopus.nimbus.jwk.Curve;
+import be.atbash.ee.security.octopus.nimbus.jwk.ECKey;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSObject;

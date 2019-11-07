@@ -15,7 +15,7 @@
  */
 package be.atbash.ee.security.octopus.keys.writer;
 
-import be.atbash.ee.security.octopus.nimbus.jose.jwk.JWKSet;
+import be.atbash.ee.security.octopus.nimbus.jwk.JWKSet;
 
 import java.security.KeyStore;
 import java.util.HashMap;

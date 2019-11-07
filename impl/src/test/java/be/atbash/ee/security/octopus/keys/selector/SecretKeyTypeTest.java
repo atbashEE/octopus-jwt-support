@@ -16,7 +16,7 @@
 package be.atbash.ee.security.octopus.keys.selector;
 
 import be.atbash.ee.security.octopus.keys.fake.*;
-import be.atbash.ee.security.octopus.nimbus.jose.jwk.KeyType;
+import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import be.atbash.util.exception.AtbashIllegalActionException;
 import org.junit.Test;
 

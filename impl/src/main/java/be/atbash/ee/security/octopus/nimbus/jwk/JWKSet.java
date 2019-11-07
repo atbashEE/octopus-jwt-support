@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.ee.security.octopus.nimbus.jose.jwk;
+package be.atbash.ee.security.octopus.nimbus.jwk;
 
 
 import be.atbash.ee.security.octopus.nimbus.util.JSONObjectUtils;
@@ -335,7 +335,7 @@ public class JWKSet implements Serializable {
                 continue;
             }
 
-            additionalMembers.put(entry.getKey(), entry.getValue());
+            additionalMembers.put(entry.getKey(), JSONObjectUtils.getJsonValueAsObject(entry.getValue()));
         }
 
         return new JWKSet(keys, additionalMembers);

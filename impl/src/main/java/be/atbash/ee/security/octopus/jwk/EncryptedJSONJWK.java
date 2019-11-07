@@ -16,7 +16,7 @@
 package be.atbash.ee.security.octopus.jwk;
 
 import be.atbash.ee.security.octopus.exception.MissingPasswordException;
-import be.atbash.ee.security.octopus.nimbus.jose.jwk.JWK;
+import be.atbash.ee.security.octopus.nimbus.jwk.JWK;
 import be.atbash.ee.security.octopus.util.EncryptionHelper;
 import be.atbash.util.StringUtils;
 

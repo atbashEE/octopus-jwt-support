@@ -18,7 +18,7 @@ package be.atbash.ee.security.octopus.keys.reader;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
-import be.atbash.ee.security.octopus.nimbus.jose.jwk.RSAKey;
+import be.atbash.ee.security.octopus.nimbus.jwk.RSAKey;
 import be.atbash.util.resource.ResourceUtil;
 import org.bouncycastle.openssl.PKCS8Generator;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;

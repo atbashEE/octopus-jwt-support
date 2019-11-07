@@ -17,10 +17,10 @@ package be.atbash.ee.security.octopus.keys;
 
 import be.atbash.ee.security.octopus.keys.reader.KeyReader;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
-import be.atbash.ee.security.octopus.nimbus.jose.jwk.ECKey;
-import be.atbash.ee.security.octopus.nimbus.jose.jwk.JWK;
-import be.atbash.ee.security.octopus.nimbus.jose.jwk.KeyType;
-import be.atbash.ee.security.octopus.nimbus.jose.jwk.RSAKey;
+import be.atbash.ee.security.octopus.nimbus.jwk.ECKey;
+import be.atbash.ee.security.octopus.nimbus.jwk.JWK;
+import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
+import be.atbash.ee.security.octopus.nimbus.jwk.RSAKey;
 import be.atbash.util.resource.ResourceUtil;
 
 import java.security.PublicKey;

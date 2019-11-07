@@ -20,6 +20,7 @@ import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.KeyLengthException;
 import be.atbash.ee.security.octopus.nimbus.jose.KeyTypeException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.AESDecrypter;
+import be.atbash.ee.security.octopus.nimbus.jose.crypto.DirectDecrypter;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.ECDHDecrypter;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.RSADecrypter;
 import be.atbash.ee.security.octopus.nimbus.jose.jca.JWEJCAContext;
@@ -66,17 +67,15 @@ public class DefaultJWEDecrypterFactory implements JWEDecrypterFactory {
         Set<JWEAlgorithm> algs = new LinkedHashSet<>();
         algs.addAll(RSADecrypter.SUPPORTED_ALGORITHMS);
         algs.addAll(ECDHDecrypter.SUPPORTED_ALGORITHMS);
-        //algs.addAll(DirectDecrypter.SUPPORTED_ALGORITHMS);  FIXME
+        algs.addAll(DirectDecrypter.SUPPORTED_ALGORITHMS);
         algs.addAll(AESDecrypter.SUPPORTED_ALGORITHMS);
-        //algs.addAll(PasswordBasedDecrypter.SUPPORTED_ALGORITHMS);
         SUPPORTED_ALGORITHMS = Collections.unmodifiableSet(algs);
 
         Set<EncryptionMethod> encs = new LinkedHashSet<>();
         encs.addAll(RSADecrypter.SUPPORTED_ENCRYPTION_METHODS);
         encs.addAll(ECDHDecrypter.SUPPORTED_ENCRYPTION_METHODS);
-        //encs.addAll(DirectDecrypter.SUPPORTED_ENCRYPTION_METHODS);
+        encs.addAll(DirectDecrypter.SUPPORTED_ENCRYPTION_METHODS);
         encs.addAll(AESDecrypter.SUPPORTED_ENCRYPTION_METHODS);
-        //encs.addAll(PasswordBasedDecrypter.SUPPORTED_ENCRYPTION_METHODS);
         SUPPORTED_ENCRYPTION_METHODS = Collections.unmodifiableSet(encs);
     }
 
@@ -135,7 +134,7 @@ public class DefaultJWEDecrypterFactory implements JWEDecrypterFactory {
             ECPrivateKey ecPrivateKey = (ECPrivateKey) key;
             decrypter = new ECDHDecrypter(ecPrivateKey);
 
-        } /* FIXME
+        }
 		else if (DirectDecrypter.SUPPORTED_ALGORITHMS.contains(header.getAlgorithm()) &&
 			DirectDecrypter.SUPPORTED_ENCRYPTION_METHODS.contains(header.getEncryptionMethod())) {
 
@@ -152,7 +151,7 @@ public class DefaultJWEDecrypterFactory implements JWEDecrypterFactory {
 
 			decrypter = directDecrypter;
 
-		} */ else if (AESDecrypter.SUPPORTED_ALGORITHMS.contains(header.getAlgorithm()) &&
+        } else if (AESDecrypter.SUPPORTED_ALGORITHMS.contains(header.getAlgorithm()) &&
                 AESDecrypter.SUPPORTED_ENCRYPTION_METHODS.contains(header.getEncryptionMethod())) {
 
             if (!(key instanceof SecretKey)) {

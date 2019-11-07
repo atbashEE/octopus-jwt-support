@@ -22,7 +22,7 @@ import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.CriticalHeaderParam
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.HMAC;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.MACProvider;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.utils.ConstantTimeUtils;
-import be.atbash.ee.security.octopus.nimbus.jose.jwk.OctetSequenceKey;
+import be.atbash.ee.security.octopus.nimbus.jwk.OctetSequenceKey;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSObject;

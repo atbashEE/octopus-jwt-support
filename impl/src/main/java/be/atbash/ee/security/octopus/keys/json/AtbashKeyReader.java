@@ -19,10 +19,10 @@ import be.atbash.ee.security.octopus.UnsupportedKeyType;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.bc.BouncyCastleProviderSingleton;
-import be.atbash.ee.security.octopus.nimbus.jose.jwk.ECKey;
-import be.atbash.ee.security.octopus.nimbus.jose.jwk.JWK;
-import be.atbash.ee.security.octopus.nimbus.jose.jwk.KeyType;
-import be.atbash.ee.security.octopus.nimbus.jose.jwk.RSAKey;
+import be.atbash.ee.security.octopus.nimbus.jwk.ECKey;
+import be.atbash.ee.security.octopus.nimbus.jwk.JWK;
+import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
+import be.atbash.ee.security.octopus.nimbus.jwk.RSAKey;
 import be.atbash.util.exception.AtbashUnexpectedException;
 
 import javax.json.JsonObject;

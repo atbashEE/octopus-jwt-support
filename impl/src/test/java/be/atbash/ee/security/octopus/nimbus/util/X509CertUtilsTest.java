@@ -16,14 +16,11 @@
 package be.atbash.ee.security.octopus.nimbus.util;
 
 
-import be.atbash.ee.security.octopus.nimbus.jose.jwk.Curve;
+import be.atbash.ee.security.octopus.nimbus.IOUtil;
+import be.atbash.ee.security.octopus.nimbus.jwk.Curve;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 import org.junit.Test;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -175,7 +172,7 @@ public class X509CertUtilsTest {
     public void testParseCertWithECKey()
             throws Exception {
 
-        String content = readFileToString("src/test/resources/sample-certs/wikipedia.crt");
+        String content = IOUtil.readFileToString("src/test/resources/sample-certs/wikipedia.crt");
 
         X509Certificate cert = X509CertUtils.parse(content);
 
@@ -205,7 +202,7 @@ public class X509CertUtilsTest {
     public void testParseCertWithRSAKey()
             throws Exception {
 
-        String content = readFileToString("src/test/resources/sample-certs/ietf.crt");
+        String content = IOUtil.readFileToString("src/test/resources/sample-certs/ietf.crt");
 
         X509Certificate cert = X509CertUtils.parse(content);
 
@@ -266,12 +263,4 @@ public class X509CertUtilsTest {
         assertThat(X509CertUtils.parse(pemString).getSubjectDN()).isEqualTo(cert.getSubjectDN());
     }
 
-    private static String readFileToString(String path) {
-        try {
-            return new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            fail(e.getMessage());
-        }
-        return null;
-    }
 }

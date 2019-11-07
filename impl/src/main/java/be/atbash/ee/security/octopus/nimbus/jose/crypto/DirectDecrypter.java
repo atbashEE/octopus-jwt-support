@@ -23,7 +23,7 @@ import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.AlgorithmSupportMes
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.ContentCryptoProvider;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.CriticalHeaderParamsDeferral;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.DirectCryptoProvider;
-import be.atbash.ee.security.octopus.nimbus.jose.jwk.OctetSequenceKey;
+import be.atbash.ee.security.octopus.nimbus.jwk.OctetSequenceKey;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEDecrypter;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEHeader;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.ee.security.octopus.nimbus.jose.jwk;
+package be.atbash.ee.security.octopus.nimbus.jwk;
 
 
 import be.atbash.ee.security.octopus.nimbus.jose.Algorithm;
@@ -234,7 +234,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
          *            encoding of the coordinate's big endian
          *            representation. Must not be {@code null}.
          */
-        public Builder(final Curve crv, final Base64URLValue x, final Base64URLValue y) {
+        public Builder(Curve crv, Base64URLValue x, Base64URLValue y) {
 
             if (crv == null) {
                 throw new IllegalArgumentException("The curve must not be null");
@@ -264,7 +264,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
          * @param pub The public EC key to represent. Must not be
          *            {@code null}.
          */
-        public Builder(final Curve crv, final ECPublicKey pub) {
+        public Builder(Curve crv, ECPublicKey pub) {
 
             this(crv,
                     encodeCoordinate(pub.getParams().getCurve().getField().getFieldSize(), pub.getW().getAffineX()),
@@ -278,7 +278,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
          * @param ecJWK The EC JWK to start with. Must not be
          *              {@code null}.
          */
-        public Builder(final ECKey ecJWK) {
+        public Builder(ECKey ecJWK) {
 
             crv = ecJWK.crv;
             x = ecJWK.x;
@@ -307,7 +307,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
          *          specified (for a public key).
          * @return This builder.
          */
-        public Builder d(final Base64URLValue d) {
+        public Builder d(Base64URLValue d) {
 
             this.d = d;
             return this;
@@ -324,7 +324,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
          *             key).
          * @return This builder.
          */
-        public Builder privateKey(final ECPrivateKey priv) {
+        public Builder privateKey(ECPrivateKey priv) {
 
             if (priv != null) {
                 this.d = encodeCoordinate(priv.getParams().getCurve().getField().getFieldSize(), priv.getS());
@@ -343,7 +343,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
          *             be "EC". Must not be {@code null}.
          * @return This builder.
          */
-        public Builder privateKey(final PrivateKey priv) {
+        public Builder privateKey(PrivateKey priv) {
 
             if (priv instanceof ECPrivateKey) {
                 return privateKey((ECPrivateKey) priv);
@@ -366,7 +366,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
          *            encryption.
          * @return This builder.
          */
-        public Builder keyUse(final KeyUse use) {
+        public Builder keyUse(KeyUse use) {
 
             this.use = use;
             return this;
@@ -380,7 +380,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
          *            specified.
          * @return This builder.
          */
-        public Builder keyOperations(final Set<KeyOperation> ops) {
+        public Builder keyOperations(Set<KeyOperation> ops) {
 
             this.ops = ops;
             return this;
@@ -394,7 +394,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
          *            specified.
          * @return This builder.
          */
-        public Builder algorithm(final Algorithm alg) {
+        public Builder algorithm(Algorithm alg) {
 
             this.alg = alg;
             return this;
@@ -410,7 +410,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
          * @param kid The key ID, {@code null} if not specified.
          * @return This builder.
          */
-        public Builder keyID(final String kid) {
+        public Builder keyID(String kid) {
 
             this.kid = kid;
             return this;
@@ -449,7 +449,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
          * @throws JOSEException If the hash algorithm is not
          *                       supported.
          */
-        public Builder keyIDFromThumbprint(final String hashAlg)
+        public Builder keyIDFromThumbprint(String hashAlg)
                 throws JOSEException {
 
             // Put mandatory params in sorted order
@@ -470,7 +470,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
          *            specified.
          * @return This builder.
          */
-        public Builder x509CertURL(final URI x5u) {
+        public Builder x509CertURL(URI x5u) {
 
             this.x5u = x5u;
             return this;
@@ -501,7 +501,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
          *               {@code null} if not specified.
          * @return This builder.
          */
-        public Builder x509CertSHA256Thumbprint(final Base64URLValue x5t256) {
+        public Builder x509CertSHA256Thumbprint(Base64URLValue x5t256) {
 
             this.x5t256 = x5t256;
             return this;
@@ -515,7 +515,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
          *            list, {@code null} if not specified.
          * @return This builder.
          */
-        public Builder x509CertChain(final List<Base64Value> x5c) {
+        public Builder x509CertChain(List<Base64Value> x5c) {
 
             this.x5c = x5c;
             return this;
@@ -529,7 +529,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
          *                 {@code null} if none.
          * @return This builder.
          */
-        public Builder keyStore(final KeyStore keyStore) {
+        public Builder keyStore(KeyStore keyStore) {
 
             this.ks = keyStore;
             return this;
@@ -577,9 +577,9 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
      * @return The Base64URL-encoded coordinate, with leading zero padding
      * up to the curve's field size.
      */
-    public static Base64URLValue encodeCoordinate(final int fieldSize, final BigInteger coordinate) {
+    public static Base64URLValue encodeCoordinate(int fieldSize, BigInteger coordinate) {
 
-        final byte[] notPadded = BigIntegerUtils.toBytesUnsigned(coordinate);
+        byte[] notPadded = BigIntegerUtils.toBytesUnsigned(coordinate);
 
         int bytesToOutput = (fieldSize + 7) / 8;
 
@@ -589,7 +589,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
             return Base64URLValue.encode(notPadded);
         }
 
-        final byte[] padded = new byte[bytesToOutput];
+        byte[] padded = new byte[bytesToOutput];
 
         System.arraycopy(notPadded, 0, padded, bytesToOutput - notPadded.length, notPadded.length);
 
@@ -634,7 +634,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
      * @param x   The public 'x' coordinate. Must not be {@code null}.
      * @param y   The public 'y' coordinate. Must not be {@code null}.
      */
-    private static void ensurePublicCoordinatesOnCurve(final Curve crv, final Base64URLValue x, final Base64URLValue y) {
+    private static void ensurePublicCoordinatesOnCurve(Curve crv, Base64URLValue x, Base64URLValue y) {
 
         if (!SUPPORTED_CURVES.contains(crv)) {
             throw new IllegalArgumentException("Unknown / unsupported curve: " + crv);
@@ -644,7 +644,6 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
             throw new IllegalArgumentException("Invalid EC JWK: The 'x' and 'y' public coordinates are not on the " + crv + " curve");
         }
     }
-
 
     /**
      * Creates a new public Elliptic Curve JSON Web Key (JWK) with the
@@ -676,10 +675,10 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
      * @param ks     Reference to the underlying key store, {@code null} if
      *               not specified.
      */
-    public ECKey(final Curve crv, final Base64URLValue x, final Base64URLValue y,
-                 final KeyUse use, final Set<KeyOperation> ops, final Algorithm alg, final String kid,
-                 final URI x5u, final Base64URLValue x5t, final Base64URLValue x5t256, final List<Base64Value> x5c,
-                 final KeyStore ks) {
+    public ECKey(Curve crv, Base64URLValue x, Base64URLValue y,
+                 KeyUse use, Set<KeyOperation> ops, Algorithm alg, String kid,
+                 URI x5u, Base64URLValue x5t, Base64URLValue x5t256, List<Base64Value> x5c,
+                 KeyStore ks) {
 
         super(KeyType.EC, use, ops, alg, kid, x5u, x5t, x5t256, x5c, ks);
 
@@ -745,10 +744,10 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
      * @param ks     Reference to the underlying key store, {@code null} if
      *               not specified.
      */
-    public ECKey(final Curve crv, final Base64URLValue x, final Base64URLValue y, final Base64URLValue d,
-                 final KeyUse use, final Set<KeyOperation> ops, final Algorithm alg, final String kid,
-                 final URI x5u, final Base64URLValue x5t, final Base64URLValue x5t256, final List<Base64Value> x5c,
-                 final KeyStore ks) {
+    public ECKey(Curve crv, Base64URLValue x, Base64URLValue y, Base64URLValue d,
+                 KeyUse use, Set<KeyOperation> ops, Algorithm alg, String kid,
+                 URI x5u, Base64URLValue x5t, Base64URLValue x5t256, List<Base64Value> x5c,
+                 KeyStore ks) {
 
         super(KeyType.EC, use, ops, alg, kid, x5u, x5t, x5t256, x5c, ks);
 
@@ -815,10 +814,10 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
      * @param x5c    The X.509 certificate chain, {@code null} if not
      *               specified.
      */
-    public ECKey(final Curve crv, final Base64URLValue x, final Base64URLValue y, final PrivateKey priv,
-                 final KeyUse use, final Set<KeyOperation> ops, final Algorithm alg, final String kid,
-                 final URI x5u, final Base64URLValue x5t, final Base64URLValue x5t256, final List<Base64Value> x5c,
-                 final KeyStore ks) {
+    public ECKey(Curve crv, Base64URLValue x, Base64URLValue y, PrivateKey priv,
+                 KeyUse use, Set<KeyOperation> ops, Algorithm alg, String kid,
+                 URI x5u, Base64URLValue x5t, Base64URLValue x5t256, List<Base64Value> x5c,
+                 KeyStore ks) {
 
         super(KeyType.EC, use, ops, alg, kid, x5u, x5t, x5t256, x5c, ks);
 
@@ -850,6 +849,125 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
     }
 
 
+    /**
+     * Creates a new public Elliptic Curve JSON Web Key (JWK) with the
+     * specified parameters.
+     *
+     * @param crv    The cryptographic curve. Must not be {@code null}.
+     * @param pub    The public EC key to represent. Must not be
+     *               {@code null}.
+     * @param use    The key use, {@code null} if not specified or if the
+     *               key is intended for signing as well as encryption.
+     * @param ops    The key operations, {@code null} if not specified.
+     * @param alg    The intended JOSE algorithm for the key, {@code null}
+     *               if not specified.
+     * @param kid    The key ID, {@code null} if not specified.
+     * @param x5u    The X.509 certificate URL, {@code null} if not
+     *               specified.
+     * @param x5t    The X.509 certificate SHA-1 thumbprint, {@code null}
+     *               if not specified.
+     * @param x5t256 The X.509 certificate SHA-256 thumbprint, {@code null}
+     *               if not specified.
+     * @param x5c    The X.509 certificate chain, {@code null} if not
+     *               specified.
+     * @param ks     Reference to the underlying key store, {@code null} if
+     *               not specified.
+     */
+    public ECKey(Curve crv, ECPublicKey pub,
+                 KeyUse use, Set<KeyOperation> ops, Algorithm alg, String kid,
+                 URI x5u, Base64URLValue x5t, Base64URLValue x5t256, List<Base64Value> x5c,
+                 KeyStore ks) {
+
+        this(crv,
+                encodeCoordinate(pub.getParams().getCurve().getField().getFieldSize(), pub.getW().getAffineX()),
+                encodeCoordinate(pub.getParams().getCurve().getField().getFieldSize(), pub.getW().getAffineY()),
+                use, ops, alg, kid,
+                x5u, x5t, x5t256, x5c,
+                ks);
+    }
+
+
+    /**
+     * Creates a new public / private Elliptic Curve JSON Web Key (JWK)
+     * with the specified parameters.
+     *
+     * @param crv    The cryptographic curve. Must not be {@code null}.
+     * @param pub    The public EC key to represent. Must not be
+     *               {@code null}.
+     * @param priv   The private EC key to represent. Must not be
+     *               {@code null}.
+     * @param use    The key use, {@code null} if not specified or if the
+     *               key is intended for signing as well as encryption.
+     * @param ops    The key operations, {@code null} if not specified.
+     * @param alg    The intended JOSE algorithm for the key, {@code null}
+     *               if not specified.
+     * @param kid    The key ID, {@code null} if not specified.
+     * @param x5u    The X.509 certificate URL, {@code null} if not
+     *               specified.
+     * @param x5t    The X.509 certificate SHA-1 thumbprint, {@code null}
+     *               if not specified.
+     * @param x5t256 The X.509 certificate SHA-256 thumbprint, {@code null}
+     *               if not specified.
+     * @param x5c    The X.509 certificate chain, {@code null} if not
+     *               specified.
+     * @param ks     Reference to the underlying key store, {@code null} if
+     *               not specified.
+     */
+    public ECKey(Curve crv, ECPublicKey pub, ECPrivateKey priv,
+                 KeyUse use, Set<KeyOperation> ops, Algorithm alg, String kid,
+                 URI x5u, Base64URLValue x5t, Base64URLValue x5t256, List<Base64Value> x5c,
+                 KeyStore ks) {
+
+        this(crv,
+                encodeCoordinate(pub.getParams().getCurve().getField().getFieldSize(), pub.getW().getAffineX()),
+                encodeCoordinate(pub.getParams().getCurve().getField().getFieldSize(), pub.getW().getAffineY()),
+                encodeCoordinate(priv.getParams().getCurve().getField().getFieldSize(), priv.getS()),
+                use, ops, alg, kid,
+                x5u, x5t, x5t256, x5c,
+                ks);
+    }
+
+
+    /**
+     * Creates a new public / private Elliptic Curve JSON Web Key (JWK)
+     * with the specified parameters. The private key is specified by its
+     * PKCS#11 handle.
+     *
+     * @param crv    The cryptographic curve. Must not be {@code null}.
+     * @param pub    The public EC key to represent. Must not be
+     *               {@code null}.
+     * @param priv   The private key as a PKCS#11 handle, {@code null} if
+     *               not specified.
+     * @param use    The key use, {@code null} if not specified or if the
+     *               key is intended for signing as well as encryption.
+     * @param ops    The key operations, {@code null} if not specified.
+     * @param alg    The intended JOSE algorithm for the key, {@code null}
+     *               if not specified.
+     * @param kid    The key ID, {@code null} if not specified.
+     * @param x5u    The X.509 certificate URL, {@code null} if not
+     *               specified.
+     * @param x5t    The X.509 certificate SHA-1 thumbprint, {@code null}
+     *               if not specified.
+     * @param x5t256 The X.509 certificate SHA-256 thumbprint, {@code null}
+     *               if not specified.
+     * @param x5c    The X.509 certificate chain, {@code null} if not
+     *               specified.
+     * @param ks     Reference to the underlying key store, {@code null} if
+     *               not specified.
+     */
+    public ECKey(Curve crv, ECPublicKey pub, PrivateKey priv,
+                 KeyUse use, Set<KeyOperation> ops, Algorithm alg, String kid,
+                 URI x5u, Base64URLValue x5t, Base64URLValue x5t256, List<Base64Value> x5c,
+                 KeyStore ks) {
+
+        this(
+                crv,
+                encodeCoordinate(pub.getParams().getCurve().getField().getFieldSize(), pub.getW().getAffineX()),
+                encodeCoordinate(pub.getParams().getCurve().getField().getFieldSize(), pub.getW().getAffineY()),
+                priv,
+                use, ops, alg, kid, x5u, x5t, x5t256, x5c,
+                ks);
+    }
 
 
     @Override
@@ -987,7 +1105,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
      *                       Cryptography (JCA) provider or if the JWK
      *                       parameters are invalid for a private EC key.
      */
-    public ECPrivateKey toECPrivateKey(final Provider provider)
+    public ECPrivateKey toECPrivateKey(Provider provider)
             throws JOSEException {
 
         if (d == null) {
@@ -1077,7 +1195,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
      *                       parameters are invalid for a public and / or
      *                       private EC key.
      */
-    public KeyPair toKeyPair(final Provider provider)
+    public KeyPair toKeyPair(Provider provider)
             throws JOSEException {
 
         if (privateKey != null) {
@@ -1090,7 +1208,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
 
 
     @Override
-    public boolean matches(final X509Certificate cert) {
+    public boolean matches(X509Certificate cert) {
 
         ECPublicKey certECKey;
         try {
@@ -1120,7 +1238,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
      *                                  and the first certificate in it
      *                                  doesn't match.
      */
-    private void ensureMatches(final List<X509Certificate> chain) {
+    private void ensureMatches(List<X509Certificate> chain) {
 
         if (chain == null)
             return;
@@ -1131,7 +1249,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
 
 
     @Override
-    public LinkedHashMap<String, ?> getRequiredParams() {
+    public LinkedHashMap<String, String> getRequiredParams() {
 
         // Put mandatory params in sorted order
         LinkedHashMap<String, String> requiredParams = new LinkedHashMap<>();
@@ -1202,15 +1320,15 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
      * Parses a public / private Elliptic Curve JWK from the specified JSON
      * object string representation.
      *
-     * @param s The JSON object string to parse. Must not be {@code null}.
+     * @param json The JSON object string to parse. Must not be {@code null}.
      * @return The public / private Elliptic Curve JWK.
      * @throws ParseException If the string couldn't be parsed to an
      *                        Elliptic Curve JWK.
      */
-    public static ECKey parse(final String s)
+    public static ECKey parse(String json)
             throws ParseException {
 
-        return parse(JSONObjectUtils.parse(s));
+        return parse(JSONObjectUtils.parse(json));
     }
 
 
@@ -1304,7 +1422,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
      * @return The public Elliptic Curve JWK.
      * @throws JOSEException If parsing failed.
      */
-    public static ECKey parse(final X509Certificate cert)
+    public static ECKey parse(X509Certificate cert)
             throws JOSEException {
 
         if (!(cert.getPublicKey() instanceof ECPublicKey)) {
@@ -1356,9 +1474,9 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
      * @throws KeyStoreException On a key store exception.
      * @throws JOSEException     If EC key loading failed.
      */
-    public static ECKey load(final KeyStore keyStore,
-                             final String alias,
-                             final char[] pin)
+    public static ECKey load(KeyStore keyStore,
+                             String alias,
+                             char[] pin)
             throws KeyStoreException, JOSEException {
 
         Certificate cert = keyStore.getCertificate(alias);

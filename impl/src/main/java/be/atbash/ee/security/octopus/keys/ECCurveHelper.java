@@ -15,7 +15,7 @@
  */
 package be.atbash.ee.security.octopus.keys;
 
-import be.atbash.ee.security.octopus.nimbus.jose.jwk.Curve;
+import be.atbash.ee.security.octopus.nimbus.jwk.Curve;
 import org.bouncycastle.jce.spec.ECNamedCurveSpec;
 
 import java.security.interfaces.ECKey;

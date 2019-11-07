@@ -17,7 +17,7 @@ package be.atbash.ee.security.octopus.keys;
 
 import be.atbash.ee.security.octopus.jwk.EncryptedJSONJWK;
 import be.atbash.ee.security.octopus.keys.reader.KeyReader;
-import be.atbash.ee.security.octopus.nimbus.jose.jwk.JWK;
+import be.atbash.ee.security.octopus.nimbus.jwk.JWK;
 import be.atbash.util.resource.ResourceUtil;
 
 import java.util.List;

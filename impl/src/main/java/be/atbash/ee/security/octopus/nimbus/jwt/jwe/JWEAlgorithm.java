@@ -220,8 +220,9 @@ public final class JWEAlgorithm extends Algorithm {
 
         /**
          * Password-Based Cryptography Specification Version 2.0
+         * FIXME Not activated for the moment. Do we reqsuire this?
          */
-        public static final Family PBES2 = new Family(PBES2_HS256_A128KW, PBES2_HS384_A192KW, PBES2_HS512_A256KW);
+        //public static final Family PBES2 = new Family(PBES2_HS256_A128KW, PBES2_HS384_A192KW, PBES2_HS512_A256KW);
 
         /***
          * Creates a new JWE algorithm family.

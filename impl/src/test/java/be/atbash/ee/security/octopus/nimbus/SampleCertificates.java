@@ -16,7 +16,7 @@
 package be.atbash.ee.security.octopus.nimbus;
 
 
-import be.atbash.ee.security.octopus.nimbus.jose.jwk.Curve;
+import be.atbash.ee.security.octopus.nimbus.jwk.Curve;
 import be.atbash.ee.security.octopus.nimbus.util.Base64Value;
 import be.atbash.ee.security.octopus.nimbus.util.X509CertUtils;
 import org.bouncycastle.asn1.x500.X500Name;

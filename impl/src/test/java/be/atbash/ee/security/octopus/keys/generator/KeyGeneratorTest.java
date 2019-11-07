@@ -16,7 +16,7 @@
 package be.atbash.ee.security.octopus.keys.generator;
 
 import be.atbash.ee.security.octopus.keys.AtbashKey;
-import be.atbash.ee.security.octopus.nimbus.jose.jwk.KeyType;
+import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import org.junit.Before;
 import org.junit.Test;
 

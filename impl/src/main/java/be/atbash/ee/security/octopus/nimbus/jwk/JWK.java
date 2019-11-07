@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.ee.security.octopus.nimbus.jose.jwk;
+package be.atbash.ee.security.octopus.nimbus.jwk;
 
 
 import be.atbash.ee.security.octopus.nimbus.jose.Algorithm;
@@ -369,7 +369,7 @@ public abstract class JWK implements Serializable {
      * @return The required JWK parameters, sorted alphanumerically by key
      * name and ready for JSON serialisation.
      */
-    public abstract LinkedHashMap<String, ?> getRequiredParams();
+    public abstract LinkedHashMap<String, String> getRequiredParams();
 
 
     /**
@@ -598,7 +598,7 @@ public abstract class JWK implements Serializable {
      * @return The public RSA or EC JWK.
      * @throws JOSEException If parsing failed.
      */
-    public static JWK parse(final X509Certificate cert)
+    public static JWK parse(X509Certificate cert)
             throws JOSEException {
 
         if (cert.getPublicKey() instanceof RSAPublicKey) {
@@ -634,7 +634,7 @@ public abstract class JWK implements Serializable {
      * @return The public RSA or EC JWK.
      * @throws JOSEException If parsing failed.
      */
-    public static JWK parseFromPEMEncodedX509Cert(final String pemEncodedCert)
+    public static JWK parseFromPEMEncodedX509Cert(String pemEncodedCert)
             throws JOSEException {
 
         X509Certificate cert = X509CertUtils.parse(pemEncodedCert);
@@ -665,7 +665,7 @@ public abstract class JWK implements Serializable {
      * @throws KeyStoreException On a key store exception.
      * @throws JOSEException     If RSA or EC key loading failed.
      */
-    public static JWK load(final KeyStore keyStore, final String alias, final char[] pin)
+    public static JWK load(KeyStore keyStore, String alias, char[] pin)
             throws KeyStoreException, JOSEException {
 
         java.security.cert.Certificate cert = keyStore.getCertificate(alias);

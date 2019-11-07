@@ -15,7 +15,7 @@
  */
 package be.atbash.ee.security.octopus.keys.generator;
 
-import be.atbash.ee.security.octopus.nimbus.jose.jwk.KeyType;
+import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import be.atbash.util.PublicAPI;
 import be.atbash.util.StringUtils;
 import org.bouncycastle.jce.ECNamedCurveTable;

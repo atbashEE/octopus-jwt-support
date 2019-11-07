@@ -23,7 +23,7 @@ import be.atbash.ee.security.octopus.keys.TestPasswordLookup;
 import be.atbash.ee.security.octopus.keys.reader.KeyReader;
 import be.atbash.ee.security.octopus.keys.reader.KeyResourceType;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
-import be.atbash.ee.security.octopus.nimbus.jose.jwk.JWKSet;
+import be.atbash.ee.security.octopus.nimbus.jwk.JWKSet;
 import be.atbash.util.TestReflectionUtils;
 import be.atbash.util.resource.ResourceUtil;
 import org.junit.Before;

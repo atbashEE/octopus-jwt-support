@@ -85,15 +85,6 @@ public class JWEAlgorithmTest {
     }
 
     @Test
-    public void testPBES2Family() {
-
-        assertThat(JWEAlgorithm.Family.PBES2).contains(JWEAlgorithm.PBES2_HS256_A128KW);
-        assertThat(JWEAlgorithm.Family.PBES2).contains(JWEAlgorithm.PBES2_HS256_A128KW);
-        assertThat(JWEAlgorithm.Family.PBES2).contains(JWEAlgorithm.PBES2_HS256_A128KW);
-        assertThat(JWEAlgorithm.Family.PBES2).hasSize(3);
-    }
-
-    @Test
     public void testECDHFamily() {
 
         assertThat(JWEAlgorithm.Family.ECDH_ES).contains(JWEAlgorithm.ECDH_ES);

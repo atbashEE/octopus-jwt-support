@@ -25,7 +25,7 @@ import be.atbash.ee.security.octopus.nimbus.jose.KeyLengthException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.AESEncrypter;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.ECDHEncrypter;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.RSAEncrypter;
-import be.atbash.ee.security.octopus.nimbus.jose.jwk.KeyType;
+import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEEncrypter;
 
 import javax.crypto.SecretKey;

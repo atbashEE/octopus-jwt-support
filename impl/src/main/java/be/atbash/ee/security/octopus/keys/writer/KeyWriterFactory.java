@@ -19,8 +19,8 @@ import be.atbash.ee.security.octopus.config.PemKeyEncryption;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.keys.writer.encoder.*;
-import be.atbash.ee.security.octopus.nimbus.jose.jwk.JWK;
-import be.atbash.ee.security.octopus.nimbus.jose.jwk.JWKSet;
+import be.atbash.ee.security.octopus.nimbus.jwk.JWK;
+import be.atbash.ee.security.octopus.nimbus.jwk.JWKSet;
 import be.atbash.util.exception.AtbashUnexpectedException;
 
 import javax.annotation.PostConstruct;

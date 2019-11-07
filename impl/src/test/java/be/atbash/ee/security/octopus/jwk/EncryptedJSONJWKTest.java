@@ -16,7 +16,7 @@
 package be.atbash.ee.security.octopus.jwk;
 
 import be.atbash.ee.security.octopus.nimbus.jose.Algorithm;
-import be.atbash.ee.security.octopus.nimbus.jose.jwk.OctetSequenceKey;
+import be.atbash.ee.security.octopus.nimbus.jwk.OctetSequenceKey;
 import be.atbash.ee.security.octopus.util.EncryptionHelper;
 import org.junit.Test;
 

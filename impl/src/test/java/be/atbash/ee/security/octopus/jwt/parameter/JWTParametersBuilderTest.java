@@ -18,7 +18,7 @@ package be.atbash.ee.security.octopus.jwt.parameter;
 import be.atbash.ee.security.octopus.jwt.JWTEncoding;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.fake.FakeRSAPrivate;
-import be.atbash.ee.security.octopus.nimbus.jose.jwk.KeyType;
+import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import be.atbash.ee.security.octopus.util.HmacSecretUtil;
 import be.atbash.util.exception.AtbashIllegalActionException;
 import org.junit.Test;

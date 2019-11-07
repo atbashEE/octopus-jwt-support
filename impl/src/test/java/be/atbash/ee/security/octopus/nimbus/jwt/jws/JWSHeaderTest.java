@@ -18,9 +18,9 @@ package be.atbash.ee.security.octopus.nimbus.jwt.jws;
 
 import be.atbash.ee.security.octopus.nimbus.jose.Header;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEObjectType;
-import be.atbash.ee.security.octopus.nimbus.jose.jwk.KeyUse;
-import be.atbash.ee.security.octopus.nimbus.jose.jwk.OctetSequenceKey;
-import be.atbash.ee.security.octopus.nimbus.jose.jwk.RSAKey;
+import be.atbash.ee.security.octopus.nimbus.jwk.KeyUse;
+import be.atbash.ee.security.octopus.nimbus.jwk.OctetSequenceKey;
+import be.atbash.ee.security.octopus.nimbus.jwk.RSAKey;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.ee.security.octopus.nimbus.util.Base64Value;

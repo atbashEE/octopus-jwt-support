@@ -17,7 +17,7 @@ package be.atbash.ee.security.octopus.nimbus.jose.crypto.impl;
 
 
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
-import be.atbash.ee.security.octopus.nimbus.jose.jwk.Curve;
+import be.atbash.ee.security.octopus.nimbus.jwk.Curve;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWECryptoParts;
@@ -46,10 +46,10 @@ import java.util.Set;
  * <p>Supports the following elliptic curves:
  *
  * <ul>
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.jwk.Curve#P_256}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.jwk.Curve#P_384}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.jwk.Curve#P_521}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.jwk.Curve#X25519}
+ *     <li>{@link Curve#P_256}
+ *     <li>{@link Curve#P_384}
+ *     <li>{@link Curve#P_521}
+ *     <li>{@link Curve#X25519}
  * </ul>
  *
  * <p>Supports the following content encryption algorithms:

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.ee.security.octopus.nimbus.jose.jwk;
+package be.atbash.ee.security.octopus.nimbus.jwk;
 
 
 import java.math.BigInteger;
@@ -26,10 +26,10 @@ import java.security.spec.*;
  * <p>Supports the following standard EC JWK curves:
  *
  * <ul>
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.jwk.Curve#P_256}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.jwk.Curve#P_256K}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.jwk.Curve#P_384}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jose.jwk.Curve#P_521}
+ *     <li>{@link Curve#P_256}
+ *     <li>{@link Curve#P_256K}
+ *     <li>{@link Curve#P_384}
+ *     <li>{@link Curve#P_521}
  * </ul>
  *
  * @author Vladimir Dzhuvinov
@@ -48,21 +48,21 @@ class ECParameterTable {
 
     /**
      * The parameter spec for a
-     * {@link be.atbash.ee.security.octopus.nimbus.jose.jwk.Curve#P_256K} curve.
+     * {@link Curve#P_256K} curve.
      */
     private static final ECParameterSpec P_256K_SPEC;
 
 
     /**
      * The parameter spec for a
-     * {@link be.atbash.ee.security.octopus.nimbus.jose.jwk.Curve#P_384} curve.
+     * {@link Curve#P_384} curve.
      */
     private static final ECParameterSpec P_384_SPEC;
 
 
     /**
      * The parameter spec for a
-     * {@link be.atbash.ee.security.octopus.nimbus.jose.jwk.Curve#P_521} curve.
+     * {@link Curve#P_521} curve.
      */
     private static final ECParameterSpec P_521_SPEC;
 
