@@ -879,7 +879,7 @@ public final class JWTClaimsSet implements Serializable {
 
                     break;
                 default:
-                    builder.claim(name, json.get(name));
+                    builder.claim(name, JSONObjectUtils.getJsonValueAsObject(json.get(name)));
                     break;
             }
         }
