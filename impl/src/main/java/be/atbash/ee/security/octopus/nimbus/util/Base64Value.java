@@ -55,7 +55,13 @@ public class Base64Value implements /*JSONAware,*/ Serializable {
             throw new IllegalArgumentException("The Base64 value must not be null");
         }
 
-        value = base64;
+        if (base64.endsWith("\n")) {
+
+            value = base64.substring(0, base64.length() - 1);
+        } else {
+            value = base64;
+
+        }
     }
 
 

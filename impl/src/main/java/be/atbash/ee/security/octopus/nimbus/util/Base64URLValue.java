@@ -127,7 +127,7 @@ public class Base64URLValue extends Base64Value {
      */
     public byte[] decode() {
 
-        return Base64.getUrlDecoder().decode(value);
+        return Base64.getUrlDecoder().decode(value.replaceAll("\n", ""));
     }
 
 }
