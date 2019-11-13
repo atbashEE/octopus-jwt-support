@@ -19,10 +19,13 @@ package be.atbash.ee.security.octopus.nimbus.util;
 import org.junit.Test;
 
 import javax.json.Json;
+import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 import java.net.URI;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -77,7 +80,7 @@ public class JSONObjectUtilsTest {
     }
 
     @Test
-    public void testGetStringList_null() throws ParseException {
+    public void testGetStringList_null()  {
 
         JsonObjectBuilder builder = Json.createObjectBuilder();
         builder.addNull("key");
@@ -85,10 +88,28 @@ public class JSONObjectUtilsTest {
     }
 
     @Test
-    public void testGetStringList_missing() throws ParseException {
+    public void testGetStringList_missing()  {
 
         JsonObjectBuilder builder = Json.createObjectBuilder();
         assertThat(JSONObjectUtils.getStringList(builder.build(), "key")).isNull();
     }
 
+    @Test
+    public void testAsJsonArray() {
+        List<String> data = new ArrayList<>();
+        data.add("item1");
+        data.add("item2");
+        data.add("item3");
+        JsonArray array = JSONObjectUtils.asJsonArray(data);
+
+        assertThat(array.toString()).isEqualTo("[\"item1\",\"item2\",\"item3\"]");
+    }
+
+    @Test
+    public void testAsJsonArray_empty() {
+        List<String> data = new ArrayList<>();
+        JsonArray array = JSONObjectUtils.asJsonArray(data);
+
+        assertThat(array.toString()).isEqualTo("[]");
+    }
 }

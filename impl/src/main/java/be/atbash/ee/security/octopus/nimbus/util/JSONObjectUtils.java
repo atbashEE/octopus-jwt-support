@@ -122,9 +122,8 @@ public class JSONObjectUtils {
      * @param jsonObject   The JSON object. Must not be {@code null}.
      * @param key The JSON object member key. Must not be {@code null}.
      * @return The JSON object member value, may be {@code null}.
-     * @throws ParseException If the value is not of the expected type.
      */
-    public static List<String> getStringList(JsonObject jsonObject, String key) throws ParseException {
+    public static List<String> getStringList(JsonObject jsonObject, String key) {
 
         // FIXME Test what happens when using other values as Strings.
         if (!hasValue(jsonObject, key)) {
@@ -133,6 +132,23 @@ public class JSONObjectUtils {
         JsonArray jsonArray = jsonObject.getJsonArray(key);
 
         return jsonArray.getValuesAs(JsonString::getString);
+
+    }
+
+    /**
+     * Gets a String list as Json Array.
+     *
+     * @param data List of String items to be converted to Json Array.
+     * @return JsonArray with the Data
+     */
+    public static JsonArray asJsonArray(List<String> data) {
+
+        JsonArrayBuilder result = Json.createArrayBuilder();
+        for (String item : data) {
+            result.add(item);
+        }
+
+        return result.build();
 
     }
 
