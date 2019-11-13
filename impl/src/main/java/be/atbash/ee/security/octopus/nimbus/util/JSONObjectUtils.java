@@ -34,7 +34,7 @@ import java.util.List;
  * @author Vladimir Dzhuvinov
  * @version 2018-11-06
  */
-public class JSONObjectUtils {
+public final class JSONObjectUtils {
 
 
     /**
@@ -221,6 +221,32 @@ public class JSONObjectUtils {
     public static boolean hasValue(JsonObject jsonObject, String key) {
         return jsonObject.containsKey(key) && jsonObject.get(key).getValueType() != JsonValue.ValueType.NULL;
     }
+
+    /**
+     * Gets a string member of a JSON object as an enumerated object.
+     *
+     * @param jsonObject The JSON object. Must not be {@code null}.
+     * @param key        The JSON object member key. Must not be
+     *                   {@code null}.
+     * @param enumClass  The enumeration class. Must not be {@code null}.
+     * @return The member value.
+     */
+    public static <T extends Enum<T>> T getEnum(JsonObject jsonObject,
+                                                String key,
+                                                Class<T> enumClass) {
+
+        String value = jsonObject.getString(key);
+
+        for (T en : enumClass.getEnumConstants()) {
+
+            if (en.toString().equalsIgnoreCase(value)) {
+                return en;
+            }
+        }
+
+        throw new IncorrectJsonValueException(String.format("Unexpected value of JSON object member with key \"%s\" for enum %s", key, enumClass.toString()));
+    }
+
     /**
      * Prevents public instantiation.
      */

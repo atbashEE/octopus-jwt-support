@@ -16,6 +16,7 @@
 package be.atbash.ee.security.octopus.nimbus.util;
 
 
+import be.atbash.ee.security.octopus.jwt.JWTEncoding;
 import org.junit.Test;
 
 import javax.json.Json;
@@ -111,5 +112,23 @@ public class JSONObjectUtilsTest {
         JsonArray array = JSONObjectUtils.asJsonArray(data);
 
         assertThat(array.toString()).isEqualTo("[]");
+    }
+
+    @Test
+    public void testGetEnum() {
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+        builder.add("key", JWTEncoding.JWS.name());
+        JsonObject jsonObject = builder.build();
+        JWTEncoding value = JSONObjectUtils.getEnum(jsonObject, "key", JWTEncoding.class);
+
+        assertThat(value).isEqualTo(JWTEncoding.JWS);
+    }
+
+    @Test(expected = IncorrectJsonValueException.class)
+    public void testGetEnum_invalid() {
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+        builder.add("key", "something");
+        JsonObject jsonObject = builder.build();
+        JSONObjectUtils.getEnum(jsonObject, "key", JWTEncoding.class);
     }
 }
