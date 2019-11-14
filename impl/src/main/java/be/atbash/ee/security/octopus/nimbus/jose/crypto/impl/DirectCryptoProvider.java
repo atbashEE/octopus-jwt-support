@@ -29,25 +29,25 @@ import java.util.Set;
 
 /**
  * The base abstract class for direct encrypters and decrypters of
- * {@link com.nimbusds.jose.JWEObject JWE objects} with a shared symmetric key.
+ * {@link be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEObject JWE objects} with a shared symmetric key.
  *
  * <p>Supports the following key management algorithms:
  *
  * <ul>
- *     <li>{@link com.nimbusds.jose.JWEAlgorithm#DIR}
+ *     <li>{@link JWEAlgorithm#DIR}
  * </ul>
  *
  * <p>Supports the following content encryption algorithms:
  *
  * <ul>
- *     <li>{@link com.nimbusds.jose.EncryptionMethod#A128CBC_HS256}
- *     <li>{@link com.nimbusds.jose.EncryptionMethod#A192CBC_HS384}
- *     <li>{@link com.nimbusds.jose.EncryptionMethod#A256CBC_HS512}
- *     <li>{@link com.nimbusds.jose.EncryptionMethod#A128GCM}
- *     <li>{@link com.nimbusds.jose.EncryptionMethod#A192GCM}
- *     <li>{@link com.nimbusds.jose.EncryptionMethod#A256GCM}
- *     <li>{@link com.nimbusds.jose.EncryptionMethod#A128CBC_HS256_DEPRECATED}
- *     <li>{@link com.nimbusds.jose.EncryptionMethod#A256CBC_HS512_DEPRECATED}
+ *     <li>{@link EncryptionMethod#A128CBC_HS256}
+ *     <li>{@link EncryptionMethod#A192CBC_HS384}
+ *     <li>{@link EncryptionMethod#A256CBC_HS512}
+ *     <li>{@link EncryptionMethod#A128GCM}
+ *     <li>{@link EncryptionMethod#A192GCM}
+ *     <li>{@link EncryptionMethod#A256GCM}
+ *     <li>{@link EncryptionMethod#A128CBC_HS256_DEPRECATED}
+ *     <li>{@link EncryptionMethod#A256CBC_HS512_DEPRECATED}
  * </ul>
  *
  * @author Vladimir Dzhuvinov

@@ -45,7 +45,7 @@ import java.util.Set;
  * <a href="https://tools.ietf.org/html/rfc7518#section-4.6">section 4.6</a>
  * for more information.
  *
- * <p>For Curve25519/X25519, see {@link X25519Decrypter} instead.
+ * <p>For Curve25519/X25519, X25519Decrypter is not copied.
  *
  * <p>This class is thread-safe.
  *

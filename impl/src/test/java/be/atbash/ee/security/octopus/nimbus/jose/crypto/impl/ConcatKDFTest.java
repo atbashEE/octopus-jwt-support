@@ -194,8 +194,7 @@ public class ConcatKDFTest {
 	}
 
 	@Test
-	public void testComputeDigestCycles()
-		throws Exception {
+    public void testComputeDigestCycles() {
 		
 		assertThat(ConcatKDF.computeDigestCycles(256, 128)).isEqualTo(1);
 		assertThat(ConcatKDF.computeDigestCycles(384, 128)).isEqualTo(1);

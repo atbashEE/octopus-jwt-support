@@ -52,7 +52,7 @@ public class RSAKeyUtilsTest {
     }
 
     @Test
-    public void testConversion_missing() throws JOSEException {
+    public void testConversion_missing() {
 
         RSAKey rsaJWK = generateKey().toPublicJWK();
 

@@ -25,6 +25,7 @@ import be.atbash.ee.security.octopus.nimbus.jwt.SignedJWT;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import org.junit.Test;
 
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.Collections;
 import java.util.HashSet;
@@ -88,8 +89,8 @@ public class UnencodedJWSPayloadTest {
 
         JWSSigner signer = new MACSigner(JWK);
 
-        byte[] headerBytes = (header.toBase64URL().toString() + '.').getBytes("UTF-8");
-        byte[] payloadBytes = "$.02".getBytes("UTF-8");
+        byte[] headerBytes = (header.toBase64URL().toString() + '.').getBytes(StandardCharsets.UTF_8);
+        byte[] payloadBytes = "$.02".getBytes(StandardCharsets.UTF_8);
         byte[] signingInput = new byte[headerBytes.length + payloadBytes.length];
         System.arraycopy(headerBytes, 0, signingInput, 0, headerBytes.length);
         System.arraycopy(payloadBytes, 0, signingInput, headerBytes.length, payloadBytes.length);
@@ -127,8 +128,8 @@ public class UnencodedJWSPayloadTest {
         assertThat((Boolean) header.getCustomParam("b64")).isFalse();
 
         JWSVerifier verifier = new MACVerifier(JWK, new HashSet<>(Collections.singletonList("b64")));
-        byte[] payloadBytes = claimsSet.toString().getBytes("UTF-8");
-        byte[] headerBytes = (header.toBase64URL().toString() + '.').getBytes("UTF-8");
+        byte[] payloadBytes = claimsSet.toString().getBytes(StandardCharsets.UTF_8);
+        byte[] headerBytes = (header.toBase64URL().toString() + '.').getBytes(StandardCharsets.UTF_8);
         byte[] signingInput = new byte[headerBytes.length + payloadBytes.length];
         System.arraycopy(headerBytes, 0, signingInput, 0, headerBytes.length);
         System.arraycopy(payloadBytes, 0, signingInput, headerBytes.length, payloadBytes.length);

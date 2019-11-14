@@ -20,6 +20,7 @@ import org.junit.Test;
 
 import java.math.BigInteger;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -72,7 +73,7 @@ public class Base64URLValueTest {
     @Test
     public void testEncodeAndDecode() {
 
-        byte[] bytes = STRING.getBytes(Charset.forName("utf-8"));
+        byte[] bytes = STRING.getBytes(StandardCharsets.UTF_8);
 
         Base64URLValue b64url = Base64URLValue.encode(bytes);
 

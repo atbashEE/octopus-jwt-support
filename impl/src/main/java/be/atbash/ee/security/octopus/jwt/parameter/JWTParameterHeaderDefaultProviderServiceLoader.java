@@ -35,7 +35,7 @@ final class JWTParameterHeaderDefaultProviderServiceLoader {
         for (JWTParameterHeaderDefaultProvider provider : providers) {
             defaultProviders.add(provider);
         }
-        Collections.sort(defaultProviders, new OrderComparator());
+        defaultProviders.sort(new OrderComparator());
     }
 
     static synchronized List<JWTParameterHeaderDefaultProvider> getDefaultProviders() {

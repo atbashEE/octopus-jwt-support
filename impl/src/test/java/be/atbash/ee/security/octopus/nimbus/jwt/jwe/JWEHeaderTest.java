@@ -455,7 +455,7 @@ public class JWEHeaderTest {
             throws ParseException {
 
         JsonObjectBuilder builder = Json.createObjectBuilder();
-        ;
+
         builder.add("alg", JWEAlgorithm.DIR.getName());
         builder.add("enc", EncryptionMethod.A128GCM.getName());
         builder.addNull("zip");

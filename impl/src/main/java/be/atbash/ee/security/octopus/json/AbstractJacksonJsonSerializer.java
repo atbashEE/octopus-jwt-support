@@ -27,7 +27,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Set;
 
 public abstract class AbstractJacksonJsonSerializer<T> implements JsonbSerializer<T> {

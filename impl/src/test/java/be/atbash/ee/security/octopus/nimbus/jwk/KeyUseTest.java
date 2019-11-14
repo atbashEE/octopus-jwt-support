@@ -112,8 +112,7 @@ public class KeyUseTest {
     }
 
     @Test
-    public void testInferKeyUseFromX509Cert_RSAENC()
-            throws IOException {
+    public void testInferKeyUseFromX509Cert_RSAENC() {
 
         String pemEncodedCert = IOUtil.readFileToString("src/test/resources/sample-certs/ietf.crt");
         X509Certificate x509Cert = X509CertUtils.parse(pemEncodedCert);
@@ -121,8 +120,7 @@ public class KeyUseTest {
     }
 
     @Test
-    public void testInferKeyUseFromX509Cert_ECDH()
-            throws IOException {
+    public void testInferKeyUseFromX509Cert_ECDH() {
 
         String pemEncodedCert = IOUtil.readFileToString("src/test/resources/sample-certs/wikipedia.crt");
         X509Certificate x509Cert = X509CertUtils.parse(pemEncodedCert);

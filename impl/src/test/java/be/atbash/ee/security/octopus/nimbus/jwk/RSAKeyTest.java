@@ -602,7 +602,7 @@ public class RSAKeyTest {
         assertThat(privKey.getModulus()).isEqualTo(new Base64URLValue(n).decodeToBigInteger());
         assertThat(privKey.getPrivateExponent()).isEqualTo(new Base64URLValue(d).decodeToBigInteger());
 
-        assertThat(privKey instanceof RSAPrivateCrtKey).isTrue();
+        assertThat(privKey).isInstanceOf(RSAPrivateCrtKey.class);
         RSAPrivateCrtKey privCrtKey = (RSAPrivateCrtKey) privKey;
         assertThat(privCrtKey.getPublicExponent()).isEqualTo(new Base64URLValue(e).decodeToBigInteger());
         assertThat(privCrtKey.getPrimeP()).isEqualTo(new Base64URLValue(p).decodeToBigInteger());
@@ -624,7 +624,7 @@ public class RSAKeyTest {
         assertThat(privKey.getModulus()).isEqualTo(new Base64URLValue(n).decodeToBigInteger());
         assertThat(privKey.getPrivateExponent()).isEqualTo(new Base64URLValue(d).decodeToBigInteger());
 
-        assertThat(privKey instanceof RSAPrivateCrtKey).isTrue();
+        assertThat(privKey).isInstanceOf(RSAPrivateCrtKey.class);
         privCrtKey = (RSAPrivateCrtKey) privKey;
         assertThat(privCrtKey.getPublicExponent()).isEqualTo(new Base64URLValue(e).decodeToBigInteger());
         assertThat(privCrtKey.getPrimeP()).isEqualTo(new Base64URLValue(p).decodeToBigInteger());
@@ -691,7 +691,7 @@ public class RSAKeyTest {
                 null, null, null, null,
                 null, null, null, null, null);
 
-        assertThat(key instanceof AsymmetricJWK).isTrue();
+        assertThat(key).isInstanceOf(AsymmetricJWK.class);
 
         // Public key export
         RSAPublicKey pubKey = (RSAPublicKey) key.toPublicKey();
@@ -717,14 +717,14 @@ public class RSAKeyTest {
                 KeyUse.SIGNATURE, null, JWSAlgorithm.RS256, "1",
                 null, null, null, null);
 
-        assertThat(key instanceof AsymmetricJWK).isTrue();
+        assertThat(key).isInstanceOf(AsymmetricJWK.class);
 
         // Private key export with CRT (2nd form)
         RSAPrivateKey privKey = (RSAPrivateKey) key.toPrivateKey();
         assertThat(privKey.getModulus()).isEqualTo(new Base64URLValue(n).decodeToBigInteger());
         assertThat(privKey.getPrivateExponent()).isEqualTo(new Base64URLValue(d).decodeToBigInteger());
 
-        assertThat(privKey instanceof RSAPrivateCrtKey).isTrue();
+        assertThat(privKey).isInstanceOf(RSAPrivateCrtKey.class);
         RSAPrivateCrtKey privCrtKey = (RSAPrivateCrtKey) privKey;
         assertThat(privCrtKey.getPublicExponent()).isEqualTo(new Base64URLValue(e).decodeToBigInteger());
         assertThat(privCrtKey.getPrimeP()).isEqualTo(new Base64URLValue(p).decodeToBigInteger());
@@ -905,7 +905,7 @@ public class RSAKeyTest {
 
         try {
             new RSAKey.Builder(new Base64URLValue(n), new Base64URLValue(e))
-                    .x509CertChain(Collections.<Base64Value>emptyList())
+                    .x509CertChain(Collections.emptyList())
                     .build();
         } catch (IllegalStateException e) {
             assertThat(e.getMessage()).isEqualTo("The X.509 certificate chain \"x5c\" must not be empty");
@@ -1312,8 +1312,7 @@ public class RSAKeyTest {
     }
 
     @Test
-    public void testParseFromX509CertWithECPublicKey()
-            throws Exception {
+    public void testParseFromX509CertWithECPublicKey() {
 
         String pemEncodedCert = IOUtil.readFileToString("src/test/resources/sample-certs/wikipedia.crt");
         X509Certificate cert = X509CertUtils.parse(pemEncodedCert);
@@ -1464,7 +1463,7 @@ public class RSAKeyTest {
             fail();
         } catch (JOSEException e) {
             assertThat(e.getMessage()).isEqualTo("Couldn't retrieve private RSA key (bad pin?): Cannot recover key");
-            assertThat(e.getCause() instanceof UnrecoverableKeyException).isTrue();
+            assertThat(e.getCause()).isInstanceOf(UnrecoverableKeyException.class);
         }
     }
 

@@ -118,7 +118,7 @@ public class ConfigKeyResourcePasswordLookup implements KeyResourcePasswordLooku
         return keyName.substring(KEY_PREFIX.length()).split("!", 2);
     }
 
-    private class ConfigKey {
+    private static class ConfigKey {
         private String path;
         private String keyId;
 

@@ -44,7 +44,7 @@ import static be.atbash.ee.security.octopus.nimbus.jwk.ECKey.SUPPORTED_CURVES;
 public class JwkKeyEncoderPublicPart implements KeyEncoder {
 
     @Override
-    public byte[] encodeKey(AtbashKey atbashKey, KeyEncoderParameters parameters) throws IOException {
+    public byte[] encodeKey(AtbashKey atbashKey, KeyEncoderParameters parameters) {
 
         if (KeyType.RSA.equals(atbashKey.getSecretKeyType().getKeyType())) {
             return encodeRSAKey(atbashKey);

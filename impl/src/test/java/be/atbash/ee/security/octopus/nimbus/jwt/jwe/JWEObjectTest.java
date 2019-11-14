@@ -73,7 +73,7 @@ public class JWEObjectTest {
         try {
             jwe.encrypt(new JWEEncrypter() {
                 @Override
-                public JWECryptoParts encrypt(JWEHeader header, byte[] clearText) throws JOSEException {
+                public JWECryptoParts encrypt(JWEHeader header, byte[] clearText) {
                     return null;
                 }
 
@@ -106,7 +106,7 @@ public class JWEObjectTest {
         try {
             jwe.encrypt(new JWEEncrypter() {
                 @Override
-                public JWECryptoParts encrypt(JWEHeader header, byte[] clearText) throws JOSEException {
+                public JWECryptoParts encrypt(JWEHeader header, byte[] clearText) {
                     return null;
                 }
 

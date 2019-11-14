@@ -67,7 +67,7 @@ public class KeySelector {
 
         List<AtbashKey> keys = keyManager.retrieveKeys(selectorCriteria);
 
-        if (keys.isEmpty() || keys.size() > 1) {
+        if (keys.size() != 1) {
             return null;
         }
         return keys.get(0);

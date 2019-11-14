@@ -43,10 +43,8 @@ final class JWKMetadata {
      *
      * @param jsonObject The JSON object to parse. Must not be {@code null}.
      * @return The key type.
-     * @throws ParseException If parsing failed.
      */
-    static KeyType parseKeyType(JsonObject jsonObject)
-            throws ParseException {
+    static KeyType parseKeyType(JsonObject jsonObject) {
 
         return KeyType.parse(jsonObject.getString("kty"));
     }
@@ -94,10 +92,8 @@ final class JWKMetadata {
      *
      * @param jsonObject The JSON object to parse. Must not be {@code null}.
      * @return The intended JOSE algorithm, {@code null} if not specified.
-     * @throws ParseException If parsing failed.
      */
-    static Algorithm parseAlgorithm(JsonObject jsonObject)
-            throws ParseException {
+    static Algorithm parseAlgorithm(JsonObject jsonObject) {
 
         if (jsonObject.containsKey("alg")) {
             return new Algorithm(jsonObject.getString("alg"));
@@ -112,10 +108,8 @@ final class JWKMetadata {
      *
      * @param jsonObject The JSON object to parse. Must not be {@code null}.
      * @return The key ID, {@code null} if not specified.
-     * @throws ParseException If parsing failed.
      */
-    static String parseKeyID(JsonObject jsonObject)
-            throws ParseException {
+    static String parseKeyID(JsonObject jsonObject) {
 
         if (jsonObject.containsKey("kid")) {
             return jsonObject.getString("kid");
@@ -149,10 +143,8 @@ final class JWKMetadata {
      * @param jsonObject The JSON object to parse. Must not be {@code null}.
      * @return The X.509 certificate thumbprint, {@code null} if not
      * specified.
-     * @throws ParseException If parsing failed.
      */
-    static Base64URLValue parseX509CertThumbprint(JsonObject jsonObject)
-            throws ParseException {
+    static Base64URLValue parseX509CertThumbprint(JsonObject jsonObject) {
 
         if (jsonObject.containsKey("x5t")) {
             return new Base64URLValue(jsonObject.getString("x5t"));
@@ -168,10 +160,8 @@ final class JWKMetadata {
      * @param jsonObject The JSON object to parse. Must not be {@code null}.
      * @return The X.509 certificate SHA-256 thumbprint, {@code null} if
      * not specified.
-     * @throws ParseException If parsing failed.
      */
-    static Base64URLValue parseX509CertSHA256Thumbprint(JsonObject jsonObject)
-            throws ParseException {
+    static Base64URLValue parseX509CertSHA256Thumbprint(JsonObject jsonObject) {
 
         if (jsonObject.containsKey("x5t#S256")) {
             return new Base64URLValue(jsonObject.getString("x5t#S256"));

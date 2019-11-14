@@ -101,7 +101,7 @@ public class JWKSetTest {
         // Check first EC key
         JWK key = keyList.get(0);
 
-        assertThat(key instanceof ECKey).isTrue();
+        assertThat(key).isInstanceOf(ECKey.class);
         assertThat(key.getKeyID()).isEqualTo("1");
         assertThat(key.getKeyUse()).isEqualTo(KeyUse.ENCRYPTION);
 
@@ -114,7 +114,7 @@ public class JWKSetTest {
 
         // Check second RSA key
         key = keyList.get(1);
-        assertThat(key instanceof RSAKey).isTrue();
+        assertThat(key).isInstanceOf(RSAKey.class);
         assertThat(key.getKeyID()).isEqualTo("2011-04-29");
         assertThat(key.getKeyUse()).isNull();
         assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.RS256);
@@ -217,7 +217,7 @@ public class JWKSetTest {
 
         // First OCT key
         JWK key = keyList.get(0);
-        assertThat(key instanceof OctetSequenceKey).isTrue();
+        assertThat(key).isInstanceOf(OctetSequenceKey.class);
         assertThat(key.getKeyType()).isEqualTo(KeyType.OCT);
         assertThat(key.getKeyUse()).isNull();
         assertThat(key.getAlgorithm()).isEqualTo(JWEAlgorithm.A128KW);
@@ -226,7 +226,7 @@ public class JWKSetTest {
 
         // Second OCT key
         key = keyList.get(1);
-        assertThat(key instanceof OctetSequenceKey).isTrue();
+        assertThat(key).isInstanceOf(OctetSequenceKey.class);
         assertThat(key.getKeyType()).isEqualTo(KeyType.OCT);
         assertThat(key.getKeyUse()).isNull();
         assertThat(key.getKeyOperations()).isNull();
@@ -236,8 +236,7 @@ public class JWKSetTest {
     }
 
     @Test
-    public void testParsePrivateJWKSet()
-            throws Exception {
+    public void testParsePrivateJWKSet() {
 
         // The string is from the JPSK spec
         String s = "{\"keys\":" +
@@ -300,7 +299,7 @@ public class JWKSetTest {
 
         // Check EC key
         JWK key = keyList.get(0);
-        assertThat(key instanceof ECKey).isTrue();
+        assertThat(key).isInstanceOf(ECKey.class);
         assertThat(key.getKeyUse()).isEqualTo(KeyUse.ENCRYPTION);
         assertThat(key.getAlgorithm()).isNull();
         assertThat(key.getKeyID()).isEqualTo("1");
@@ -317,7 +316,7 @@ public class JWKSetTest {
 
         // Check RSA key
         key = keyList.get(1);
-        assertThat(key instanceof RSAKey).isTrue();
+        assertThat(key).isInstanceOf(RSAKey.class);
         assertThat(key.getKeyUse()).isNull();
         assertThat(key.getKeyOperations()).isNull();
         assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.RS256);
@@ -443,7 +442,7 @@ public class JWKSetTest {
         // Check first EC key
         JWK key = keyList.get(0);
 
-        assertThat(key instanceof ECKey).isTrue();
+        assertThat(key).isInstanceOf(ECKey.class);
         assertThat(key.getKeyID()).isEqualTo("1");
         assertThat(key.getKeyUse()).isEqualTo(KeyUse.ENCRYPTION);
         assertThat(key.getKeyOperations()).isNull();
@@ -457,7 +456,7 @@ public class JWKSetTest {
 
         // Check second RSA key
         key = keyList.get(1);
-        assertThat(key instanceof RSAKey).isTrue();
+        assertThat(key).isInstanceOf(RSAKey.class);
         assertThat(key.getKeyID()).isEqualTo("2011-04-29");
         assertThat(key.getKeyUse()).isNull();
         assertThat(key.getKeyOperations()).isNull();
@@ -506,7 +505,7 @@ public class JWKSetTest {
         // Check first EC key
         JWK key = keySet.getKeyByKeyId("1");
 
-        assertThat(key instanceof ECKey).isTrue();
+        assertThat(key).isInstanceOf(ECKey.class);
         assertThat(key.getKeyID()).isEqualTo("1");
         assertThat(key.getKeyUse()).isEqualTo(KeyUse.ENCRYPTION);
 
@@ -519,7 +518,7 @@ public class JWKSetTest {
 
         // Check second RSA key
         key = keySet.getKeyByKeyId("2011-04-29");
-        assertThat(key instanceof RSAKey).isTrue();
+        assertThat(key).isInstanceOf(RSAKey.class);
         assertThat(key.getKeyID()).isEqualTo("2011-04-29");
         assertThat(key.getKeyUse()).isNull();
         assertThat(key.getKeyOperations()).isNull();
@@ -561,8 +560,7 @@ public class JWKSetTest {
     }
 
 
-    public void testOctJWKSetToPublic()
-            throws Exception {
+    public void testOctJWKSetToPublic() {
 
         OctetSequenceKey oct1 = new OctetSequenceKey.Builder(new Base64URLValue("abc")).build();
         assertThat(oct1.getKeyValue().toString()).isEqualTo("abc");

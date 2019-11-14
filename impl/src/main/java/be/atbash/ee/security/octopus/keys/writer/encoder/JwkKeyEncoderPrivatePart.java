@@ -51,7 +51,7 @@ public class JwkKeyEncoderPrivatePart implements KeyEncoder {
     }
 
     @Override
-    public byte[] encodeKey(AtbashKey atbashKey, KeyEncoderParameters parameters) throws IOException {
+    public byte[] encodeKey(AtbashKey atbashKey, KeyEncoderParameters parameters) {
 
         if (KeyType.RSA.equals(atbashKey.getSecretKeyType().getKeyType())) {
             return encodeRSAKey(atbashKey);

@@ -67,7 +67,7 @@ public class OctetSequenceKeyTest {
 
         OctetSequenceKey key = new OctetSequenceKey(k, null, ops, JWSAlgorithm.HS256, "1", x5u, x5t, x5t256, x5c, keyStore);
 
-        assertThat(key instanceof SecretJWK).isTrue();
+        assertThat(key).isInstanceOf(SecretJWK.class);
 
         assertThat(key.getKeyType()).isEqualTo(KeyType.OCT);
         assertThat(key.getKeyUse()).isNull();
@@ -295,8 +295,7 @@ public class OctetSequenceKeyTest {
     }
 
     @Test
-    public void testBuilderWithByteArray()
-            throws Exception {
+    public void testBuilderWithByteArray() {
 
         byte[] key = new byte[32];
         new SecureRandom().nextBytes(key);
@@ -307,8 +306,7 @@ public class OctetSequenceKeyTest {
     }
 
     @Test
-    public void testBuilderWithSecretKey()
-            throws Exception {
+    public void testBuilderWithSecretKey() {
 
         byte[] key = new byte[32];
         new SecureRandom().nextBytes(key);
@@ -402,7 +400,7 @@ public class OctetSequenceKeyTest {
 
         String orderedJSON = "{\"k\":\"GawgguFyGrWKav7AX4VKUg\",\"kty\":\"oct\"}";
 
-        Base64URLValue expected = Base64URLValue.encode(MessageDigest.getInstance("SHA-256").digest(orderedJSON.getBytes(Charset.forName("UTF-8"))));
+        Base64URLValue expected = Base64URLValue.encode(MessageDigest.getInstance("SHA-256").digest(orderedJSON.getBytes(StandardCharsets.UTF_8)));
 
         assertThat(thumbprint).isEqualTo(expected);
     }
@@ -553,7 +551,7 @@ public class OctetSequenceKeyTest {
             fail();
         } catch (Exception e) {
             assertThat(e.getMessage()).contains("Couldn't retrieve secret key (bad pin?)");
-            assertThat(e.getCause() instanceof UnrecoverableKeyException).isTrue();
+            assertThat(e.getCause()).isInstanceOf(UnrecoverableKeyException.class);
         }
     }
 

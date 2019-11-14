@@ -32,7 +32,7 @@ import java.util.Set;
 
 /**
  * The base abstract class for Elliptic Curve Diffie-Hellman encrypters and
- * decrypters of {@link JWEObject JWE objects}.
+ * decrypters of {@link be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEObject JWE objects}.
  *
  * <p>Supports the following key management algorithms:
  *

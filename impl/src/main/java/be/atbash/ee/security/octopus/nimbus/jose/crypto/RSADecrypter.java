@@ -31,7 +31,7 @@ import java.util.Set;
 
 
 /**
- * RSA decrypter of {@link JWEObject JWE objects}. Expects a
+ * RSA decrypter of {@link be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEObject JWE objects}. Expects a
  * private RSA key.
  *
  * <p>Decrypts the encrypted Content Encryption Key (CEK) with the private RSA
@@ -54,14 +54,14 @@ import java.util.Set;
  * <p>Supports the following content encryption algorithms:
  *
  * <ul>
- *     <li>{@link EncryptionMethod#A128CBC_HS256}
- *     <li>{@link EncryptionMethod#A192CBC_HS384}
- *     <li>{@link EncryptionMethod#A256CBC_HS512}
- *     <li>{@link EncryptionMethod#A128GCM}
- *     <li>{@link EncryptionMethod#A192GCM}
- *     <li>{@link EncryptionMethod#A256GCM}
- *     <li>{@link EncryptionMethod#A128CBC_HS256_DEPRECATED}
- *     <li>{@link EncryptionMethod#A256CBC_HS512_DEPRECATED}
+ *     <li>{@link be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod#A128CBC_HS256}
+ *     <li>{@link be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod#A192CBC_HS384}
+ *     <li>{@link be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod#A256CBC_HS512}
+ *     <li>{@link be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod#A128GCM}
+ *     <li>{@link be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod#A192GCM}
+ *     <li>{@link be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod#A256GCM}
+ *     <li>{@link be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod#A128CBC_HS256_DEPRECATED}
+ *     <li>{@link be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod#A256CBC_HS512_DEPRECATED}
  * </ul>
  *
  * @author David Ortiz

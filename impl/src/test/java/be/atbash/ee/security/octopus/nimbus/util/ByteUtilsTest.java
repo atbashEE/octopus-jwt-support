@@ -20,6 +20,7 @@ import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import org.junit.Test;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -59,7 +60,7 @@ public class ByteUtilsTest {
     public void testHashTruncation()
             throws Exception {
 
-        byte[] hash = MessageDigest.getInstance("SHA-256").digest("Hello, world!".getBytes(Charset.forName("UTF-8")));
+        byte[] hash = MessageDigest.getInstance("SHA-256").digest("Hello, world!".getBytes(StandardCharsets.UTF_8));
 
         byte[] firstHalf = ByteUtils.subArray(hash, ByteUtils.byteLength(0), ByteUtils.byteLength(128));
         byte[] secondHalf = ByteUtils.subArray(hash, ByteUtils.byteLength(128), ByteUtils.byteLength(128));
@@ -70,8 +71,7 @@ public class ByteUtilsTest {
     }
 
     @Test
-    public void testSafeBitLength_OK()
-            throws JOSEException {
+    public void testSafeBitLength_OK() {
 
         assertThat(ByteUtils.bitLength(1)).isEqualTo(8);
         assertThat(ByteUtils.bitLength(2)).isEqualTo(16);

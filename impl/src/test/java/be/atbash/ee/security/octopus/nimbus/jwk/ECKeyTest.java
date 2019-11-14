@@ -888,8 +888,7 @@ public class ECKeyTest {
     }
 
     @Test
-    public void testParseFromX509CertWithRSAPublicKey()
-            throws Exception {
+    public void testParseFromX509CertWithRSAPublicKey() {
 
         String pemEncodedCert = IOUtil.readFileToString("src/test/resources/sample-certs/ietf.crt");
         X509Certificate cert = X509CertUtils.parse(pemEncodedCert);
@@ -960,7 +959,7 @@ public class ECKeyTest {
             fail();
         } catch (JOSEException e) {
             assertThat(e.getMessage()).isEqualTo("Couldn't retrieve private EC key (bad pin?): Cannot recover key");
-            assertThat(e.getCause() instanceof UnrecoverableKeyException).isTrue();
+            assertThat(e.getCause()).isInstanceOf(UnrecoverableKeyException.class);
         }
     }
 

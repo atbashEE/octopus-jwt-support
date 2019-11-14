@@ -23,6 +23,8 @@ import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSObject;
 import org.junit.Test;
 
+import java.nio.charset.StandardCharsets;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -51,7 +53,7 @@ public class PayloadTest {
         assertThat(payload.getOrigin()).isEqualTo(Payload.Origin.JWS_OBJECT);
         assertThat(payload.toJWSObject()).isEqualTo(jwsObject);
         assertThat(payload.toString()).isEqualTo(s);
-        assertThat(new String(payload.toBytes(), "UTF-8")).isEqualTo(s);
+        assertThat(new String(payload.toBytes(), StandardCharsets.UTF_8)).isEqualTo(s);
     }
 
 
@@ -73,7 +75,7 @@ public class PayloadTest {
         assertThat(payload.toJWSObject().getHeader().getAlgorithm()).isEqualTo(JWSAlgorithm.HS256);
 
         assertThat(payload.toString()).isEqualTo(s);
-        assertThat(new String(payload.toBytes(), "UTF-8")).isEqualTo(s);
+        assertThat(new String(payload.toBytes(), StandardCharsets.UTF_8)).isEqualTo(s);
     }
 
     @Test
@@ -98,7 +100,7 @@ public class PayloadTest {
         assertThat(payload.toJWSObject()).isNotNull();
 
         assertThat(payload.toString()).isEqualTo(s);
-        assertThat(new String(payload.toBytes(), "UTF-8")).isEqualTo(s);
+        assertThat(new String(payload.toBytes(), StandardCharsets.UTF_8)).isEqualTo(s);
     }
 
     @Test
@@ -122,7 +124,7 @@ public class PayloadTest {
         assertThat(payload.toJWSObject()).isNotNull();
 
         assertThat(payload.toString()).isEqualTo(s);
-        assertThat(new String(payload.toBytes(), "UTF-8")).isEqualTo(s);
+        assertThat(new String(payload.toBytes(), StandardCharsets.UTF_8)).isEqualTo(s);
     }
 
     @Test
