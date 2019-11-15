@@ -203,8 +203,12 @@ public final class JSONObjectUtils {
         if (value instanceof Integer) {
             builder.add(key, Json.createValue((Integer) value));
         }
+        if (value instanceof Long) {
+            builder.add(key, Json.createValue((Long) value));
+        }
         if (value instanceof Boolean) {
-            builder.add(key, Json.createValue(((Boolean) value).toString()));
+            Boolean bool = (Boolean) value;
+            builder.add(key, bool ? JsonValue.TRUE : JsonValue.FALSE);
         }
         if (value instanceof Collection) {
             // We assume collection of String

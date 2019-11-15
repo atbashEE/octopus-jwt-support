@@ -131,4 +131,16 @@ public class JSONObjectUtilsTest {
         JsonObject jsonObject = builder.build();
         JSONObjectUtils.getEnum(jsonObject, "key", JWTEncoding.class);
     }
+
+    @Test
+    public void addValue() {
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+        JSONObjectUtils.addValue(builder, "stringKey", "someString");
+        JSONObjectUtils.addValue(builder, "longKey", 123456L);
+        JSONObjectUtils.addValue(builder, "intKey", 123);
+        JSONObjectUtils.addValue(builder, "boolKey", Boolean.TRUE);
+
+        String data = builder.build().toString();
+        assertThat(data).isEqualTo("{\"stringKey\":\"someString\",\"longKey\":123456,\"intKey\":123,\"boolKey\":true}");
+    }
 }
