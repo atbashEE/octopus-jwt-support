@@ -505,7 +505,7 @@ public final class JWTClaimsSet implements Serializable {
         for (int i = 0; i < stringArray.length; i++) {
 
             try {
-                stringArray[i] = (String) list.get(i);
+                stringArray[i] = list.get(i).toString();
             } catch (ClassCastException e) {
                 throw new ParseException("The \"" + name + "\" claim is not a list / JSON array of strings", 0);
             }
@@ -800,7 +800,7 @@ public final class JWTClaimsSet implements Serializable {
             } else if (claim.getValue() != null) {
                 JSONObjectUtils.addValue(result, claim.getKey(), claim.getValue());
             } else if (includeClaimsWithNullValues) {
-                result.add(claim.getKey(), "");
+                result.addNull(claim.getKey());
             }
         }
 
@@ -829,61 +829,60 @@ public final class JWTClaimsSet implements Serializable {
 
         JWTClaimsSet.Builder builder = new JWTClaimsSet.Builder();
 
-        // Parse registered + custom params
-        for (String name : json.keySet()) {
+        if (json != null) {
+            // Parse registered + custom params
+            for (String name : json.keySet()) {
 
-            switch (name) {
-                case ISSUER_CLAIM:
+                switch (name) {
+                    case ISSUER_CLAIM:
 
-                    builder.issuer(json.getString(ISSUER_CLAIM));
+                        builder.issuer(json.getString(ISSUER_CLAIM));
 
-                    break;
-                case SUBJECT_CLAIM:
+                        break;
+                    case SUBJECT_CLAIM:
 
-                    builder.subject(json.getString(SUBJECT_CLAIM));
+                        builder.subject(json.getString(SUBJECT_CLAIM));
 
-                    break;
-                case AUDIENCE_CLAIM:
+                        break;
+                    case AUDIENCE_CLAIM:
 
-                    JsonValue audValue = json.get(AUDIENCE_CLAIM);
+                        JsonValue audValue = json.get(AUDIENCE_CLAIM);
 
-                    if (audValue.getValueType() == JsonValue.ValueType.STRING) {
-                        List<String> singleAud = new ArrayList<>();
-                        singleAud.add(json.getString(AUDIENCE_CLAIM));
-                        builder.audience(singleAud);
-                    } else if (audValue.getValueType() == JsonValue.ValueType.ARRAY) {
-                        builder.audience(JSONObjectUtils.getStringList(json, AUDIENCE_CLAIM));
-                    } else if (audValue == null) {
-                        builder.audience((String) null);
-                    }
+                        if (audValue.getValueType() == JsonValue.ValueType.STRING) {
+                            List<String> singleAud = new ArrayList<>();
+                            singleAud.add(json.getString(AUDIENCE_CLAIM));
+                            builder.audience(singleAud);
+                        } else if (audValue.getValueType() == JsonValue.ValueType.ARRAY) {
+                            builder.audience(JSONObjectUtils.getStringList(json, AUDIENCE_CLAIM));
+                        }
 
-                    break;
-                case EXPIRATION_TIME_CLAIM:
+                        break;
+                    case EXPIRATION_TIME_CLAIM:
 
-                    builder.expirationTime(new Date(json.getJsonNumber(EXPIRATION_TIME_CLAIM).longValue() * 1000));
+                        builder.expirationTime(new Date(json.getJsonNumber(EXPIRATION_TIME_CLAIM).longValue() * 1000));
 
-                    break;
-                case NOT_BEFORE_CLAIM:
+                        break;
+                    case NOT_BEFORE_CLAIM:
 
-                    builder.notBeforeTime(new Date(json.getJsonNumber(NOT_BEFORE_CLAIM).longValue() * 1000));
+                        builder.notBeforeTime(new Date(json.getJsonNumber(NOT_BEFORE_CLAIM).longValue() * 1000));
 
-                    break;
-                case ISSUED_AT_CLAIM:
+                        break;
+                    case ISSUED_AT_CLAIM:
 
-                    builder.issueTime(new Date(json.getJsonNumber(ISSUED_AT_CLAIM).longValue() * 1000));
+                        builder.issueTime(new Date(json.getJsonNumber(ISSUED_AT_CLAIM).longValue() * 1000));
 
-                    break;
-                case JWT_ID_CLAIM:
+                        break;
+                    case JWT_ID_CLAIM:
 
-                    builder.jwtID(json.getString(JWT_ID_CLAIM));
+                        builder.jwtID(json.getString(JWT_ID_CLAIM));
 
-                    break;
-                default:
-                    builder.claim(name, JSONObjectUtils.getJsonValueAsObject(json.get(name)));
-                    break;
+                        break;
+                    default:
+                        builder.claim(name, JSONObjectUtils.getJsonValueAsObject(json.get(name)));
+                        break;
+                }
             }
         }
-
         return builder.build();
     }
 

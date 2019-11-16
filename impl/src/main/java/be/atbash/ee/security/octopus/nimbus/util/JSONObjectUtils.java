@@ -154,6 +154,9 @@ public final class JSONObjectUtils {
 
     public static Object getJsonValueAsObject(JsonValue value) {
         Object result = null;
+        if (value == null) {
+            return null;
+        }
         switch (value.getValueType()) {
 
             case ARRAY:
@@ -196,15 +199,23 @@ public final class JSONObjectUtils {
     public static void addValue(JsonObjectBuilder builder, String key, Object value) {
         if (value instanceof JsonObject) {
             builder.add(key, (JsonObject) value);
+            return;
+        }
+        if (value instanceof JsonArray) {
+            builder.add(key, (JsonArray) value);
+            return;  // Mainly for this case sine JsonArray is also Collection
         }
         if (value instanceof String) {
             builder.add(key, Json.createValue(value.toString()));
+            return;
         }
         if (value instanceof Integer) {
             builder.add(key, Json.createValue((Integer) value));
+            return;
         }
         if (value instanceof Long) {
             builder.add(key, Json.createValue((Long) value));
+            return;
         }
         if (value instanceof Boolean) {
             Boolean bool = (Boolean) value;
