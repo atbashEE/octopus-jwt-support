@@ -115,6 +115,35 @@ public final class JSONObjectUtils {
         return null;
     }
 
+    /**
+     * Gets a string member of a JSON object as {@code java.net.URI}.
+     *
+     * @param jsonObject The JSON object. Must not be {@code null}.
+     * @param key        The JSON object member key. Must not be {@code null}.
+     * @return The JSON object member value, may be {@code null}.
+     * @throws ParseException If the value is not of the expected type.
+     */
+    public static URI getURIRequired(JsonObject jsonObject, String key)
+            throws ParseException {
+
+        URI uri = getURI(jsonObject, key);
+        if (uri == null) {
+            throw new ParseException(String.format("Missing JSON object member with key \"%s\"", key), 0);
+        }
+        return uri;
+    }
+
+    /**
+     * Remove the key from the Json Object.
+     * @param jsonObject The JsonObject
+     * @param key The key to remove
+     * @return The JsonObject with the key removed.
+     */
+    public static JsonObject remove(JsonObject jsonObject, String key) {
+        JsonObjectBuilder result = Json.createObjectBuilder(jsonObject);
+        result.remove(key);
+        return result.build();
+    }
 
     /**
      * Gets a string list member of a JSON object

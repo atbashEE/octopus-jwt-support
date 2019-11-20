@@ -143,4 +143,30 @@ public class JSONObjectUtilsTest {
         String data = builder.build().toString();
         assertThat(data).isEqualTo("{\"stringKey\":\"someString\",\"longKey\":123456,\"intKey\":123,\"boolKey\":true}");
     }
+
+    @Test
+    public void remove() {
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+        builder.add("key1", "value1");
+        builder.add("key2", "value2");
+
+        JsonObject jsonObject1 = builder.build();
+        JsonObject jsonObject2 = JSONObjectUtils.remove(jsonObject1, "key1");
+
+        assertThat(jsonObject2.keySet()).containsOnly("key2");
+
+    }
+
+    @Test
+    public void remove_nonExistentKey() {
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+        builder.add("key1", "value1");
+        builder.add("key2", "value2");
+
+        JsonObject jsonObject1 = builder.build();
+        JsonObject jsonObject2 = JSONObjectUtils.remove(jsonObject1, "key3");
+
+        assertThat(jsonObject2.keySet()).contains("key1", "key2");
+
+    }
 }
