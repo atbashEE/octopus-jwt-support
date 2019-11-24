@@ -487,7 +487,7 @@ public class JWSHeaderTest {
         assertThat(jsonObject).hasSize(2);
 
         Header header = JWSHeader.parse(jsonObject);
-        assertThat(header.getCriticalParams()).isNull();
+        assertThat(header.getCriticalParams()).isEmpty();
     }
 
     @Test

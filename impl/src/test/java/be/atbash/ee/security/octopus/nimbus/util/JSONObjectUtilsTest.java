@@ -85,14 +85,14 @@ public class JSONObjectUtilsTest {
 
         JsonObjectBuilder builder = Json.createObjectBuilder();
         builder.addNull("key");
-        assertThat(JSONObjectUtils.getStringList(builder.build(), "key")).isNull();
+        assertThat(JSONObjectUtils.getStringList(builder.build(), "key")).isEmpty();
     }
 
     @Test
     public void testGetStringList_missing()  {
 
         JsonObjectBuilder builder = Json.createObjectBuilder();
-        assertThat(JSONObjectUtils.getStringList(builder.build(), "key")).isNull();
+        assertThat(JSONObjectUtils.getStringList(builder.build(), "key")).isEmpty();
     }
 
     @Test
@@ -130,6 +130,15 @@ public class JSONObjectUtilsTest {
         builder.add("key", "something");
         JsonObject jsonObject = builder.build();
         JSONObjectUtils.getEnum(jsonObject, "key", JWTEncoding.class);
+    }
+
+    @Test
+    public void testGetEnum_null() {
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+        builder.addNull("key");
+        JsonObject jsonObject = builder.build();
+        JWTEncoding value = JSONObjectUtils.getEnum(jsonObject, "key", JWTEncoding.class);
+        assertThat(value).isNull();
     }
 
     @Test

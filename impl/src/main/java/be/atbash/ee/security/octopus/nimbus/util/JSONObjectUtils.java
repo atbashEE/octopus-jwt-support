@@ -24,6 +24,7 @@ import javax.json.bind.JsonbException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -156,7 +157,7 @@ public final class JSONObjectUtils {
 
         // FIXME Test what happens when using other values as Strings.
         if (!hasValue(jsonObject, key)) {
-            return null;
+            return new ArrayList<>();
         }
         JsonArray jsonArray = jsonObject.getJsonArray(key);
 
@@ -234,6 +235,10 @@ public final class JSONObjectUtils {
             builder.add(key, (JsonArray) value);
             return;  // Mainly for this case sine JsonArray is also Collection
         }
+        if (value instanceof JsonValue) {
+            builder.add(key, (JsonValue)value);
+            return;
+        }
         if (value instanceof String) {
             builder.add(key, Json.createValue(value.toString()));
             return;
@@ -278,7 +283,9 @@ public final class JSONObjectUtils {
     public static <T extends Enum<T>> T getEnum(JsonObject jsonObject,
                                                 String key,
                                                 Class<T> enumClass) {
-
+        if (!hasValue(jsonObject, key)) {
+            return null;
+        }
         String value = jsonObject.getString(key);
 
         for (T en : enumClass.getEnumConstants()) {
