@@ -24,15 +24,15 @@ import be.atbash.ee.security.octopus.nimbus.jose.proc.BadJOSEException;
  * @author Vladimir Dzhuvinov
  * @version 2015-06-29
  */
-class BadJWTException extends BadJOSEException {
-
+public class BadJWTException extends BadJOSEException {
+// also used in oauth2-oidc-sdk
 
     /**
      * Creates a new bad JWT exception.
      *
      * @param message The exception message.
      */
-    BadJWTException(String message) {
+    public BadJWTException(String message) {
 
         super(message);
     }
@@ -44,7 +44,7 @@ class BadJWTException extends BadJOSEException {
      * @param message The exception message.
      * @param cause   The exception cause.
      */
-    BadJWTException(String message, Throwable cause) {
+    public BadJWTException(String message, Throwable cause) {
 
         super(message, cause);
     }
