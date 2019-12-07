@@ -24,6 +24,7 @@ import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEObjectType;
 import be.atbash.ee.security.octopus.nimbus.jose.Payload;
 import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
+import be.atbash.ee.security.octopus.nimbus.jwt.JWTClaimsSet;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEHeader;
@@ -36,6 +37,7 @@ import be.atbash.util.exception.AtbashUnexpectedException;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.json.JsonObject;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
@@ -116,8 +118,6 @@ public class JWTEncoder {
     }
 
     private JWSObject createJWTObject(Object data, JWTParametersSigning parameters) throws JOSEException {
-        String payload = createJSONString(data);
-
         JWSObject jwsObject;
 
         JWSHeader header = new JWSHeader.Builder(signerFactory.defineJWSAlgorithm(parameters))
@@ -126,7 +126,14 @@ public class JWTEncoder {
                 .customParams(parameters.getHeaderValues())
                 .build();
 
-        jwsObject = new JWSObject(header, new Payload(payload));
+        if (data instanceof JWTClaimsSet) {
+            JsonObject jsonObject = ((JWTClaimsSet) data).toJSONObject();
+            jwsObject = new JWSObject(header, new Payload(jsonObject));
+        } else {
+            String payload = createJSONString(data);
+
+            jwsObject = new JWSObject(header, new Payload(payload));
+        }
 
         // Apply the Signing protection
         JWSSigner signer = signerFactory.createSigner(parameters);
