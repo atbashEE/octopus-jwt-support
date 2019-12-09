@@ -17,8 +17,6 @@ package be.atbash.ee.security.octopus.nimbus.jose.crypto.impl;
 
 
 import be.atbash.ee.security.octopus.nimbus.jwk.Curve;
-import be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod;
-import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import org.junit.Test;
 
@@ -48,35 +46,6 @@ public class AlgorithmSupportMessageTest {
         String msg = AlgorithmSupportMessage.unsupportedJWSAlgorithm(unsupported, supported);
 
         assertThat(msg).isEqualTo("Unsupported JWS algorithm ES256, must be HS256");
-    }
-
-    @Test
-    public void testWithJWEAlgorithm() {
-
-        JWEAlgorithm unsupported = JWEAlgorithm.A128GCMKW;
-
-        Collection<JWEAlgorithm> supported = new LinkedHashSet<>();
-        supported.add(JWEAlgorithm.RSA1_5);
-        supported.add(JWEAlgorithm.RSA_OAEP);
-
-        String msg = AlgorithmSupportMessage.unsupportedJWEAlgorithm(unsupported, supported);
-
-        assertThat(msg).isEqualTo("Unsupported JWE algorithm A128GCMKW, must be RSA1_5 or RSA-OAEP");
-    }
-
-    @Test
-    public void testWithEncryptionMethod() {
-
-        EncryptionMethod unsupported = EncryptionMethod.A128CBC_HS256_DEPRECATED;
-
-        Collection<EncryptionMethod> supported = new LinkedHashSet<>();
-        supported.add(EncryptionMethod.A128GCM);
-        supported.add(EncryptionMethod.A192GCM);
-        supported.add(EncryptionMethod.A256GCM);
-
-        String msg = AlgorithmSupportMessage.unsupportedEncryptionMethod(unsupported, supported);
-
-        assertThat(msg).isEqualTo("Unsupported JWE encryption method A128CBC+HS256, must be A128GCM, A192GCM or A256GCM");
     }
 
     @Test

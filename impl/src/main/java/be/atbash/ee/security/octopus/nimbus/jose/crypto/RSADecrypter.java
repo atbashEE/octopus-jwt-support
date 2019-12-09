@@ -47,8 +47,6 @@ import java.util.Set;
  *
  * <ul>
  *     <li>{@link JWEAlgorithm#RSA_OAEP_256}
- *     <li>{@link JWEAlgorithm#RSA_OAEP} (deprecated)
- *     <li>{@link JWEAlgorithm#RSA1_5} (deprecated)
  * </ul>
  *
  * <p>Supports the following content encryption algorithms:
@@ -60,8 +58,6 @@ import java.util.Set;
  *     <li>{@link be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod#A128GCM}
  *     <li>{@link be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod#A192GCM}
  *     <li>{@link be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod#A256GCM}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod#A128CBC_HS256_DEPRECATED}
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod#A256CBC_HS512_DEPRECATED}
  * </ul>
  *
  * @author David Ortiz
@@ -82,14 +78,6 @@ public class RSADecrypter extends RSACryptoProvider implements JWEDecrypter, Cri
      * The private RSA key.
      */
     private final PrivateKey privateKey;
-
-
-    /**
-     * Stores a CEK decryption exception is one was encountered during the
-     * last {@link #decrypt} run.
-     */
-    private Exception cekDecryptionException;
-
 
     /**
      * Creates a new RSA decrypter. This constructor can also accept a
@@ -241,36 +229,7 @@ public class RSADecrypter extends RSACryptoProvider implements JWEDecrypter, Cri
 
         SecretKey cek;
 
-        if (alg.equals(JWEAlgorithm.RSA1_5)) {
-
-            int keyLength = header.getEncryptionMethod().cekBitLength();
-
-            // Protect against MMA attack by generating random CEK to be used on decryption failure,
-            // see http://www.ietf.org/mail-archive/web/jose/current/msg01832.html
-            SecretKey randomCEK = ContentCryptoProvider.generateCEK(header.getEncryptionMethod(), getJCAContext().getSecureRandom());
-
-            try {
-                cek = RSA1_5.decryptCEK(privateKey, encryptedKey.decode(), keyLength, getJCAContext().getKeyEncryptionProvider());
-
-                if (cek == null) {
-                    // CEK length mismatch, signalled by null instead of
-                    // exception to prevent MMA attack
-                    cek = randomCEK;
-                }
-
-            } catch (Exception e) {
-                // continue
-                cekDecryptionException = e;
-                cek = randomCEK;
-            }
-
-            cekDecryptionException = null;
-
-        } else if (alg.equals(JWEAlgorithm.RSA_OAEP)) {
-
-            cek = RSA_OAEP.decryptCEK(privateKey, encryptedKey.decode(), getJCAContext().getKeyEncryptionProvider());
-
-        } else if (alg.equals(JWEAlgorithm.RSA_OAEP_256)) {
+        if (alg.equals(JWEAlgorithm.RSA_OAEP_256)) {
 
             cek = RSA_OAEP_256.decryptCEK(privateKey, encryptedKey.decode(), getJCAContext().getKeyEncryptionProvider());
 
@@ -280,19 +239,6 @@ public class RSADecrypter extends RSACryptoProvider implements JWEDecrypter, Cri
         }
 
         return ContentCryptoProvider.decrypt(header, encryptedKey, iv, cipherText, authTag, cek, getJCAContext());
-    }
-
-
-    /**
-     * Returns the Content Encryption Key (CEK) decryption exception if one
-     * was encountered during the last {@link #decrypt} run. Intended for
-     * logging and debugging purposes.
-     *
-     * @return The recorded exception, {@code null} if none.
-     */
-    public Exception getCEKDecryptionException() {
-
-        return cekDecryptionException;
     }
 }
 

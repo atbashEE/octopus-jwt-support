@@ -42,8 +42,6 @@ public class EncryptionMethodTest {
         assertThat(EncryptionMethod.A192GCM.cekBitLength()).isEqualTo(192);
         assertThat(EncryptionMethod.A256GCM.cekBitLength()).isEqualTo(256);
 
-        assertThat(EncryptionMethod.A128CBC_HS256_DEPRECATED.cekBitLength()).isEqualTo(256);
-        assertThat(EncryptionMethod.A256CBC_HS512_DEPRECATED.cekBitLength()).isEqualTo(512);
     }
 
 

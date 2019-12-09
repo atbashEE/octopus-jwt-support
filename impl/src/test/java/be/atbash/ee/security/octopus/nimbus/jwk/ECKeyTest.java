@@ -185,7 +185,6 @@ public class ECKeyTest {
             throws Exception {
 
         URI x5u = new URI("http://example.com/jwk.json");
-        Base64URLValue x5t = new Base64URLValue("abc");
         Base64URLValue x5t256 = new Base64URLValue("abc256");
         List<Base64Value> x5c = null;
 
@@ -194,7 +193,7 @@ public class ECKeyTest {
         KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
 
         ECKey key = new ECKey(ExampleKeyP256.CRV, ExampleKeyP256.X, ExampleKeyP256.Y, ExampleKeyP256.D,
-                KeyUse.SIGNATURE, ops, JWSAlgorithm.ES256, "1", x5u, x5t, x5t256, x5c, keyStore);
+                KeyUse.SIGNATURE, ops, JWSAlgorithm.ES256, "1", x5u, x5t256, x5c, keyStore);
 
         assertThat(key).isInstanceOf(AsymmetricJWK.class);
         assertThat(key).isInstanceOf(CurveBasedJWK.class);
@@ -205,7 +204,6 @@ public class ECKeyTest {
         assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.ES256);
         assertThat(key.getKeyID()).isEqualTo("1");
         assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
-        assertThat(key.getX509CertThumbprint().toString()).isEqualTo(x5t.toString());
         assertThat(key.getX509CertSHA256Thumbprint().toString()).isEqualTo(x5t256.toString());
         assertThat(key.getX509CertChain()).isNull();
         assertThat(key.getParsedX509CertChain()).isNull();
@@ -247,7 +245,6 @@ public class ECKeyTest {
         assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.ES256);
         assertThat(key.getKeyID()).isEqualTo("1");
         assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
-        assertThat(key.getX509CertThumbprint().toString()).isEqualTo(x5t.toString());
         assertThat(key.getX509CertSHA256Thumbprint().toString()).isEqualTo(x5t256.toString());
         assertThat(key.getX509CertChain()).isNull();
         assertThat(key.getParsedX509CertChain()).isNull();
@@ -266,7 +263,6 @@ public class ECKeyTest {
             throws Exception {
 
         URI x5u = new URI("http://example.com/jwk.json");
-        Base64URLValue x5t = new Base64URLValue("abc");
         Base64URLValue x5t256 = new Base64URLValue("abc256");
         List<Base64Value> x5c = null;
 
@@ -274,7 +270,7 @@ public class ECKeyTest {
         Set<KeyOperation> ops = new LinkedHashSet<>(Arrays.asList(KeyOperation.SIGN, KeyOperation.VERIFY));
 
         ECKey key = new ECKey(ExampleKeyP256.CRV, ExampleKeyP256.X, ExampleKeyP256.Y, ExampleKeyP256.D,
-                use, ops, JWSAlgorithm.ES256, "1", x5u, x5t, x5t256, x5c, null);
+                use, ops, JWSAlgorithm.ES256, "1", x5u, x5t256, x5c, null);
 
         // Test getters
         assertThat(key.getKeyUse()).isNull();
@@ -284,7 +280,6 @@ public class ECKeyTest {
         assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.ES256);
         assertThat(key.getKeyID()).isEqualTo("1");
         assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
-        assertThat(key.getX509CertThumbprint().toString()).isEqualTo(x5t.toString());
         assertThat(key.getX509CertSHA256Thumbprint().toString()).isEqualTo(x5t256.toString());
         assertThat(key.getX509CertChain()).isNull();
         assertThat(key.getParsedX509CertChain()).isNull();
@@ -330,7 +325,6 @@ public class ECKeyTest {
         assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.ES256);
         assertThat(key.getKeyID()).isEqualTo("1");
         assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
-        assertThat(key.getX509CertThumbprint().toString()).isEqualTo(x5t.toString());
         assertThat(key.getX509CertSHA256Thumbprint().toString()).isEqualTo(x5t256.toString());
         assertThat(key.getX509CertChain()).isNull();
         assertThat(key.getParsedX509CertChain()).isNull();
@@ -360,7 +354,6 @@ public class ECKeyTest {
                 .algorithm(JWSAlgorithm.ES256)
                 .keyID("1")
                 .x509CertURL(x5u)
-                .x509CertThumbprint(x5t)
                 .x509CertChain(x5c)
                 .keyStore(keyStore)
                 .build();
@@ -370,7 +363,6 @@ public class ECKeyTest {
         assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.ES256);
         assertThat(key.getKeyID()).isEqualTo("1");
         assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
-        assertThat(key.getX509CertThumbprint().toString()).isEqualTo(x5t.toString());
         assertThat(key.getX509CertChain()).isNull();
         assertThat(key.getParsedX509CertChain()).isNull();
         assertThat(key.getKeyStore()).isEqualTo(keyStore);
@@ -409,7 +401,6 @@ public class ECKeyTest {
         assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.ES256);
         assertThat(key.getKeyID()).isEqualTo("1");
         assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
-        assertThat(key.getX509CertThumbprint().toString()).isEqualTo(x5t.toString());
         assertThat(key.getX509CertChain()).isNull();
         assertThat(key.getParsedX509CertChain()).isNull();
         assertThat(key.getKeyStore()).isNull();
@@ -427,7 +418,6 @@ public class ECKeyTest {
             throws Exception {
 
         URI x5u = new URI("http://example.com/jwk.json");
-        Base64URLValue x5t = new Base64URLValue("abc");
         List<Base64Value> x5c = null;
 
         KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
@@ -438,7 +428,6 @@ public class ECKeyTest {
                 .algorithm(JWSAlgorithm.ES256)
                 .keyID("1")
                 .x509CertURL(x5u)
-                .x509CertThumbprint(x5t)
                 .x509CertChain(x5c)
                 .keyStore(keyStore)
                 .build();
@@ -451,7 +440,6 @@ public class ECKeyTest {
         assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.ES256);
         assertThat(key.getKeyID()).isEqualTo("1");
         assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
-        assertThat(key.getX509CertThumbprint().toString()).isEqualTo(x5t.toString());
         assertThat(key.getX509CertChain()).isNull();
         assertThat(key.getParsedX509CertChain()).isNull();
         assertThat(key.getKeyStore()).isEqualTo(keyStore);
@@ -571,7 +559,7 @@ public class ECKeyTest {
 
         Set<KeyOperation> ops = new HashSet<>(Arrays.asList(KeyOperation.SIGN, KeyOperation.VERIFY));
 
-        JWK jwk = new ECKey(ExampleKeyP256.CRV, ExampleKeyP256.X, ExampleKeyP256.Y, use, ops, null, null, null, null, null, null, null);
+        JWK jwk = new ECKey(ExampleKeyP256.CRV, ExampleKeyP256.X, ExampleKeyP256.Y, use, ops, null, null, null, null, null, null);
         assertThat(jwk.getKeyUse()).isEqualTo(use);
         assertThat(jwk.getKeyOperations()).isEqualTo(ops);
 
@@ -766,7 +754,7 @@ public class ECKeyTest {
 
         KeyPairGenerator gen = KeyPairGenerator.getInstance("EC");
         gen.initialize(Curve.P_256.toECParameterSpec());
-        final KeyPair kp = gen.generateKeyPair();
+        KeyPair kp = gen.generateKeyPair();
 
         ECPublicKey publicKey = (ECPublicKey) kp.getPublic();
         PrivateKey privateKey = new PrivateKey() {
@@ -881,7 +869,6 @@ public class ECKeyTest {
         assertThat(ecKey.getKeyUse()).isEqualTo(KeyUse.ENCRYPTION);
         assertThat(ecKey.getKeyID()).isEqualTo(cert.getSerialNumber().toString(10));
         assertThat(ecKey.getX509CertChain().size()).isEqualTo(1);
-        assertThat(ecKey.getX509CertThumbprint()).isNull();
         assertThat(ecKey.getX509CertSHA256Thumbprint()).isEqualTo(Base64URLValue.encode(sha256.digest(cert.getEncoded())));
         assertThat(ecKey.getAlgorithm()).isNull();
         assertThat(ecKey.getKeyOperations()).isNull();
@@ -948,7 +935,6 @@ public class ECKeyTest {
         assertThat(ecKey.getKeyUse()).isEqualTo(KeyUse.SIGNATURE);
         assertThat(ecKey.getKeyID()).isEqualTo("1");
         assertThat(ecKey.getX509CertChain().size()).isEqualTo(1);
-        assertThat(ecKey.getX509CertThumbprint()).isNull();
         assertThat(ecKey.getX509CertSHA256Thumbprint()).isNotNull();
         assertThat(ecKey.isPrivate()).isTrue();
         assertThat(ecKey.getKeyStore()).isEqualTo(keyStore);
@@ -983,7 +969,6 @@ public class ECKeyTest {
         assertThat(ecKey.getKeyUse()).isEqualTo(KeyUse.ENCRYPTION);
         assertThat(ecKey.getKeyID()).isEqualTo("1");
         assertThat(ecKey.getX509CertChain().size()).isEqualTo(1);
-        assertThat(ecKey.getX509CertThumbprint()).isNull();
         assertThat(ecKey.getX509CertSHA256Thumbprint()).isNotNull();
         assertThat(ecKey.isPrivate()).isFalse();
         assertThat(ecKey.getKeyStore()).isEqualTo(keyStore);
@@ -1032,8 +1017,7 @@ public class ECKeyTest {
                     Curve.P_256,
                     ExampleKeyP384Alt.X, // on diff curve
                     ExampleKeyP384Alt.Y, // on diff curve
-                    null,
-                    null,
+                    KeyUse.SIGNATURE,
                     null,
                     null,
                     null,
@@ -1052,7 +1036,6 @@ public class ECKeyTest {
                     ExampleKeyP384Alt.X, // on diff curve
                     ExampleKeyP384Alt.Y, // on diff curve
                     ExampleKeyP256.D,    // private D coordinate
-                    null,
                     null,
                     null,
                     null,

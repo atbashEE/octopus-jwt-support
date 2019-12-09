@@ -17,10 +17,6 @@ package be.atbash.ee.security.octopus.nimbus.jose.crypto.impl;
 
 
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
-import be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod;
-import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
-import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEHeader;
-import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -208,44 +204,6 @@ public class AESCBCTest {
         }
     }
 
-    @Test
-    public void testCBCPaddingOracleAttackOldConcatKDF()
-            throws Exception {
-
-        SecretKey inputKey = new SecretKeySpec(INPUT_KEY_256, "AES");
-
-        Assert.assertArrayEquals("Input key", INPUT_KEY_256, inputKey.getEncoded());
-
-        AuthenticatedCipherText act = AESCBC.encryptWithConcatKDF(
-                new JWEHeader(JWEAlgorithm.RSA1_5, EncryptionMethod.A128CBC_HS256_DEPRECATED),
-                new SecretKeySpec(INPUT_KEY_256, "AES"),
-                Base64URLValue.encode(INPUT_KEY_256), // mock
-                IV,
-                PLAIN_TEXT,
-                null,
-                null
-        );
-
-        byte[] cipherText = act.getCipherText();
-
-        // Now change the cipher text to make CBC padding invalid.
-        cipherText[cipherText.length - 1] ^= 0x01;
-
-        try {
-            AESCBC.decryptWithConcatKDF(
-                    new JWEHeader(JWEAlgorithm.RSA1_5, EncryptionMethod.A128CBC_HS256_DEPRECATED),
-                    new SecretKeySpec(INPUT_KEY_256, "AES"),
-                    Base64URLValue.encode(INPUT_KEY_256), // mock
-                    Base64URLValue.encode(IV),
-                    Base64URLValue.encode(cipherText),
-                    Base64URLValue.encode(act.getAuthenticationTag()),
-                    null,
-                    null
-            );
-        } catch (JOSEException e) {
-            assertThat(e.getMessage()).isEqualTo("MAC check failed");
-        }
-    }
 
     @Test
     public void testIntegerOverflowHmacBypass()

@@ -58,7 +58,7 @@ public class DefaultJWEDecrypterFactoryTest {
         assertThat(factory.supportedJWEAlgorithms()).containsAll(JWEAlgorithm.Family.AES_KW);
         assertThat(factory.supportedJWEAlgorithms()).contains(JWEAlgorithm.DIR);
 
-        assertThat(factory.supportedJWEAlgorithms()).hasSize(14);
+        assertThat(factory.supportedJWEAlgorithms()).hasSize(12);
     }
 
 
@@ -69,10 +69,8 @@ public class DefaultJWEDecrypterFactoryTest {
 
         assertThat(factory.supportedEncryptionMethods()).containsAll(EncryptionMethod.Family.AES_GCM);
         assertThat(factory.supportedEncryptionMethods()).containsAll(EncryptionMethod.Family.AES_CBC_HMAC_SHA);
-        assertThat(factory.supportedEncryptionMethods()).contains(EncryptionMethod.A128CBC_HS256_DEPRECATED);
-        assertThat(factory.supportedEncryptionMethods()).contains(EncryptionMethod.A256CBC_HS512_DEPRECATED);
 
-        assertThat(factory.supportedEncryptionMethods()).hasSize(8);
+        assertThat(factory.supportedEncryptionMethods()).hasSize(6);
     }
 
     @Test

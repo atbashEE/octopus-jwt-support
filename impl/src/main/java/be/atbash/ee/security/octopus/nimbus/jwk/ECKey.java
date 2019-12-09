@@ -196,13 +196,6 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
 
 
         /**
-         * X.509 certificate SHA-1 thumbprint, optional.
-         */
-        @Deprecated
-        private Base64URLValue x5t;
-
-
-        /**
          * X.509 certificate SHA-256 thumbprint, optional.
          */
         private Base64URLValue x5t256;
@@ -290,7 +283,6 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
             alg = ecJWK.getAlgorithm();
             kid = ecJWK.getKeyID();
             x5u = ecJWK.getX509CertURL();
-            x5t = ecJWK.getX509CertThumbprint();
             x5t256 = ecJWK.getX509CertSHA256Thumbprint();
             x5c = ecJWK.getX509CertChain();
             ks = ecJWK.getKeyStore();
@@ -478,22 +470,6 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
 
 
         /**
-         * Sets the X.509 certificate SHA-1 thumbprint ({@code x5t}) of
-         * the JWK.
-         *
-         * @param x5t The X.509 certificate SHA-1 thumbprint,
-         *            {@code null} if not specified.
-         * @return This builder.
-         */
-        @Deprecated
-        public Builder x509CertThumbprint(final Base64URLValue x5t) {
-
-            this.x5t = x5t;
-            return this;
-        }
-
-
-        /**
          * Sets the X.509 certificate SHA-256 thumbprint
          * ({@code x5t#S256}) of the JWK.
          *
@@ -548,16 +524,16 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
             try {
                 if (d == null && priv == null) {
                     // Public key
-                    return new ECKey(crv, x, y, use, ops, alg, kid, x5u, x5t, x5t256, x5c, ks);
+                    return new ECKey(crv, x, y, use, ops, alg, kid, x5u, x5t256, x5c, ks);
                 }
 
                 if (priv != null) {
                     // PKCS#11 reference to private key
-                    return new ECKey(crv, x, y, priv, use, ops, alg, kid, x5u, x5t, x5t256, x5c, ks);
+                    return new ECKey(crv, x, y, priv, use, ops, alg, kid, x5u, x5t256, x5c, ks);
                 }
 
                 // Public / private key pair with 'd'
-                return new ECKey(crv, x, y, d, use, ops, alg, kid, x5u, x5t, x5t256, x5c, ks);
+                return new ECKey(crv, x, y, d, use, ops, alg, kid, x5u, x5t256, x5c, ks);
 
             } catch (IllegalArgumentException e) {
                 throw new IllegalStateException(e.getMessage(), e);
@@ -666,8 +642,6 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
      * @param kid    The key ID, {@code null} if not specified.
      * @param x5u    The X.509 certificate URL, {@code null} if not
      *               specified.
-     * @param x5t    The X.509 certificate SHA-1 thumbprint, {@code null}
-     *               if not specified.
      * @param x5t256 The X.509 certificate SHA-256 thumbprint, {@code null}
      *               if not specified.
      * @param x5c    The X.509 certificate chain, {@code null} if not
@@ -677,10 +651,10 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
      */
     public ECKey(Curve crv, Base64URLValue x, Base64URLValue y,
                  KeyUse use, Set<KeyOperation> ops, Algorithm alg, String kid,
-                 URI x5u, Base64URLValue x5t, Base64URLValue x5t256, List<Base64Value> x5c,
+                 URI x5u, Base64URLValue x5t256, List<Base64Value> x5c,
                  KeyStore ks) {
 
-        super(KeyType.EC, use, ops, alg, kid, x5u, x5t, x5t256, x5c, ks);
+        super(KeyType.EC, use, ops, alg, kid, x5u, x5t256, x5c, ks);
 
         if (crv == null) {
             throw new IllegalArgumentException("The curve must not be null");
@@ -735,8 +709,6 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
      * @param kid    The key ID, {@code null} if not specified.
      * @param x5u    The X.509 certificate URL, {@code null} if not
      *               specified.
-     * @param x5t    The X.509 certificate SHA-1 thumbprint, {@code null}
-     *               if not specified.
      * @param x5t256 The X.509 certificate SHA-256 thumbprint, {@code null}
      *               if not specified.
      * @param x5c    The X.509 certificate chain, {@code null} if not
@@ -746,10 +718,10 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
      */
     public ECKey(Curve crv, Base64URLValue x, Base64URLValue y, Base64URLValue d,
                  KeyUse use, Set<KeyOperation> ops, Algorithm alg, String kid,
-                 URI x5u, Base64URLValue x5t, Base64URLValue x5t256, List<Base64Value> x5c,
+                 URI x5u, Base64URLValue x5t256, List<Base64Value> x5c,
                  KeyStore ks) {
 
-        super(KeyType.EC, use, ops, alg, kid, x5u, x5t, x5t256, x5c, ks);
+        super(KeyType.EC, use, ops, alg, kid, x5u, x5t256, x5c, ks);
 
         if (crv == null) {
             throw new IllegalArgumentException("The curve must not be null");
@@ -807,8 +779,6 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
      * @param kid    The key ID, {@code null} if not specified.
      * @param x5u    The X.509 certificate URL, {@code null} if not
      *               specified.
-     * @param x5t    The X.509 certificate SHA-1 thumbprint, {@code null}
-     *               if not specified.
      * @param x5t256 The X.509 certificate SHA-256 thumbprint, {@code null}
      *               if not specified.
      * @param x5c    The X.509 certificate chain, {@code null} if not
@@ -816,10 +786,10 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
      */
     public ECKey(Curve crv, Base64URLValue x, Base64URLValue y, PrivateKey priv,
                  KeyUse use, Set<KeyOperation> ops, Algorithm alg, String kid,
-                 URI x5u, Base64URLValue x5t, Base64URLValue x5t256, List<Base64Value> x5c,
+                 URI x5u, Base64URLValue x5t256, List<Base64Value> x5c,
                  KeyStore ks) {
 
-        super(KeyType.EC, use, ops, alg, kid, x5u, x5t, x5t256, x5c, ks);
+        super(KeyType.EC, use, ops, alg, kid, x5u, x5t256, x5c, ks);
 
         if (crv == null) {
             throw new IllegalArgumentException("The curve must not be null");
@@ -864,8 +834,6 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
      * @param kid    The key ID, {@code null} if not specified.
      * @param x5u    The X.509 certificate URL, {@code null} if not
      *               specified.
-     * @param x5t    The X.509 certificate SHA-1 thumbprint, {@code null}
-     *               if not specified.
      * @param x5t256 The X.509 certificate SHA-256 thumbprint, {@code null}
      *               if not specified.
      * @param x5c    The X.509 certificate chain, {@code null} if not
@@ -875,14 +843,14 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
      */
     public ECKey(Curve crv, ECPublicKey pub,
                  KeyUse use, Set<KeyOperation> ops, Algorithm alg, String kid,
-                 URI x5u, Base64URLValue x5t, Base64URLValue x5t256, List<Base64Value> x5c,
+                 URI x5u, Base64URLValue x5t256, List<Base64Value> x5c,
                  KeyStore ks) {
 
         this(crv,
                 encodeCoordinate(pub.getParams().getCurve().getField().getFieldSize(), pub.getW().getAffineX()),
                 encodeCoordinate(pub.getParams().getCurve().getField().getFieldSize(), pub.getW().getAffineY()),
                 use, ops, alg, kid,
-                x5u, x5t, x5t256, x5c,
+                x5u, x5t256, x5c,
                 ks);
     }
 
@@ -904,8 +872,6 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
      * @param kid    The key ID, {@code null} if not specified.
      * @param x5u    The X.509 certificate URL, {@code null} if not
      *               specified.
-     * @param x5t    The X.509 certificate SHA-1 thumbprint, {@code null}
-     *               if not specified.
      * @param x5t256 The X.509 certificate SHA-256 thumbprint, {@code null}
      *               if not specified.
      * @param x5c    The X.509 certificate chain, {@code null} if not
@@ -915,7 +881,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
      */
     public ECKey(Curve crv, ECPublicKey pub, ECPrivateKey priv,
                  KeyUse use, Set<KeyOperation> ops, Algorithm alg, String kid,
-                 URI x5u, Base64URLValue x5t, Base64URLValue x5t256, List<Base64Value> x5c,
+                 URI x5u, Base64URLValue x5t256, List<Base64Value> x5c,
                  KeyStore ks) {
 
         this(crv,
@@ -923,7 +889,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
                 encodeCoordinate(pub.getParams().getCurve().getField().getFieldSize(), pub.getW().getAffineY()),
                 encodeCoordinate(priv.getParams().getCurve().getField().getFieldSize(), priv.getS()),
                 use, ops, alg, kid,
-                x5u, x5t, x5t256, x5c,
+                x5u, x5t256, x5c,
                 ks);
     }
 
@@ -946,8 +912,6 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
      * @param kid    The key ID, {@code null} if not specified.
      * @param x5u    The X.509 certificate URL, {@code null} if not
      *               specified.
-     * @param x5t    The X.509 certificate SHA-1 thumbprint, {@code null}
-     *               if not specified.
      * @param x5t256 The X.509 certificate SHA-256 thumbprint, {@code null}
      *               if not specified.
      * @param x5c    The X.509 certificate chain, {@code null} if not
@@ -957,7 +921,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
      */
     public ECKey(Curve crv, ECPublicKey pub, PrivateKey priv,
                  KeyUse use, Set<KeyOperation> ops, Algorithm alg, String kid,
-                 URI x5u, Base64URLValue x5t, Base64URLValue x5t256, List<Base64Value> x5c,
+                 URI x5u, Base64URLValue x5t256, List<Base64Value> x5c,
                  KeyStore ks) {
 
         this(
@@ -965,7 +929,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
                 encodeCoordinate(pub.getParams().getCurve().getField().getFieldSize(), pub.getW().getAffineX()),
                 encodeCoordinate(pub.getParams().getCurve().getField().getFieldSize(), pub.getW().getAffineY()),
                 priv,
-                use, ops, alg, kid, x5u, x5t, x5t256, x5c,
+                use, ops, alg, kid, x5u, x5t256, x5c,
                 ks);
     }
 
@@ -1044,7 +1008,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
      *                       Cryptography (JCA) provider or if the JWK
      *                       parameters are invalid for a public EC key.
      */
-    public ECPublicKey toECPublicKey(final Provider provider)
+    public ECPublicKey toECPublicKey(Provider provider)
             throws JOSEException {
 
         ECParameterSpec spec = crv.toECParameterSpec();
@@ -1293,7 +1257,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
         return new ECKey(
                 getCurve(), getX(), getY(),
                 getKeyUse(), getKeyOperations(), getAlgorithm(), getKeyID(),
-                getX509CertURL(), getX509CertThumbprint(), getX509CertSHA256Thumbprint(), getX509CertChain(),
+                getX509CertURL(),  getX509CertSHA256Thumbprint(), getX509CertChain(),
                 getKeyStore());
     }
 
@@ -1373,7 +1337,6 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
                         JWKMetadata.parseAlgorithm(jsonObject),
                         JWKMetadata.parseKeyID(jsonObject),
                         JWKMetadata.parseX509CertURL(jsonObject),
-                        JWKMetadata.parseX509CertThumbprint(jsonObject),
                         JWKMetadata.parseX509CertSHA256Thumbprint(jsonObject),
                         JWKMetadata.parseX509CertChain(jsonObject),
                         null);
@@ -1386,7 +1349,6 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
                         JWKMetadata.parseAlgorithm(jsonObject),
                         JWKMetadata.parseKeyID(jsonObject),
                         JWKMetadata.parseX509CertURL(jsonObject),
-                        JWKMetadata.parseX509CertThumbprint(jsonObject),
                         JWKMetadata.parseX509CertSHA256Thumbprint(jsonObject),
                         JWKMetadata.parseX509CertChain(jsonObject),
                         null);

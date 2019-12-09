@@ -26,14 +26,11 @@ import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 import java.io.Serializable;
 import java.net.URI;
-import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.cert.X509Certificate;
-import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
-import java.security.spec.ECParameterSpec;
 import java.text.ParseException;
 import java.util.*;
 
@@ -50,7 +47,6 @@ import java.util.*;
  *     <li>{@link #getKeyOperations key_ops} (optional)
  *     <li>{@link #getKeyID kid} (optional)
  *     <li>{@link #getX509CertURL()  x5u} (optional)
- *     <li>{@link #getX509CertThumbprint()  x5t} (optional)
  *     <li>{@link #getX509CertSHA256Thumbprint()  x5t#S256} (optional)
  *     <li>{@link #getX509CertChain() x5c} (optional)
  *     <li>{@link #getKeyStore()}
@@ -122,14 +118,6 @@ public abstract class JWK implements Serializable {
      */
     private final URI x5u;
 
-
-    /**
-     * X.509 certificate SHA-1 thumbprint, optional.
-     */
-    @Deprecated
-    private final Base64URLValue x5t;
-
-
     /**
      * X.509 certificate SHA-256 thumbprint, optional.
      */
@@ -166,8 +154,6 @@ public abstract class JWK implements Serializable {
      * @param kid    The key ID, {@code null} if not specified.
      * @param x5u    The X.509 certificate URL, {@code null} if not
      *               specified.
-     * @param x5t    The X.509 certificate thumbprint, {@code null} if not
-     *               specified.
      * @param x5t256 The X.509 certificate SHA-256 thumbprint, {@code null}
      *               if not specified.
      * @param x5c    The X.509 certificate chain, {@code null} if not
@@ -175,16 +161,15 @@ public abstract class JWK implements Serializable {
      * @param ks     Reference to the underlying key store, {@code null} if
      *               none.
      */
-    protected JWK(final KeyType kty,
-                  final KeyUse use,
-                  final Set<KeyOperation> ops,
-                  final Algorithm alg,
-                  final String kid,
-                  final URI x5u,
-                  final Base64URLValue x5t,
-                  final Base64URLValue x5t256,
-                  final List<Base64Value> x5c,
-                  final KeyStore ks) {
+    protected JWK(KeyType kty,
+                  KeyUse use,
+                  Set<KeyOperation> ops,
+                  Algorithm alg,
+                  String kid,
+                  URI x5u,
+                  Base64URLValue x5t256,
+                  List<Base64Value> x5c,
+                  KeyStore ks) {
 
         if (kty == null) {
             throw new IllegalArgumentException("The key type \"kty\" parameter must not be null");
@@ -204,7 +189,6 @@ public abstract class JWK implements Serializable {
         this.kid = kid;
 
         this.x5u = x5u;
-        this.x5t = x5t;
         this.x5t256 = x5t256;
 
         if (x5c != null && x5c.isEmpty()) {
@@ -290,21 +274,6 @@ public abstract class JWK implements Serializable {
 
         return x5u;
     }
-
-
-    /**
-     * Gets the X.509 certificate SHA-1 thumbprint ({@code x5t}) of this
-     * JWK.
-     *
-     * @return The X.509 certificate SHA-1 thumbprint, {@code null} if not
-     * specified.
-     */
-    @Deprecated
-    public Base64URLValue getX509CertThumbprint() {
-
-        return x5t;
-    }
-
 
     /**
      * Gets the X.509 certificate SHA-256 thumbprint ({@code x5t#S256}) of
@@ -395,7 +364,7 @@ public abstract class JWK implements Serializable {
      * @return The SHA-256 thumbprint.
      * @throws JOSEException If the hash algorithm is not supported.
      */
-    public Base64URLValue computeThumbprint(final String hashAlg)
+    public Base64URLValue computeThumbprint(String hashAlg)
             throws JOSEException {
 
         return ThumbprintUtils.compute(hashAlg, this);
@@ -479,10 +448,6 @@ public abstract class JWK implements Serializable {
             result.add("x5u", x5u.toString());
         }
 
-        if (x5t != null) {
-            result.add("x5t", x5t.toString());
-        }
-
         if (x5t256 != null) {
             result.add("x5t#S256", x5t256.toString());
         }
@@ -525,15 +490,15 @@ public abstract class JWK implements Serializable {
      * The JWK must be an {@link ECKey}, an {@link RSAKey}, or a
      * {@link OctetSequenceKey}.
      *
-     * @param s The JSON object string to parse. Must not be {@code null}.
+     * @param value The JSON object string to parse. Must not be {@code null}.
      * @return The JWK.
      * @throws ParseException If the string couldn't be parsed to a
      *                        supported JWK.
      */
-    public static JWK parse(final String s)
+    public static JWK parse(String value)
             throws ParseException {
 
-        return parse(JSONObjectUtils.parse(s));
+        return parse(JSONObjectUtils.parse(value));
     }
 
 
@@ -548,7 +513,7 @@ public abstract class JWK implements Serializable {
      * @throws ParseException If the JSON object couldn't be parsed to a
      *                        supported JWK.
      */
-    public static JWK parse(final JsonObject jsonObject)
+    public static JWK parse(JsonObject jsonObject)
             throws ParseException {
 
         KeyType kty = KeyType.parse(jsonObject.getString("kty"));
@@ -684,53 +649,6 @@ public abstract class JWK implements Serializable {
         }
     }
 
-
-    private static void validateEcCurves(ECPublicKey publicKey, ECPrivateKey privateKey) throws JOSEException {
-        final ECParameterSpec pubParams = publicKey.getParams();
-        final ECParameterSpec privParams = privateKey.getParams();
-        if (!pubParams.getCurve().equals(privParams.getCurve())) {
-            throw new JOSEException("Public/private EC key curve mismatch: " + publicKey);
-        }
-        if (pubParams.getCofactor() != privParams.getCofactor()) {
-            throw new JOSEException("Public/private EC key cofactor mismatch: " + publicKey);
-        }
-        if (!pubParams.getGenerator().equals(privParams.getGenerator())) {
-            throw new JOSEException("Public/private EC key generator mismatch: " + publicKey);
-        }
-        if (!pubParams.getOrder().equals(privParams.getOrder())) {
-            throw new JOSEException("Public/private EC key order mismatch: " + publicKey);
-        }
-    }
-
-
-    private static KeyPair mergeKeyPairs(final List<KeyPair> keys) throws JOSEException {
-        final KeyPair pair;
-        if (keys.size() == 1) {
-            // Assume public key, or private key easy to convert to public,
-            // otherwise not representable as a JWK
-            pair = keys.get(0);
-        } else if (keys.size() == 2) {
-            // If two keys, assume public + private keys separated
-            pair = twoKeysToKeyPair(keys);
-        } else {
-            throw new JOSEException("Expected key or pair of PEM-encoded keys");
-        }
-        return pair;
-    }
-
-    private static KeyPair twoKeysToKeyPair(final List<? extends KeyPair> keys) throws JOSEException {
-        final KeyPair key1 = keys.get(0);
-        final KeyPair key2 = keys.get(1);
-        if (key1.getPublic() != null && key2.getPrivate() != null) {
-            return new KeyPair(key1.getPublic(), key2.getPrivate());
-        } else if (key1.getPrivate() != null && key2.getPublic() != null) {
-            return new KeyPair(key2.getPublic(), key1.getPrivate());
-        } else {
-            throw new JOSEException("Not a public/private key pair");
-        }
-    }
-
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -746,7 +664,6 @@ public abstract class JWK implements Serializable {
                 Objects.equals(alg, jwk.alg) &&
                 Objects.equals(kid, jwk.kid) &&
                 Objects.equals(x5u, jwk.x5u) &&
-                Objects.equals(x5t, jwk.x5t) &&
                 Objects.equals(x5t256, jwk.x5t256) &&
                 Objects.equals(x5c, jwk.x5c) &&
                 Objects.equals(parsedX5c, jwk.parsedX5c) &&
@@ -756,6 +673,6 @@ public abstract class JWK implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(kty, use, ops, alg, kid, x5u, x5t, x5t256, x5c, parsedX5c, keyStore);
+        return Objects.hash(kty, use, ops, alg, kid, x5u, x5t256, x5c, parsedX5c, keyStore);
     }
 }

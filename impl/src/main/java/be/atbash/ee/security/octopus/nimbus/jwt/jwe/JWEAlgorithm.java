@@ -27,8 +27,6 @@ import be.atbash.ee.security.octopus.nimbus.jose.AlgorithmFamily;
  *
  * <ul>
  *     <li>{@link #RSA_OAEP_256 RSA-OAEP-256}
- *     <li>{@link #RSA_OAEP RSA-OAEP} (deprecated)
- *     <li>{@link #RSA1_5} (deprecated)
  *     <li>{@link #A128KW}
  *     <li>{@link #A192KW}
  *     <li>{@link #A256KW}
@@ -51,25 +49,6 @@ public final class JWEAlgorithm extends Algorithm {
 
 
     private static final long serialVersionUID = 1L;
-
-
-    /**
-     * RSAES-PKCS1-V1_5 (RFC 3447). Use of this RSA encryption algorithm is
-     * no longer recommended, use {@link #RSA_OAEP_256} instead.
-     */
-    @Deprecated
-    public static final JWEAlgorithm RSA1_5 = new JWEAlgorithm("RSA1_5");
-
-
-    /**
-     * RSAES using Optimal Asymmetric Encryption Padding (OAEP) (RFC 3447),
-     * with the default parameters specified by RFC 3447 in section A.2.1.
-     * Use of this encryption algorithm is no longer recommended, use
-     * {@link #RSA_OAEP_256} instead.
-     */
-    @Deprecated
-    public static final JWEAlgorithm RSA_OAEP = new JWEAlgorithm("RSA-OAEP");
-
 
     /**
      * RSAES using Optimal Asymmetric Encryption Padding (OAEP) (RFC 3447),
@@ -196,7 +175,7 @@ public final class JWEAlgorithm extends Algorithm {
         /**
          * RSA key encryption.
          */
-        public static final Family RSA = new Family(RSA1_5, RSA_OAEP, RSA_OAEP_256);
+        public static final Family RSA = new Family(RSA_OAEP_256);
 
 
         /**
@@ -255,11 +234,7 @@ public final class JWEAlgorithm extends Algorithm {
      */
     public static JWEAlgorithm parse(String value) {
 
-        if (value.equals(RSA1_5.getName())) {
-            return RSA1_5;
-        } else if (value.equals(RSA_OAEP.getName())) {
-            return RSA_OAEP;
-        } else if (value.equals(RSA_OAEP_256.getName())) {
+        if (value.equals(RSA_OAEP_256.getName())) {
             return RSA_OAEP_256;
         } else if (value.equals(A128KW.getName())) {
             return A128KW;

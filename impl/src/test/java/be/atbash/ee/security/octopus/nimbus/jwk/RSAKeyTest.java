@@ -15,7 +15,6 @@
  */
 package be.atbash.ee.security.octopus.nimbus.jwk;
 
-
 import be.atbash.ee.security.octopus.nimbus.IOUtil;
 import be.atbash.ee.security.octopus.nimbus.SampleCertificates;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
@@ -47,7 +46,6 @@ import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
-
 
 /**
  * Tests the RSA JWK class.
@@ -117,7 +115,6 @@ public class RSAKeyTest {
             throws Exception {
 
         URI x5u = new URI("http://example.com/jwk.json");
-        Base64URLValue x5t = new Base64URLValue("abc");
         Base64URLValue x5t256 = new Base64URLValue("abc256");
         List<Base64Value> x5c = null; // not specified here
 
@@ -132,7 +129,7 @@ public class RSAKeyTest {
                 new Base64URLValue(dp), new Base64URLValue(dq), new Base64URLValue(qi), null,
                 privateKey,
                 KeyUse.SIGNATURE, null, JWSAlgorithm.RS256, "1",
-                x5u, x5t, x5t256, x5c,
+                x5u, x5t256, x5c,
                 keyStore);
 
         // Test getters
@@ -141,7 +138,6 @@ public class RSAKeyTest {
         assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.RS256);
         assertThat(key.getKeyID()).isEqualTo("1");
         assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
-        assertThat(key.getX509CertThumbprint().toString()).isEqualTo(x5t.toString());
         assertThat(key.getX509CertSHA256Thumbprint().toString()).isEqualTo(x5t256.toString());
         assertThat(key.getX509CertChain()).isNull();
         assertThat(key.getParsedX509CertChain()).isNull();
@@ -178,7 +174,6 @@ public class RSAKeyTest {
         assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.RS256);
         assertThat(key.getKeyID()).isEqualTo("1");
         assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
-        assertThat(key.getX509CertThumbprint().toString()).isEqualTo(x5t.toString());
         assertThat(key.getX509CertSHA256Thumbprint().toString()).isEqualTo(x5t256.toString());
         assertThat(key.getX509CertChain()).isNull();
         assertThat(key.getParsedX509CertChain()).isNull();
@@ -232,16 +227,15 @@ public class RSAKeyTest {
             throws Exception {
 
         URI x5u = new URI("http://example.com/jwk.json");
-        Base64URLValue x5t = new Base64URLValue("abc");
         Base64URLValue x5t256 = new Base64URLValue("abc256");
         List<Base64Value> x5c = null; // not specified here
 
         RSAKey key = new RSAKey(new Base64URLValue(n), new Base64URLValue(e), new Base64URLValue(d),
                 new Base64URLValue(p), new Base64URLValue(q),
                 new Base64URLValue(dp), new Base64URLValue(dq), new Base64URLValue(qi),
-                null,
+                null, null,
                 KeyUse.SIGNATURE, null, JWSAlgorithm.RS256, "1",
-                x5u, x5t, x5t256, x5c);
+                x5u, x5t256, x5c, null);
 
         // Test getters
         assertThat(key.getKeyUse()).isEqualTo(KeyUse.SIGNATURE);
@@ -249,7 +243,6 @@ public class RSAKeyTest {
         assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.RS256);
         assertThat(key.getKeyID()).isEqualTo("1");
         assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
-        assertThat(key.getX509CertThumbprint().toString()).isEqualTo(x5t.toString());
         assertThat(key.getX509CertSHA256Thumbprint().toString()).isEqualTo(x5t256.toString());
         assertThat(key.getX509CertChain()).isNull();
         assertThat(key.getParsedX509CertChain()).isNull();
@@ -282,7 +275,6 @@ public class RSAKeyTest {
         assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.RS256);
         assertThat(key.getKeyID()).isEqualTo("1");
         assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
-        assertThat(key.getX509CertThumbprint().toString()).isEqualTo(x5t.toString());
         assertThat(key.getX509CertSHA256Thumbprint().toString()).isEqualTo(x5t256.toString());
         assertThat(key.getX509CertChain()).isNull();
         assertThat(key.getParsedX509CertChain()).isNull();
@@ -351,7 +343,6 @@ public class RSAKeyTest {
                 .algorithm(JWSAlgorithm.RS256)
                 .keyID("1")
                 .x509CertURL(x5u)
-                .x509CertThumbprint(x5t)
                 .x509CertSHA256Thumbprint(x5t256)
                 .x509CertChain(x5c)
                 .build();
@@ -362,7 +353,6 @@ public class RSAKeyTest {
         assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.RS256);
         assertThat(key.getKeyID()).isEqualTo("1");
         assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
-        assertThat(key.getX509CertThumbprint().toString()).isEqualTo(x5t.toString());
         assertThat(key.getX509CertSHA256Thumbprint().toString()).isEqualTo(x5t256.toString());
         assertThat(key.getX509CertChain()).isNull();
         assertThat(key.getParsedX509CertChain()).isNull();
@@ -396,7 +386,6 @@ public class RSAKeyTest {
         assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.RS256);
         assertThat(key.getKeyID()).isEqualTo("1");
         assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
-        assertThat(key.getX509CertThumbprint().toString()).isEqualTo(x5t.toString());
         assertThat(key.getX509CertSHA256Thumbprint().toString()).isEqualTo(x5t256.toString());
         assertThat(key.getX509CertChain()).isNull();
         assertThat(key.getParsedX509CertChain()).isNull();
@@ -445,7 +434,6 @@ public class RSAKeyTest {
                 .algorithm(JWSAlgorithm.RS256)
                 .keyID("1")
                 .x509CertURL(x5u)
-                .x509CertThumbprint(x5t)
                 .x509CertSHA256Thumbprint(x5t256)
                 .x509CertChain(x5c)
                 .keyStore(keyStore)
@@ -459,7 +447,6 @@ public class RSAKeyTest {
         assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.RS256);
         assertThat(key.getKeyID()).isEqualTo("1");
         assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
-        assertThat(key.getX509CertThumbprint().toString()).isEqualTo(x5t.toString());
         assertThat(key.getX509CertSHA256Thumbprint().toString()).isEqualTo(x5t256.toString());
         assertThat(key.getX509CertChain()).isNull();
         assertThat(key.getParsedX509CertChain()).isNull();
@@ -487,7 +474,6 @@ public class RSAKeyTest {
         assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.RS256);
         assertThat(key.getKeyID()).isEqualTo("1");
         assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
-        assertThat(key.getX509CertThumbprint().toString()).isEqualTo(x5t.toString());
         assertThat(key.getX509CertSHA256Thumbprint().toString()).isEqualTo(x5t256.toString());
         assertThat(key.getX509CertChain()).isNull();
         assertThat(key.getParsedX509CertChain()).isNull();
@@ -525,7 +511,6 @@ public class RSAKeyTest {
                 .algorithm(JWSAlgorithm.RS256)
                 .keyID("1")
                 .x509CertURL(x5u)
-                .x509CertThumbprint(x5t)
                 .x509CertSHA256Thumbprint(x5t256)
                 .x509CertChain(x5c)
                 .keyStore(keyStore)
@@ -540,7 +525,6 @@ public class RSAKeyTest {
         assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.RS256);
         assertThat(key.getKeyID()).isEqualTo("1");
         assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
-        assertThat(key.getX509CertThumbprint().toString()).isEqualTo(x5t.toString());
         assertThat(key.getX509CertSHA256Thumbprint().toString()).isEqualTo(x5t256.toString());
         assertThat(key.getX509CertChain()).isNull();
         assertThat(key.getParsedX509CertChain()).isNull();
@@ -570,7 +554,7 @@ public class RSAKeyTest {
 
 
         RSAKey key = new RSAKey(new Base64URLValue(n), new Base64URLValue(e),
-                null, null, null, null,
+                new Base64URLValue(d), null, null, null,
                 null, null, null, null, null);
 
         // Public key export
@@ -581,7 +565,7 @@ public class RSAKeyTest {
 
 
         // Public key import
-        key = new RSAKey(pubKey, null, null, null, null, null, null, null, null, null);
+        key = new RSAKey(pubKey, null, null, null, null, null, null, null, null);
         assertThat(key.getModulus()).isEqualTo(new Base64URLValue(n));
         assertThat(key.getPublicExponent()).isEqualTo(new Base64URLValue(e));
     }
@@ -593,8 +577,7 @@ public class RSAKeyTest {
         RSAKey key = new RSAKey(new Base64URLValue(n), new Base64URLValue(e), new Base64URLValue(d),
                 new Base64URLValue(p), new Base64URLValue(q),
                 new Base64URLValue(dp), new Base64URLValue(dq), new Base64URLValue(qi),
-                null,
-                KeyUse.SIGNATURE, null, JWSAlgorithm.RS256, "1",
+                null, null, KeyUse.SIGNATURE, null, JWSAlgorithm.RS256, "1",
                 null, null, null, null);
 
         // Private key export with CRT (2nd form)
@@ -635,7 +618,7 @@ public class RSAKeyTest {
 
 
         // Key pair import, 1st private form
-        key = new RSAKey(pubKey, privKey, KeyUse.SIGNATURE, null, JWSAlgorithm.RS256, "1", null, null, null, null, null);
+        key = new RSAKey(pubKey, privKey, KeyUse.SIGNATURE, null, JWSAlgorithm.RS256, "1", null, null, null, null);
         assertThat(key.getKeyUse()).isEqualTo(KeyUse.SIGNATURE);
         assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.RS256);
         assertThat(key.getKeyID()).isEqualTo("1");
@@ -688,7 +671,7 @@ public class RSAKeyTest {
 
 
         RSAKey key = new RSAKey(new Base64URLValue(n), new Base64URLValue(e),
-                null, null, null, null,
+                new Base64URLValue(d), null, null, null,
                 null, null, null, null, null);
 
         assertThat(key).isInstanceOf(AsymmetricJWK.class);
@@ -701,37 +684,9 @@ public class RSAKeyTest {
 
 
         // Public key import
-        key = new RSAKey(pubKey, null, null, null, null, null, null, null, null, null);
+        key = new RSAKey(pubKey, null, null, null, null, null, null, null, null);
         assertThat(key.getModulus()).isEqualTo(new Base64URLValue(n));
         assertThat(key.getPublicExponent()).isEqualTo(new Base64URLValue(e));
-    }
-
-    @Test
-    public void testPrivateKeyExport()
-            throws Exception {
-
-        RSAKey key = new RSAKey(new Base64URLValue(n), new Base64URLValue(e), new Base64URLValue(d),
-                new Base64URLValue(p), new Base64URLValue(q),
-                new Base64URLValue(dp), new Base64URLValue(dq), new Base64URLValue(qi),
-                null,
-                KeyUse.SIGNATURE, null, JWSAlgorithm.RS256, "1",
-                null, null, null, null);
-
-        assertThat(key).isInstanceOf(AsymmetricJWK.class);
-
-        // Private key export with CRT (2nd form)
-        RSAPrivateKey privKey = (RSAPrivateKey) key.toPrivateKey();
-        assertThat(privKey.getModulus()).isEqualTo(new Base64URLValue(n).decodeToBigInteger());
-        assertThat(privKey.getPrivateExponent()).isEqualTo(new Base64URLValue(d).decodeToBigInteger());
-
-        assertThat(privKey).isInstanceOf(RSAPrivateCrtKey.class);
-        RSAPrivateCrtKey privCrtKey = (RSAPrivateCrtKey) privKey;
-        assertThat(privCrtKey.getPublicExponent()).isEqualTo(new Base64URLValue(e).decodeToBigInteger());
-        assertThat(privCrtKey.getPrimeP()).isEqualTo(new Base64URLValue(p).decodeToBigInteger());
-        assertThat(privCrtKey.getPrimeQ()).isEqualTo(new Base64URLValue(q).decodeToBigInteger());
-        assertThat(privCrtKey.getPrimeExponentP()).isEqualTo(new Base64URLValue(dp).decodeToBigInteger());
-        assertThat(privCrtKey.getPrimeExponentQ()).isEqualTo(new Base64URLValue(dq).decodeToBigInteger());
-        assertThat(privCrtKey.getCrtCoefficient()).isEqualTo(new Base64URLValue(qi).decodeToBigInteger());
     }
 
     @Test
@@ -860,7 +815,7 @@ public class RSAKeyTest {
 
         Set<KeyOperation> ops = new HashSet<>(Arrays.asList(KeyOperation.SIGN, KeyOperation.VERIFY));
 
-        JWK jwk = new RSAKey(new Base64URLValue(n), new Base64URLValue(e), use, ops, null, null, null, null, null, null, null);
+        JWK jwk = new RSAKey(new Base64URLValue(n), new Base64URLValue(e), new Base64URLValue(d), use, ops, null, null, null, null, null, null);
         assertThat(jwk.getKeyUse()).isEqualTo(use);
         assertThat(jwk.getKeyOperations()).isEqualTo(ops);
 
@@ -1248,7 +1203,7 @@ public class RSAKeyTest {
 
         KeyPairGenerator gen = KeyPairGenerator.getInstance("RSA");
         gen.initialize(1024);
-        final KeyPair kp = gen.generateKeyPair();
+        KeyPair kp = gen.generateKeyPair();
 
         RSAPublicKey publicKey = (RSAPublicKey) kp.getPublic();
         PrivateKey privateKey = new PrivateKey() {
@@ -1305,7 +1260,6 @@ public class RSAKeyTest {
         assertThat(rsaKey.getKeyID()).isEqualTo(cert.getSerialNumber().toString(10));
         assertThat(rsaKey.getX509CertChain().get(0).toString()).isNotSameAs(pemEncodedCert);
         assertThat(rsaKey.getX509CertChain()).hasSize(1);
-        assertThat(rsaKey.getX509CertThumbprint()).isNull();
         assertThat(rsaKey.getX509CertSHA256Thumbprint()).isEqualTo(Base64URLValue.encode(sha256.digest(cert.getEncoded())));
         assertThat(rsaKey.getAlgorithm()).isNull();
         assertThat(rsaKey.getKeyOperations()).isNull();
@@ -1452,7 +1406,6 @@ public class RSAKeyTest {
         assertThat(rsaKey.getKeyUse()).isEqualTo(KeyUse.SIGNATURE);
         assertThat(rsaKey.getKeyID()).isEqualTo("1");
         assertThat(rsaKey.getX509CertChain().size()).isEqualTo(1);
-        assertThat(rsaKey.getX509CertThumbprint()).isNull();
         assertThat(rsaKey.getX509CertSHA256Thumbprint()).isNotNull();
         assertThat(rsaKey.isPrivate()).isTrue();
         assertThat(rsaKey.getKeyStore()).isEqualTo(keyStore);
@@ -1487,7 +1440,6 @@ public class RSAKeyTest {
         assertThat(rsaKey.getKeyID()).isEqualTo("1");
         assertThat(rsaKey.getX509CertChain().size()).isEqualTo(1);
         assertThat(rsaKey.getParsedX509CertChain().size()).isEqualTo(1);
-        assertThat(rsaKey.getX509CertThumbprint()).isNull();
         assertThat(rsaKey.getX509CertSHA256Thumbprint()).isNotNull();
         assertThat(rsaKey.isPrivate()).isFalse();
         assertThat(rsaKey.getKeyStore()).isEqualTo(keyStore);

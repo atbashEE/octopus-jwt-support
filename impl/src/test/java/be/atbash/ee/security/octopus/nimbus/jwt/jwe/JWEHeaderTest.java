@@ -72,57 +72,6 @@ public class JWEHeaderTest {
         assertThat(header.getCustomParams()).isEmpty();
     }
 
-
-    @Test
-    public void testParse1()
-            throws Exception {
-
-        // Example header from JWE spec
-        // {"alg":"RSA-OAEP","enc":"A256GCM"}
-        Base64URLValue in = new Base64URLValue("eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZHQ00ifQ");
-
-        JWEHeader header = JWEHeader.parse(in);
-
-        assertThat(header.toBase64URL()).isEqualTo(in);
-
-        assertThat(header).isNotNull();
-
-        assertThat(header.getAlgorithm()).isEqualTo(JWEAlgorithm.RSA_OAEP);
-        assertThat(header.getEncryptionMethod()).isEqualTo(EncryptionMethod.A256GCM);
-
-        assertThat(header.getType()).isNull();
-        assertThat(header.getContentType()).isNull();
-
-        assertThat(header.getIncludedParams()).contains("alg");
-        assertThat(header.getIncludedParams()).contains("enc");
-        assertThat(header.getIncludedParams()).hasSize(2);
-    }
-
-    @Test
-    public void testParse2()
-            throws Exception {
-
-        // Example header from JWE spec
-        // {"alg":"RSA1_5","enc":"A128CBC-HS256"}
-        Base64URLValue in = new Base64URLValue("eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0");
-
-        JWEHeader header = JWEHeader.parse(in);
-
-        assertThat(header.toBase64URL()).isEqualTo(in);
-
-        assertThat(header).isNotNull();
-
-        assertThat(header.getAlgorithm()).isEqualTo(JWEAlgorithm.RSA1_5);
-        assertThat(header.getEncryptionMethod()).isEqualTo(EncryptionMethod.A128CBC_HS256);
-
-        assertThat(header.getType()).isNull();
-        assertThat(header.getContentType()).isNull();
-
-        assertThat(header.getIncludedParams()).contains("alg");
-        assertThat(header.getIncludedParams()).contains("enc");
-        assertThat(header.getIncludedParams()).hasSize(2);
-    }
-
     @Test
     public void testSerializeAndParse()
             throws Exception {
@@ -132,14 +81,14 @@ public class JWEHeaderTest {
         KeyUse use = KeyUse.ENCRYPTION;
         String kid = "1234";
 
-        RSAKey jwk = new RSAKey.Builder(mod, exp).keyUse(use).algorithm(JWEAlgorithm.RSA1_5).keyID(kid).build();
+        RSAKey jwk = new RSAKey.Builder(mod, exp).keyUse(use).algorithm(JWEAlgorithm.RSA_OAEP_256).keyID(kid).build();
 
         List<Base64Value> certChain = new LinkedList<>();
         certChain.add(new Base64Value("asd"));
         certChain.add(new Base64Value("fgh"));
         certChain.add(new Base64Value("jkl"));
 
-        JWEHeader header = new JWEHeader.Builder(JWEAlgorithm.RSA1_5, EncryptionMethod.A256GCM).
+        JWEHeader header = new JWEHeader.Builder(JWEAlgorithm.RSA_OAEP_256, EncryptionMethod.A256GCM).
                 type(new JOSEObjectType("JWT")).
                 compressionAlgorithm(CompressionAlgorithm.DEF).
                 jwkURL(new URI("https://example.com/jku.json")).
@@ -164,7 +113,7 @@ public class JWEHeaderTest {
         // Parse back
         header = JWEHeader.parse(base64URL);
 
-        assertThat(header.getAlgorithm()).isEqualTo(JWEAlgorithm.RSA1_5);
+        assertThat(header.getAlgorithm()).isEqualTo(JWEAlgorithm.RSA_OAEP_256);
         assertThat(header.getType()).isEqualTo(new JOSEObjectType("JWT"));
         assertThat(header.getEncryptionMethod()).isEqualTo(EncryptionMethod.A256GCM);
         assertThat(header.getCompressionAlgorithm()).isEqualTo(CompressionAlgorithm.DEF);
@@ -176,7 +125,7 @@ public class JWEHeaderTest {
         assertThat(jwk.getModulus()).isEqualTo(new Base64URLValue("abc123"));
         assertThat(jwk.getPublicExponent()).isEqualTo(new Base64URLValue("def456"));
         assertThat(jwk.getKeyUse()).isEqualTo(KeyUse.ENCRYPTION);
-        assertThat(jwk.getAlgorithm()).isEqualTo(JWEAlgorithm.RSA1_5);
+        assertThat(jwk.getAlgorithm()).isEqualTo(JWEAlgorithm.RSA_OAEP_256);
         assertThat(jwk.getKeyID()).isEqualTo("1234");
 
         assertThat(header.getX509CertURL()).isEqualTo(new URI("https://example/cert.b64"));
@@ -225,7 +174,7 @@ public class JWEHeaderTest {
         // Test copy constructor
         header = new JWEHeader(header);
 
-        assertThat(header.getAlgorithm()).isEqualTo(JWEAlgorithm.RSA1_5);
+        assertThat(header.getAlgorithm()).isEqualTo(JWEAlgorithm.RSA_OAEP_256);
         assertThat(header.getType()).isEqualTo(new JOSEObjectType("JWT"));
         assertThat(header.getEncryptionMethod()).isEqualTo(EncryptionMethod.A256GCM);
         assertThat(header.getCompressionAlgorithm()).isEqualTo(CompressionAlgorithm.DEF);
@@ -237,7 +186,7 @@ public class JWEHeaderTest {
         assertThat(jwk.getModulus()).isEqualTo(new Base64URLValue("abc123"));
         assertThat(jwk.getPublicExponent()).isEqualTo(new Base64URLValue("def456"));
         assertThat(jwk.getKeyUse()).isEqualTo(KeyUse.ENCRYPTION);
-        assertThat(jwk.getAlgorithm()).isEqualTo(JWEAlgorithm.RSA1_5);
+        assertThat(jwk.getAlgorithm()).isEqualTo(JWEAlgorithm.RSA_OAEP_256);
         assertThat(jwk.getKeyID()).isEqualTo("1234");
 
         assertThat(header.getX509CertURL()).isEqualTo(new URI("https://example/cert.b64"));
@@ -274,7 +223,7 @@ public class JWEHeaderTest {
         crit.add("exp");
         crit.add("nbf");
 
-        JWEHeader h = new JWEHeader.Builder(JWEAlgorithm.RSA1_5, EncryptionMethod.A128CBC_HS256).
+        JWEHeader h = new JWEHeader.Builder(JWEAlgorithm.RSA_OAEP_256, EncryptionMethod.A128CBC_HS256).
                 criticalParams(crit).
                 build();
 

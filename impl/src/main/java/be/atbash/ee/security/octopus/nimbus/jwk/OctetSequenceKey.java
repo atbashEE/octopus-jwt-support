@@ -125,14 +125,6 @@ public final class OctetSequenceKey extends JWK implements SecretJWK {
          */
         private URI x5u;
 
-
-        /**
-         * X.509 certificate SHA-1 thumbprint, optional.
-         */
-        @Deprecated
-        private Base64URLValue x5t;
-
-
         /**
          * X.509 certificate SHA-256 thumbprint, optional.
          */
@@ -174,7 +166,7 @@ public final class OctetSequenceKey extends JWK implements SecretJWK {
          * @param key The key value. Must not be empty byte array or
          *            {@code null}.
          */
-        public Builder(final byte[] key) {
+        public Builder(byte[] key) {
 
             this(Base64URLValue.encode(key));
 
@@ -190,7 +182,7 @@ public final class OctetSequenceKey extends JWK implements SecretJWK {
          * @param secretKey The secret key to represent. Must not be
          *                  {@code null}.
          */
-        public Builder(final SecretKey secretKey) {
+        public Builder(SecretKey secretKey) {
 
             this(secretKey.getEncoded());
         }
@@ -204,7 +196,7 @@ public final class OctetSequenceKey extends JWK implements SecretJWK {
          *            encryption.
          * @return This builder.
          */
-        public Builder keyUse(final KeyUse use) {
+        public Builder keyUse(KeyUse use) {
 
             this.use = use;
             return this;
@@ -219,7 +211,7 @@ public final class OctetSequenceKey extends JWK implements SecretJWK {
          *            specified.
          * @return This builder.
          */
-        public Builder keyOperations(final Set<KeyOperation> ops) {
+        public Builder keyOperations(Set<KeyOperation> ops) {
 
             this.ops = ops;
             return this;
@@ -233,7 +225,7 @@ public final class OctetSequenceKey extends JWK implements SecretJWK {
          *            specified.
          * @return This builder.
          */
-        public Builder algorithm(final Algorithm alg) {
+        public Builder algorithm(Algorithm alg) {
 
             this.alg = alg;
             return this;
@@ -249,7 +241,7 @@ public final class OctetSequenceKey extends JWK implements SecretJWK {
          * @param kid The key ID, {@code null} if not specified.
          * @return This builder.
          */
-        public Builder keyID(final String kid) {
+        public Builder keyID(String kid) {
 
             this.kid = kid;
             return this;
@@ -288,7 +280,7 @@ public final class OctetSequenceKey extends JWK implements SecretJWK {
          * @throws JOSEException If the hash algorithm is not
          *                       supported.
          */
-        public Builder keyIDFromThumbprint(final String hashAlg)
+        public Builder keyIDFromThumbprint(String hashAlg)
                 throws JOSEException {
 
             // Put mandatory params in sorted order
@@ -307,28 +299,11 @@ public final class OctetSequenceKey extends JWK implements SecretJWK {
          *            specified.
          * @return This builder.
          */
-        public Builder x509CertURL(final URI x5u) {
+        public Builder x509CertURL(URI x5u) {
 
             this.x5u = x5u;
             return this;
         }
-
-
-        /**
-         * Sets the X.509 certificate SHA-1 thumbprint ({@code x5t}) of
-         * the JWK.
-         *
-         * @param x5t The X.509 certificate SHA-1 thumbprint,
-         *            {@code null} if not specified.
-         * @return This builder.
-         */
-        @Deprecated
-        public Builder x509CertThumbprint(final Base64URLValue x5t) {
-
-            this.x5t = x5t;
-            return this;
-        }
-
 
         /**
          * Sets the X.509 certificate SHA-256 thumbprint
@@ -338,7 +313,7 @@ public final class OctetSequenceKey extends JWK implements SecretJWK {
          *               {@code null} if not specified.
          * @return This builder.
          */
-        public Builder x509CertSHA256Thumbprint(final Base64URLValue x5t256) {
+        public Builder x509CertSHA256Thumbprint(Base64URLValue x5t256) {
 
             this.x5t256 = x5t256;
             return this;
@@ -352,7 +327,7 @@ public final class OctetSequenceKey extends JWK implements SecretJWK {
          *            list, {@code null} if not specified.
          * @return This builder.
          */
-        public Builder x509CertChain(final List<Base64Value> x5c) {
+        public Builder x509CertChain(List<Base64Value> x5c) {
 
             this.x5c = x5c;
             return this;
@@ -366,7 +341,7 @@ public final class OctetSequenceKey extends JWK implements SecretJWK {
          *                 {@code null} if none.
          * @return This builder.
          */
-        public Builder keyStore(final KeyStore keyStore) {
+        public Builder keyStore(KeyStore keyStore) {
 
             this.ks = keyStore;
             return this;
@@ -383,7 +358,7 @@ public final class OctetSequenceKey extends JWK implements SecretJWK {
         public OctetSequenceKey build() {
 
             try {
-                return new OctetSequenceKey(k, use, ops, alg, kid, x5u, x5t, x5t256, x5c, ks);
+                return new OctetSequenceKey(k, use, ops, alg, kid, x5u, x5t256, x5c, ks);
 
             } catch (IllegalArgumentException e) {
 
@@ -407,8 +382,6 @@ public final class OctetSequenceKey extends JWK implements SecretJWK {
      *               if not specified.
      * @param kid    The key ID. {@code null} if not specified.
      * @param x5u    The X.509 certificate URL, {@code null} if not specified.
-     * @param x5t    The X.509 certificate SHA-1 thumbprint, {@code null}
-     *               if not specified.
      * @param x5t256 The X.509 certificate SHA-256 thumbprint, {@code null}
      *               if not specified.
      * @param x5c    The X.509 certificate chain, {@code null} if not
@@ -416,12 +389,12 @@ public final class OctetSequenceKey extends JWK implements SecretJWK {
      * @param ks     Reference to the underlying key store, {@code null} if
      *               not specified.
      */
-    public OctetSequenceKey(final Base64URLValue k,
-                            final KeyUse use, final Set<KeyOperation> ops, final Algorithm alg, final String kid,
-                            final URI x5u, final Base64URLValue x5t, final Base64URLValue x5t256, final List<Base64Value> x5c,
-                            final KeyStore ks) {
+    public OctetSequenceKey(Base64URLValue k,
+                            KeyUse use, Set<KeyOperation> ops, Algorithm alg, String kid,
+                            URI x5u,  Base64URLValue x5t256, List<Base64Value> x5c,
+                            KeyStore ks) {
 
-        super(KeyType.OCT, use, ops, alg, kid, x5u, x5t, x5t256, x5c, ks);
+        super(KeyType.OCT, use, ops, alg, kid, x5u, x5t256, x5c, ks);
 
         if (k == null) {
             throw new IllegalArgumentException("The key value must not be null");
@@ -474,7 +447,7 @@ public final class OctetSequenceKey extends JWK implements SecretJWK {
      * @param jcaAlg The JCA algorithm. Must not be {@code null}.
      * @return The secret key representation.
      */
-    public SecretKey toSecretKey(final String jcaAlg) {
+    public SecretKey toSecretKey(String jcaAlg) {
 
         return new SecretKeySpec(toByteArray(), jcaAlg);
     }
@@ -544,15 +517,15 @@ public final class OctetSequenceKey extends JWK implements SecretJWK {
      * Parses an octet sequence JWK from the specified JSON object string
      * representation.
      *
-     * @param s The JSON object string to parse. Must not be {@code null}.
+     * @param value The JSON object string to parse. Must not be {@code null}.
      * @return The octet sequence JWK.
      * @throws ParseException If the string couldn't be parsed to an octet
      *                        sequence JWK.
      */
-    public static OctetSequenceKey parse(final String s)
+    public static OctetSequenceKey parse(String value)
             throws ParseException {
 
-        return parse(JSONObjectUtils.parse(s));
+        return parse(JSONObjectUtils.parse(value));
     }
 
 
@@ -566,7 +539,7 @@ public final class OctetSequenceKey extends JWK implements SecretJWK {
      * @throws ParseException If the JSON object couldn't be parsed to an
      *                        octet sequence JWK.
      */
-    public static OctetSequenceKey parse(final JsonObject jsonObject)
+    public static OctetSequenceKey parse(JsonObject jsonObject)
             throws ParseException {
 
         // Parse the mandatory parameters first
@@ -586,7 +559,6 @@ public final class OctetSequenceKey extends JWK implements SecretJWK {
                 JWKMetadata.parseAlgorithm(jsonObject),
                 JWKMetadata.parseKeyID(jsonObject),
                 JWKMetadata.parseX509CertURL(jsonObject),
-                JWKMetadata.parseX509CertThumbprint(jsonObject),
                 JWKMetadata.parseX509CertSHA256Thumbprint(jsonObject),
                 JWKMetadata.parseX509CertChain(jsonObject),
                 null // key store
@@ -606,7 +578,7 @@ public final class OctetSequenceKey extends JWK implements SecretJWK {
      * @throws KeyStoreException On a key store exception.
      * @throws JOSEException     If octet sequence key loading failed.
      */
-    public static OctetSequenceKey load(final KeyStore keyStore, final String alias, final char[] pin)
+    public static OctetSequenceKey load(KeyStore keyStore, String alias, char[] pin)
             throws KeyStoreException, JOSEException {
 
         Key key;

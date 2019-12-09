@@ -31,8 +31,6 @@ public class JWEAlgorithmTest {
     @Test
     public void testParse() {
 
-        assertThat(JWEAlgorithm.RSA1_5).isEqualTo(JWEAlgorithm.parse("RSA1_5"));
-        assertThat(JWEAlgorithm.RSA_OAEP).isEqualTo(JWEAlgorithm.parse("RSA-OAEP"));
         assertThat(JWEAlgorithm.RSA_OAEP_256).isEqualTo(JWEAlgorithm.parse("RSA-OAEP-256"));
 
         assertThat(JWEAlgorithm.A128KW).isEqualTo(JWEAlgorithm.parse("A128KW"));
@@ -60,10 +58,8 @@ public class JWEAlgorithmTest {
     @Test
     public void testRSAFamily() {
 
-        assertThat(JWEAlgorithm.Family.RSA).contains(JWEAlgorithm.RSA1_5);
-        assertThat(JWEAlgorithm.Family.RSA).contains(JWEAlgorithm.RSA_OAEP);
         assertThat(JWEAlgorithm.Family.RSA).contains(JWEAlgorithm.RSA_OAEP_256);
-        assertThat(JWEAlgorithm.Family.RSA).hasSize(3);
+        assertThat(JWEAlgorithm.Family.RSA).hasSize(1);
     }
 
     @Test

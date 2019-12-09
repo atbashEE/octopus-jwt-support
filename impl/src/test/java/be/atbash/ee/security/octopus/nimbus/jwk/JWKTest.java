@@ -59,14 +59,13 @@ public class JWKTest {
     }
 
 
-    private void validateJWKFromX509Cert(final JWK jwk, final KeyType expectedKeyType) {
+    private void validateJWKFromX509Cert(JWK jwk, KeyType expectedKeyType) {
 
         assertThat(jwk.getKeyType()).isEqualTo(expectedKeyType);
         assertThat(jwk.getAlgorithm()).isNull();
         assertThat(jwk.getKeyUse()).isEqualTo(KeyUse.ENCRYPTION);
         assertThat(jwk.getKeyOperations()).isNull();
         assertThat(jwk.getX509CertChain().size()).isEqualTo(1);
-        assertThat(jwk.getX509CertThumbprint()).isNull();
         assertThat(jwk.getX509CertSHA256Thumbprint()).isNotNull();
         assertThat(jwk.isPrivate()).isFalse();
 
@@ -165,7 +164,6 @@ public class JWKTest {
         assertThat(rsaKey.getKeyUse()).isEqualTo(KeyUse.SIGNATURE);
         assertThat(rsaKey.getKeyID()).isEqualTo("1");
         assertThat(rsaKey.getX509CertChain().size()).isEqualTo(1);
-        assertThat(rsaKey.getX509CertThumbprint()).isNull();
         assertThat(rsaKey.getX509CertSHA256Thumbprint()).isNotNull();
         assertThat(rsaKey.isPrivate()).isTrue();
 
@@ -226,7 +224,6 @@ public class JWKTest {
         assertThat(ecKey.getKeyUse()).isEqualTo(KeyUse.SIGNATURE);
         assertThat(ecKey.getKeyID()).isEqualTo("1");
         assertThat(ecKey.getX509CertChain().size()).isEqualTo(1);
-        assertThat(ecKey.getX509CertThumbprint()).isNull();
         assertThat(ecKey.getX509CertSHA256Thumbprint()).isNotNull();
         assertThat(ecKey.isPrivate()).isTrue();
 

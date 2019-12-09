@@ -136,24 +136,6 @@ final class JWKMetadata {
         }
     }
 
-
-    /**
-     * Parses the optional X.509 certificate thumbprint.
-     *
-     * @param jsonObject The JSON object to parse. Must not be {@code null}.
-     * @return The X.509 certificate thumbprint, {@code null} if not
-     * specified.
-     */
-    static Base64URLValue parseX509CertThumbprint(JsonObject jsonObject) {
-
-        if (jsonObject.containsKey("x5t")) {
-            return new Base64URLValue(jsonObject.getString("x5t"));
-        } else {
-            return null;
-        }
-    }
-
-
     /**
      * Parses the optional X.509 certificate SHA-256 thumbprint.
      *

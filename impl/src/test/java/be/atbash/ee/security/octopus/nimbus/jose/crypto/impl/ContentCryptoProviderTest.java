@@ -59,8 +59,7 @@ public class ContentCryptoProviderTest  {
 		// 256 bit cek
 		assertThat(ContentCryptoProvider.COMPATIBLE_ENCRYPTION_METHODS.get(256)).contains(EncryptionMethod.A256GCM);
 		assertThat(ContentCryptoProvider.COMPATIBLE_ENCRYPTION_METHODS.get(256)).contains(EncryptionMethod.A128CBC_HS256);
-		assertThat(ContentCryptoProvider.COMPATIBLE_ENCRYPTION_METHODS.get(256)).contains(EncryptionMethod.A128CBC_HS256_DEPRECATED);
-		assertThat(ContentCryptoProvider.COMPATIBLE_ENCRYPTION_METHODS.get(256).size()).isEqualTo(3);
+		assertThat(ContentCryptoProvider.COMPATIBLE_ENCRYPTION_METHODS.get(256).size()).isEqualTo(2);
 
 		// 384 bit cek
 		assertThat(ContentCryptoProvider.COMPATIBLE_ENCRYPTION_METHODS.get(384)).contains(EncryptionMethod.A192CBC_HS384);
@@ -68,8 +67,7 @@ public class ContentCryptoProviderTest  {
 
 		// 512 bit cek
 		assertThat(ContentCryptoProvider.COMPATIBLE_ENCRYPTION_METHODS.get(512)).contains(EncryptionMethod.A256CBC_HS512);
-		assertThat(ContentCryptoProvider.COMPATIBLE_ENCRYPTION_METHODS.get(512)).contains(EncryptionMethod.A256CBC_HS512_DEPRECATED);
-		assertThat(ContentCryptoProvider.COMPATIBLE_ENCRYPTION_METHODS.get(512).size()).isEqualTo(2);
+		assertThat(ContentCryptoProvider.COMPATIBLE_ENCRYPTION_METHODS.get(512).size()).isEqualTo(1);
 
 		// Total
 		assertThat(ContentCryptoProvider.COMPATIBLE_ENCRYPTION_METHODS.size()).isEqualTo(5);
@@ -175,7 +173,5 @@ public class ContentCryptoProviderTest  {
 		assertThat(ContentCryptoProvider.generateCEK(EncryptionMethod.A192CBC_HS384, randomGen).getEncoded().length).isEqualTo(ByteUtils.byteLength(384));
 		assertThat(ContentCryptoProvider.generateCEK(EncryptionMethod.A256CBC_HS512, randomGen).getEncoded().length).isEqualTo(ByteUtils.byteLength(512));
 
-		assertThat(ContentCryptoProvider.generateCEK(EncryptionMethod.A128CBC_HS256_DEPRECATED, randomGen).getEncoded().length).isEqualTo(ByteUtils.byteLength(256));
-		assertThat(ContentCryptoProvider.generateCEK(EncryptionMethod.A256CBC_HS512_DEPRECATED, randomGen).getEncoded().length).isEqualTo(ByteUtils.byteLength(512));
 	}
 }

@@ -57,7 +57,6 @@ public class OctetSequenceKeyTest {
 
         Base64URLValue k = new Base64URLValue("GawgguFyGrWKav7AX4VKUg");
         URI x5u = new URI("http://example.com/jwk.json");
-        Base64URLValue x5t = new Base64URLValue("abc");
         Base64URLValue x5t256 = new Base64URLValue("abc256");
         List<Base64Value> x5c = SampleCertificates.SAMPLE_X5C_RSA;
 
@@ -65,7 +64,7 @@ public class OctetSequenceKeyTest {
 
         KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
 
-        OctetSequenceKey key = new OctetSequenceKey(k, null, ops, JWSAlgorithm.HS256, "1", x5u, x5t, x5t256, x5c, keyStore);
+        OctetSequenceKey key = new OctetSequenceKey(k, null, ops, JWSAlgorithm.HS256, "1", x5u, x5t256, x5c, keyStore);
 
         assertThat(key).isInstanceOf(SecretJWK.class);
 
@@ -77,7 +76,6 @@ public class OctetSequenceKeyTest {
         assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.HS256);
         assertThat(key.getKeyID()).isEqualTo("1");
         assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
-        assertThat(key.getX509CertThumbprint().toString()).isEqualTo(x5t.toString());
         assertThat(key.getX509CertSHA256Thumbprint().toString()).isEqualTo(x5t256.toString());
         assertThat(key.getX509CertChain().size()).isEqualTo(x5c.size());
         assertThat(key.getKeyStore()).isEqualTo(keyStore);
@@ -106,7 +104,6 @@ public class OctetSequenceKeyTest {
         assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.HS256);
         assertThat(key.getKeyID()).isEqualTo("1");
         assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
-        assertThat(key.getX509CertThumbprint().toString()).isEqualTo(x5t.toString());
         assertThat(key.getX509CertSHA256Thumbprint().toString()).isEqualTo(x5t256.toString());
         assertThat(key.getX509CertChain().size()).isEqualTo(x5c.size());
         assertThat(key.getKeyStore()).isNull();
@@ -132,11 +129,10 @@ public class OctetSequenceKeyTest {
 
         Base64URLValue k = new Base64URLValue("GawgguFyGrWKav7AX4VKUg");
         URI x5u = new URI("http://example.com/jwk.json");
-        Base64URLValue x5t = new Base64URLValue("abc");
         Base64URLValue x5t256 = new Base64URLValue("abc256");
         List<Base64Value> x5c = SampleCertificates.SAMPLE_X5C_RSA;
 
-        OctetSequenceKey key = new OctetSequenceKey(k, KeyUse.SIGNATURE, null, JWSAlgorithm.HS256, "1", x5u, x5t, x5t256, x5c, null);
+        OctetSequenceKey key = new OctetSequenceKey(k, KeyUse.SIGNATURE, null, JWSAlgorithm.HS256, "1", x5u, x5t256, x5c, null);
 
         assertThat(key.getKeyType()).isEqualTo(KeyType.OCT);
         assertThat(key.getKeyUse()).isEqualTo(KeyUse.SIGNATURE);
@@ -144,7 +140,6 @@ public class OctetSequenceKeyTest {
         assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.HS256);
         assertThat(key.getKeyID()).isEqualTo("1");
         assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
-        assertThat(key.getX509CertThumbprint().toString()).isEqualTo(x5t.toString());
         assertThat(key.getX509CertSHA256Thumbprint().toString()).isEqualTo(x5t256.toString());
         assertThat(key.getX509CertChain().size()).isEqualTo(x5c.size());
         assertThat(key.getKeyStore()).isNull();
@@ -171,7 +166,6 @@ public class OctetSequenceKeyTest {
         assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.HS256);
         assertThat(key.getKeyID()).isEqualTo("1");
         assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
-        assertThat(key.getX509CertThumbprint().toString()).isEqualTo(x5t.toString());
         assertThat(key.getX509CertSHA256Thumbprint().toString()).isEqualTo(x5t256.toString());
         assertThat(key.getX509CertChain().size()).isEqualTo(x5c.size());
 
@@ -197,7 +191,7 @@ public class OctetSequenceKeyTest {
 
         Set<KeyOperation> ops = new HashSet<>(Arrays.asList(KeyOperation.SIGN, KeyOperation.VERIFY));
 
-        JWK jwk = new OctetSequenceKey(new Base64URLValue("GawgguFyGrWKav7AX4VKUg"), use, ops, null, null, null, null, null, null, null);
+        JWK jwk = new OctetSequenceKey(new Base64URLValue("GawgguFyGrWKav7AX4VKUg"), use, ops, null, null, null, null, null, null);
         assertThat(jwk.getKeyUse()).isEqualTo(use);
         assertThat(jwk.getKeyOperations()).isEqualTo(ops);
     }
@@ -222,7 +216,6 @@ public class OctetSequenceKeyTest {
 
         Base64URLValue k = new Base64URLValue("GawgguFyGrWKav7AX4VKUg");
         URI x5u = new URI("http://example.com/jwk.json");
-        Base64URLValue x5t = new Base64URLValue("abc");
         List<Base64Value> x5c = SampleCertificates.SAMPLE_X5C_RSA;
 
         Set<KeyOperation> ops = new LinkedHashSet<>(Arrays.asList(KeyOperation.SIGN, KeyOperation.VERIFY));
@@ -234,7 +227,6 @@ public class OctetSequenceKeyTest {
                 .algorithm(JWSAlgorithm.HS256)
                 .keyID("1")
                 .x509CertURL(x5u)
-                .x509CertThumbprint(x5t)
                 .x509CertChain(x5c)
                 .keyStore(keyStore)
                 .build();
@@ -247,7 +239,6 @@ public class OctetSequenceKeyTest {
         assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.HS256);
         assertThat(key.getKeyID()).isEqualTo("1");
         assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
-        assertThat(key.getX509CertThumbprint().toString()).isEqualTo(x5t.toString());
         assertThat(key.getX509CertChain().size()).isEqualTo(x5c.size());
         assertThat(key.getKeyStore()).isEqualTo(keyStore);
 
@@ -277,7 +268,6 @@ public class OctetSequenceKeyTest {
         assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.HS256);
         assertThat(key.getKeyID()).isEqualTo("1");
         assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
-        assertThat(key.getX509CertThumbprint().toString()).isEqualTo(x5t.toString());
         assertThat(key.getX509CertChain().size()).isEqualTo(x5c.size());
         assertThat(key.getKeyStore()).isNull();
 

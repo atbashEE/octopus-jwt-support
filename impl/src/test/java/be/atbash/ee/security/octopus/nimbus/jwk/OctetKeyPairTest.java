@@ -153,7 +153,6 @@ public class OctetKeyPairTest {
             throws Exception {
 
         URI x5u = new URI("http://example.com/jwk.json");
-        Base64URLValue x5t = new Base64URLValue("abc");
         Base64URLValue x5t256 = new Base64URLValue("abc256");
         List<Base64Value> x5c = SampleCertificates.SAMPLE_X5C_RSA;
         Set<KeyOperation> ops = null;
@@ -161,10 +160,10 @@ public class OctetKeyPairTest {
         KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
 
         OctetKeyPair key = new OctetKeyPair(EXAMPLE_OKP_ED25519.CRV, EXAMPLE_OKP_ED25519.X, EXAMPLE_OKP_ED25519.D,
-                KeyUse.SIGNATURE, ops, JWSAlgorithm.EdDSA, "1", x5u, x5t, x5t256, x5c, keyStore);
+                KeyUse.SIGNATURE, ops, JWSAlgorithm.EdDSA, "1", x5u, x5t256, x5c, keyStore);
 
-        assertThat(key instanceof AsymmetricJWK).isTrue();
-        assertThat(key instanceof CurveBasedJWK).isTrue();
+        assertThat(key).isInstanceOf(AsymmetricJWK.class);
+        assertThat(key).isInstanceOf(CurveBasedJWK.class);
 
         // Test getters
         assertThat(key.getKeyUse()).isEqualTo(KeyUse.SIGNATURE);
@@ -172,7 +171,6 @@ public class OctetKeyPairTest {
         assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.EdDSA);
         assertThat(key.getKeyID()).isEqualTo("1");
         assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
-        assertThat(key.getX509CertThumbprint().toString()).isEqualTo(x5t.toString());
         assertThat(key.getX509CertSHA256Thumbprint().toString()).isEqualTo(x5t256.toString());
         assertThat(key.getX509CertChain().size()).isEqualTo(x5c.size());
         assertThat(key.getKeyStore()).isEqualTo(keyStore);
@@ -219,7 +217,6 @@ public class OctetKeyPairTest {
         assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.EdDSA);
         assertThat(key.getKeyID()).isEqualTo("1");
         assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
-        assertThat(key.getX509CertThumbprint().toString()).isEqualTo(x5t.toString());
         assertThat(key.getX509CertSHA256Thumbprint().toString()).isEqualTo(x5t256.toString());
         assertThat(key.getX509CertChain().size()).isEqualTo(x5c.size());
         assertThat(key.getKeyStore()).isNull();
@@ -238,7 +235,6 @@ public class OctetKeyPairTest {
             throws Exception {
 
         URI x5u = new URI("http://example.com/jwk.json");
-        Base64URLValue x5t = new Base64URLValue("abc");
         Base64URLValue x5t256 = new Base64URLValue("abc256");
         List<Base64Value> x5c = SampleCertificates.SAMPLE_X5C_RSA;
         Set<KeyOperation> ops = null;
@@ -246,10 +242,10 @@ public class OctetKeyPairTest {
         KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
 
         OctetKeyPair key = new OctetKeyPair(EXAMPLE_OKP_ED25519.CRV, EXAMPLE_OKP_ED25519.X,
-                KeyUse.SIGNATURE, ops, JWSAlgorithm.EdDSA, "1", x5u, x5t, x5t256, x5c, keyStore);
+                KeyUse.SIGNATURE, ops, JWSAlgorithm.EdDSA, "1", x5u, x5t256, x5c, keyStore);
 
-        assertThat(key instanceof AsymmetricJWK).isTrue();
-        assertThat(key instanceof CurveBasedJWK).isTrue();
+        assertThat(key).isInstanceOf(AsymmetricJWK.class);
+        assertThat(key).isInstanceOf(CurveBasedJWK.class);
 
         // Test getters
         assertThat(key.getKeyUse()).isEqualTo(KeyUse.SIGNATURE);
@@ -257,7 +253,6 @@ public class OctetKeyPairTest {
         assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.EdDSA);
         assertThat(key.getKeyID()).isEqualTo("1");
         assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
-        assertThat(key.getX509CertThumbprint().toString()).isEqualTo(x5t.toString());
         assertThat(key.getX509CertSHA256Thumbprint().toString()).isEqualTo(x5t256.toString());
         assertThat(key.getX509CertChain().size()).isEqualTo(x5c.size());
         assertThat(key.getKeyStore()).isEqualTo(keyStore);
@@ -300,7 +295,6 @@ public class OctetKeyPairTest {
             throws Exception {
 
         URI x5u = new URI("http://example.com/jwk.json");
-        Base64URLValue x5t = new Base64URLValue("abc");
         Base64URLValue x5tS256 = new Base64URLValue("ghi");
         List<Base64Value> x5c = SampleCertificates.SAMPLE_X5C_RSA;
 
@@ -313,7 +307,6 @@ public class OctetKeyPairTest {
                 .algorithm(JWSAlgorithm.EdDSA)
                 .keyID("1")
                 .x509CertURL(x5u)
-                .x509CertThumbprint(x5t)
                 .x509CertSHA256Thumbprint(x5tS256)
                 .x509CertChain(x5c)
                 .keyStore(keyStore)
@@ -325,7 +318,6 @@ public class OctetKeyPairTest {
         assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.EdDSA);
         assertThat(key.getKeyID()).isEqualTo("1");
         assertThat(key.getX509CertURL()).isEqualTo(x5u);
-        assertThat(key.getX509CertThumbprint()).isEqualTo(x5t);
         assertThat(key.getX509CertSHA256Thumbprint()).isEqualTo(x5tS256);
         assertThat(key.getX509CertChain().size()).isEqualTo(x5c.size());
         assertThat(key.getKeyStore()).isEqualTo(keyStore);
@@ -368,7 +360,6 @@ public class OctetKeyPairTest {
         assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.EdDSA);
         assertThat(key.getKeyID()).isEqualTo("1");
         assertThat(key.getX509CertURL()).isEqualTo(x5u);
-        assertThat(key.getX509CertThumbprint()).isEqualTo(x5t);
         assertThat(key.getX509CertChain().size()).isEqualTo(x5c.size());
         assertThat(key.getKeyStore()).isNull();
 
@@ -398,7 +389,6 @@ public class OctetKeyPairTest {
                 .algorithm(JWSAlgorithm.EdDSA)
                 .keyID("1")
                 .x509CertURL(x5u)
-                .x509CertThumbprint(x5t)
                 .x509CertSHA256Thumbprint(x5tS256)
                 .x509CertChain(x5c)
                 .keyStore(keyStore)
@@ -412,7 +402,6 @@ public class OctetKeyPairTest {
         assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.EdDSA);
         assertThat(key.getKeyID()).isEqualTo("1");
         assertThat(key.getX509CertURL()).isEqualTo(x5u);
-        assertThat(key.getX509CertThumbprint()).isEqualTo(x5t);
         assertThat(key.getX509CertSHA256Thumbprint()).isEqualTo(x5tS256);
         assertThat(key.getX509CertChain().size()).isEqualTo(x5c.size());
         assertThat(key.getKeyStore()).isEqualTo(keyStore);
@@ -452,7 +441,7 @@ public class OctetKeyPairTest {
 
             // public / private OKP
             try {
-                new OctetKeyPair(crv, EXAMPLE_OKP_ED25519.X, EXAMPLE_OKP_ED25519.D, null, null, null, null, null, null, null, null, null);
+                new OctetKeyPair(crv, EXAMPLE_OKP_ED25519.X, EXAMPLE_OKP_ED25519.D, null, null, null, null, null, null, null, null);
                 fail();
             } catch (IllegalArgumentException e) {
                 assertThat(e.getMessage()).isEqualTo("Unknown / unsupported curve: " + crv);

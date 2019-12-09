@@ -17,7 +17,10 @@ package be.atbash.ee.security.octopus.nimbus.jose.crypto;
 
 
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
-import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.*;
+import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.AlgorithmSupportMessage;
+import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.ContentCryptoProvider;
+import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.RSACryptoProvider;
+import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.RSA_OAEP_256;
 import be.atbash.ee.security.octopus.nimbus.jwk.RSAKey;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.*;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
@@ -44,8 +47,6 @@ import java.security.interfaces.RSAPublicKey;
  *
  * <ul>
  *     <li>{@link JWEAlgorithm#RSA_OAEP_256}
- *     <li>{@link JWEAlgorithm#RSA_OAEP} (deprecated)
- *     <li>{@link JWEAlgorithm#RSA1_5} (deprecated)
  * </ul>
  *
  * <p>Supports the following content encryption algorithms:
@@ -57,8 +58,6 @@ import java.security.interfaces.RSAPublicKey;
  *     <li>{@link EncryptionMethod#A128GCM}
  *     <li>{@link EncryptionMethod#A192GCM}
  *     <li>{@link EncryptionMethod#A256GCM}
- *     <li>{@link EncryptionMethod#A128CBC_HS256_DEPRECATED}
- *     <li>{@link EncryptionMethod#A256CBC_HS512_DEPRECATED}
  * </ul>
  *
  * @author David Ortiz
@@ -168,15 +167,7 @@ public class RSAEncrypter extends RSACryptoProvider implements JWEEncrypter {
 
         Base64URLValue encryptedKey; // The second JWE part
 
-        if (alg.equals(JWEAlgorithm.RSA1_5)) {
-
-            encryptedKey = Base64URLValue.encode(RSA1_5.encryptCEK(publicKey, cek, getJCAContext().getKeyEncryptionProvider()));
-
-        } else if (alg.equals(JWEAlgorithm.RSA_OAEP)) {
-
-            encryptedKey = Base64URLValue.encode(RSA_OAEP.encryptCEK(publicKey, cek, getJCAContext().getKeyEncryptionProvider()));
-
-        } else if (alg.equals(JWEAlgorithm.RSA_OAEP_256)) {
+        if (alg.equals(JWEAlgorithm.RSA_OAEP_256)) {
 
             encryptedKey = Base64URLValue.encode(RSA_OAEP_256.encryptCEK(publicKey, cek, getJCAContext().getKeyEncryptionProvider()));
 

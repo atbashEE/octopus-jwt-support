@@ -169,7 +169,7 @@ public class EncryptedJWTTest {
         List<String> aud = new ArrayList<>();
         aud.add("https://app-one.com");
         aud.add("https://app-two.com");
-        final Date NOW = new Date(new Date().getTime() / 1000 * 1000);
+        Date NOW = new Date(new Date().getTime() / 1000 * 1000);
         Date exp = new Date(NOW.getTime() + 1000 * 60 * 10);
         Date nbf = NOW;
         Date iat = NOW;
@@ -188,7 +188,7 @@ public class EncryptedJWTTest {
 
 
         // Request JWT encrypted with RSA-OAEP and 128-bit AES/GCM
-        JWEHeader header = new JWEHeader(JWEAlgorithm.RSA_OAEP, EncryptionMethod.A128GCM);
+        JWEHeader header = new JWEHeader(JWEAlgorithm.RSA_OAEP_256, EncryptionMethod.A128GCM);
 
 
         // Create the encrypted JWT object

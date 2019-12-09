@@ -69,13 +69,13 @@ public class HeaderTest {
             throws Exception {
 
         // Example BASE64URL from JWE spec
-        Base64URLValue in = new Base64URLValue("eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0");
+        Base64URLValue in = new Base64URLValue("eyJhbGciOiJSU0EtT0FFUC0yNTYiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0");
 
         Header header = Header.parse(in);
 
         assertThat(header).isInstanceOf(JWEHeader.class);
         assertThat(header.toBase64URL()).isEqualTo(in);
-        assertThat(header.getAlgorithm()).isEqualTo(JWEAlgorithm.RSA1_5);
+        assertThat(header.getAlgorithm()).isEqualTo(JWEAlgorithm.RSA_OAEP_256);
 
         JWEHeader jweHeader = (JWEHeader) header;
         assertThat(jweHeader.getEncryptionMethod()).isEqualTo(EncryptionMethod.A128CBC_HS256);

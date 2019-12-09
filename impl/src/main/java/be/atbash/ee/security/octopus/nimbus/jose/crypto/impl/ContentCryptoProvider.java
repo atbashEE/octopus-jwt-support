@@ -62,8 +62,6 @@ public class ContentCryptoProvider {
         methods.add(EncryptionMethod.A128GCM);
         methods.add(EncryptionMethod.A192GCM);
         methods.add(EncryptionMethod.A256GCM);
-        methods.add(EncryptionMethod.A128CBC_HS256_DEPRECATED);
-        methods.add(EncryptionMethod.A256CBC_HS512_DEPRECATED);
         SUPPORTED_ENCRYPTION_METHODS = Collections.unmodifiableSet(methods);
 
         Map<Integer, Set<EncryptionMethod>> encsMap = new HashMap<>();
@@ -76,10 +74,8 @@ public class ContentCryptoProvider {
         bit192Encs.add(EncryptionMethod.A192GCM);
         bit256Encs.add(EncryptionMethod.A256GCM);
         bit256Encs.add(EncryptionMethod.A128CBC_HS256);
-        bit256Encs.add(EncryptionMethod.A128CBC_HS256_DEPRECATED);
         bit384Encs.add(EncryptionMethod.A192CBC_HS384);
         bit512Encs.add(EncryptionMethod.A256CBC_HS512);
-        bit512Encs.add(EncryptionMethod.A256CBC_HS512_DEPRECATED);
         encsMap.put(128, Collections.unmodifiableSet(bit128Encs));
         encsMap.put(192, Collections.unmodifiableSet(bit192Encs));
         encsMap.put(256, Collections.unmodifiableSet(bit256Encs));
@@ -192,16 +188,6 @@ public class ContentCryptoProvider {
 
             iv = ivContainer.get();
 
-        } else if (header.getEncryptionMethod().equals(EncryptionMethod.A128CBC_HS256_DEPRECATED) ||
-                header.getEncryptionMethod().equals(EncryptionMethod.A256CBC_HS512_DEPRECATED)) {
-
-            iv = AESCBC.generateIV(jcaProvider.getSecureRandom());
-
-            authCipherText = AESCBC.encryptWithConcatKDF(
-                    header, cek, encryptedKey, iv, plainText,
-                    jcaProvider.getContentEncryptionProvider(),
-                    jcaProvider.getMACProvider());
-
         } else {
 
             throw new JOSEException(AlgorithmSupportMessage.unsupportedEncryptionMethod(
@@ -278,19 +264,6 @@ public class ContentCryptoProvider {
                     aad,
                     authTag.decode(),
                     jcaProvider.getContentEncryptionProvider());
-
-        } else if (header.getEncryptionMethod().equals(EncryptionMethod.A128CBC_HS256_DEPRECATED) ||
-                header.getEncryptionMethod().equals(EncryptionMethod.A256CBC_HS512_DEPRECATED)) {
-
-            plainText = AESCBC.decryptWithConcatKDF(
-                    header,
-                    cek,
-                    encryptedKey,
-                    iv,
-                    cipherText,
-                    authTag,
-                    jcaProvider.getContentEncryptionProvider(),
-                    jcaProvider.getMACProvider());
 
         } else {
             throw new JOSEException(AlgorithmSupportMessage.unsupportedEncryptionMethod(

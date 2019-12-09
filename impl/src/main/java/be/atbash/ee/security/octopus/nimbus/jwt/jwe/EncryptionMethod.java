@@ -32,8 +32,6 @@ import be.atbash.ee.security.octopus.nimbus.jose.AlgorithmFamily;
  *     <li>{@link #A128GCM}
  *     <li>{@link #A192GCM}
  *     <li>{@link #A256GCM}
- *     <li>{@link #A128CBC_HS256_DEPRECATED A128CBC+HS256 (deprecated)}
- *     <li>{@link #A256CBC_HS512_DEPRECATED A256CBC+HS512 (deprecated)}
  * </ul>
  *
  * <p>Additional encryption method names can be defined using the constructors.
@@ -75,22 +73,6 @@ public final class EncryptionMethod extends Algorithm {
      */
     public static final EncryptionMethod A256CBC_HS512 =
             new EncryptionMethod("A256CBC-HS512", 512);
-
-
-    /**
-     * AES_128_CBC_HMAC_SHA_256 authenticated encryption using a 256 bit
-     * key, deprecated in JOSE draft suite version 09.
-     */
-    public static final EncryptionMethod A128CBC_HS256_DEPRECATED =
-            new EncryptionMethod("A128CBC+HS256", 256);
-
-
-    /**
-     * AES_256_CBC_HMAC_SHA_512 authenticated encryption using a 512 bit
-     * key, deprecated in JOSE draft suite version 09.
-     */
-    public static final EncryptionMethod A256CBC_HS512_DEPRECATED =
-            new EncryptionMethod("A256CBC+HS512", 512);
 
 
     /**
@@ -223,14 +205,6 @@ public final class EncryptionMethod extends Algorithm {
         } else if (value.equals(A256GCM.getName())) {
 
             return A256GCM;
-
-        } else if (value.equals(A128CBC_HS256_DEPRECATED.getName())) {
-
-            return A128CBC_HS256_DEPRECATED;
-
-        } else if (value.equals(A256CBC_HS512_DEPRECATED.getName())) {
-
-            return A256CBC_HS512_DEPRECATED;
 
         } else {
 

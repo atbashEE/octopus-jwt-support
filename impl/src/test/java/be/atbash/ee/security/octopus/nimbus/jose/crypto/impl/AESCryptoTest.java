@@ -48,7 +48,7 @@ public class AESCryptoTest  {
 	@Test
 	public void testClassEncryptionMethodSupport() {
 
-		assertThat(AESCryptoProvider.SUPPORTED_ENCRYPTION_METHODS).hasSize(8);
+		assertThat(AESCryptoProvider.SUPPORTED_ENCRYPTION_METHODS).hasSize(6);
 
 		assertThat(AESCryptoProvider.SUPPORTED_ENCRYPTION_METHODS).contains(EncryptionMethod.A128CBC_HS256);
 		assertThat(AESCryptoProvider.SUPPORTED_ENCRYPTION_METHODS).contains(EncryptionMethod.A192CBC_HS384);
@@ -56,7 +56,5 @@ public class AESCryptoTest  {
 		assertThat(AESCryptoProvider.SUPPORTED_ENCRYPTION_METHODS).contains(EncryptionMethod.A128GCM);
 		assertThat(AESCryptoProvider.SUPPORTED_ENCRYPTION_METHODS).contains(EncryptionMethod.A192GCM);
 		assertThat(AESCryptoProvider.SUPPORTED_ENCRYPTION_METHODS).contains(EncryptionMethod.A256GCM);
-		assertThat(AESCryptoProvider.SUPPORTED_ENCRYPTION_METHODS).contains(EncryptionMethod.A128CBC_HS256_DEPRECATED);
-		assertThat(AESCryptoProvider.SUPPORTED_ENCRYPTION_METHODS).contains(EncryptionMethod.A256CBC_HS512_DEPRECATED);
 	}
 }

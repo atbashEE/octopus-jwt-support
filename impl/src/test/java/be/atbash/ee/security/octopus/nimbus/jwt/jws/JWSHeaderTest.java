@@ -80,7 +80,7 @@ public class JWSHeaderTest {
         KeyUse use = KeyUse.ENCRYPTION;
         String kid = "1234";
 
-        RSAKey jwk = new RSAKey.Builder(mod, exp).keyUse(use).algorithm(JWEAlgorithm.RSA1_5).keyID(kid).build();
+        RSAKey jwk = new RSAKey.Builder(mod, exp).keyUse(use).algorithm(JWEAlgorithm.RSA_OAEP_256).keyID(kid).build();
 
         List<Base64Value> certChain = new LinkedList<>();
         certChain.add(new Base64Value("asd"));
@@ -122,7 +122,7 @@ public class JWSHeaderTest {
         assertThat(jwk.getModulus()).isEqualTo(new Base64URLValue("abc123"));
         assertThat(jwk.getPublicExponent()).isEqualTo(new Base64URLValue("def456"));
         assertThat(jwk.getKeyUse()).isEqualTo(KeyUse.ENCRYPTION);
-        assertThat(jwk.getAlgorithm()).isEqualTo(JWEAlgorithm.RSA1_5);
+        assertThat(jwk.getAlgorithm()).isEqualTo(JWEAlgorithm.RSA_OAEP_256);
         assertThat(jwk.getKeyID()).isEqualTo("1234");
 
         assertThat(header.getX509CertURL()).isEqualTo(new URI("https://example/cert.b64"));
@@ -171,7 +171,7 @@ public class JWSHeaderTest {
         assertThat(jwk.getModulus()).isEqualTo(new Base64URLValue("abc123"));
         assertThat(jwk.getPublicExponent()).isEqualTo(new Base64URLValue("def456"));
         assertThat(jwk.getKeyUse()).isEqualTo(KeyUse.ENCRYPTION);
-        assertThat(jwk.getAlgorithm()).isEqualTo(JWEAlgorithm.RSA1_5);
+        assertThat(jwk.getAlgorithm()).isEqualTo(JWEAlgorithm.RSA_OAEP_256);
         assertThat(jwk.getKeyID()).isEqualTo("1234");
 
         assertThat(header.getX509CertURL()).isEqualTo(new URI("https://example/cert.b64"));

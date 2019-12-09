@@ -16,14 +16,8 @@
 package be.atbash.ee.security.octopus.nimbus.jwt.jwe;
 
 
-import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
-import be.atbash.ee.security.octopus.nimbus.jose.Payload;
-import be.atbash.ee.security.octopus.nimbus.jose.jca.JWEJCAContext;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import org.junit.Test;
-
-import java.util.Collections;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -40,7 +34,7 @@ public class JWEObjectTest {
     public void testBase64URLConstructor()
             throws Exception {
 
-        JWEHeader header = new JWEHeader(JWEAlgorithm.RSA1_5,
+        JWEHeader header = new JWEHeader(JWEAlgorithm.RSA_OAEP_256,
                 EncryptionMethod.A128CBC_HS256);
 
         Base64URLValue firstPart = header.toBase64URL();
@@ -64,69 +58,5 @@ public class JWEObjectTest {
         assertThat(jwe.getState()).isEqualTo(JWEObject.State.ENCRYPTED);
     }
 
-    @Test
-    public void testRejectUnsupportedJWEAlgorithmOnEncrypt() {
 
-        JWEHeader header = new JWEHeader(JWEAlgorithm.RSA1_5, EncryptionMethod.A128CBC_HS256);
-        JWEObject jwe = new JWEObject(header, new Payload("Hello world"));
-
-        try {
-            jwe.encrypt(new JWEEncrypter() {
-                @Override
-                public JWECryptoParts encrypt(JWEHeader header, byte[] clearText) {
-                    return null;
-                }
-
-                @Override
-                public Set<JWEAlgorithm> supportedJWEAlgorithms() {
-                    return Collections.singleton(new JWEAlgorithm("xyz"));
-                }
-
-                @Override
-                public Set<EncryptionMethod> supportedEncryptionMethods() {
-                    return null;
-                }
-
-                @Override
-                public JWEJCAContext getJCAContext() {
-                    return null;
-                }
-            });
-        } catch (JOSEException e) {
-            assertThat(e.getMessage()).isEqualTo("The \"RSA1_5\" algorithm is not supported by the JWE encrypter: Supported algorithms: [xyz]");
-        }
-    }
-
-    @Test
-    public void testRejectUnsupportedJWEMethodOnEncrypt() {
-
-        JWEHeader header = new JWEHeader(JWEAlgorithm.RSA1_5, EncryptionMethod.A128CBC_HS256);
-        JWEObject jwe = new JWEObject(header, new Payload("Hello world"));
-
-        try {
-            jwe.encrypt(new JWEEncrypter() {
-                @Override
-                public JWECryptoParts encrypt(JWEHeader header, byte[] clearText) {
-                    return null;
-                }
-
-                @Override
-                public Set<JWEAlgorithm> supportedJWEAlgorithms() {
-                    return Collections.singleton(JWEAlgorithm.RSA1_5);
-                }
-
-                @Override
-                public Set<EncryptionMethod> supportedEncryptionMethods() {
-                    return Collections.singleton(new EncryptionMethod("xyz"));
-                }
-
-                @Override
-                public JWEJCAContext getJCAContext() {
-                    return null;
-                }
-            });
-        } catch (JOSEException e) {
-            assertThat(e.getMessage()).isEqualTo("The \"A128CBC-HS256\" encryption method or key size is not supported by the JWE encrypter: Supported methods: [xyz]");
-        }
-    }
 }
