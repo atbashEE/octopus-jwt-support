@@ -52,8 +52,8 @@ public final class AESGCMKW {
      * @throws JOSEException If encryption failed.
      */
     public static AuthenticatedCipherText encryptCEK(SecretKey cek,
-                                                     final Container<byte[]> iv,
-                                                     final SecretKey kek,
+                                                     Container<byte[]> iv,
+                                                     SecretKey kek,
                                                      Provider provider)
             throws JOSEException {
 

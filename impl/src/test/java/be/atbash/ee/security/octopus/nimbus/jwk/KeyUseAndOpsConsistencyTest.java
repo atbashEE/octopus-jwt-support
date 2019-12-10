@@ -16,7 +16,7 @@
 package be.atbash.ee.security.octopus.nimbus.jwk;
 
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -29,27 +29,27 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Vladimir Dzhuvinov
  * @version 2017-06-30
  */
-public class KeyUseAndOpsConsistencyTest extends TestCase {
+public class KeyUseAndOpsConsistencyTest {
 
-
+    @Test
     public void testBothNull() {
 
         assertThat(KeyUseAndOpsConsistency.areConsistent(null, null)).isTrue();
     }
 
-
+    @Test
     public void testUseNull() {
 
         assertThat(KeyUseAndOpsConsistency.areConsistent(null, Collections.singleton(KeyOperation.SIGN))).isTrue();
     }
 
-
+    @Test
     public void testOpsNull() {
 
         assertThat(KeyUseAndOpsConsistency.areConsistent(KeyUse.SIGNATURE, null)).isTrue();
     }
 
-
+    @Test
     public void testConsistentSignatureUse() {
 
         assertThat(KeyUseAndOpsConsistency.areConsistent(
@@ -57,7 +57,7 @@ public class KeyUseAndOpsConsistencyTest extends TestCase {
                 new HashSet<>(Arrays.asList(KeyOperation.SIGN, KeyOperation.VERIFY)))).isTrue();
     }
 
-
+    @Test
     public void testConsistentEncryptionUse() {
 
         assertThat(KeyUseAndOpsConsistency.areConsistent(
@@ -71,7 +71,7 @@ public class KeyUseAndOpsConsistencyTest extends TestCase {
                 new HashSet<>(Arrays.asList(KeyOperation.ENCRYPT, KeyOperation.DECRYPT, KeyOperation.WRAP_KEY, KeyOperation.UNWRAP_KEY)))).isTrue();
     }
 
-
+    @Test
     public void testSignatureUseNotConsistent() {
 
         assertThat(KeyUseAndOpsConsistency.areConsistent(
@@ -112,7 +112,7 @@ public class KeyUseAndOpsConsistencyTest extends TestCase {
         )).isFalse();
     }
 
-
+    @Test
     public void testEncryptionUseNotConsistent() {
 
         assertThat(KeyUseAndOpsConsistency.areConsistent(

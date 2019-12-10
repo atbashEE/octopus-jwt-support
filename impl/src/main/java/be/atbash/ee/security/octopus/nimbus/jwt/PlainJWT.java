@@ -100,15 +100,15 @@ public class PlainJWT extends PlainObject implements JWT {
      * Parses an unsecured (plain) JSON Web Token (JWT) from the specified
      * string in compact format.
      *
-     * @param s The string to parse. Must not be {@code null}.
+     * @param value The string to parse. Must not be {@code null}.
      * @return The unsecured JWT.
      * @throws ParseException If the string couldn't be parsed to a valid
      *                        unsecured JWT.
      */
-    public static PlainJWT parse(final String s)
+    public static PlainJWT parse(String value)
             throws ParseException {
 
-        Base64URLValue[] parts = JOSEObject.split(s);
+        Base64URLValue[] parts = JOSEObject.split(value);
 
         if (!parts[2].toString().isEmpty()) {
 

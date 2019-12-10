@@ -98,13 +98,13 @@ public class PlainJWTTest {
     public void testParse()
             throws Exception {
 
-        String s = "eyJhbGciOiJub25lIn0" +
+        String jwtString = "eyJhbGciOiJub25lIn0" +
                 "." +
                 "eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFt" +
                 "cGxlLmNvbS9pc19yb290Ijp0cnVlfQ" +
                 ".";
 
-        PlainJWT jwt = PlainJWT.parse(s);
+        PlainJWT jwt = PlainJWT.parse(jwtString);
 
         assertThat(jwt.getHeader().getAlgorithm()).isEqualTo(Algorithm.NONE);
         assertThat(jwt.getHeader().getType()).isNull();

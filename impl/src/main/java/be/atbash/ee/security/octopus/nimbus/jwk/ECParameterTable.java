@@ -84,7 +84,7 @@ class ECParameterTable {
          *
          * @param size The EC field size.
          */
-        public ECFieldImpl(final int size) {
+        public ECFieldImpl(int size) {
 
             this.size = size;
         }
@@ -153,7 +153,7 @@ class ECParameterTable {
      * @return The EC parameter spec, {@code null} if it cannot be
      * determined.
      */
-    public static ECParameterSpec get(final Curve curve) {
+    public static ECParameterSpec get(Curve curve) {
 
         if (Curve.P_256.equals(curve)) {
             return P_256_SPEC;
@@ -177,7 +177,7 @@ class ECParameterTable {
      * @return The JWK elliptic curve, {@code null} if it cannot be
      * determined.
      */
-    public static Curve get(final ECParameterSpec spec) {
+    public static Curve get(ECParameterSpec spec) {
 
         if (spec == null) {
             return null;

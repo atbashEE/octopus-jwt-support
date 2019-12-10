@@ -62,7 +62,7 @@ class KeyUseAndOpsConsistency {
      * @param ops The key operations. May be {@code null}.
      * @return {@code true} if consistent, else {@code false}.
      */
-    static boolean areConsistent(final KeyUse use, final Set<KeyOperation> ops) {
+    static boolean areConsistent(KeyUse use, Set<KeyOperation> ops) {
 
         if (use == null || ops == null) {
             return true;

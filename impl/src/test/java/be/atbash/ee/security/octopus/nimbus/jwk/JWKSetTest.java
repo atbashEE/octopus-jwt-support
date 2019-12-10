@@ -68,7 +68,7 @@ public class JWKSetTest {
             throws Exception {
 
         // The string is from the JWK spec
-        String s = "{\"keys\":" +
+        String json = "{\"keys\":" +
                 "[" +
                 "{\"kty\":\"EC\"," +
                 "\"crv\":\"P-256\"," +
@@ -91,7 +91,7 @@ public class JWKSetTest {
                 "}";
 
 
-        JWKSet keySet = JWKSet.parse(s);
+        JWKSet keySet = JWKSet.parse(json);
 
 
         List<JWK> keyList = keySet.getKeys();
@@ -160,9 +160,9 @@ public class JWKSetTest {
         assertThat(keySet.getKeys().size()).isEqualTo(2);
         assertThat(keySet.getAdditionalMembers().size()).isEqualTo(1);
 
-        String s = keySet.toString();
+        String jwkSet = keySet.toString();
 
-        keySet = JWKSet.parse(s);
+        keySet = JWKSet.parse(jwkSet);
 
         assertThat(keySet.getKeys().size()).isEqualTo(2);
 
@@ -197,7 +197,7 @@ public class JWKSetTest {
             throws Exception {
 
         // The string is from the JPSK spec
-        String s = "{\"keys\":" +
+        String json = "{\"keys\":" +
                 "[" +
                 " {\"kty\":\"oct\"," +
                 "  \"alg\":\"A128KW\", " +
@@ -209,7 +209,7 @@ public class JWKSetTest {
                 "}";
 
 
-        JWKSet keySet = JWKSet.parse(s);
+        JWKSet keySet = JWKSet.parse(json);
 
 
         List<JWK> keyList = keySet.getKeys();
@@ -239,7 +239,7 @@ public class JWKSetTest {
     public void testParsePrivateJWKSet() {
 
         // The string is from the JPSK spec
-        String s = "{\"keys\":" +
+        String json = "{\"keys\":" +
                 "  [" +
                 "    {\"kty\":\"EC\"," +
                 "     \"crv\":\"P-256\"," +
@@ -286,7 +286,7 @@ public class JWKSetTest {
         JWKSet keySet = null;
 
         try {
-            keySet = JWKSet.parse(s);
+            keySet = JWKSet.parse(json);
 
         } catch (ParseException e) {
 
@@ -377,7 +377,7 @@ public class JWKSetTest {
             throws Exception {
 
         // The string is from the JPSK spec
-        String s = "{\"keys\":" +
+        String json = "{\"keys\":" +
                 "  [" +
                 "    {\"kty\":\"EC\"," +
                 "     \"crv\":\"P-256\"," +
@@ -422,19 +422,19 @@ public class JWKSetTest {
                 "}";
 
 
-        JWKSet keySet = JWKSet.parse(s);
+        JWKSet keySet = JWKSet.parse(json);
 
 
         List<JWK> keyList = keySet.getKeys();
         assertThat(keyList.size()).isEqualTo(2);
 
-        final boolean publicParamsOnly = true;
+        boolean publicParamsOnly = true;
 
 
         // Strip all private parameters
-        s = keySet.toJSONObject(publicParamsOnly).toString();
+        json = keySet.toJSONObject(publicParamsOnly).toString();
 
-        keySet = JWKSet.parse(s);
+        keySet = JWKSet.parse(json);
 
         keyList = keySet.getKeys();
         assertThat(keyList.size()).isEqualTo(2);
@@ -476,7 +476,7 @@ public class JWKSetTest {
     @Test
     public void testGetByKeyId() throws Exception {
         // The string is from the JWK spec
-        String s = "{\"keys\":" +
+        String json = "{\"keys\":" +
                 "[" +
                 "{\"kty\":\"EC\"," +
                 "\"crv\":\"P-256\"," +
@@ -499,7 +499,7 @@ public class JWKSetTest {
                 "}";
 
 
-        JWKSet keySet = JWKSet.parse(s);
+        JWKSet keySet = JWKSet.parse(json);
 
 
         // Check first EC key
@@ -551,7 +551,7 @@ public class JWKSetTest {
 
         JWKSet privateSet = new JWKSet(keyList);
 
-        final boolean publicParamsOnly = true;
+        boolean publicParamsOnly = true;
         JsonObject jsonObject = privateSet.toJSONObject(publicParamsOnly);
 
         JWKSet publicSet = JWKSet.parse(jsonObject.toString());
@@ -559,7 +559,7 @@ public class JWKSetTest {
         assertThat(publicSet.getKeys().size()).isEqualTo(0);
     }
 
-
+    @Test
     public void testOctJWKSetToPublic() {
 
         OctetSequenceKey oct1 = new OctetSequenceKey.Builder(new Base64URLValue("abc")).build();

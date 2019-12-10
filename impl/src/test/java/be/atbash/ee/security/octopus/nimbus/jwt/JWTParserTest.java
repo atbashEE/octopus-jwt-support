@@ -39,13 +39,13 @@ public class JWTParserTest {
     public void testParsePlainJWT()
             throws Exception {
 
-        String s = "eyJhbGciOiJub25lIn0" +
+        String jwtString = "eyJhbGciOiJub25lIn0" +
                 "." +
                 "eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFt" +
                 "cGxlLmNvbS9pc19yb290Ijp0cnVlfQ" +
                 ".";
 
-        JWT jwt = JWTParser.parse(s);
+        JWT jwt = JWTParser.parse(jwtString);
 
         assertThat(jwt.getHeader().getAlgorithm()).isEqualTo(Algorithm.NONE);
 
@@ -68,7 +68,7 @@ public class JWTParserTest {
     public void testParseEncryptedJWT()
             throws Exception {
 
-        String s = "eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0." +
+        String jwtString = "eyJhbGciOiJSU0EtT0FFUC0yNTYiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0." +
                 "QR1Owv2ug2WyPBnbQrRARTeEk9kDO2w8qDcjiHnSJflSdv1iNqhWXaKH4MqAkQtM" +
                 "oNfABIPJaZm0HaA415sv3aeuBWnD8J-Ui7Ah6cWafs3ZwwFKDFUUsWHSK-IPKxLG" +
                 "TkND09XyjORj_CHAgOPJ-Sd8ONQRnJvWn_hXV1BNMHzUjPyYwEsRhDhzjAD26ima" +
@@ -80,9 +80,9 @@ public class JWTParserTest {
                 "HDjUEOKIwrtkHthpqEanSBNYHZgmNOV7sln1Eu9g3J8." +
                 "fiK51VwhsxJ-siBMR-YFiA";
 
-        JWT jwt = JWTParser.parse(s);
+        JWT jwt = JWTParser.parse(jwtString);
 
-        assertThat(jwt.getHeader().getAlgorithm()).isEqualTo(JWEAlgorithm.RSA1_5);
+        assertThat(jwt.getHeader().getAlgorithm()).isEqualTo(JWEAlgorithm.RSA_OAEP_256);
 
         assertThat(jwt).isInstanceOf(EncryptedJWT.class);
 
@@ -90,7 +90,7 @@ public class JWTParserTest {
 
         assertThat(encryptedJWT.getState()).isEqualTo(JWEObject.State.ENCRYPTED);
 
-        assertThat(encryptedJWT.getHeader().getAlgorithm()).isEqualTo(JWEAlgorithm.RSA1_5);
+        assertThat(encryptedJWT.getHeader().getAlgorithm()).isEqualTo(JWEAlgorithm.RSA_OAEP_256);
         assertThat(encryptedJWT.getHeader().getEncryptionMethod()).isEqualTo(EncryptionMethod.A128CBC_HS256);
         assertThat(encryptedJWT.getHeader().getType()).isNull();
         assertThat(encryptedJWT.getHeader().getContentType()).isNull();

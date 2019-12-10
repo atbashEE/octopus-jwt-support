@@ -38,7 +38,7 @@ public class HMAC {
 
 
     public static Mac getInitMac(SecretKey secretKey,
-                                 final Provider provider)
+                                 Provider provider)
             throws JOSEException {
 
         Mac mac;

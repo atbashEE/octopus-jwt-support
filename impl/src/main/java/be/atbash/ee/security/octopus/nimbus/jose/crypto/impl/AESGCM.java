@@ -96,7 +96,7 @@ public final class AESGCM {
             throws JOSEException {
 
         // Key alg must be "AES"
-        final SecretKey aesKey = KeyUtils.toAESKey(secretKey);
+        SecretKey aesKey = KeyUtils.toAESKey(secretKey);
 
         Cipher cipher;
 
@@ -130,7 +130,7 @@ public final class AESGCM {
             throw new JOSEException("Couldn't encrypt with AES/GCM/NoPadding: " + e.getMessage(), e);
         }
 
-        final int tagPos = cipherOutput.length - ByteUtils.byteLength(AUTH_TAG_BIT_LENGTH);
+        int tagPos = cipherOutput.length - ByteUtils.byteLength(AUTH_TAG_BIT_LENGTH);
 
         byte[] cipherText = ByteUtils.subArray(cipherOutput, 0, tagPos);
         byte[] authTag = ByteUtils.subArray(cipherOutput, tagPos, ByteUtils.byteLength(AUTH_TAG_BIT_LENGTH));
@@ -246,7 +246,7 @@ public final class AESGCM {
             throws JOSEException {
 
         // Key alg must be "AES"
-        final SecretKey aesKey = KeyUtils.toAESKey(secretKey);
+        SecretKey aesKey = KeyUtils.toAESKey(secretKey);
 
         Cipher cipher;
 

@@ -26,7 +26,6 @@ import be.atbash.util.exception.AtbashUnexpectedException;
 import org.bouncycastle.asn1.x9.X9ECParameters;
 import org.bouncycastle.jcajce.provider.asymmetric.util.EC5Util;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.PublicKey;
@@ -100,12 +99,12 @@ public class JwkKeyEncoderPublicPart implements KeyEncoder {
     }
 
     private Curve deriveCurve(PublicKey publicKey) throws GeneralSecurityException {
-        if (publicKey instanceof java.security.interfaces.ECPublicKey) {
-            final java.security.interfaces.ECPublicKey pk = (java.security.interfaces.ECPublicKey) publicKey;
-            final ECParameterSpec params = pk.getParams();
+        if (publicKey instanceof ECPublicKey) {
+            ECPublicKey pk = (ECPublicKey) publicKey;
+            ECParameterSpec params = pk.getParams();
             return deriveCurve(EC5Util.convertSpec(params, false));
         } else if (publicKey instanceof org.bouncycastle.jce.interfaces.ECPublicKey) {
-            final org.bouncycastle.jce.interfaces.ECPublicKey pk = (org.bouncycastle.jce.interfaces.ECPublicKey) publicKey;
+            org.bouncycastle.jce.interfaces.ECPublicKey pk = (org.bouncycastle.jce.interfaces.ECPublicKey) publicKey;
             return deriveCurve(pk.getParameters());
         } else
             throw new IllegalArgumentException("Can only be used with instances of ECPublicKey (either jce or bc implementation)");

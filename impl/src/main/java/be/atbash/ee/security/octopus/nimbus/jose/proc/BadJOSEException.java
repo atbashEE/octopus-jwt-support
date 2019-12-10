@@ -32,7 +32,7 @@ public class BadJOSEException extends JOSEException {
      *
      * @param message The exception message.
      */
-    public BadJOSEException(final String message) {
+    public BadJOSEException(String message) {
 
         super(message);
     }
@@ -44,7 +44,7 @@ public class BadJOSEException extends JOSEException {
      * @param message The exception message.
      * @param cause   The exception cause.
      */
-    public BadJOSEException(final String message, final Throwable cause) {
+    public BadJOSEException(String message, Throwable cause) {
 
         super(message, cause);
     }

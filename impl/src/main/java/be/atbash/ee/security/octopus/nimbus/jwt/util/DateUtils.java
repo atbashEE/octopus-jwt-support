@@ -31,7 +31,7 @@ public class DateUtils {
      * @param date The date. Must not be {@code null}.
      * @return The Unix epoch time, in seconds.
      */
-    public static long toSecondsSinceEpoch(final Date date) {
+    public static long toSecondsSinceEpoch(Date date) {
 
         return date.getTime() / 1000L;
     }
@@ -43,7 +43,7 @@ public class DateUtils {
      * @param time The Unix epoch time, in seconds. Must not be negative.
      * @return The date.
      */
-    public static Date fromSecondsSinceEpoch(final long time) {
+    public static Date fromSecondsSinceEpoch(long time) {
 
         return new Date(time * 1000L);
     }
@@ -76,9 +76,9 @@ public class DateUtils {
      * @return {@code true} if the date is before the reference, plus the
      * maximum accepted clock skew, else {@code false}.
      */
-    public static boolean isAfter(final Date date,
-                                  final Date reference,
-                                  final long maxClockSkewSeconds) {
+    public static boolean isAfter(Date date,
+                                  Date reference,
+                                  long maxClockSkewSeconds) {
 
         return new Date(date.getTime() + maxClockSkewSeconds * 1000L).after(reference);
     }
@@ -110,9 +110,9 @@ public class DateUtils {
      * @return {@code true} if the date is before the reference, minus the
      * maximum accepted clock skew, else {@code false}.
      */
-    public static boolean isBefore(final Date date,
-                                   final Date reference,
-                                   final long maxClockSkewSeconds) {
+    public static boolean isBefore(Date date,
+                                   Date reference,
+                                   long maxClockSkewSeconds) {
 
         return new Date(date.getTime() - maxClockSkewSeconds * 1000L).before(reference);
     }

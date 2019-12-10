@@ -234,33 +234,33 @@ public final class Curve implements Serializable {
     /**
      * Parses a cryptographic curve from the specified string.
      *
-     * @param s The string to parse. Must not be {@code null} or empty.
+     * @param value The string to parse. Must not be {@code null} or empty.
      * @return The cryptographic curve.
      */
-    public static Curve parse(String s) {
+    public static Curve parse(String value) {
 
-        if (s == null || s.trim().isEmpty()) {
+        if (value == null || value.trim().isEmpty()) {
             throw new IllegalArgumentException("The cryptographic curve string must not be null or empty");
         }
 
-        if (s.equals(P_256.getName())) {
+        if (value.equals(P_256.getName())) {
             return P_256;
-        } else if (s.equals(P_256K.getName())) {
+        } else if (value.equals(P_256K.getName())) {
             return P_256K;
-        } else if (s.equals(P_384.getName())) {
+        } else if (value.equals(P_384.getName())) {
             return P_384;
-        } else if (s.equals(P_521.getName())) {
+        } else if (value.equals(P_521.getName())) {
             return P_521;
-        } else if (s.equals(Ed25519.getName())) {
+        } else if (value.equals(Ed25519.getName())) {
             return Ed25519;
-        } else if (s.equals(Ed448.getName())) {
+        } else if (value.equals(Ed448.getName())) {
             return Ed448;
-        } else if (s.equals(X25519.getName())) {
+        } else if (value.equals(X25519.getName())) {
             return X25519;
-        } else if (s.equals(X448.getName())) {
+        } else if (value.equals(X448.getName())) {
             return X448;
         } else {
-            return new Curve(s);
+            return new Curve(value);
         }
     }
 
@@ -355,7 +355,7 @@ public final class Curve implements Serializable {
      * @param spec The EC parameter spec. May be {@code null}.
      * @return The curve, {@code null} if it cannot be determined.
      */
-    public static Curve forECParameterSpec(final ECParameterSpec spec) {
+    public static Curve forECParameterSpec(ECParameterSpec spec) {
 
         return ECParameterTable.get(spec);
     }

@@ -45,7 +45,7 @@ public final class BigIntegerUtils {
 
         // round bitlen
         bitlen = ((bitlen + 7) >> 3) << 3;
-        final byte[] bigBytes = bigInt.toByteArray();
+        byte[] bigBytes = bigInt.toByteArray();
 
         if (((bigInt.bitLength() % 8) != 0) && (((bigInt.bitLength() / 8) + 1) == (bitlen / 8))) {
 
@@ -64,8 +64,8 @@ public final class BigIntegerUtils {
             len--;
         }
 
-        final int startDst = bitlen / 8 - len; // to pad w/ nulls as per spec
-        final byte[] resizedBytes = new byte[bitlen / 8];
+        int startDst = bitlen / 8 - len; // to pad w/ nulls as per spec
+        byte[] resizedBytes = new byte[bitlen / 8];
         System.arraycopy(bigBytes, startSrc, resizedBytes, startDst, len);
         return resizedBytes;
     }

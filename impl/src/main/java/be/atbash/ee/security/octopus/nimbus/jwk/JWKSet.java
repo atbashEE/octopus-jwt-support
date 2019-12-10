@@ -96,7 +96,7 @@ public class JWKSet implements Serializable {
      *
      * @param key The JWK. Must not be {@code null}.
      */
-    public JWKSet(final JWK key) {
+    public JWKSet(JWK key) {
 
         this(Collections.singletonList(key));
 
@@ -111,7 +111,7 @@ public class JWKSet implements Serializable {
      *
      * @param keys The JWK list. Must not be {@code null}.
      */
-    public JWKSet(final List<JWK> keys) {
+    public JWKSet(List<JWK> keys) {
 
         this(keys, Collections.emptyMap());
     }
@@ -125,7 +125,7 @@ public class JWKSet implements Serializable {
      * @param customMembers The additional custom members. Must not be
      *                      {@code null}.
      */
-    public JWKSet(final List<JWK> keys, final Map<String, Object> customMembers) {
+    public JWKSet(List<JWK> keys, Map<String, Object> customMembers) {
 
         if (keys == null) {
             throw new IllegalArgumentException("The JWK list must not be null");
@@ -233,7 +233,7 @@ public class JWKSet implements Serializable {
      *                       parameters will be included.
      * @return The JSON object representation.
      */
-    public JsonObject toJSONObject(final boolean publicKeysOnly) {
+    public JsonObject toJSONObject(boolean publicKeysOnly) {
 
         JsonObjectBuilder result = Json.createObjectBuilder(customMembers);
 
@@ -278,15 +278,15 @@ public class JWKSet implements Serializable {
     /**
      * Parses the specified string representing a JSON Web Key (JWK) set.
      *
-     * @param s The string to parse. Must not be {@code null}.
+     * @param value The string to parse. Must not be {@code null}.
      * @return The JWK set.
      * @throws ParseException If the string couldn't be parsed to a valid
      *                        JSON Web Key (JWK) set.
      */
-    public static JWKSet parse(final String s)
+    public static JWKSet parse(String value)
             throws ParseException {
 
-        return parse(JSONObjectUtils.parse(s));
+        return parse(JSONObjectUtils.parse(value));
     }
 
 
@@ -299,7 +299,7 @@ public class JWKSet implements Serializable {
      * @throws ParseException If the string couldn't be parsed to a valid
      *                        JSON Web Key (JWK) set.
      */
-    public static JWKSet parse(final JsonObject json)
+    public static JWKSet parse(JsonObject json)
             throws ParseException {
 
         JsonArray keyArray = json.getJsonArray("keys");

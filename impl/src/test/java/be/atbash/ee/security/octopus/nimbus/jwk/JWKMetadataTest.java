@@ -16,18 +16,19 @@
 package be.atbash.ee.security.octopus.nimbus.jwk;
 
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 import javax.json.Json;
 import javax.json.JsonObjectBuilder;
 import java.text.ParseException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 
 
-public class JWKMetadataTest extends TestCase {
+public class JWKMetadataTest {
 
-
+    @Test
     public void testParseEmptyX509CertChain() {
 
         JsonObjectBuilder builder = Json.createObjectBuilder();

@@ -19,7 +19,6 @@ package be.atbash.ee.security.octopus.nimbus.util;
 import org.junit.Test;
 
 import java.math.BigInteger;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -38,7 +37,7 @@ public class Base64URLValueTest {
 
 
     // Test JSON string
-    private static final String STRING = "{\"iss\":\"joe\",\r\n" +
+    private static final String JSON_STRING = "{\"iss\":\"joe\",\r\n" +
             " \"exp\":1300819380,\r\n" +
             " \"http://example.com/is_root\":true}";
 
@@ -73,7 +72,7 @@ public class Base64URLValueTest {
     @Test
     public void testEncodeAndDecode() {
 
-        byte[] bytes = STRING.getBytes(StandardCharsets.UTF_8);
+        byte[] bytes = JSON_STRING.getBytes(StandardCharsets.UTF_8);
 
         Base64URLValue b64url = Base64URLValue.encode(bytes);
 

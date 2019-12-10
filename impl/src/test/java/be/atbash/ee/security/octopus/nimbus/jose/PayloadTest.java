@@ -39,21 +39,21 @@ public class PayloadTest {
             throws Exception {
 
         // From http://tools.ietf.org/html/rfc7515#appendix-A.1
-        String s = "eyJ0eXAiOiJKV1QiLA0KICJhbGciOiJIUzI1NiJ9" +
+        String jws = "eyJ0eXAiOiJKV1QiLA0KICJhbGciOiJIUzI1NiJ9" +
                 "." +
                 "eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFt" +
                 "cGxlLmNvbS9pc19yb290Ijp0cnVlfQ" +
                 "." +
                 "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk";
 
-        JWSObject jwsObject = JWSObject.parse(s);
+        JWSObject jwsObject = JWSObject.parse(jws);
 
         Payload payload = new Payload(jwsObject);
 
         assertThat(payload.getOrigin()).isEqualTo(Payload.Origin.JWS_OBJECT);
         assertThat(payload.toJWSObject()).isEqualTo(jwsObject);
-        assertThat(payload.toString()).isEqualTo(s);
-        assertThat(new String(payload.toBytes(), StandardCharsets.UTF_8)).isEqualTo(s);
+        assertThat(payload.toString()).isEqualTo(jws);
+        assertThat(new String(payload.toBytes(), StandardCharsets.UTF_8)).isEqualTo(jws);
     }
 
 
@@ -62,20 +62,20 @@ public class PayloadTest {
             throws Exception {
 
         // From http://tools.ietf.org/html/rfc7515#appendix-A.1
-        String s = "eyJ0eXAiOiJKV1QiLA0KICJhbGciOiJIUzI1NiJ9" +
+        String jws = "eyJ0eXAiOiJKV1QiLA0KICJhbGciOiJIUzI1NiJ9" +
                 "." +
                 "eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFt" +
                 "cGxlLmNvbS9pc19yb290Ijp0cnVlfQ" +
                 "." +
                 "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk";
 
-        Payload payload = new Payload(s);
+        Payload payload = new Payload(jws);
 
         assertThat(payload.getOrigin()).isEqualTo(Payload.Origin.STRING);
         assertThat(payload.toJWSObject().getHeader().getAlgorithm()).isEqualTo(JWSAlgorithm.HS256);
 
-        assertThat(payload.toString()).isEqualTo(s);
-        assertThat(new String(payload.toBytes(), StandardCharsets.UTF_8)).isEqualTo(s);
+        assertThat(payload.toString()).isEqualTo(jws);
+        assertThat(new String(payload.toBytes(), StandardCharsets.UTF_8)).isEqualTo(jws);
     }
 
     @Test
@@ -83,14 +83,14 @@ public class PayloadTest {
             throws Exception {
 
         // From http://tools.ietf.org/html/rfc7515#appendix-A.1
-        String s = "eyJ0eXAiOiJKV1QiLA0KICJhbGciOiJIUzI1NiJ9" +
+        String jws = "eyJ0eXAiOiJKV1QiLA0KICJhbGciOiJIUzI1NiJ9" +
                 "." +
                 "eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFt" +
                 "cGxlLmNvbS9pc19yb290Ijp0cnVlfQ" +
                 "." +
                 "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk";
 
-        SignedJWT signedJWT = SignedJWT.parse(s);
+        SignedJWT signedJWT = SignedJWT.parse(jws);
 
         Payload payload = new Payload(signedJWT);
 
@@ -99,8 +99,8 @@ public class PayloadTest {
 
         assertThat(payload.toJWSObject()).isNotNull();
 
-        assertThat(payload.toString()).isEqualTo(s);
-        assertThat(new String(payload.toBytes(), StandardCharsets.UTF_8)).isEqualTo(s);
+        assertThat(payload.toString()).isEqualTo(jws);
+        assertThat(new String(payload.toBytes(), StandardCharsets.UTF_8)).isEqualTo(jws);
     }
 
     @Test
@@ -108,14 +108,14 @@ public class PayloadTest {
             throws Exception {
 
         // From http://tools.ietf.org/html/rfc7515#appendix-A.1
-        String s = "eyJ0eXAiOiJKV1QiLA0KICJhbGciOiJIUzI1NiJ9" +
+        String jws = "eyJ0eXAiOiJKV1QiLA0KICJhbGciOiJIUzI1NiJ9" +
                 "." +
                 "eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFt" +
                 "cGxlLmNvbS9pc19yb290Ijp0cnVlfQ" +
                 "." +
                 "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk";
 
-        Payload payload = new Payload(s);
+        Payload payload = new Payload(jws);
 
         assertThat(payload.getOrigin()).isEqualTo(Payload.Origin.STRING);
         assertThat(payload.toJWSObject().getHeader().getAlgorithm()).isEqualTo(JWSAlgorithm.HS256);
@@ -123,8 +123,8 @@ public class PayloadTest {
 
         assertThat(payload.toJWSObject()).isNotNull();
 
-        assertThat(payload.toString()).isEqualTo(s);
-        assertThat(new String(payload.toBytes(), StandardCharsets.UTF_8)).isEqualTo(s);
+        assertThat(payload.toString()).isEqualTo(jws);
+        assertThat(new String(payload.toBytes(), StandardCharsets.UTF_8)).isEqualTo(jws);
     }
 
     @Test

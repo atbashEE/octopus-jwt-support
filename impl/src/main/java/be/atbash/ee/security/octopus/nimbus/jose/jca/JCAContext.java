@@ -60,7 +60,7 @@ public class JCAContext {
      * @param randomGen The specific secure random generator, {@code null}
      *                  to use the default system one.
      */
-    public JCAContext(final Provider provider, final SecureRandom randomGen) {
+    public JCAContext(Provider provider, SecureRandom randomGen) {
 
         this.provider = provider;
         this.randomGen = randomGen;
@@ -87,7 +87,7 @@ public class JCAContext {
      *                 a more specific one is absent, {@code null} to use
      *                 the default system provider.
      */
-    public void setProvider(final Provider provider) {
+    public void setProvider(Provider provider) {
 
         this.provider = provider;
     }
@@ -114,7 +114,7 @@ public class JCAContext {
      * @param randomGen The secure random generator, {@code null} to use
      *                  the default system one.
      */
-    public void setSecureRandom(final SecureRandom randomGen) {
+    public void setSecureRandom(SecureRandom randomGen) {
 
         this.randomGen = randomGen;
     }

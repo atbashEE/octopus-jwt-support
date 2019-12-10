@@ -16,12 +16,11 @@
 package be.atbash.ee.security.octopus.nimbus;
 
 import java.io.IOException;
-import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import static junit.framework.TestCase.fail;
+import static org.junit.Assert.fail;
 
 public final class IOUtil {
 
@@ -37,12 +36,4 @@ public final class IOUtil {
         return null;
     }
 
-    public static String readURIToString(URI uri) {
-        try {
-            return new String(Files.readAllBytes(Paths.get(uri)), StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            fail(e.getMessage());
-        }
-        return null;
-    }
 }

@@ -108,7 +108,7 @@ public class ConcatKDF implements JCAAware<JCAContext> {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        final MessageDigest md = getMessageDigest();
+        MessageDigest md = getMessageDigest();
 
         for (int i = 1; i <= computeDigestCycles(ByteUtils.safeBitLength(md.getDigestLength()), keyLengthBits); i++) {
 
@@ -130,7 +130,7 @@ public class ConcatKDF implements JCAAware<JCAContext> {
 
         byte[] derivedKeyMaterial = baos.toByteArray();
 
-        final int keyLengthBytes = ByteUtils.byteLength(keyLengthBits);
+        int keyLengthBytes = ByteUtils.byteLength(keyLengthBits);
 
         if (derivedKeyMaterial.length == keyLengthBytes) {
             // Return immediately
@@ -164,7 +164,7 @@ public class ConcatKDF implements JCAAware<JCAContext> {
                                byte[] suppPrivInfo)
             throws JOSEException {
 
-        final byte[] otherInfo = composeOtherInfo(algID, partyUInfo, partyVInfo, suppPubInfo, suppPrivInfo);
+        byte[] otherInfo = composeOtherInfo(algID, partyUInfo, partyVInfo, suppPubInfo, suppPrivInfo);
 
         return deriveKey(sharedSecret, keyLength, otherInfo);
     }
@@ -203,7 +203,7 @@ public class ConcatKDF implements JCAAware<JCAContext> {
     private MessageDigest getMessageDigest()
             throws JOSEException {
 
-        final Provider provider = getJCAContext().getProvider();
+        Provider provider = getJCAContext().getProvider();
 
         try {
             if (provider == null)

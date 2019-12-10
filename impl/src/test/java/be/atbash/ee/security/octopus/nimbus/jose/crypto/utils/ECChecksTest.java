@@ -33,7 +33,7 @@ public class ECChecksTest {
     private static ECPrivateKey generateECPrivateKey(Curve curve)
             throws Exception {
 
-        final ECParameterSpec ecParameterSpec = curve.toECParameterSpec();
+        ECParameterSpec ecParameterSpec = curve.toECParameterSpec();
 
         KeyPairGenerator generator = KeyPairGenerator.getInstance("EC");
         generator.initialize(ecParameterSpec);
@@ -46,7 +46,7 @@ public class ECChecksTest {
     private static ECPublicKey generateECPublicKey(Curve curve)
             throws Exception {
 
-        final ECParameterSpec ecParameterSpec = curve.toECParameterSpec();
+        ECParameterSpec ecParameterSpec = curve.toECParameterSpec();
 
         KeyPairGenerator generator = KeyPairGenerator.getInstance("EC");
         generator.initialize(ecParameterSpec);

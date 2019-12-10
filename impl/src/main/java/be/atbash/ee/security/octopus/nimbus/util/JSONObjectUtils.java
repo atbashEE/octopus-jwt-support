@@ -55,12 +55,12 @@ public final class JSONObjectUtils {
      *     <li>JSON objects map to {@code net.minidev.json.JSONObject}.
      * </ul>
      *
-     * @param s The JSON object string to parse. Must not be {@code null}.
+     * @param value The JSON object string to parse. Must not be {@code null}.
      * @return The JSON object.
      * @throws ParseException If the string cannot be parsed to a valid JSON
      *                        object.
      */
-    public static JsonObject parse(String s)
+    public static JsonObject parse(String value)
             throws ParseException {
 
         JsonObject result;
@@ -69,7 +69,7 @@ public final class JSONObjectUtils {
             JsonbConfig config = new JsonbConfig();
             Jsonb jsonb = JsonbBuilder.create(config);
 
-            result = jsonb.fromJson(s, JsonObject.class);
+            result = jsonb.fromJson(value, JsonObject.class);
 
 
         } catch (JsonbException e) {

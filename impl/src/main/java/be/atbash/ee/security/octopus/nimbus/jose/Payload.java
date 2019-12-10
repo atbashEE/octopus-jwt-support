@@ -156,12 +156,12 @@ public final class Payload implements Serializable {
     /**
      * Converts a string to a byte array using {@code UTF-8}.
      *
-     * @param string The string to convert. May be {@code null}.
+     * @param value The string to convert. May be {@code null}.
      * @return The resulting byte array, {@code null} if conversion failed.
      */
-    private static byte[] stringToByteArray(String string) {
+    private static byte[] stringToByteArray(String value) {
 
-        return string != null ? string.getBytes(UTF_8) : null;
+        return value != null ? value.getBytes(UTF_8) : null;
     }
 
 

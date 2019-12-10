@@ -34,7 +34,7 @@ public class BadJWEException extends BadJOSEException {
      *
      * @param message The exception message.
      */
-    public BadJWEException(final String message) {
+    public BadJWEException(String message) {
 
         super(message);
     }
@@ -46,7 +46,7 @@ public class BadJWEException extends BadJOSEException {
      * @param message The exception message.
      * @param cause   The exception cause.
      */
-    public BadJWEException(final String message, final Throwable cause) {
+    public BadJWEException(String message, Throwable cause) {
 
         super(message, cause);
     }

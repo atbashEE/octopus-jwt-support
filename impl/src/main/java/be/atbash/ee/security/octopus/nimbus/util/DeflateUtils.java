@@ -50,7 +50,7 @@ public final class DeflateUtils {
      * @return The compressed bytes.
      * @throws IOException If compression failed.
      */
-    public static byte[] compress(final byte[] bytes)
+    public static byte[] compress(byte[] bytes)
             throws IOException {
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -83,7 +83,7 @@ public final class DeflateUtils {
      * @return The decompressed bytes.
      * @throws IOException If decompression failed.
      */
-    public static byte[] decompress(final byte[] bytes)
+    public static byte[] decompress(byte[] bytes)
             throws IOException {
 
         Inflater inflater = null;

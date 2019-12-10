@@ -123,7 +123,7 @@ public final class KeyType implements Serializable {
      * {@code false}.
      */
     @Override
-    public boolean equals(final Object object) {
+    public boolean equals(Object object) {
 
         return object instanceof KeyType &&
                 this.toString().equals(object.toString());
@@ -146,26 +146,26 @@ public final class KeyType implements Serializable {
     /**
      * Parses a key type from the specified {@code kty} parameter value.
      *
-     * @param s The string to parse. Must not be {@code null}.
+     * @param value The string to parse. Must not be {@code null}.
      * @return The key type (matching standard key type constant, else a
      * newly created one).
      */
-    public static KeyType parse(final String s) {
+    public static KeyType parse(String value) {
 
-        if (s == null) {
+        if (value == null) {
             throw new IllegalArgumentException("The key type to parse must not be null");
         }
 
-        if (s.equals(EC.getValue())) {
+        if (value.equals(EC.getValue())) {
             return EC;
-        } else if (s.equals(RSA.getValue())) {
+        } else if (value.equals(RSA.getValue())) {
             return RSA;
-        } else if (s.equals(OCT.getValue())) {
+        } else if (value.equals(OCT.getValue())) {
             return OCT;
-        } else if (s.equals(OKP.getValue())) {
+        } else if (value.equals(OKP.getValue())) {
             return OKP;
         } else {
-            return new KeyType(s);
+            return new KeyType(value);
         }
     }
 

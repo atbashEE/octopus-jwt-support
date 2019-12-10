@@ -36,7 +36,7 @@ public final class KeyUtils {
      * @param secretKey The secret key, {@code null} if not specified.
      * @return The AES secret key, {@code null} if not specified.
      */
-    public static SecretKey toAESKey(final SecretKey secretKey) {
+    public static SecretKey toAESKey(SecretKey secretKey) {
 
         if (secretKey == null) {
             return null;

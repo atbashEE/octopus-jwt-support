@@ -16,7 +16,7 @@
 package be.atbash.ee.security.octopus.nimbus.jwk;
 
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 import java.text.ParseException;
 import java.util.Arrays;
@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 
 
 /**
@@ -32,9 +33,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Vladimir Dzhuvinov
  * @version 2014-04-03
  */
-public class KeyOperationTest extends TestCase {
+public class KeyOperationTest {
 
-
+    @Test
     public void testIdentifiers() {
 
         assertThat(KeyOperation.SIGN.identifier()).isEqualTo("sign");
@@ -62,14 +63,14 @@ public class KeyOperationTest extends TestCase {
         assertThat(KeyOperation.DERIVE_BITS.toString()).isEqualTo("deriveBits");
     }
 
-
+    @Test
     public void testParseNull()
             throws ParseException {
 
         assertThat(KeyOperation.parse(null)).isNull();
     }
 
-
+    @Test
     public void testParseSparseList()
             throws ParseException {
 
@@ -81,7 +82,7 @@ public class KeyOperationTest extends TestCase {
         assertThat(ops.size()).isEqualTo(2);
     }
 
-
+    @Test
     public void testParseList()
             throws ParseException {
 
@@ -93,7 +94,7 @@ public class KeyOperationTest extends TestCase {
         assertThat(ops.size()).isEqualTo(2);
     }
 
-
+    @Test
     public void testParseException() {
 
         List<String> sl = Arrays.asList("sign", "no-such-op", "verify");

@@ -52,7 +52,7 @@ public class X509CertUtils {
      * @return The X.509 certificate, {@code null} if not specified or
      * parsing failed.
      */
-    public static X509Certificate parse(final byte[] derEncodedCert) {
+    public static X509Certificate parse(byte[] derEncodedCert) {
 
         try {
             return parseWithException(derEncodedCert);
@@ -70,7 +70,7 @@ public class X509CertUtils {
      * @return The X.509 certificate, {@code null} if not specified.
      * @throws CertificateException If parsing failed.
      */
-    public static X509Certificate parseWithException(final byte[] derEncodedCert)
+    public static X509Certificate parseWithException(byte[] derEncodedCert)
             throws CertificateException {
 
         if (derEncodedCert == null || derEncodedCert.length == 0) {
@@ -78,7 +78,7 @@ public class X509CertUtils {
         }
 
         CertificateFactory cf = CertificateFactory.getInstance("X.509");
-        final Certificate cert = cf.generateCertificate(new ByteArrayInputStream(derEncodedCert));
+        Certificate cert = cf.generateCertificate(new ByteArrayInputStream(derEncodedCert));
 
         if (!(cert instanceof X509Certificate)) {
             throw new CertificateException("Not a X.509 certificate: " + cert.getType());
@@ -96,13 +96,13 @@ public class X509CertUtils {
      *                       specified.
      * @return The X.509 certificate, {@code null} if parsing failed.
      */
-    public static X509Certificate parse(final String pemEncodedCert) {
+    public static X509Certificate parse(String pemEncodedCert) {
 
         if (pemEncodedCert == null || pemEncodedCert.isEmpty()) {
             return null;
         }
 
-        final int markerStart = pemEncodedCert.indexOf(PEM_BEGIN_MARKER);
+        int markerStart = pemEncodedCert.indexOf(PEM_BEGIN_MARKER);
 
         if (markerStart < 0) {
             return null;
@@ -110,7 +110,7 @@ public class X509CertUtils {
 
         String buf = pemEncodedCert.substring(markerStart + PEM_BEGIN_MARKER.length());
 
-        final int markerEnd = buf.indexOf(PEM_END_MARKER);
+        int markerEnd = buf.indexOf(PEM_END_MARKER);
 
         if (markerEnd < 0) {
             return null;
@@ -132,14 +132,14 @@ public class X509CertUtils {
      *                       specified.
      * @return The X.509 certificate, {@code null} if parsing failed.
      */
-    public static X509Certificate parseWithException(final String pemEncodedCert)
+    public static X509Certificate parseWithException(String pemEncodedCert)
             throws CertificateException {
 
         if (pemEncodedCert == null || pemEncodedCert.isEmpty()) {
             return null;
         }
 
-        final int markerStart = pemEncodedCert.indexOf(PEM_BEGIN_MARKER);
+        int markerStart = pemEncodedCert.indexOf(PEM_BEGIN_MARKER);
 
         if (markerStart < 0) {
             throw new CertificateException("PEM begin marker not found");
@@ -147,7 +147,7 @@ public class X509CertUtils {
 
         String buf = pemEncodedCert.substring(markerStart + PEM_BEGIN_MARKER.length());
 
-        final int markerEnd = buf.indexOf(PEM_END_MARKER);
+        int markerEnd = buf.indexOf(PEM_END_MARKER);
 
         if (markerEnd < 0) {
             throw new CertificateException("PEM end marker not found");
@@ -168,7 +168,7 @@ public class X509CertUtils {
      * @return The PEM-encoded X.509 certificate, {@code null} if encoding
      * failed.
      */
-    public static String toPEMString(final X509Certificate cert) {
+    public static String toPEMString(X509Certificate cert) {
 
         return toPEMString(cert, true);
     }
@@ -183,7 +183,7 @@ public class X509CertUtils {
      * @return The PEM-encoded X.509 certificate, {@code null} if encoding
      * failed.
      */
-    public static String toPEMString(final X509Certificate cert, final boolean withLineBreaks) {
+    public static String toPEMString(X509Certificate cert, boolean withLineBreaks) {
 
         StringBuilder sb = new StringBuilder();
         sb.append(PEM_BEGIN_MARKER);
@@ -212,7 +212,7 @@ public class X509CertUtils {
      * @return The SHA-256 thumbprint, BASE64URL-encoded, {@code null} if
      * a certificate encoding exception is encountered.
      */
-    public static Base64URLValue computeSHA256Thumbprint(final X509Certificate cert) {
+    public static Base64URLValue computeSHA256Thumbprint(X509Certificate cert) {
 
         try {
             byte[] derEncodedCert = cert.getEncoded();

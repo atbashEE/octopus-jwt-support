@@ -84,11 +84,11 @@ public final class JWEJCAContext extends JCAContext {
      *                        requiring a random number, {@code null} to
      *                        use the default system one.
      */
-    public JWEJCAContext(final Provider generalProvider,
-                         final Provider keProvider,
-                         final Provider ceProvider,
-                         final Provider macProvider,
-                         final SecureRandom randomGen) {
+    public JWEJCAContext(Provider generalProvider,
+                         Provider keProvider,
+                         Provider ceProvider,
+                         Provider macProvider,
+                         SecureRandom randomGen) {
 
         super(generalProvider, randomGen);
         this.keProvider = keProvider;
@@ -105,7 +105,7 @@ public final class JWEJCAContext extends JCAContext {
      *                   general one, and if that is not specified to the
      *                   default system provider.
      */
-    public void setKeyEncryptionProvider(final Provider keProvider) {
+    public void setKeyEncryptionProvider(Provider keProvider) {
 
         this.keProvider = keProvider;
     }
@@ -131,7 +131,7 @@ public final class JWEJCAContext extends JCAContext {
      *                   the general one, and if that is not specified to
      *                   the default system provider.
      */
-    public void setContentEncryptionProvider(final Provider ceProvider) {
+    public void setContentEncryptionProvider(Provider ceProvider) {
 
         this.ceProvider = ceProvider;
     }
@@ -159,7 +159,7 @@ public final class JWEJCAContext extends JCAContext {
      *                    one, and if that is not specified to the default
      *                    system provider.
      */
-    public void setMACProvider(final Provider macProvider) {
+    public void setMACProvider(Provider macProvider) {
 
         this.macProvider = macProvider;
     }

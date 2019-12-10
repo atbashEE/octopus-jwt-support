@@ -177,7 +177,7 @@ public class MACSigner extends MACProvider implements JWSSigner {
     public Base64URLValue sign(JWSHeader header, byte[] signingInput)
             throws JOSEException {
 
-        final int minRequiredLength = getMinRequiredSecretLength(header.getAlgorithm());
+        int minRequiredLength = getMinRequiredSecretLength(header.getAlgorithm());
 
         if (getSecret().length < ByteUtils.byteLength(minRequiredLength)) {
             throw new KeyLengthException("The secret length for " + header.getAlgorithm() + " must be at least " + minRequiredLength + " bits");

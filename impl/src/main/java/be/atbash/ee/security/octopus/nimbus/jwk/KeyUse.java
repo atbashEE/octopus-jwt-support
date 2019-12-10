@@ -66,7 +66,7 @@ public final class KeyUse implements Serializable {
      * @param identifier The public key use identifier. Must not be
      *                   {@code null}.
      */
-    public KeyUse(final String identifier) {
+    public KeyUse(String identifier) {
 
         if (identifier == null)
             throw new IllegalArgumentException("The key use identifier must not be null");
@@ -124,31 +124,31 @@ public final class KeyUse implements Serializable {
      * Parses a public key use from the specified JWK {@code use} parameter
      * value.
      *
-     * @param s The string to parse. May be {@code null}.
+     * @param value The string to parse. May be {@code null}.
      * @return The public key use, {@code null} if none.
      * @throws ParseException If the string couldn't be parsed to a valid
      *                        public key use.
      */
-    public static KeyUse parse(final String s)
+    public static KeyUse parse(String value)
             throws ParseException {
 
-        if (s == null) {
+        if (value == null) {
             return null;
         }
 
-        if (s.equals(SIGNATURE.identifier())) {
+        if (value.equals(SIGNATURE.identifier())) {
             return SIGNATURE;
         }
 
-        if (s.equals(ENCRYPTION.identifier())) {
+        if (value.equals(ENCRYPTION.identifier())) {
             return ENCRYPTION;
         }
 
-        if (s.trim().isEmpty()) {
+        if (value.trim().isEmpty()) {
             throw new ParseException("JWK use value must not be empty or blank", 0);
         }
 
-        return new KeyUse(s);
+        return new KeyUse(value);
     }
 
 
@@ -162,7 +162,7 @@ public final class KeyUse implements Serializable {
      * @return The public key use, {@code null} if the key use couldn't be
      * reliably determined.
      */
-    public static KeyUse from(final X509Certificate cert) {
+    public static KeyUse from(X509Certificate cert) {
 
         if (cert.getKeyUsage() == null) {
             return null;

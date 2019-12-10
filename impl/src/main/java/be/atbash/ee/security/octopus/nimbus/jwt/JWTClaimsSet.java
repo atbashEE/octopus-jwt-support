@@ -891,15 +891,15 @@ public final class JWTClaimsSet implements Serializable {
      * Parses a JSON Web Token (JWT) claims set from the specified JSON
      * object string representation.
      *
-     * @param s The JSON object string to parse. Must not be {@code null}.
+     * @param value The JSON object string to parse. Must not be {@code null}.
      * @return The JWT claims set.
      * @throws ParseException If the specified JSON object string doesn't
      *                        represent a valid JWT claims set.
      */
-    public static JWTClaimsSet parse(String s)
+    public static JWTClaimsSet parse(String value)
             throws ParseException {
 
-        return parse(JSONObjectUtils.parse(s));
+        return parse(JSONObjectUtils.parse(value));
     }
 
 

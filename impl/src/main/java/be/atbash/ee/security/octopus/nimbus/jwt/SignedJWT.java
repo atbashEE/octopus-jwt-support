@@ -90,15 +90,15 @@ public class SignedJWT extends JWSObject implements JWT {
      * Parses a signed JSON Web Token (JWT) from the specified string in
      * compact format.
      *
-     * @param s The string to parse. Must not be {@code null}.
+     * @param value The string to parse. Must not be {@code null}.
      * @return The signed JWT.
      * @throws ParseException If the string couldn't be parsed to a valid
      *                        signed JWT.
      */
-    public static SignedJWT parse(String s)
+    public static SignedJWT parse(String value)
             throws ParseException {
 
-        Base64URLValue[] parts = JOSEObject.split(s);
+        Base64URLValue[] parts = JOSEObject.split(value);
 
         if (parts.length != 3) {
             throw new ParseException("Unexpected number of Base64URL parts, must be three", 0);

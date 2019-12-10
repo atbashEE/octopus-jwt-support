@@ -81,7 +81,7 @@ public final class ByteUtils {
      * @param byteLength The byte length.
      * @return The bit length.
      */
-    public static int bitLength(final int byteLength) {
+    public static int bitLength(int byteLength) {
 
         return byteLength * 8;
     }
@@ -95,7 +95,7 @@ public final class ByteUtils {
      * @return The bit length.
      * @throws IntegerOverflowException On a integer overflow.
      */
-    public static int safeBitLength(final int byteLength)
+    public static int safeBitLength(int byteLength)
             throws IntegerOverflowException {
 
         long longResult = (long) byteLength * (long) 8;
@@ -113,7 +113,7 @@ public final class ByteUtils {
      * @param byteArray The byte array. May be {@code null}.
      * @return The bite length, zero if the array is {@code null}.
      */
-    public static int bitLength(final byte[] byteArray) {
+    public static int bitLength(byte[] byteArray) {
 
         if (byteArray == null) {
             return 0;
@@ -131,7 +131,7 @@ public final class ByteUtils {
      * @return The bite length, zero if the array is {@code null}.
      * @throws IntegerOverflowException On a integer overflow.
      */
-    public static int safeBitLength(final byte[] byteArray)
+    public static int safeBitLength(byte[] byteArray)
             throws IntegerOverflowException {
 
         if (byteArray == null) {
@@ -148,7 +148,7 @@ public final class ByteUtils {
      * @param bitLength The bit length.
      * @return The byte byte length.
      */
-    public static int byteLength(final int bitLength) {
+    public static int byteLength(int bitLength) {
 
         return bitLength / 8;
     }
