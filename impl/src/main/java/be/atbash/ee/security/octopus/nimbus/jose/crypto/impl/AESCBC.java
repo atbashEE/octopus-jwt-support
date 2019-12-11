@@ -18,8 +18,6 @@ package be.atbash.ee.security.octopus.nimbus.jose.crypto.impl;
 
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.utils.ConstantTimeUtils;
-import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEHeader;
-import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.ee.security.octopus.nimbus.util.ByteUtils;
 
 import javax.crypto.Cipher;
@@ -31,15 +29,11 @@ import java.security.Provider;
 import java.security.SecureRandom;
 import java.util.Arrays;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 
 /**
  * AES/CBC/PKCS5Padding and AES/CBC/PKCS5Padding/HMAC-SHA2 encryption and
  * decryption methods. This class is thread-safe.
  *
- * <p>Also supports the deprecated AES/CBC/HMAC encryption using a custom
- * concat KDF (JOSE draft suite 08).
  *
  * <p>See RFC 7518 (JWA), section 5.2.
  *
@@ -195,67 +189,6 @@ public final class AESCBC {
         return new AuthenticatedCipherText(cipherText, authTag);
     }
 
-
-    /**
-     * Encrypts the specified plain text using the deprecated concat KDF
-     * from JOSE draft suite 09.
-     *
-     * @param header       The JWE header. Must not be {@code null}.
-     * @param secretKey    The secret key. Must be 256 or 512 bits long.
-     *                     Must not be {@code null}.
-     * @param encryptedKey The encrypted key. Must not be {@code null}.
-     * @param iv           The initialisation vector (IV). Must not be
-     *                     {@code null}.
-     * @param plainText    The plain text. Must not be {@code null}.
-     * @param ceProvider   The JCA provider for the content encryption, or
-     *                     {@code null} to use the default one.
-     * @param macProvider  The JCA provider for the MAC computation, or
-     *                     {@code null} to use the default one.
-     * @return The authenticated cipher text.
-     * @throws JOSEException If encryption failed.
-     */
-    public static AuthenticatedCipherText encryptWithConcatKDF(JWEHeader header,
-                                                               SecretKey secretKey,
-                                                               Base64URLValue encryptedKey,
-                                                               byte[] iv,
-                                                               byte[] plainText,
-                                                               Provider ceProvider,
-                                                               Provider macProvider)
-            throws JOSEException {
-
-        byte[] epu = null;
-
-        if (header.getCustomParam("epu") instanceof String) {
-
-            epu = new Base64URLValue((String) header.getCustomParam("epu")).decode();
-        }
-
-        byte[] epv = null;
-
-        if (header.getCustomParam("epv") instanceof String) {
-
-            epv = new Base64URLValue((String) header.getCustomParam("epv")).decode();
-        }
-
-        // Generate alternative CEK using concat-KDF
-        SecretKey altCEK = LegacyConcatKDF.generateCEK(secretKey, header.getEncryptionMethod(), epu, epv);
-
-        byte[] cipherText = AESCBC.encrypt(altCEK, iv, plainText, ceProvider);
-
-        // Generate content integrity key for HMAC
-        SecretKey cik = LegacyConcatKDF.generateCIK(secretKey, header.getEncryptionMethod(), epu, epv);
-
-        String macInput = header.toBase64URL().toString() + "." +
-                encryptedKey.toString() + "." +
-                Base64URLValue.encode(iv).toString() + "." +
-                Base64URLValue.encode(cipherText);
-
-        byte[] mac = HMAC.compute(cik, macInput.getBytes(UTF_8), macProvider);
-
-        return new AuthenticatedCipherText(cipherText, mac);
-    }
-
-
     /**
      * Decrypts the specified cipher text using AES/CBC/PKCS5Padding.
      *
@@ -342,68 +275,6 @@ public final class AESCBC {
         }
 
         return decrypt(compositeKey.getAESKey(), iv, cipherText, ceProvider);
-    }
-
-
-    /**
-     * Decrypts the specified cipher text using the deprecated concat KDF
-     * from JOSE draft suite 09.
-     *
-     * @param header       The JWE header. Must not be {@code null}.
-     * @param secretKey    The secret key. Must be 256 or 512 bits long.
-     *                     Must not be {@code null}.
-     * @param encryptedKey The encrypted key. Must not be {@code null}.
-     * @param iv           The initialisation vector (IV). Must not be
-     *                     {@code null}.
-     * @param cipherText   The cipher text. Must not be {@code null}.
-     * @param authTag      The authentication tag. Must not be {@code null}.
-     * @param ceProvider   The JCA provider for the content encryption, or
-     *                     {@code null} to use the default one.
-     * @param macProvider  The JCA provider for the MAC computation, or
-     *                     {@code null} to use the default one.
-     * @return The decrypted plain text.
-     * @throws JOSEException If decryption failed.
-     */
-    public static byte[] decryptWithConcatKDF(JWEHeader header,
-                                              SecretKey secretKey,
-                                              Base64URLValue encryptedKey,
-                                              Base64URLValue iv,
-                                              Base64URLValue cipherText,
-                                              Base64URLValue authTag,
-                                              Provider ceProvider,
-                                              Provider macProvider)
-            throws JOSEException {
-
-        byte[] epu = null;
-
-        if (header.getCustomParam("epu") instanceof String) {
-
-            epu = new Base64URLValue((String) header.getCustomParam("epu")).decode();
-        }
-
-        byte[] epv = null;
-
-        if (header.getCustomParam("epv") instanceof String) {
-
-            epv = new Base64URLValue((String) header.getCustomParam("epv")).decode();
-        }
-
-        SecretKey cik = LegacyConcatKDF.generateCIK(secretKey, header.getEncryptionMethod(), epu, epv);
-
-        String macInput = header.toBase64URL().toString() + "." +
-                encryptedKey.toString() + "." +
-                iv.toString() + "." +
-                cipherText.toString();
-
-        byte[] mac = HMAC.compute(cik, macInput.getBytes(UTF_8), macProvider);
-
-        if (!ConstantTimeUtils.areEqual(authTag.decode(), mac)) {
-            throw new JOSEException("MAC check failed");
-        }
-
-        SecretKey cekAlt = LegacyConcatKDF.generateCEK(secretKey, header.getEncryptionMethod(), epu, epv);
-
-        return AESCBC.decrypt(cekAlt, iv.decode(), cipherText.decode(), ceProvider);
     }
 
 

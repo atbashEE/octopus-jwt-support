@@ -157,14 +157,6 @@ public final class JWSHeader extends CommonJWTHeader {
          */
         private URI x5u;
 
-
-        /**
-         * X.509 certificate SHA-1 thumbprint.
-         */
-        @Deprecated
-        private Base64URLValue x5t;
-
-
         /**
          * X.509 certificate SHA-256 thumbprint.
          */
@@ -230,7 +222,6 @@ public final class JWSHeader extends CommonJWTHeader {
             jku = jwsHeader.getJWKURL();
             jwk = jwsHeader.getJWK();
             x5u = jwsHeader.getX509CertURL();
-            x5t = jwsHeader.getX509CertThumbprint();
             x5t256 = jwsHeader.getX509CertSHA256Thumbprint();
             x5c = jwsHeader.getX509CertChain();
             kid = jwsHeader.getKeyID();
@@ -319,22 +310,6 @@ public final class JWSHeader extends CommonJWTHeader {
         public Builder x509CertURL(URI x5u) {
 
             this.x5u = x5u;
-            return this;
-        }
-
-
-        /**
-         * Sets the X.509 certificate SHA-1 thumbprint ({@code x5t})
-         * parameter.
-         *
-         * @param x5t The X.509 certificate SHA-1 thumbprint parameter,
-         *            {@code null} if not specified.
-         * @return This builder.
-         */
-        @Deprecated
-        public Builder x509CertThumbprint(Base64URLValue x5t) {
-
-            this.x5t = x5t;
             return this;
         }
 
@@ -451,7 +426,7 @@ public final class JWSHeader extends CommonJWTHeader {
 
             return new JWSHeader(
                     alg, typ, cty, crit,
-                    jku, jwk, x5u, x5t, x5t256, x5c, kid,
+                    jku, jwk, x5u, x5t256, x5c, kid,
                     customParams, parsedBase64URL);
         }
     }
@@ -468,7 +443,7 @@ public final class JWSHeader extends CommonJWTHeader {
      */
     public JWSHeader(JWSAlgorithm alg) {
 
-        this(alg, null, null, null, null, null, null, null, null, null, null, null, null);
+        this(alg, null, null, null, null, null, null, null, null, null, null, null);
     }
 
 
@@ -493,9 +468,6 @@ public final class JWSHeader extends CommonJWTHeader {
      *                        parameter, {@code null} if not specified.
      * @param x5u             The X.509 certificate URL parameter
      *                        ({@code x5u}), {@code null} if not specified.
-     * @param x5t             The X.509 certificate SHA-1 thumbprint
-     *                        ({@code x5t}) parameter, {@code null} if not
-     *                        specified.
      * @param x5t256          The X.509 certificate SHA-256 thumbprint
      *                        ({@code x5t#S256}) parameter, {@code null} if
      *                        not specified.
@@ -515,14 +487,13 @@ public final class JWSHeader extends CommonJWTHeader {
                      URI jku,
                      JWK jwk,
                      URI x5u,
-                     Base64URLValue x5t,
                      Base64URLValue x5t256,
                      List<Base64Value> x5c,
                      String kid,
                      Map<String, Object> customParams,
                      Base64URLValue parsedBase64URL) {
 
-        super(alg, typ, cty, crit, jku, jwk, x5u, x5t, x5t256, x5c, kid, customParams, parsedBase64URL);
+        super(alg, typ, cty, crit, jku, jwk, x5u, x5t256, x5c, kid, customParams, parsedBase64URL);
 
         if (alg.getName().equals(Algorithm.NONE.getName())) {
             throw new IllegalArgumentException("The JWS algorithm \"alg\" cannot be \"none\"");
@@ -545,7 +516,6 @@ public final class JWSHeader extends CommonJWTHeader {
                 jwsHeader.getJWKURL(),
                 jwsHeader.getJWK(),
                 jwsHeader.getX509CertURL(),
-                jwsHeader.getX509CertThumbprint(),
                 jwsHeader.getX509CertSHA256Thumbprint(),
                 jwsHeader.getX509CertChain(),
                 jwsHeader.getKeyID(),
@@ -650,8 +620,6 @@ public final class JWSHeader extends CommonJWTHeader {
                 }
             } else if ("x5u".equals(name)) {
                 header = header.x509CertURL(JSONObjectUtils.getURI(jsonObject, name));
-            } else if ("x5t".equals(name)) {
-                header = header.x509CertThumbprint(Base64URLValue.from(jsonObject.getString(name)));
             } else if ("x5t#S256".equals(name)) {
                 header = header.x509CertSHA256Thumbprint(Base64URLValue.from(jsonObject.getString(name)));
             } else if ("x5c".equals(name)) {

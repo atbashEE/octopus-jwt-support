@@ -183,14 +183,6 @@ public final class JWEHeader extends CommonJWTHeader {
          */
         private URI x5u;
 
-
-        /**
-         * X.509 certificate SHA-1 thumbprint.
-         */
-        @Deprecated
-        private Base64URLValue x5t;
-
-
         /**
          * X.509 certificate SHA-256 thumbprint.
          */
@@ -312,7 +304,6 @@ public final class JWEHeader extends CommonJWTHeader {
             jku = jweHeader.getJWKURL();
             jwk = jweHeader.getJWK();
             x5u = jweHeader.getX509CertURL();
-            x5t = jweHeader.getX509CertThumbprint();
             x5t256 = jweHeader.getX509CertSHA256Thumbprint();
             x5c = jweHeader.getX509CertChain();
             kid = jweHeader.getKeyID();
@@ -413,23 +404,6 @@ public final class JWEHeader extends CommonJWTHeader {
             this.x5u = x5u;
             return this;
         }
-
-
-        /**
-         * Sets the X.509 certificate SHA-1 thumbprint ({@code x5t})
-         * parameter.
-         *
-         * @param x5t The X.509 certificate SHA-1 thumbprint parameter,
-         *            {@code null} if not specified.
-         * @return This builder.
-         */
-        @Deprecated
-        public Builder x509CertThumbprint(Base64URLValue x5t) {
-
-            this.x5t = x5t;
-            return this;
-        }
-
 
         /**
          * Sets the X.509 certificate SHA-256 thumbprint
@@ -658,7 +632,7 @@ public final class JWEHeader extends CommonJWTHeader {
 
             return new JWEHeader(
                     alg, enc, typ, cty, crit,
-                    jku, jwk, x5u, x5t, x5t256, x5c, kid,
+                    jku, jwk, x5u, x5t256, x5c, kid,
                     epk, zip, apu, apv, p2s, p2c,
                     iv, tag,
                     customParams, parsedBase64URL);
@@ -735,7 +709,7 @@ public final class JWEHeader extends CommonJWTHeader {
 
         this(
                 alg, enc,
-                null, null, null, null, null, null, null, null, null, null,
+                null, null, null, null, null, null, null, null, null,
                 null, null, null, null, null, 0,
                 null, null,
                 null, null);
@@ -765,9 +739,6 @@ public final class JWEHeader extends CommonJWTHeader {
      *                        parameter, {@code null} if not specified.
      * @param x5u             The X.509 certificate URL parameter
      *                        ({@code x5u}), {@code null} if not specified.
-     * @param x5t             The X.509 certificate SHA-1 thumbprint
-     *                        ({@code x5t}) parameter, {@code null} if not
-     *                        specified.
      * @param x5t256          The X.509 certificate SHA-256 thumbprint
      *                        ({@code x5t#S256}) parameter, {@code null} if
      *                        not specified.
@@ -804,7 +775,6 @@ public final class JWEHeader extends CommonJWTHeader {
                      URI jku,
                      JWK jwk,
                      URI x5u,
-                     Base64URLValue x5t,
                      Base64URLValue x5t256,
                      List<Base64Value> x5c,
                      String kid,
@@ -819,7 +789,7 @@ public final class JWEHeader extends CommonJWTHeader {
                      Map<String, Object> customParams,
                      Base64URLValue parsedBase64URL) {
 
-        super(alg, typ, cty, crit, jku, jwk, x5u, x5t, x5t256, x5c, kid, customParams, parsedBase64URL);
+        super(alg, typ, cty, crit, jku, jwk, x5u, x5t256, x5c, kid, customParams, parsedBase64URL);
 
         if (alg.getName().equals(Algorithm.NONE.getName())) {
             throw new IllegalArgumentException("The JWE algorithm cannot be \"none\"");
@@ -862,7 +832,6 @@ public final class JWEHeader extends CommonJWTHeader {
                 jweHeader.getJWKURL(),
                 jweHeader.getJWK(),
                 jweHeader.getX509CertURL(),
-                jweHeader.getX509CertThumbprint(),
                 jweHeader.getX509CertSHA256Thumbprint(),
                 jweHeader.getX509CertChain(),
                 jweHeader.getKeyID(),
@@ -1183,8 +1152,6 @@ public final class JWEHeader extends CommonJWTHeader {
                 }
             } else if ("x5u".equals(name)) {
                 header = header.x509CertURL(JSONObjectUtils.getURI(jsonObject, name));
-            } else if ("x5t".equals(name)) {
-                header = header.x509CertThumbprint(Base64URLValue.from(jsonObject.getString(name)));
             } else if ("x5t#S256".equals(name)) {
                 header = header.x509CertSHA256Thumbprint(Base64URLValue.from(jsonObject.getString(name)));
             } else if ("x5c".equals(name)) {

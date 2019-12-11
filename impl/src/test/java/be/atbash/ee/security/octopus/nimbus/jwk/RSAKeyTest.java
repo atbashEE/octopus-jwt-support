@@ -223,7 +223,7 @@ public class RSAKeyTest {
     }
 
     @Test
-    public void testConstructorAndSerialize_deprecated()
+    public void testConstructorAndSerialize()
             throws Exception {
 
         URI x5u = new URI("http://example.com/jwk.json");
@@ -328,7 +328,6 @@ public class RSAKeyTest {
             throws Exception {
 
         URI x5u = new URI("http://example.com/jwk.json");
-        Base64URLValue x5t = new Base64URLValue("abc");
         Base64URLValue x5t256 = new Base64URLValue("abc");
         List<Base64Value> x5c = null; // not specified here
 
@@ -413,7 +412,6 @@ public class RSAKeyTest {
             throws Exception {
 
         URI x5u = new URI("http://example.com/jwk.json");
-        Base64URLValue x5t = new Base64URLValue("abc");
         Base64URLValue x5t256 = new Base64URLValue("abc256");
         List<Base64Value> x5c = null; // not specified here
 
@@ -494,7 +492,6 @@ public class RSAKeyTest {
             throws Exception {
 
         URI x5u = new URI("http://example.com/jwk.json");
-        Base64URLValue x5t = new Base64URLValue("abc");
         Base64URLValue x5t256 = new Base64URLValue("abc256");
         List<Base64Value> x5c = null; // not specified here
 
@@ -582,6 +579,8 @@ public class RSAKeyTest {
 
         // Private key export with CRT (2nd form)
         RSAPrivateKey privKey = key.toRSAPrivateKey();
+        assertThat(privKey).isNotNull();
+
         assertThat(privKey.getModulus()).isEqualTo(new Base64URLValue(n).decodeToBigInteger());
         assertThat(privKey.getPrivateExponent()).isEqualTo(new Base64URLValue(d).decodeToBigInteger());
 
@@ -726,6 +725,7 @@ public class RSAKeyTest {
         // Convert back to Java RSA keys
         RSAPublicKey rsaPublicKeyOut = rsaJWK.toRSAPublicKey();
         RSAPrivateKey rsaPrivateKeyOut = rsaJWK.toRSAPrivateKey();
+        assertThat(rsaPrivateKeyOut).isNotNull();
 
         assertThat(rsaPublicKeyOut.getAlgorithm()).isEqualTo(rsaPublicKeyIn.getAlgorithm());
         assertThat(rsaPublicKeyOut.getPublicExponent()).isEqualTo(rsaPublicKeyIn.getPublicExponent());
@@ -774,6 +774,7 @@ public class RSAKeyTest {
         // Convert back to Java RSA keys
         RSAPublicKey rsaPublicKeyOut = rsaJWK.toRSAPublicKey();
         RSAPrivateCrtKey rsaPrivateKeyOut = (RSAPrivateCrtKey) rsaJWK.toRSAPrivateKey();
+        assertThat(rsaPrivateKeyOut).isNotNull();
 
         assertThat(rsaPublicKeyOut.getAlgorithm()).isEqualTo(rsaPublicKeyIn.getAlgorithm());
         assertThat(rsaPublicKeyOut.getPublicExponent()).isEqualTo(rsaPublicKeyIn.getPublicExponent());
@@ -1254,6 +1255,7 @@ public class RSAKeyTest {
         MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
         String pemEncodedCert = IOUtil.readFileToString("src/test/resources/sample-certs/ietf.crt");
         X509Certificate cert = X509CertUtils.parse(pemEncodedCert);
+        assertThat(cert).isNotNull();
         RSAKey rsaKey = RSAKey.parse(cert);
 
         assertThat(rsaKey.getKeyUse()).isEqualTo(KeyUse.ENCRYPTION);
@@ -1270,6 +1272,7 @@ public class RSAKeyTest {
 
         String pemEncodedCert = IOUtil.readFileToString("src/test/resources/sample-certs/wikipedia.crt");
         X509Certificate cert = X509CertUtils.parse(pemEncodedCert);
+        assertThat(cert).isNotNull();
 
         try {
             RSAKey.parse(cert);

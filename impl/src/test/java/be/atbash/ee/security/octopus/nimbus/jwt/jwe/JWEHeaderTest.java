@@ -55,7 +55,6 @@ public class JWEHeaderTest {
         assertThat(header.getJWKURL()).isNull();
         assertThat(header.getJWK()).isNull();
         assertThat(header.getX509CertURL()).isNull();
-        assertThat(header.getX509CertThumbprint()).isNull();
         assertThat(header.getX509CertSHA256Thumbprint()).isNull();
         assertThat(header.getX509CertChain()).isNull();
         assertThat(header.getType()).isNull();
@@ -94,7 +93,6 @@ public class JWEHeaderTest {
                 jwkURL(new URI("https://example.com/jku.json")).
                 jwk(jwk).
                 x509CertURL(new URI("https://example/cert.b64")).
-                x509CertThumbprint(new Base64URLValue("789iop")).
                 x509CertSHA256Thumbprint(new Base64URLValue("789asd")).
                 x509CertChain(certChain).
                 keyID("1234").
@@ -129,7 +127,6 @@ public class JWEHeaderTest {
         assertThat(jwk.getKeyID()).isEqualTo("1234");
 
         assertThat(header.getX509CertURL()).isEqualTo(new URI("https://example/cert.b64"));
-        assertThat(header.getX509CertThumbprint()).isEqualTo(new Base64URLValue("789iop"));
         assertThat(header.getX509CertSHA256Thumbprint()).isEqualTo(new Base64URLValue("789asd"));
 
         certChain = header.getX509CertChain();
@@ -160,7 +157,6 @@ public class JWEHeaderTest {
         assertThat(header.getIncludedParams()).contains("jwk");
         assertThat(header.getIncludedParams()).contains("kid");
         assertThat(header.getIncludedParams()).contains("x5u");
-        assertThat(header.getIncludedParams()).contains("x5t");
         assertThat(header.getIncludedParams()).contains("x5c");
         assertThat(header.getIncludedParams()).contains("apu");
         assertThat(header.getIncludedParams()).contains("apv");
@@ -169,7 +165,7 @@ public class JWEHeaderTest {
         assertThat(header.getIncludedParams()).contains("iv");
         assertThat(header.getIncludedParams()).contains("tag");
         assertThat(header.getIncludedParams()).contains("xCustom");
-        assertThat(header.getIncludedParams()).hasSize(18);
+        assertThat(header.getIncludedParams()).hasSize(17);
 
         // Test copy constructor
         header = new JWEHeader(header);
@@ -190,7 +186,6 @@ public class JWEHeaderTest {
         assertThat(jwk.getKeyID()).isEqualTo("1234");
 
         assertThat(header.getX509CertURL()).isEqualTo(new URI("https://example/cert.b64"));
-        assertThat(header.getX509CertThumbprint()).isEqualTo(new Base64URLValue("789iop"));
         assertThat(header.getX509CertSHA256Thumbprint()).isEqualTo(new Base64URLValue("789asd"));
 
         certChain = header.getX509CertChain();
@@ -268,7 +263,6 @@ public class JWEHeaderTest {
                 jwkURL(new URI("http://example.com/jwk.json")).
                 jwk(new OctetSequenceKey.Builder(new Base64URLValue("xyz")).build()).
                 x509CertURL(new URI("http://example.com/cert.pem")).
-                x509CertThumbprint(new Base64URLValue("abc")).
                 x509CertSHA256Thumbprint(new Base64URLValue("abc256")).
                 x509CertChain(Arrays.asList(new Base64Value("abc"), new Base64Value("def"))).
                 keyID("123").
@@ -293,7 +287,6 @@ public class JWEHeaderTest {
         assertThat(h.getJWKURL().toString()).isEqualTo("http://example.com/jwk.json");
         assertThat(((OctetSequenceKey) h.getJWK()).getKeyValue().toString()).isEqualTo("xyz");
         assertThat(h.getX509CertURL().toString()).isEqualTo("http://example.com/cert.pem");
-        assertThat(h.getX509CertThumbprint().toString()).isEqualTo("abc");
         assertThat(h.getX509CertSHA256Thumbprint().toString()).isEqualTo("abc256");
         assertThat(h.getX509CertChain().get(0).toString()).isEqualTo("abc");
         assertThat(h.getX509CertChain().get(1).toString()).isEqualTo("def");
@@ -319,7 +312,6 @@ public class JWEHeaderTest {
         assertThat(h.getIncludedParams()).contains("jku");
         assertThat(h.getIncludedParams()).contains("jwk");
         assertThat(h.getIncludedParams()).contains("x5u");
-        assertThat(h.getIncludedParams()).contains("x5t");
         assertThat(h.getIncludedParams()).contains("x5t#S256");
         assertThat(h.getIncludedParams()).contains("x5c");
         assertThat(h.getIncludedParams()).contains("kid");
@@ -332,7 +324,7 @@ public class JWEHeaderTest {
         assertThat(h.getIncludedParams()).contains("tag");
         assertThat(h.getIncludedParams()).contains("exp");
         assertThat(h.getIncludedParams()).contains("nbf");
-        assertThat(h.getIncludedParams()).hasSize(21);
+        assertThat(h.getIncludedParams()).hasSize(20);
     }
 
     @Test

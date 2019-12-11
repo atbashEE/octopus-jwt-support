@@ -63,8 +63,6 @@ import javax.crypto.spec.SecretKeySpec;
  *     <li>{@link EncryptionMethod#A128GCM}
  *     <li>{@link EncryptionMethod#A192GCM}
  *     <li>{@link EncryptionMethod#A256GCM}
- *     <li>{@link EncryptionMethod#A128CBC_HS256_DEPRECATED}
- *     <li>{@link EncryptionMethod#A256CBC_HS512_DEPRECATED}
  * </ul>
  *
  * @author Melisa Halsband

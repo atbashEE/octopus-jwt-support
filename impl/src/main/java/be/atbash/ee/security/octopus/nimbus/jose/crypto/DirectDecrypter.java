@@ -59,8 +59,6 @@ import java.util.Set;
  *     <li>{@link be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod#A128GCM} (requires 128 bit key)
  *     <li>{@link be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod#A192GCM} (requires 192 bit key)
  *     <li>{@link be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod#A256GCM} (requires 256 bit key)
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod#A128CBC_HS256_DEPRECATED} (requires 256 bit key)
- *     <li>{@link be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod#A256CBC_HS512_DEPRECATED} (requires 512 bit key)
  * </ul>
  *
  * <p>Also supports a promiscuous mode to decrypt any JWE by passing the
