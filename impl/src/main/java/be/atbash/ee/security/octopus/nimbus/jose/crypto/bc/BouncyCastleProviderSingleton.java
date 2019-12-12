@@ -48,15 +48,12 @@ public final class BouncyCastleProviderSingleton {
      *
      * @return The BouncyCastle JCA provider instance.
      */
-    public static BouncyCastleProvider getInstance() {
+    public static synchronized BouncyCastleProvider getInstance() {
 
-        if (bouncyCastleProvider != null) {
+        if (bouncyCastleProvider == null) {
 
-            return bouncyCastleProvider;
-
-        } else {
             bouncyCastleProvider = new BouncyCastleProvider();
-            return bouncyCastleProvider;
         }
+        return bouncyCastleProvider;
     }
 }

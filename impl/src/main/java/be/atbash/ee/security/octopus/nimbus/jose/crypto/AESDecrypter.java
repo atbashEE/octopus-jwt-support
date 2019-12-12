@@ -16,7 +16,6 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto;
 
 
-import be.atbash.ee.security.octopus.nimbus.jose.CriticalHeaderParamsAware;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.KeyLengthException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.*;
@@ -70,7 +69,7 @@ import java.util.Set;
  * @author Vladimir Dzhuvinov
  * @version 2015-06-29
  */
-public class AESDecrypter extends AESCryptoProvider implements JWEDecrypter, CriticalHeaderParamsAware {
+public class AESDecrypter extends AESCryptoProvider implements JWEDecrypter {
 
 
     /**
@@ -144,15 +143,11 @@ public class AESDecrypter extends AESCryptoProvider implements JWEDecrypter, Cri
         critPolicy.setDeferredCriticalHeaderParams(defCritHeaders);
     }
 
-
-    @Override
     public Set<String> getProcessedCriticalHeaderParams() {
 
         return critPolicy.getProcessedCriticalHeaderParams();
     }
 
-
-    @Override
     public Set<String> getDeferredCriticalHeaderParams() {
 
         return critPolicy.getProcessedCriticalHeaderParams();

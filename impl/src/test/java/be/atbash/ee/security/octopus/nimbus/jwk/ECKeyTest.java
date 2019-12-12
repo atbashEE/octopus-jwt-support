@@ -66,16 +66,16 @@ public class ECKeyTest {
     private static final class ExampleKeyP256 {
 
 
-        public static final Curve CRV = Curve.P_256;
+        static final Curve CRV = Curve.P_256;
 
 
-        public static final Base64URLValue X = new Base64URLValue("MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4");
+        static final Base64URLValue X = new Base64URLValue("MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4");
 
 
-        public static final Base64URLValue Y = new Base64URLValue("4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM");
+        static final Base64URLValue Y = new Base64URLValue("4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM");
 
 
-        public static final Base64URLValue D = new Base64URLValue("870MB6gfuTJ4HtUnUvYMyJpr5eUZNP4Bk43bVdj3eAE");
+        static final Base64URLValue D = new Base64URLValue("870MB6gfuTJ4HtUnUvYMyJpr5eUZNP4Bk43bVdj3eAE");
     }
 
 
@@ -83,13 +83,13 @@ public class ECKeyTest {
     private static final class ExampleKeyP256Alt {
 
 
-        public static final Curve CRV = Curve.P_256;
+        static final Curve CRV = Curve.P_256;
 
 
-        public static final Base64URLValue X = new Base64URLValue("3l2Da_flYc-AuUTm2QzxgyvJxYM_2TeB9DMlwz7j1PE");
+        static final Base64URLValue X = new Base64URLValue("3l2Da_flYc-AuUTm2QzxgyvJxYM_2TeB9DMlwz7j1PE");
 
 
-        public static final Base64URLValue Y = new Base64URLValue("-kjT7Wrfhwsi9SG6H4UXiyUiVE9GHCLauslksZ3-_t0");
+        static final Base64URLValue Y = new Base64URLValue("-kjT7Wrfhwsi9SG6H4UXiyUiVE9GHCLauslksZ3-_t0");
     }
 
 
@@ -97,13 +97,13 @@ public class ECKeyTest {
     private static final class ExampleKeyP384Alt {
 
 
-        public static final Curve CRV = Curve.P_384;
+        static final Curve CRV = Curve.P_384;
 
 
-        public static final Base64URLValue X = new Base64URLValue("Xy0mn0LmRyDBeHBjZrqH9z5Weu5pzCZYl1FJGHdoEj1utAoCpD4-Wn3VAIT-qgFF");
+        static final Base64URLValue X = new Base64URLValue("Xy0mn0LmRyDBeHBjZrqH9z5Weu5pzCZYl1FJGHdoEj1utAoCpD4-Wn3VAIT-qgFF");
 
 
-        public static final Base64URLValue Y = new Base64URLValue("mrZQ1aB1E7JksXe6LXmM3BiGzqtlwCtMN0cpJb5EU62JMSISSK8l7cXSFt84A25z");
+        static final Base64URLValue Y = new Base64URLValue("mrZQ1aB1E7JksXe6LXmM3BiGzqtlwCtMN0cpJb5EU62JMSISSK8l7cXSFt84A25z");
     }
 
 
@@ -111,13 +111,13 @@ public class ECKeyTest {
     private static final class ExampleKeyP521Alt {
 
 
-        public static final Curve CRV = Curve.P_521;
+        static final Curve CRV = Curve.P_521;
 
 
-        public static final Base64URLValue X = new Base64URLValue("AfwEaSkqoPQynn4SdAXOqbyDuK6KsbI04i-6aWvh3GdvREZuHaWFyg791gcvJ4OqG13-gzfYxZxfblPMqfOtQrzk");
+        static final Base64URLValue X = new Base64URLValue("AfwEaSkqoPQynn4SdAXOqbyDuK6KsbI04i-6aWvh3GdvREZuHaWFyg791gcvJ4OqG13-gzfYxZxfblPMqfOtQrzk");
 
 
-        public static final Base64URLValue Y = new Base64URLValue("AHgOZhhJb2ZiozkquiEa0Z9SfERJbWaaE7qEnCuk9VVZaWruKWKNzZadoIRPt8h305r14KRoxu8AfV20X-d_2Ups");
+        static final Base64URLValue Y = new Base64URLValue("AHgOZhhJb2ZiozkquiEa0Z9SfERJbWaaE7qEnCuk9VVZaWruKWKNzZadoIRPt8h305r14KRoxu8AfV20X-d_2Ups");
     }
 
     @Test
@@ -343,7 +343,6 @@ public class ECKeyTest {
             throws Exception {
 
         URI x5u = new URI("http://example.com/jwk.json");
-        Base64URLValue x5t = new Base64URLValue("abc");
         List<Base64Value> x5c = null;
 
         KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
@@ -844,7 +843,8 @@ public class ECKeyTest {
         ECPublicKey ecPublicKey = (ECPublicKey) chain.get(0).getPublicKey();
 
         ECKey jwk = new ECKey.Builder(Curve.P_256, ecPublicKey)
-                .build();
+                .build();  // TODO is this to check it isn't throwing exception?
+        // FIXME Multiple tests?
 
         try {
             new ECKey.Builder(Curve.P_256, ExampleKeyP256.X, ExampleKeyP256.Y)
@@ -862,6 +862,7 @@ public class ECKeyTest {
         MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
         String pemEncodedCert = IOUtil.readFileToString("src/test/resources/sample-certs/wikipedia.crt");
         X509Certificate cert = X509CertUtils.parse(pemEncodedCert);
+        assertThat(cert).isNotNull();
         ECKey ecKey = ECKey.parse(cert);
 
         assertThat(ecKey.getKeyType()).isEqualTo(KeyType.EC);
@@ -879,6 +880,7 @@ public class ECKeyTest {
 
         String pemEncodedCert = IOUtil.readFileToString("src/test/resources/sample-certs/ietf.crt");
         X509Certificate cert = X509CertUtils.parse(pemEncodedCert);
+        assertThat(cert).isNotNull();
 
         try {
             ECKey.parse(cert);
@@ -1063,6 +1065,7 @@ public class ECKeyTest {
         ECKey ecJWK_p256 = new ECKey.Builder(Curve.P_256, (ECPublicKey) keyPair.getPublic())
                 .privateKey((ECPrivateKey) keyPair.getPrivate())
                 .build();
+        // FIXME Multiple Tests
 
         // EC key on P_384
         ecParameterSpec = Curve.P_384.toECParameterSpec();
@@ -1120,6 +1123,7 @@ public class ECKeyTest {
         assertThat(ecKeyB).isEqualTo(ecKeyA);
     }
 
+    @Test
     public void testEqualsFailure()
             throws Exception {
 

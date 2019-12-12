@@ -33,7 +33,7 @@ import javax.crypto.spec.SecretKeySpec;
  * @author Vladimir Dzhuvinov
  * @version 2015-06-29
  */
-public final class CompositeKey {
+final class CompositeKey {
 
 
     /**
@@ -67,7 +67,7 @@ public final class CompositeKey {
      *                 Must not be {@code null}.
      * @throws KeyLengthException If the input key length is not supported.
      */
-    public CompositeKey(SecretKey inputKey)
+    CompositeKey(SecretKey inputKey)
             throws KeyLengthException {
 
         this.inputKey = inputKey;

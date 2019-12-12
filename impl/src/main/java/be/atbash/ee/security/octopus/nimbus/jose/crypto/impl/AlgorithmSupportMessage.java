@@ -48,18 +48,25 @@ public final class AlgorithmSupportMessage {
 
         for (int i = 0; i < items.length; i++) {
 
-            if (i == 0) {
-                // no delimiter
-            } else if (i < items.length - 1) {
-                sb.append(", ");
-            } else if (i == items.length - 1) {
-                sb.append(" or ");
-            }
+            addDelimiter(sb, i, items.length);
 
             sb.append(items[i].toString());
         }
 
         return sb.toString();
+    }
+
+    private static void addDelimiter(StringBuilder sb, int idx, int length) {
+        if (idx == 0) {
+            return;
+            // no delimiter
+        }
+        if (idx < length - 1) {
+            sb.append(", ");
+        }
+        if (idx == length - 1) {
+            sb.append(" or ");
+        }
     }
 
 

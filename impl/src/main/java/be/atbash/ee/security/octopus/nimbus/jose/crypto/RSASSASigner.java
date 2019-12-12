@@ -64,7 +64,8 @@ public class RSASSASigner extends RSASSAProvider implements JWSSigner {
     /**
      * The minimum size of generated keys.
      */
-    public static final int MIN_KEY_SIZE_BITS = 2048;  // FIXME A better location for this
+    public static final int MIN_KEY_SIZE_BITS = 2048;  // FIXME A better location for this, together with ECDHDecrypter.SUPPORTED_ELLIPTIC_CURVES
+    //and ECDHEncrypter.SUPPORTED_ELLIPTIC_CURVES
 
     /**
      * The private RSA key. Represented by generic private key interface to

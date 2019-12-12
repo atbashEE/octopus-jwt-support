@@ -49,7 +49,7 @@ public class ECParameterTableTest {
 
             // Lookup
             ECParameterSpec spec = ECParameterTable.get(crv);
-
+            assertThat(spec).isNotNull();
             assertThat(spec.getCurve().getField().getFieldSize()).isEqualTo(expectedSpec.getCurve().getField().getFieldSize());
             assertThat(spec.getCurve().getA()).isEqualTo(expectedSpec.getCurve().getA());
             assertThat(spec.getCurve().getB()).isEqualTo(expectedSpec.getCurve().getB());

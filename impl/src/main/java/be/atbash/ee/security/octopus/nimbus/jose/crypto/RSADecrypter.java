@@ -16,7 +16,6 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto;
 
 
-import be.atbash.ee.security.octopus.nimbus.jose.CriticalHeaderParamsAware;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.*;
 import be.atbash.ee.security.octopus.nimbus.jwk.RSAKey;
@@ -65,7 +64,7 @@ import java.util.Set;
  * @author Dimitar A. Stoikov
  * @version 2018-10-11
  */
-public class RSADecrypter extends RSACryptoProvider implements JWEDecrypter, CriticalHeaderParamsAware {
+public class RSADecrypter extends RSACryptoProvider implements JWEDecrypter {
 
 
     /**
@@ -185,15 +184,11 @@ public class RSADecrypter extends RSACryptoProvider implements JWEDecrypter, Cri
         return privateKey;
     }
 
-
-    @Override
     public Set<String> getProcessedCriticalHeaderParams() {
 
         return critPolicy.getProcessedCriticalHeaderParams();
     }
 
-
-    @Override
     public Set<String> getDeferredCriticalHeaderParams() {
 
         return critPolicy.getProcessedCriticalHeaderParams();

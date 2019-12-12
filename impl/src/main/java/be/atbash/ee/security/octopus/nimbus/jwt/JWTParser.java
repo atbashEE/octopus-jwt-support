@@ -17,7 +17,6 @@ package be.atbash.ee.security.octopus.nimbus.jwt;
 
 
 import be.atbash.ee.security.octopus.nimbus.jose.Algorithm;
-import be.atbash.ee.security.octopus.nimbus.jose.Header;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;

@@ -51,7 +51,7 @@ public abstract class BaseJWSProvider implements JWSProvider {
      * @param algs The supported algorithms by the JWS provider instance.
      *             Must not be {@code null}.
      */
-    public BaseJWSProvider(Set<JWSAlgorithm> algs) {
+    BaseJWSProvider(Set<JWSAlgorithm> algs) {
 
         if (algs == null) {
             throw new IllegalArgumentException("The supported JWS algorithm set must not be null");

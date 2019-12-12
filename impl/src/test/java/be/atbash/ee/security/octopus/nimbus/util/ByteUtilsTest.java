@@ -16,10 +16,8 @@
 package be.atbash.ee.security.octopus.nimbus.util;
 
 
-import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import org.junit.Test;
 
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 

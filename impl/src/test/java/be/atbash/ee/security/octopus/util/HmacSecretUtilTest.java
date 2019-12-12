@@ -63,6 +63,7 @@ public class HmacSecretUtilTest {
         private String stringProperty;
         private int intProperty;
 
+        // Default construcor and getters and setters required for JSON Handling
         public SomeToken() {
         }
 

@@ -28,7 +28,7 @@ import java.security.spec.InvalidParameterSpecException;
 
 
 /**
- * AES/GSM/NoPadding encryption and decryption methods.
+ * AES/GCM/NoPadding encryption and decryption methods.
  *
  * <p>See RFC 7518 (JWA), section 5.1 and appendix 3.
  *
@@ -43,13 +43,13 @@ public final class AESGCM {
     /**
      * The standard Initialisation Vector (IV) length (96 bits).
      */
-    public static final int IV_BIT_LENGTH = 96;
+    private static final int IV_BIT_LENGTH = 96;
 
 
     /**
      * The standard authentication tag length (128 bits).
      */
-    public static final int AUTH_TAG_BIT_LENGTH = 128;
+    private static final int AUTH_TAG_BIT_LENGTH = 128;
 
 
     /**
@@ -64,7 +64,7 @@ public final class AESGCM {
      */
     public static byte[] generateIV(SecureRandom randomGen) {
 
-        byte[] bytes = new byte[IV_BIT_LENGTH / 8];
+        byte[] bytes = new byte[ByteUtils.byteLength(IV_BIT_LENGTH)];
         randomGen.nextBytes(bytes);
         return bytes;
     }
@@ -151,7 +151,7 @@ public final class AESGCM {
      * @throws JOSEException If retrieval of the algorithm parameters from
      *                       the cipher failed, or the parameters are
      *                       deemed unusable.
-     * @see {@link #actualParamsOf(Cipher)}
+     * @see #actualParamsOf(Cipher)
      * @see #validate(byte[], int)
      */
     private static byte[] actualIVOf(Cipher cipher)

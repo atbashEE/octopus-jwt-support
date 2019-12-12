@@ -31,7 +31,7 @@ import java.util.List;
  * @author Vladimir Dzhuvinov
  * @version 2018-02-27
  */
-public class X509CertChainUtils {
+public final class X509CertChainUtils {
 
     /**
      * Converts the specified JSON array of strings to a list of Base64
@@ -45,8 +45,9 @@ public class X509CertChainUtils {
     public static List<Base64Value> toBase64List(JsonArray jsonArray)
             throws ParseException {
 
-        if (jsonArray == null)
+        if (jsonArray == null) {
             return null;
+        }
 
         List<Base64Value> chain = new LinkedList<>();
 
@@ -80,8 +81,9 @@ public class X509CertChainUtils {
     public static List<X509Certificate> parse(List<Base64Value> b64List)
             throws ParseException {
 
-        if (b64List == null)
+        if (b64List == null) {
             return null;
+        }
 
         List<X509Certificate> out = new LinkedList<>();
 

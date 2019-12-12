@@ -168,7 +168,7 @@ public abstract class ECDHCryptoProvider extends BaseJWEProvider {
     protected JWECryptoParts encryptWithZ(JWEHeader header, SecretKey Z, byte[] clearText)
             throws JOSEException {
 
-        return this.encryptWithZ(header, Z, clearText, null);
+        return encryptWithZ(header, Z, clearText, null);
     }
 
     /**

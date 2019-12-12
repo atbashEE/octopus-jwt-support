@@ -89,7 +89,7 @@ public abstract class ECDSAProvider extends BaseJWSProvider {
      * @see #supportedJWSAlgorithms()
      */
     public JWSAlgorithm supportedECDSAAlgorithm() {
-
+        // FIXME Review? REeturns just the first one?
         return supportedJWSAlgorithms().iterator().next();
     }
 }

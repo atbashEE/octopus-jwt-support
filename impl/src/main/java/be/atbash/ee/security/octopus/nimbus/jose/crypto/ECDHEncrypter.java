@@ -85,7 +85,7 @@ public class ECDHEncrypter extends ECDHCryptoProvider implements JWEEncrypter {
     /**
      * The supported EC JWK curves by the ECDH crypto provider class.
      */
-    public static final Set<Curve> SUPPORTED_ELLIPTIC_CURVES;
+    private static final Set<Curve> SUPPORTED_ELLIPTIC_CURVES;
 
 
     static {

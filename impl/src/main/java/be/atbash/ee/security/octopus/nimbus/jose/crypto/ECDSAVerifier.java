@@ -16,7 +16,6 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto;
 
 
-import be.atbash.ee.security.octopus.nimbus.jose.CriticalHeaderParamsAware;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.AlgorithmSupportMessage;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.CriticalHeaderParamsDeferral;
@@ -61,7 +60,7 @@ import java.util.Set;
  * @author Vladimir Dzhuvinov
  * @version 2017-04-13
  */
-public class ECDSAVerifier extends ECDSAProvider implements JWSVerifier, CriticalHeaderParamsAware {
+public class ECDSAVerifier extends ECDSAProvider implements JWSVerifier {
 
 
     /**
@@ -141,15 +140,11 @@ public class ECDSAVerifier extends ECDSAProvider implements JWSVerifier, Critica
         return publicKey;
     }
 
-
-    @Override
     public Set<String> getProcessedCriticalHeaderParams() {
 
         return critPolicy.getProcessedCriticalHeaderParams();
     }
 
-
-    @Override
     public Set<String> getDeferredCriticalHeaderParams() {
 
         return critPolicy.getProcessedCriticalHeaderParams();

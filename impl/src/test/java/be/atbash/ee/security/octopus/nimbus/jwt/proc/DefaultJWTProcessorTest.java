@@ -117,7 +117,6 @@ public class DefaultJWTProcessorTest {
 
             if (claimsSet.getIssuer() == null || !claimsSet.getIssuer().equals("https://openid.c2id.com")) {
                 return false;
-                //throw new BadJWTException("Unexpected/missing issuer");
             }
             return true;
         });
@@ -300,6 +299,7 @@ public class DefaultJWTProcessorTest {
         JWTClaimsSet claims = processor.process(jwt);
 
         assertThat(claims.getIssuer()).isEqualTo("joe");
+        assertThat(claims.getExpirationTime()).isNotNull();
         assertThat(claims.getExpirationTime().getTime()).isEqualTo(1300819380L * 1000L);
         assertThat(claims.getBooleanClaim("http://example.com/is_root")).isTrue();
         assertThat(claims.getClaims()).hasSize(3);
@@ -801,7 +801,6 @@ public class DefaultJWTProcessorTest {
     }
 
     // https://bitbucket.org/connect2id/nimbus-jose-jwt/issues/222/jwe-vulnerability-cannot-force-content
-    @SuppressWarnings("unchecked")
     @Test
     public void testRejectPlainNestedJWT_withCTY()
             throws Exception {
@@ -957,26 +956,12 @@ public class DefaultJWTProcessorTest {
         }
     }
 
-    private OctetSequenceKey generateOctetSequenceKey(int size) {
-
-
-        byte[] keyMaterial = new byte[size / 8];
-
-
-        // The default random gen
-        new SecureRandom().nextBytes(keyMaterial);
-
-
-        OctetSequenceKey.Builder builder = new OctetSequenceKey.Builder(Base64URLValue.encode(keyMaterial));
-
-        return builder.build();
-    }
 
 
     private static class TestKeySelector extends KeySelector {
         private Key key;
 
-        public TestKeySelector(Key key) {
+        TestKeySelector(Key key) {
             this.key = key;
         }
 
@@ -989,7 +974,7 @@ public class DefaultJWTProcessorTest {
     private static class TestJWKKeySelector extends KeySelector {
         private Key key;
 
-        public TestJWKKeySelector(String jwk, boolean publicKey) {
+        TestJWKKeySelector(String jwk, boolean publicKey) {
             try {
                 RSAKey jwkKey = RSAKey.parse(jwk);
                 if (publicKey) {

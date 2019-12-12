@@ -413,7 +413,7 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
         /**
          * Reference to the underlying key store, {@code null} if none.
          */
-        private KeyStore ks;
+        private KeyStore keystore;
 
 
         /**
@@ -485,7 +485,7 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
             x5u = rsaJWK.getX509CertURL();
             x5t256 = rsaJWK.getX509CertSHA256Thumbprint();
             x5c = rsaJWK.getX509CertChain();
-            ks = rsaJWK.getKeyStore();
+            keystore = rsaJWK.getKeyStore();
         }
 
 
@@ -516,11 +516,11 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
         public Builder privateKey(RSAPrivateKey priv) {
 
             if (priv instanceof RSAPrivateCrtKey) {
-                return this.privateKey((RSAPrivateCrtKey) priv);
+                return privateKey((RSAPrivateCrtKey) priv);
             } else if (priv instanceof RSAMultiPrimePrivateCrtKey) {
-                return this.privateKey((RSAMultiPrimePrivateCrtKey) priv);
+                return privateKey((RSAMultiPrimePrivateCrtKey) priv);
             } else {
-                this.d = Base64URLValue.encode(priv.getPrivateExponent());
+                d = Base64URLValue.encode(priv.getPrivateExponent());
                 return this;
             }
         }
@@ -808,7 +808,7 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
             requiredParams.put("e", e.toString());
             requiredParams.put("kty", KeyType.RSA.getValue());
             requiredParams.put("n", n.toString());
-            this.kid = ThumbprintUtils.compute(hashAlg, requiredParams).toString();
+            kid = ThumbprintUtils.compute(hashAlg, requiredParams).toString();
             return this;
         }
 
@@ -864,7 +864,7 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
          */
         public Builder keyStore(KeyStore keyStore) {
 
-            this.ks = keyStore;
+            this.keystore = keyStore;
             return this;
         }
 
@@ -883,7 +883,7 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
                 return new RSAKey(n, e, d, p, q, dp, dq, qi, oth,
                         priv,
                         use, ops, alg, kid, x5u, x5t256, x5c,
-                        ks);
+                        keystore);
 
             } catch (IllegalArgumentException e) {
 
@@ -1190,7 +1190,7 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
                   Base64URLValue p, Base64URLValue q,
                   Base64URLValue dp, Base64URLValue dq, Base64URLValue qi,
                   List<OtherPrimesInfo> oth,
-                  PrivateKey prv,
+                  PrivateKey privateKey,
                   KeyUse use, Set<KeyOperation> ops, Algorithm alg, String kid,
                   URI x5u, Base64URLValue x5t256, List<Base64Value> x5c,
                   KeyStore ks) {
@@ -1273,7 +1273,7 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
             this.oth = Collections.emptyList();
         }
 
-        this.privateKey = prv; // PKCS#11 handle
+        this.privateKey = privateKey; // PKCS#11 handle
     }
 
 
@@ -1779,10 +1779,7 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
         if (!e.decodeToBigInteger().equals(certRSAKey.getPublicExponent())) {
             return false;
         }
-        if (!n.decodeToBigInteger().equals(certRSAKey.getModulus())) {
-            return false;
-        }
-        return true;
+        return n.decodeToBigInteger().equals(certRSAKey.getModulus());
     }
 
 

@@ -38,6 +38,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 
 public class SampleCertificates {
 
@@ -180,6 +182,7 @@ public class SampleCertificates {
             JcaContentSignerBuilder signerBuilder = new JcaContentSignerBuilder("SHA256withECDSA");
             X509CertificateHolder certHolder = x509certBuilder.build(signerBuilder.build(privateKey));
             X509Certificate cert = X509CertUtils.parse(certHolder.getEncoded());
+            assertThat(cert).isNotNull();
             SAMPLE_X5C_EC = Collections.unmodifiableList(Collections.singletonList(Base64Value.encode(cert.getEncoded())));
         } catch (Exception e) {
             throw new RuntimeException(e);

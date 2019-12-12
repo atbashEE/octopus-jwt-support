@@ -24,7 +24,6 @@ import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -116,6 +115,7 @@ public class KeyUseTest {
 
         String pemEncodedCert = IOUtil.readFileToString("src/test/resources/sample-certs/ietf.crt");
         X509Certificate x509Cert = X509CertUtils.parse(pemEncodedCert);
+        assertThat(x509Cert).isNotNull();
         assertThat(KeyUse.from(x509Cert)).isEqualTo(KeyUse.ENCRYPTION);
     }
 
@@ -124,6 +124,7 @@ public class KeyUseTest {
 
         String pemEncodedCert = IOUtil.readFileToString("src/test/resources/sample-certs/wikipedia.crt");
         X509Certificate x509Cert = X509CertUtils.parse(pemEncodedCert);
+        assertThat(x509Cert).isNotNull();
         assertThat(KeyUse.from(x509Cert)).isEqualTo(KeyUse.ENCRYPTION);
     }
 
@@ -153,8 +154,8 @@ public class KeyUseTest {
 
         JcaContentSignerBuilder signerBuilder = new JcaContentSignerBuilder("SHA256withRSA");
         X509CertificateHolder certHolder = x509certBuilder.build(signerBuilder.build(keyPair.getPrivate()));
-        X509Certificate cert = X509CertUtils.parse(certHolder.getEncoded());
-
-        assertThat(KeyUse.from(cert)).isNull();
+        X509Certificate x509Cert = X509CertUtils.parse(certHolder.getEncoded());
+        assertThat(x509Cert).isNotNull();
+        assertThat(KeyUse.from(x509Cert)).isNull();
     }
 }

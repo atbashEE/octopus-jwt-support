@@ -46,15 +46,6 @@ public class Base64URLValueTest {
     private static final BigInteger BIGINT = new BigInteger("9999999999999999999999999999999999");
 
 
-    // Test base64URL string
-    private static final Base64URLValue B64URL = new Base64URLValue(
-            "0vx7agoebGcQSuuPiLJXZptN9nndrQmbXEps2aiAFbWhM78LhWx" +
-                    "4cbbfAAtVT86zwu1RK7aPFFxuhDR1L6tSoc_BJECPebWKRXjBZCiFV4n3oknjhMs" +
-                    "tn64tZ_2W-5JsGY4Hc5n9yBXArwl93lqt7_RN5w6Cf0h4QyQ5v-65YGjQR0_FDW2" +
-                    "QvzqY368QQMicAtaSqzs8KJZgnYb9c7d0zgdAZHzu6qMQvRL5hajrn1n91CbOpbI" +
-                    "SD08qNLyrdkt-bFTWhAI4vMQFh6WeZu0fM4lFd2NcRwr3XPksINHaQ-G_xBniIqb" +
-                    "w0Ls1jF44-csFCur-kEgU8awapJzKnqDKgw");
-
     @Test
     public void testByteArrayEncodeAndDecode() {
 

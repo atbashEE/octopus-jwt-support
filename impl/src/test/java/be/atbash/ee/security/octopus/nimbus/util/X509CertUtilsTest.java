@@ -175,7 +175,7 @@ public class X509CertUtilsTest {
         String content = IOUtil.readFileToString("src/test/resources/sample-certs/wikipedia.crt");
 
         X509Certificate cert = X509CertUtils.parse(content);
-
+        assertThat(cert).isNotNull();
 
         assertThat(cert.getPublicKey()).isInstanceOf(ECPublicKey.class);
 
@@ -205,6 +205,7 @@ public class X509CertUtilsTest {
         String content = IOUtil.readFileToString("src/test/resources/sample-certs/ietf.crt");
 
         X509Certificate cert = X509CertUtils.parse(content);
+        assertThat(cert).isNotNull();
 
         assertThat(cert.getPublicKey()).isInstanceOf(RSAPublicKey.class);
 

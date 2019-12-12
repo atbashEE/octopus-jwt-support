@@ -45,13 +45,13 @@ public class ContentCryptoProvider {
     /**
      * The supported encryption methods.
      */
-    public static final Set<EncryptionMethod> SUPPORTED_ENCRYPTION_METHODS;
+    static final Set<EncryptionMethod> SUPPORTED_ENCRYPTION_METHODS;
 
 
     /**
      * The encryption methods compatible with each key size in bits.
      */
-    public static final Map<Integer, Set<EncryptionMethod>> COMPATIBLE_ENCRYPTION_METHODS;
+    static final Map<Integer, Set<EncryptionMethod>> COMPATIBLE_ENCRYPTION_METHODS;
 
 
     static {
@@ -223,7 +223,7 @@ public class ContentCryptoProvider {
      * @throws JOSEException If decryption failed.
      */
     public static byte[] decrypt(JWEHeader header,
-                                 Base64URLValue encryptedKey,
+                                 Base64URLValue encryptedKey,  // FIXME Not used?
                                  Base64URLValue iv,
                                  Base64URLValue cipherText,
                                  Base64URLValue authTag,

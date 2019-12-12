@@ -29,7 +29,7 @@ import java.util.Base64;
  * @author Vladimir Dzhuvinov
  * @version 2018-07-24
  */
-public class X509CertUtils {
+public final class X509CertUtils {
 
 
     /**
@@ -221,5 +221,8 @@ public class X509CertUtils {
         } catch (NoSuchAlgorithmException | CertificateEncodingException e) {
             return null;
         }
+    }
+
+    private X509CertUtils() {
     }
 }

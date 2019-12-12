@@ -41,23 +41,22 @@ public class OctetKeyPairTest {
     // Test parameters are from JWK spec
     private static final class EXAMPLE_OKP_ED25519 {
 
-
-        public static final Curve CRV = Curve.Ed25519;
-
-
-        public static final Base64URLValue X = new Base64URLValue("11qYAYKxCrfVS_7TyWQHOg7hcvPapiMlrwIaaPcHURo");
+        static final Curve CRV = Curve.Ed25519;
 
 
-        public static final Base64URLValue D = new Base64URLValue("nWGxne_9WmC6hEr0kuwsxERJxWl7MmkZcDusAxyuf2A");
+        static final Base64URLValue X = new Base64URLValue("11qYAYKxCrfVS_7TyWQHOg7hcvPapiMlrwIaaPcHURo");
+
+
+        static final Base64URLValue D = new Base64URLValue("nWGxne_9WmC6hEr0kuwsxERJxWl7MmkZcDusAxyuf2A");
     }
 
 
     private static final class EXAMPLE_OKP_X448 {
 
-        public static final Curve CRV = Curve.X448;
+        static final Curve CRV = Curve.X448;
 
 
-        public static final Base64URLValue X = new Base64URLValue("PreoKbDNIPW8_AtZm2_sz22kYnEHvbDU80W0MCfYuXL8PjT7QjKhPKcG3LV67D2uB73BxnvzNgk");
+        static final Base64URLValue X = new Base64URLValue("PreoKbDNIPW8_AtZm2_sz22kYnEHvbDU80W0MCfYuXL8PjT7QjKhPKcG3LV67D2uB73BxnvzNgk");
     }
 
 
@@ -80,8 +79,7 @@ public class OctetKeyPairTest {
 
         assertThat(okp.isPrivate()).isTrue();
 
-        JWK pubJWK = okp.toPublicJWK();
-        OctetKeyPair pubOKP = (OctetKeyPair) pubJWK;
+        OctetKeyPair pubOKP = okp.toPublicJWK();
         assertThat(pubOKP.getKeyType()).isEqualTo(KeyType.OKP);
         assertThat(pubOKP.getCurve()).isEqualTo(Curve.Ed25519);
         assertThat(pubOKP.getX()).isEqualTo(okp.getX());
@@ -377,7 +375,6 @@ public class OctetKeyPairTest {
             throws Exception {
 
         URI x5u = new URI("http://example.com/jwk.json");
-        Base64URLValue x5t = new Base64URLValue("abc");
         Base64URLValue x5tS256 = new Base64URLValue("ghi");
         List<Base64Value> x5c = SampleCertificates.SAMPLE_X5C_RSA;
 

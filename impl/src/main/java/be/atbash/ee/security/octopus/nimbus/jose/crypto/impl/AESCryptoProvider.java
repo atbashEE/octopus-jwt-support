@@ -74,7 +74,7 @@ public abstract class AESCryptoProvider extends BaseJWEProvider {
     /**
      * The JWE algorithms compatible with each key size in bits.
      */
-    public static final Map<Integer, Set<JWEAlgorithm>> COMPATIBLE_ALGORITHMS;
+    private static final Map<Integer, Set<JWEAlgorithm>> COMPATIBLE_ALGORITHMS;
 
 
     static {

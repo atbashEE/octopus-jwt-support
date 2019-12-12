@@ -84,6 +84,7 @@ public class JWKTest {
 
         String pemEncodedCert = IOUtil.readFileToString("src/test/resources/sample-certs/ietf.crt");
         X509Certificate cert = X509CertUtils.parse(pemEncodedCert);
+        assertThat(cert).isNotNull();
         JWK jwk = JWK.parse(cert);
         validateJWKFromX509Cert(jwk, KeyType.RSA);
     }
@@ -94,6 +95,7 @@ public class JWKTest {
 
         String pemEncodedCert = IOUtil.readFileToString("src/test/resources/sample-certs/wikipedia.crt");
         X509Certificate cert = X509CertUtils.parse(pemEncodedCert);
+        assertThat(cert).isNotNull();
         JWK jwk = JWK.parse(cert);
         validateJWKFromX509Cert(jwk, KeyType.EC);
         assertThat(((ECKey) jwk).getCurve()).isEqualTo(Curve.P_256);

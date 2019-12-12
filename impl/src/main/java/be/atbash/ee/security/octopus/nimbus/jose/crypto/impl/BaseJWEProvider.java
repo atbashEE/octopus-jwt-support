@@ -61,8 +61,8 @@ abstract class BaseJWEProvider implements JWEProvider {
      * @param encs The supported encryption methods by the JWE provider
      *             instance. Must not be {@code null}.
      */
-    public BaseJWEProvider(Set<JWEAlgorithm> algs,
-                           Set<EncryptionMethod> encs) {
+    BaseJWEProvider(Set<JWEAlgorithm> algs,
+                    Set<EncryptionMethod> encs) {
 
         if (algs == null) {
             throw new IllegalArgumentException("The supported JWE algorithm set must not be null");

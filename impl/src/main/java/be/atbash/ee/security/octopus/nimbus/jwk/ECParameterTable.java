@@ -17,7 +17,10 @@ package be.atbash.ee.security.octopus.nimbus.jwk;
 
 
 import java.math.BigInteger;
-import java.security.spec.*;
+import java.security.spec.ECFieldFp;
+import java.security.spec.ECParameterSpec;
+import java.security.spec.ECPoint;
+import java.security.spec.EllipticCurve;
 
 
 /**
@@ -65,37 +68,6 @@ class ECParameterTable {
      * {@link Curve#P_521} curve.
      */
     private static final ECParameterSpec P_521_SPEC;
-
-
-    /**
-     * Simple EC field implementation.
-     */
-    private static class ECFieldImpl implements ECField {
-
-
-        /**
-         * The field size.
-         */
-        private int size;
-
-
-        /**
-         * Creates a new EC field with the specified size.
-         *
-         * @param size The EC field size.
-         */
-        public ECFieldImpl(int size) {
-
-            this.size = size;
-        }
-
-
-        @Override
-        public int getFieldSize() {
-            return size;
-        }
-    }
-
 
     static {
         // Values obtained from org.bouncycastle.jce.ECNamedCurveTable

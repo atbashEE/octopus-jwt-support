@@ -38,9 +38,7 @@ public class PlainJWTTest {
                 .audience("http://app.example.com")
                 .build();
 
-        JWTClaimsSet readOnlyClaimsSet = claimsSet;
-
-        PlainJWT jwt = new PlainJWT(readOnlyClaimsSet);
+        PlainJWT jwt = new PlainJWT(claimsSet);
 
         assertThat(jwt.getJWTClaimsSet().getSubject()).isEqualTo("alice");
         assertThat(jwt.getJWTClaimsSet().getIssuer()).isEqualTo("http://c2id.com");
@@ -59,9 +57,7 @@ public class PlainJWTTest {
                 .audience("http://app.example.com")
                 .build();
 
-        JWTClaimsSet readOnlyClaimsSet = claimsSet;
-
-        PlainJWT jwt = new PlainJWT(header, readOnlyClaimsSet);
+        PlainJWT jwt = new PlainJWT(header, claimsSet);
 
         assertThat(jwt.getHeader()).isEqualTo(header);
 

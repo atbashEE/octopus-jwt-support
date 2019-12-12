@@ -158,7 +158,7 @@ public abstract class JWK implements Serializable {
      *               if not specified.
      * @param x5c    The X.509 certificate chain, {@code null} if not
      *               specified.
-     * @param ks     Reference to the underlying key store, {@code null} if
+     * @param keyStore     Reference to the underlying key store, {@code null} if
      *               none.
      */
     protected JWK(KeyType kty,
@@ -169,7 +169,7 @@ public abstract class JWK implements Serializable {
                   URI x5u,
                   Base64URLValue x5t256,
                   List<Base64Value> x5c,
-                  KeyStore ks) {
+                  KeyStore keyStore) {
 
         if (kty == null) {
             throw new IllegalArgumentException("The key type \"kty\" parameter must not be null");
@@ -202,7 +202,7 @@ public abstract class JWK implements Serializable {
             throw new IllegalArgumentException("Invalid X.509 certificate chain \"x5c\": " + e.getMessage(), e);
         }
 
-        this.keyStore = ks;
+        this.keyStore = keyStore;
     }
 
 

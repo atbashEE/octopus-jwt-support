@@ -51,7 +51,7 @@ public class DefaultJWSVerifierFactory implements JWSVerifierFactory {
     /**
      * The supported JWS algorithms.
      */
-    public static final Set<JWSAlgorithm> SUPPORTED_ALGORITHMS;
+    private static final Set<JWSAlgorithm> SUPPORTED_ALGORITHMS;
 
 
     static {

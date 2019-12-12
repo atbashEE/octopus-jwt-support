@@ -47,7 +47,7 @@ public final class AESCBC {
     /**
      * The standard Initialisation Vector (IV) length (128 bits).
      */
-    public static final int IV_BIT_LENGTH = 128;
+    private static final int IV_BIT_LENGTH = 128;
 
 
     /**

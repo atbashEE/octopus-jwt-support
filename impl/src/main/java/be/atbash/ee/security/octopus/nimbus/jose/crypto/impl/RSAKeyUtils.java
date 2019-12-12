@@ -26,8 +26,10 @@ import java.security.interfaces.RSAPrivateKey;
 /**
  * RSA JWK conversion utility.
  */
-public class RSAKeyUtils {
+public final class RSAKeyUtils {
 
+    private RSAKeyUtils() {
+    }
 
     /**
      * Returns the private RSA key of the specified RSA JWK. Supports

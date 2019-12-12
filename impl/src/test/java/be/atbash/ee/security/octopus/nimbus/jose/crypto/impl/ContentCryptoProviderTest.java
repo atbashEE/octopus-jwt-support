@@ -43,7 +43,7 @@ import static org.junit.Assert.fail;
  * @author Vladimir Dzhuvinov
  * @version 2015-06-29
  */
-public class ContentCryptoProviderTest  {
+public class ContentCryptoProviderTest {
 
 	@Test
 	public void testCompatibleEncryptionMethods() {
@@ -86,42 +86,42 @@ public class ContentCryptoProviderTest  {
 		jcaProvider.setProvider(BouncyCastleProviderSingleton.getInstance());
 
 		JWECryptoParts jweParts = ContentCryptoProvider.encrypt(
-			header,
-			clearText,
-			cek,
-			encryptedKey,
-			jcaProvider);
+                header,
+                clearText,
+                cek,
+                encryptedKey,
+                jcaProvider);
 
 		assertThat(Arrays.equals(clearText, ContentCryptoProvider.decrypt(
-			header,
-			encryptedKey,
-			jweParts.getInitializationVector(),
-			jweParts.getCipherText(),
-			jweParts.getAuthenticationTag(),
-			cek,
-			jcaProvider))).isTrue();
+                header,
+                encryptedKey,
+                jweParts.getInitializationVector(),
+                jweParts.getCipherText(),
+                jweParts.getAuthenticationTag(),
+                cek,
+                jcaProvider))).isTrue();
 	}
 
 	@Test
 	public void test_A256CBC_HS512_cekTooShort()
-		throws Exception {
+            throws Exception {
 
-		 JWEHeader header = new JWEHeader(JWEAlgorithm.DIR, EncryptionMethod.A256CBC_HS512);
+        JWEHeader header = new JWEHeader(JWEAlgorithm.DIR, EncryptionMethod.A256CBC_HS512);
         byte[] clearText = "Hello world!".getBytes(StandardCharsets.UTF_8);
 		byte[] cekBytes = new byte[32];
 		new SecureRandom().nextBytes(cekBytes);
 		SecretKey cek = new SecretKeySpec(cekBytes, "AES");
-		 Base64URLValue encryptedKey = null;
-		 JWEJCAContext jcaProvider = new JWEJCAContext();
+        Base64URLValue encryptedKey = null;
+        JWEJCAContext jcaProvider = new JWEJCAContext();
 		jcaProvider.setProvider(BouncyCastleProviderSingleton.getInstance());
 
 		try {
 			ContentCryptoProvider.encrypt(
-				header,
-				clearText,
-				cek,
-				encryptedKey,
-				jcaProvider);
+                    header,
+                    clearText,
+                    cek,
+                    encryptedKey,
+                    jcaProvider);
 
 			fail();
 
@@ -133,24 +133,24 @@ public class ContentCryptoProviderTest  {
 
 	@Test
 	public void test_A256GCM_cekTooShort()
-		throws Exception {
+            throws Exception {
 
-		 JWEHeader header = new JWEHeader(JWEAlgorithm.DIR, EncryptionMethod.A256GCM);
+        JWEHeader header = new JWEHeader(JWEAlgorithm.DIR, EncryptionMethod.A256GCM);
         byte[] clearText = "Hello world!".getBytes(StandardCharsets.UTF_8);
 		byte[] cekBytes = new byte[16];
 		new SecureRandom().nextBytes(cekBytes);
 		SecretKey cek = new SecretKeySpec(cekBytes, "AES");
-		 Base64URLValue encryptedKey = null;
-		 JWEJCAContext jcaProvider = new JWEJCAContext();
+        Base64URLValue encryptedKey = null;
+        JWEJCAContext jcaProvider = new JWEJCAContext();
 		jcaProvider.setProvider(BouncyCastleProviderSingleton.getInstance());
 
 		try {
 			ContentCryptoProvider.encrypt(
-				header,
-				clearText,
-				cek,
-				encryptedKey,
-				jcaProvider);
+                    header,
+                    clearText,
+                    cek,
+                    encryptedKey,
+                    jcaProvider);
 
 			fail();
 
@@ -162,7 +162,7 @@ public class ContentCryptoProviderTest  {
 
 	@Test
 	public void testKeyGen()
-		throws Exception {
+            throws Exception {
 
 		SecureRandom randomGen = new SecureRandom();
 

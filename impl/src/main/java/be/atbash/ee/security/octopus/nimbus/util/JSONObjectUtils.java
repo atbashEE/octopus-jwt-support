@@ -126,6 +126,7 @@ public final class JSONObjectUtils {
      */
     public static URI getURIRequired(JsonObject jsonObject, String key)
             throws ParseException {
+        // USed by oauth2-oidc-sdk
 
         URI uri = getURI(jsonObject, key);
         if (uri == null) {

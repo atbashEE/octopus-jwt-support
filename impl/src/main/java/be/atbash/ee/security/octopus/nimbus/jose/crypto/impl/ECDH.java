@@ -212,7 +212,7 @@ public final class ECDH {
 
         byte[] sharedSecretBytes;
         //try {
-        throw new UnsupportedOperationException("Import from Google Crypto ");
+        throw new UnsupportedOperationException("Import from Google Crypto ");  // FIXME
         //sharedSecretBytes = X25519.computeSharedSecret(privateKeyBytes, publicKeyBytes);
         //} catch (InvalidKeyException e) {
         //    throw new JOSEException(e.getMessage(), e);

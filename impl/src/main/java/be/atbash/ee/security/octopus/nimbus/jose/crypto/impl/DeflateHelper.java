@@ -28,8 +28,11 @@ import be.atbash.ee.security.octopus.nimbus.util.DeflateUtils;
  * @author Vladimir Dzhuvinov
  * @version 2014-07-08
  */
-public class DeflateHelper {
+final class DeflateHelper {
 
+
+    private DeflateHelper() {
+    }
 
     /**
      * Applies compression to the specified plain text if requested.
@@ -40,7 +43,7 @@ public class DeflateHelper {
      * @throws JOSEException If compression failed or the requested
      *                       compression algorithm is not supported.
      */
-    public static byte[] applyCompression(JWEHeader jweHeader, byte[] bytes)
+    static byte[] applyCompression(JWEHeader jweHeader, byte[] bytes)
             throws JOSEException {
 
         CompressionAlgorithm compressionAlg = jweHeader.getCompressionAlgorithm();
@@ -75,7 +78,7 @@ public class DeflateHelper {
      * @throws JOSEException If decompression failed or the requested
      *                       compression algorithm is not supported.
      */
-    public static byte[] applyDecompression(JWEHeader jweHeader, byte[] bytes)
+    static byte[] applyDecompression(JWEHeader jweHeader, byte[] bytes)
             throws JOSEException {
 
         CompressionAlgorithm compressionAlg = jweHeader.getCompressionAlgorithm();

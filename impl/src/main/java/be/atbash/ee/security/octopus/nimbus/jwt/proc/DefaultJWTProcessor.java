@@ -78,7 +78,6 @@ import java.text.ParseException;
  * @author Vladimir Dzhuvinov
  * @version 2019-10-15
  */
-// FIXME Try to use this (and JWTClaimSet) as basis for JWTDecoder
 public class DefaultJWTProcessor {
 
 

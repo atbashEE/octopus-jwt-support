@@ -30,7 +30,7 @@ public class GenerationParameters {
         if (StringUtils.isEmpty(builder.kid)) {
             throw new KeyGenerationParameterException("Key id is required");
         }
-        this.kid = builder.kid;
+        kid = builder.kid;
     }
 
     public String getKid() {

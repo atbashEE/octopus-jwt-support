@@ -58,8 +58,7 @@ public class PayloadTest {
 
 
     @Test
-    public void testJWSObjectFromString()
-            throws Exception {
+    public void testJWSObjectFromString() {
 
         // From http://tools.ietf.org/html/rfc7515#appendix-A.1
         String jws = "eyJ0eXAiOiJKV1QiLA0KICJhbGciOiJIUzI1NiJ9" +
@@ -72,6 +71,7 @@ public class PayloadTest {
         Payload payload = new Payload(jws);
 
         assertThat(payload.getOrigin()).isEqualTo(Payload.Origin.STRING);
+        assertThat(payload.toJWSObject()).isNotNull();
         assertThat(payload.toJWSObject().getHeader().getAlgorithm()).isEqualTo(JWSAlgorithm.HS256);
 
         assertThat(payload.toString()).isEqualTo(jws);
@@ -118,6 +118,7 @@ public class PayloadTest {
         Payload payload = new Payload(jws);
 
         assertThat(payload.getOrigin()).isEqualTo(Payload.Origin.STRING);
+        assertThat(payload.toJWSObject()).isNotNull();
         assertThat(payload.toJWSObject().getHeader().getAlgorithm()).isEqualTo(JWSAlgorithm.HS256);
         assertThat(payload.toSignedJWT().getJWTClaimsSet().getIssuer()).isEqualTo("joe");
 

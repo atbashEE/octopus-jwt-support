@@ -171,7 +171,6 @@ public class DefaultJWTClaimsVerifier implements JWTVerifier {
         this.prohibitedClaims = prohibitedClaims != null ? Collections.unmodifiableSet(prohibitedClaims) : Collections.emptySet();
     }
 
-    //@Override
     public void setMaxClockSkew(int maxClockSkewSeconds) {
         maxClockSkew = maxClockSkewSeconds;
     }

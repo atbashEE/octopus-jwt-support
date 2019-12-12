@@ -33,7 +33,7 @@ import java.security.spec.PSSParameterSpec;
  * @author Vladimir Dzhuvinov
  * @version 2015-05-31
  */
-public class RSASSA {
+public final class RSASSA {
 
 
     /**

@@ -340,7 +340,7 @@ public class OctetKeyPair extends JWK implements AsymmetricJWK, CurveBasedJWK {
             requiredParams.put("crv", crv.toString());
             requiredParams.put("kty", KeyType.OKP.getValue());
             requiredParams.put("x", x.toString());
-            this.kid = ThumbprintUtils.compute(hashAlg, requiredParams).toString();
+            kid = ThumbprintUtils.compute(hashAlg, requiredParams).toString();
             return this;
         }
 

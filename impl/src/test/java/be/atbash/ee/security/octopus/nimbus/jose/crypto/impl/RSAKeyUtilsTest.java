@@ -47,6 +47,7 @@ public class RSAKeyUtilsTest {
         RSAPrivateKey privateKey = (RSAPrivateKey) RSAKeyUtils.toRSAPrivateKey(rsaJWK);
 
         assertThat(privateKey.getModulus().bitLength()).isEqualTo(2048);
+        assertThat(rsaJWK.toRSAPrivateKey()).isNotNull();
 
         Assert.assertArrayEquals(privateKey.getEncoded(), rsaJWK.toRSAPrivateKey().getEncoded());
     }

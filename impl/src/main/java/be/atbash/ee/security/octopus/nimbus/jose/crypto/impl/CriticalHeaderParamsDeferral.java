@@ -16,7 +16,6 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto.impl;
 
 
-import be.atbash.ee.security.octopus.nimbus.jose.CriticalHeaderParamsAware;
 import be.atbash.ee.security.octopus.nimbus.jose.Header;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEHeader;
@@ -30,7 +29,6 @@ import java.util.Set;
  *
  * @author Vladimir Dzhuvinov
  * @version 2015-05-20
- * @see CriticalHeaderParamsAware
  */
 public class CriticalHeaderParamsDeferral {
 
@@ -78,9 +76,9 @@ public class CriticalHeaderParamsDeferral {
     public void setDeferredCriticalHeaderParams(Set<String> defCritHeaders) {
 
         if (defCritHeaders == null) {
-            this.deferredParams = Collections.emptySet();
+            deferredParams = Collections.emptySet();
         } else {
-            this.deferredParams = defCritHeaders;
+            deferredParams = defCritHeaders;
         }
     }
 

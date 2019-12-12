@@ -34,8 +34,10 @@ import java.security.Provider;
  * @author Vladimir Dzhuvinov
  * @version 2015-04-23
  */
-public class HMAC {
+public final class HMAC {
 
+    private HMAC() {
+    }
 
     public static Mac getInitMac(SecretKey secretKey,
                                  Provider provider)

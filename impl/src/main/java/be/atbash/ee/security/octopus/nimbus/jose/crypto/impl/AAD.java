@@ -33,8 +33,10 @@ import java.nio.charset.StandardCharsets;
  * @author Vladimir Dzhuvinov
  * @version 2017-06-01
  */
-public class AAD {
+public final class AAD {
 
+    private AAD() {
+    }
 
     /**
      * Computes the Additional Authenticated Data (AAD) for the specified
@@ -73,7 +75,7 @@ public class AAD {
      * representation (8 byte array).
      * @throws IntegerOverflowException On a integer overflow.
      */
-    public static byte[] computeLength(byte[] aad)
+    static byte[] computeLength(byte[] aad)
             throws IntegerOverflowException {
 
         int bitLength = ByteUtils.safeBitLength(aad);

@@ -16,7 +16,6 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto;
 
 
-import be.atbash.ee.security.octopus.nimbus.jose.CriticalHeaderParamsAware;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.CriticalHeaderParamsDeferral;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.ECDH;
@@ -80,13 +79,13 @@ import java.util.Set;
  * @author Vladimir Dzhuvinov
  * @version 2018-12-12
  */
-public class ECDHDecrypter extends ECDHCryptoProvider implements JWEDecrypter, CriticalHeaderParamsAware {
+public class ECDHDecrypter extends ECDHCryptoProvider implements JWEDecrypter {
 
 
     /**
      * The supported EC JWK curves by the ECDH crypto provider class.
      */
-    public static final Set<Curve> SUPPORTED_ELLIPTIC_CURVES;
+    private static final Set<Curve> SUPPORTED_ELLIPTIC_CURVES;
 
 
     static {
@@ -139,7 +138,7 @@ public class ECDHDecrypter extends ECDHCryptoProvider implements JWEDecrypter, C
             throw new JOSEException("The EC JWK doesn't contain a private part");
         }
 
-        this.privateKey = ecJWK.toECPrivateKey();
+        privateKey = ecJWK.toECPrivateKey();
     }
 
 
@@ -206,14 +205,12 @@ public class ECDHDecrypter extends ECDHCryptoProvider implements JWEDecrypter, C
     }
 
 
-    @Override
     public Set<String> getProcessedCriticalHeaderParams() {
 
         return critPolicy.getProcessedCriticalHeaderParams();
     }
 
 
-    @Override
     public Set<String> getDeferredCriticalHeaderParams() {
 
         return critPolicy.getProcessedCriticalHeaderParams();

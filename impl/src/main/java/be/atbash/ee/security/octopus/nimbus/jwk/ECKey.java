@@ -319,7 +319,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
         public Builder privateKey(ECPrivateKey priv) {
 
             if (priv != null) {
-                this.d = encodeCoordinate(priv.getParams().getCurve().getField().getFieldSize(), priv.getS());
+                d = encodeCoordinate(priv.getParams().getCurve().getField().getFieldSize(), priv.getS());
             }
 
             return this;
@@ -450,7 +450,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
             requiredParams.put("kty", KeyType.EC.getValue());
             requiredParams.put("x", x.toString());
             requiredParams.put("y", y.toString());
-            this.kid = ThumbprintUtils.compute(hashAlg, requiredParams).toString();
+            kid = ThumbprintUtils.compute(hashAlg, requiredParams).toString();
             return this;
         }
 
@@ -507,7 +507,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
          */
         public Builder keyStore(KeyStore keyStore) {
 
-            this.ks = keyStore;
+            ks = keyStore;
             return this;
         }
 
@@ -678,9 +678,9 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
 
         ensureMatches(getParsedX509CertChain());
 
-        this.d = null;
+        d = null;
 
-        this.privateKey = null;
+        privateKey = null;
     }
 
 
@@ -751,7 +751,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
 
         this.d = d;
 
-        this.privateKey = null;
+        privateKey = null;
     }
 
 
@@ -769,7 +769,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
      *               point. It is represented as the Base64URL encoding of
      *               the coordinate's big endian representation. Must not
      *               be {@code null}.
-     * @param priv   The private key as a PKCS#11 handle, {@code null} if
+     * @param privateKey   The private key as a PKCS#11 handle, {@code null} if
      *               not specified.
      * @param use    The key use, {@code null} if not specified or if the
      *               key is intended for signing as well as encryption.
@@ -784,7 +784,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
      * @param x5c    The X.509 certificate chain, {@code null} if not
      *               specified.
      */
-    public ECKey(Curve crv, Base64URLValue x, Base64URLValue y, PrivateKey priv,
+    public ECKey(Curve crv, Base64URLValue x, Base64URLValue y, PrivateKey privateKey,
                  KeyUse use, Set<KeyOperation> ops, Algorithm alg, String kid,
                  URI x5u, Base64URLValue x5t256, List<Base64Value> x5c,
                  KeyStore ks) {
@@ -815,7 +815,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
 
         d = null;
 
-        this.privateKey = priv;
+        this.privateKey = privateKey;
     }
 
 
@@ -1185,10 +1185,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
         if (!getX().decodeToBigInteger().equals(certECKey.getW().getAffineX())) {
             return false;
         }
-        if (!getY().decodeToBigInteger().equals(certECKey.getW().getAffineY())) {
-            return false;
-        }
-        return true;
+        return getY().decodeToBigInteger().equals(certECKey.getW().getAffineY());
     }
 
 

@@ -57,8 +57,8 @@ public class DHGenerationParameters extends GenerationParameters {
             return this;
         }
 
-        public DHGenerationParametersBuilder withDHParamaterSpec(DHParameterSpec dhParamaterSpec) {
-            this.parameterSpec = dhParamaterSpec;
+        public DHGenerationParametersBuilder withDHParamaterSpec(DHParameterSpec dhParameterSpec) {
+            parameterSpec = dhParameterSpec;
             return this;
         }
 

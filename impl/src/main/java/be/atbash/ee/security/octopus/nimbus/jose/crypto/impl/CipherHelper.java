@@ -28,8 +28,10 @@ import java.security.Provider;
  * @author Cedric Staub
  * @version 2014-01-22
  */
-public class CipherHelper {
+public final class CipherHelper {
 
+    private CipherHelper() {
+    }
 
     /**
      * Instantiates a cipher with an (optional) JCA provider.

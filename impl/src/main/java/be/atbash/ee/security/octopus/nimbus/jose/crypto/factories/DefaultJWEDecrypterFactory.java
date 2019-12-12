@@ -54,13 +54,13 @@ public class DefaultJWEDecrypterFactory implements JWEDecrypterFactory {
     /**
      * The supported JWE algorithms.
      */
-    public static final Set<JWEAlgorithm> SUPPORTED_ALGORITHMS;
+    private static final Set<JWEAlgorithm> SUPPORTED_ALGORITHMS;
 
 
     /**
      * The supported encryption methods.
      */
-    public static final Set<EncryptionMethod> SUPPORTED_ENCRYPTION_METHODS;
+    private static final Set<EncryptionMethod> SUPPORTED_ENCRYPTION_METHODS;
 
 
     static {

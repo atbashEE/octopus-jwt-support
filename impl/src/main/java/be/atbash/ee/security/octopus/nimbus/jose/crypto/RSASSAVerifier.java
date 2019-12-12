@@ -16,7 +16,6 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto;
 
 
-import be.atbash.ee.security.octopus.nimbus.jose.CriticalHeaderParamsAware;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.CriticalHeaderParamsDeferral;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.RSASSA;
@@ -60,7 +59,7 @@ import java.util.Set;
  * @author Vladimir Dzhuvinov
  * @version 2015-06-02
  */
-public class RSASSAVerifier extends RSASSAProvider implements JWSVerifier, CriticalHeaderParamsAware {
+public class RSASSAVerifier extends RSASSAProvider implements JWSVerifier {
 
 
     /**
@@ -131,14 +130,12 @@ public class RSASSAVerifier extends RSASSAProvider implements JWSVerifier, Criti
     }
 
 
-    @Override
     public Set<String> getProcessedCriticalHeaderParams() {
 
         return critPolicy.getProcessedCriticalHeaderParams();
     }
 
 
-    @Override
     public Set<String> getDeferredCriticalHeaderParams() {
 
         return critPolicy.getProcessedCriticalHeaderParams();

@@ -821,11 +821,8 @@ public final class JWTClaimsSet implements Serializable {
      *
      * @param json The JSON object to parse. Must not be {@code null}.
      * @return The JWT claims set.
-     * @throws ParseException If the specified JSON object doesn't
-     *                        represent a valid JWT claims set.
      */
-    public static JWTClaimsSet parse(JsonObject json)
-            throws ParseException {
+    public static JWTClaimsSet parse(JsonObject json) {
 
         JWTClaimsSet.Builder builder = new JWTClaimsSet.Builder();
 

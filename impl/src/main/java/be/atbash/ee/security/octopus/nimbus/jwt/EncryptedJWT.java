@@ -41,7 +41,7 @@ public class EncryptedJWT extends JWEObject implements JWT {
     /**
      * Creates a new to-be-encrypted JSON Web Token (JWT) with the specified
      * header and claims set. The initial state will be
-     * {@link com.nimbusds.jose.JWEObject.State#UNENCRYPTED unencrypted}.
+     * {@link JWEObject.State#UNENCRYPTED unencrypted}.
      *
      * @param header    The JWE header. Must not be {@code null}.
      * @param claimsSet The JWT claims set. Must not be {@code null}.
@@ -55,7 +55,7 @@ public class EncryptedJWT extends JWEObject implements JWT {
     /**
      * Creates a new encrypted JSON Web Token (JWT) with the specified
      * serialised parts. The state will be
-     * {@link com.nimbusds.jose.JWEObject.State#ENCRYPTED encrypted}.
+     * {@link JWEObject.State#ENCRYPTED encrypted}.
      *
      * @param firstPart  The first part, corresponding to the JWE header.
      *                   Must not be {@code null}.

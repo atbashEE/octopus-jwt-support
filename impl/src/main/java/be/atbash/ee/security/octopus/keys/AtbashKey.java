@@ -39,7 +39,7 @@ public class AtbashKey {
             throw new IllegalArgumentException("Parameter path cannot be null");
         }
 
-        this.keyId = defineKeyId(path);
+        keyId = defineKeyId(path);
         this.key = key;
         secretKeyType = SecretKeyType.fromKey(key);
     }

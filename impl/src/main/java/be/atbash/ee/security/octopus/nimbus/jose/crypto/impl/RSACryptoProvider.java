@@ -31,7 +31,6 @@ import java.util.Set;
  *
  * <p>Supports the following key management algorithms:
  *
- *     <li>{@link JWEAlgorithm#RSA_OAEP}
  *     <li>{@link JWEAlgorithm#RSA_OAEP_256}
  * </ul>
  *

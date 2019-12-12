@@ -16,7 +16,6 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto;
 
 
-import be.atbash.ee.security.octopus.nimbus.jose.CriticalHeaderParamsAware;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.CriticalHeaderParamsDeferral;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.HMAC;
@@ -56,7 +55,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * @author Vladimir Dzhuvinov
  * @version 2016-06-26
  */
-public class MACVerifier extends MACProvider implements JWSVerifier, CriticalHeaderParamsAware {
+public class MACVerifier extends MACProvider implements JWSVerifier {
 
 
     /**
@@ -163,15 +162,11 @@ public class MACVerifier extends MACProvider implements JWSVerifier, CriticalHea
         critPolicy.setDeferredCriticalHeaderParams(defCritHeaders);
     }
 
-
-    @Override
     public Set<String> getProcessedCriticalHeaderParams() {
 
         return critPolicy.getProcessedCriticalHeaderParams();
     }
 
-
-    @Override
     public Set<String> getDeferredCriticalHeaderParams() {
 
         return critPolicy.getProcessedCriticalHeaderParams();

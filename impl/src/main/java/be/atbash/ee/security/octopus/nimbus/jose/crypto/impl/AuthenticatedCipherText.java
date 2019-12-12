@@ -46,14 +46,16 @@ public final class AuthenticatedCipherText {
      */
     public AuthenticatedCipherText(byte[] cipherText, byte[] authenticationTag) {
 
-        if (cipherText == null)
+        if (cipherText == null) {
             throw new IllegalArgumentException("The cipher text must not be null");
+        }
 
         this.cipherText = cipherText;
 
 
-        if (authenticationTag == null)
+        if (authenticationTag == null) {
             throw new IllegalArgumentException("The authentication tag must not be null");
+        }
 
         this.authenticationTag = authenticationTag;
     }

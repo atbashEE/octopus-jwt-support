@@ -287,7 +287,7 @@ public final class OctetSequenceKey extends JWK implements SecretJWK {
             LinkedHashMap<String, String> requiredParams = new LinkedHashMap<>();
             requiredParams.put("k", k.toString());
             requiredParams.put("kty", KeyType.OCT.getValue());
-            this.kid = ThumbprintUtils.compute(hashAlg, requiredParams).toString();
+            kid = ThumbprintUtils.compute(hashAlg, requiredParams).toString();
             return this;
         }
 
