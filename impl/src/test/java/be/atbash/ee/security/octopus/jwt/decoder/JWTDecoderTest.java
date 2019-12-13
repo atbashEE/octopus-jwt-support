@@ -15,9 +15,23 @@
  */
 package be.atbash.ee.security.octopus.jwt.decoder;
 
+import be.atbash.ee.security.octopus.jwt.JWTEncoding;
+import be.atbash.ee.security.octopus.jwt.encoder.JWTEncoder;
+import be.atbash.ee.security.octopus.jwt.encoder.testclasses.MyColor;
+import be.atbash.ee.security.octopus.jwt.parameter.JWTParameters;
+import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersBuilder;
+import be.atbash.ee.security.octopus.keys.AtbashKey;
+import be.atbash.ee.security.octopus.keys.ListKeyManager;
+import be.atbash.ee.security.octopus.keys.generator.KeyGenerator;
+import be.atbash.ee.security.octopus.keys.generator.RSAGenerationParameters;
+import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
+import be.atbash.ee.security.octopus.keys.selector.SelectorCriteria;
+import be.atbash.ee.security.octopus.keys.selector.TestKeySelector;
+import be.atbash.ee.security.octopus.nimbus.jwt.JWTClaimsSet;
 import org.junit.Test;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,5 +51,46 @@ public class JWTDecoderTest {
         assertThat(result.keySet()).containsOnlyOnce("pets", "dateValue", "valueForClass");
     }
 
+    @Test
+    public void decode_customSerializer() {
+        List<AtbashKey> keys = generateRSAKeys("kid");
+        JWTParameters parameters = getJwtParameters(keys);
+        JWTEncoder encoder = new JWTEncoder();
+        JWTClaimsSet claims = new JWTClaimsSet.Builder().claim("value", "200,150,100").build();
+
+        ListKeyManager keyManager = new ListKeyManager(keys);
+
+        String json = encoder.encode(claims, parameters);
+
+        JWTData<MyColor> myColor = decoder.decode(json, MyColor.class, new TestKeySelector(keyManager), null);
+        assertThat(myColor).isNotNull();
+        MyColor data = myColor.getData();
+        assertThat(data).isNotNull();
+        assertThat(data.getR()).isEqualTo(200);
+        assertThat(data.getG()).isEqualTo(150);
+        assertThat(data.getB()).isEqualTo(100);
+
+    }
+
+    private List<AtbashKey> generateRSAKeys(String kid) {
+        RSAGenerationParameters generationParameters = new RSAGenerationParameters.RSAGenerationParametersBuilder()
+                .withKeyId(kid)
+                .build();
+        KeyGenerator generator = new KeyGenerator();
+        return generator.generateKeys(generationParameters);
+    }
+
+    private JWTParameters getJwtParameters(List<AtbashKey> keys) {
+
+        ListKeyManager keyManager = new ListKeyManager(keys);
+        SelectorCriteria criteria = SelectorCriteria.newBuilder().withAsymmetricPart(AsymmetricPart.PRIVATE).build();
+        List<AtbashKey> keyList = keyManager.retrieveKeys(criteria);
+
+        assertThat(keyList).as("We should have 1 Private key").hasSize(1);
+
+        return JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS)
+                .withSecretKeyForSigning(keyList.get(0))
+                .build();
+    }
 
 }

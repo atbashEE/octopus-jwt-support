@@ -17,6 +17,7 @@ package be.atbash.ee.security.octopus.jwt.encoder;
 
 import be.atbash.ee.security.octopus.jwt.JWTEncoding;
 import be.atbash.ee.security.octopus.jwt.decoder.JWTDecoder;
+import be.atbash.ee.security.octopus.jwt.encoder.testclasses.MyColor;
 import be.atbash.ee.security.octopus.jwt.encoder.testclasses.Payload;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParameters;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersBuilder;
@@ -27,10 +28,13 @@ import be.atbash.ee.security.octopus.keys.generator.KeyGenerator;
 import be.atbash.ee.security.octopus.keys.generator.RSAGenerationParameters;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.keys.selector.SelectorCriteria;
+import be.atbash.ee.security.octopus.nimbus.jwt.JWT;
+import be.atbash.ee.security.octopus.nimbus.jwt.JWTParser;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
@@ -70,17 +74,7 @@ public class JWTEncoderTest {
     public void encodeObject_jwt() {
         // Encode a POJO to JWT
 
-        List<AtbashKey> keys = generateRSAKeys("kid");
-
-        ListKeyManager keyManager = new ListKeyManager(keys);
-        SelectorCriteria criteria = SelectorCriteria.newBuilder().withAsymmetricPart(AsymmetricPart.PRIVATE).build();
-        List<AtbashKey> keyList = keyManager.retrieveKeys(criteria);
-
-        assertThat(keyList).as("We should have 1 Private key").hasSize(1);
-
-        JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS)
-                .withSecretKeyForSigning(keyList.get(0))
-                .build();
+        JWTParameters parameters = getJwtParameters();
 
         JWTEncoder encoder = new JWTEncoder();
         String encoded = encoder.encode(payload, parameters);
@@ -102,6 +96,20 @@ public class JWTEncoderTest {
         List<String> list = (List<String>) content.get("myList");
         assertThat(list).containsOnly("permission1", "permission2");
         assertThat(content).containsEntry("value", "JUnit");
+    }
+
+    private JWTParameters getJwtParameters() {
+        List<AtbashKey> keys = generateRSAKeys("kid");
+
+        ListKeyManager keyManager = new ListKeyManager(keys);
+        SelectorCriteria criteria = SelectorCriteria.newBuilder().withAsymmetricPart(AsymmetricPart.PRIVATE).build();
+        List<AtbashKey> keyList = keyManager.retrieveKeys(criteria);
+
+        assertThat(keyList).as("We should have 1 Private key").hasSize(1);
+
+        return JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS)
+                .withSecretKeyForSigning(keyList.get(0))
+                .build();
     }
 
     @Test
@@ -170,4 +178,15 @@ public class JWTEncoderTest {
         return generator.generateKeys(generationParameters);
     }
 
+    @Test
+    public void encodeWithCustomerSerializer() throws ParseException {
+        JWTParameters parameters = getJwtParameters();
+
+        JWTEncoder encoder = new JWTEncoder();
+        String json = encoder.encode(new MyColor(100, 150, 200), parameters);
+
+        JWT jwt = JWTParser.parse(json);
+        assertThat(jwt.getJWTClaimsSet().getStringClaim("value")).isEqualTo("100,150,200");
+
+    }
 }

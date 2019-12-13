@@ -144,7 +144,6 @@ public class JWTEncoder {
     }
 
     private String createJSONString(Object data) {
-        // FIXME Verify if this needs to be a dependency where some writers can be registered.
         JsonbConfig config = new JsonbConfig();
 
         config.withSerializers(SerializerProvider.getInstance().getSerializers());
