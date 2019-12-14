@@ -78,8 +78,8 @@ public class DateUtils {
      */
     public static boolean isAfter(Date date,
                                   Date reference,
-                                  long maxClockSkewSeconds) {
-
+                                  int maxClockSkewSeconds) {
+        // TODO As Java 8 features
         return new Date(date.getTime() + maxClockSkewSeconds * 1000L).after(reference);
     }
 
@@ -112,8 +112,8 @@ public class DateUtils {
      */
     public static boolean isBefore(Date date,
                                    Date reference,
-                                   long maxClockSkewSeconds) {
-
+                                   int maxClockSkewSeconds) {
+        // TODO As Java 8 features
         return new Date(date.getTime() - maxClockSkewSeconds * 1000L).before(reference);
     }
 

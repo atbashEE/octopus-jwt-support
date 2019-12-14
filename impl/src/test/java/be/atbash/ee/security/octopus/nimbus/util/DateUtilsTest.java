@@ -59,7 +59,7 @@ public class DateUtilsTest {
 
         Date date = new Date(100001L);
         Date reference = new Date(100000L);
-        assertThat(DateUtils.isAfter(date, reference, 0L)).isTrue();
+        assertThat(DateUtils.isAfter(date, reference, 0)).isTrue();
     }
 
     @Test
@@ -67,7 +67,7 @@ public class DateUtilsTest {
 
         Date date = new Date(100000L);
         Date reference = new Date(100001L);
-        assertThat(DateUtils.isAfter(date, reference, 0L)).isFalse();
+        assertThat(DateUtils.isAfter(date, reference, 0)).isFalse();
     }
 
     @Test
@@ -75,7 +75,7 @@ public class DateUtilsTest {
 
         Date date = new Date(100000L);
         Date reference = new Date(100001L);
-        assertThat(DateUtils.isBefore(date, reference, 0L)).isTrue();
+        assertThat(DateUtils.isBefore(date, reference, 0)).isTrue();
     }
 
     @Test
@@ -83,7 +83,7 @@ public class DateUtilsTest {
 
         Date date = new Date(100001L);
         Date reference = new Date(100000L);
-        assertThat(DateUtils.isBefore(date, reference, 0L)).isFalse();
+        assertThat(DateUtils.isBefore(date, reference, 0)).isFalse();
     }
 
     @Test
@@ -91,7 +91,7 @@ public class DateUtilsTest {
 
         Date date = new Date(2000L);
         Date reference = new Date(2999L);
-        long skewSeconds = 1L;
+        int skewSeconds = 1;
         assertThat(DateUtils.isAfter(date, reference, skewSeconds)).isTrue();
     }
 
@@ -100,7 +100,7 @@ public class DateUtilsTest {
 
         Date date = new Date(2000L);
         Date reference = new Date(3000L);
-        long skewSeconds = 1L;
+        int skewSeconds = 1;
         assertThat(DateUtils.isAfter(date, reference, skewSeconds)).isFalse();
     }
 
@@ -109,7 +109,7 @@ public class DateUtilsTest {
 
         Date date = new Date(2000L);
         Date reference = new Date(1001L);
-        long skewSeconds = 1L;
+        int skewSeconds = 1;
         assertThat(DateUtils.isBefore(date, reference, skewSeconds)).isTrue();
     }
 
@@ -118,14 +118,14 @@ public class DateUtilsTest {
 
         Date date = new Date(2000L);
         Date reference = new Date(1000L);
-        long skewSeconds = 1L;
+        int skewSeconds = 1;
         assertThat(DateUtils.isBefore(date, reference, skewSeconds)).isFalse();
     }
 
     @Test
     public void testNotBefore() {
 
-        long skewSeconds = 1L;
+        int skewSeconds = 1;
 
         assertThat(DateUtils.isAfter(new Date(4001L), new Date(5000L), skewSeconds)).isTrue();
         assertThat(DateUtils.isAfter(new Date(5000L), new Date(5000L), skewSeconds)).isTrue();

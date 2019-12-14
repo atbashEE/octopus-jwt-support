@@ -15,6 +15,7 @@
  */
 package be.atbash.ee.security.octopus.nimbus.jwt.proc;
 
+import be.atbash.config.test.TestConfig;
 import be.atbash.ee.security.octopus.jwt.decoder.JWTVerifier;
 import be.atbash.ee.security.octopus.nimbus.jwt.JWTClaimsSet;
 import be.atbash.util.TestReflectionUtils;
@@ -35,7 +36,9 @@ public class DefaultJWTClaimsVerifierTest {
     @After
     public void tearDown() {
         logger.clear();
+        TestConfig.resetConfig();
     }
+
 
     @Test
     public void testDefaultConstructor() throws NoSuchFieldException {
@@ -171,10 +174,10 @@ public class DefaultJWTClaimsVerifierTest {
 
     @Test
     public void testClockSkew() throws NoSuchFieldException {
+        TestConfig.addConfigValue("jwt.clock.skew.secs", "120");
 
         DefaultJWTClaimsVerifier verifier = new DefaultJWTClaimsVerifier();
 
-        verifier.setMaxClockSkew(120);
         assertThat((Integer) TestReflectionUtils.getValueOf(verifier, "maxClockSkew")).isEqualTo(120);
     }
 

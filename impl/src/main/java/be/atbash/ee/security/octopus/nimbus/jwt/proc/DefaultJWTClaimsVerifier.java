@@ -16,6 +16,7 @@
 package be.atbash.ee.security.octopus.nimbus.jwt.proc;
 
 
+import be.atbash.ee.security.octopus.config.JwtSupportConfiguration;
 import be.atbash.ee.security.octopus.jwt.decoder.JWTVerifier;
 import be.atbash.ee.security.octopus.nimbus.jwt.JWTClaimsSet;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
@@ -47,18 +48,12 @@ import java.util.*;
 public class DefaultJWTClaimsVerifier implements JWTVerifier {
 
 
-    /**
-     * The default maximum acceptable clock skew, in seconds (60).
-     */
-    public static final int DEFAULT_MAX_CLOCK_SKEW_SECONDS = 60; //FIXME, implement this as config parameter
-
-
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultJWTClaimsVerifier.class);
 
     /**
      * The maximum acceptable clock skew, in seconds.
      */
-    private int maxClockSkew = DEFAULT_MAX_CLOCK_SKEW_SECONDS;
+    private int maxClockSkew;
 
 
     /**
@@ -169,10 +164,8 @@ public class DefaultJWTClaimsVerifier implements JWTVerifier {
         this.requiredClaims = Collections.unmodifiableSet(requiredClaimsCopy);
 
         this.prohibitedClaims = prohibitedClaims != null ? Collections.unmodifiableSet(prohibitedClaims) : Collections.emptySet();
-    }
 
-    public void setMaxClockSkew(int maxClockSkewSeconds) {
-        maxClockSkew = maxClockSkewSeconds;
+        maxClockSkew = JwtSupportConfiguration.getInstance().getClockSkewSeconds();
     }
 
     @Override

@@ -412,3 +412,9 @@ The default type of the created keyStores. This overwrites the default which is 
 default : **RS256**
 
 Defines the algorithm used for signing the JWT in case we use RSA keys. Valid values are _RS256_, _RS384_, _RS512_, _PS256_, _PS384_, and _PS512_.
+
+=== jwt.clock.skew.secs (since 1.0.0)
+
+default : **60**
+
+Defines the clock skew value for verifying expiration dates of JWT tokens.

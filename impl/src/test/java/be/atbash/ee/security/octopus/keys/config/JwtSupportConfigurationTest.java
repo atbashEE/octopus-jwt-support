@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -189,6 +189,29 @@ public class JwtSupportConfigurationTest {
 
         assertThat(configuration.getPemKeyEncryption()).isEqualTo(PemKeyEncryption.NONE);
 
+    }
+
+    @Test
+    public void getClockSkewSeconds() {
+        assertThat(configuration.getClockSkewSeconds()).isEqualTo(60);
+    }
+
+    @Test
+    public void getClockSkewSeconds_zeroAllowed() {
+        TestConfig.addConfigValue("jwt.clock.skew.secs", "0");
+        assertThat(configuration.getClockSkewSeconds()).isEqualTo(0);
+    }
+
+    @Test(expected = ConfigurationException.class)
+    public void getClockSkewSeconds_invalid() {
+        TestConfig.addConfigValue("jwt.clock.skew.secs", "-1");
+        configuration.getClockSkewSeconds();
+    }
+
+    @Test(expected = ConfigurationException.class)
+    public void getClockSkewSeconds_wrongType() {
+        TestConfig.addConfigValue("jwt.clock.skew.secs", "12.34");
+        configuration.getClockSkewSeconds();
     }
 
     public static class TestKeyManager implements KeyManager {

@@ -172,6 +172,22 @@ public class JwtSupportConfiguration extends AbstractConfiguration implements Mo
         return result;
     }
 
+    @ConfigProperty
+    public int getClockSkewSeconds() {
+        Integer result;
+        try {
+            result = getOptionalValue("jwt.clock.skew.secs", 60, Integer.class);
+        } catch (NumberFormatException e) {
+
+            throw new ConfigurationException(String.format("Error in reading parameter value 'jwt.clock.skew.secs' : %s", e.getMessage()));
+        }
+
+        if (result < 0) {
+            throw new ConfigurationException(String.format("Clock skew value must be positive, parameter 'jwt.clock.skew.secs' is %s", result));
+        }
+        return result;
+    }
+
     // Java SE Support
     private static JwtSupportConfiguration INSTANCE;
 
