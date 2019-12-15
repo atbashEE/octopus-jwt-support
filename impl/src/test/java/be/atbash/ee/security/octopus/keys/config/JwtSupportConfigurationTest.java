@@ -29,6 +29,7 @@ import be.atbash.ee.security.octopus.keys.reader.KeyResourceTypeProvider;
 import be.atbash.ee.security.octopus.keys.reader.password.ConfigKeyResourcePasswordLookup;
 import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup;
 import be.atbash.ee.security.octopus.keys.selector.SelectorCriteria;
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -213,6 +214,61 @@ public class JwtSupportConfigurationTest {
         TestConfig.addConfigValue("jwt.clock.skew.secs", "12.34");
         configuration.getClockSkewSeconds();
     }
+
+    @Test
+    public void getDefaultJWEAlgorithmEC() {
+        TestConfig.addConfigValue("jwt.jwe.algorithm.default.EC", "ECDH-ES");
+        JWEAlgorithm algorithm = configuration.getDefaultJWEAlgorithmEC();
+        assertThat(algorithm).isEqualTo(JWEAlgorithm.ECDH_ES);
+    }
+
+    @Test
+    public void getDefaultJWEAlgorithmEC_default() {
+        // Default
+        JWEAlgorithm algorithm = configuration.getDefaultJWEAlgorithmEC();
+        assertThat(algorithm).isEqualTo(JWEAlgorithm.ECDH_ES_A256KW);
+    }
+
+    @Test(expected = ConfigurationException.class)
+    public void getDefaultJWEAlgorithmEC_invalid() {
+        TestConfig.addConfigValue("jwt.jwe.algorithm.default.EC", "RSA-OAEP-256");
+        configuration.getDefaultJWEAlgorithmEC();
+
+    }
+
+    @Test(expected = ConfigurationException.class)
+    public void getDefaultJWEAlgorithmEC_empty() {
+        TestConfig.addConfigValue("jwt.jwe.algorithm.default.EC", "");
+        configuration.getDefaultJWEAlgorithmEC();
+    }
+
+    @Test
+    public void getDefaultJWEAlgorithmOCT() {
+        TestConfig.addConfigValue("jwt.jwe.algorithm.default.OCT", "A192KW");
+        JWEAlgorithm algorithm = configuration.getDefaultJWEAlgorithmOCT();
+        assertThat(algorithm).isEqualTo(JWEAlgorithm.A192KW);
+    }
+
+    @Test
+    public void getDefaultJWEAlgorithmOCT_default() {
+        // Default
+        JWEAlgorithm algorithm = configuration.getDefaultJWEAlgorithmOCT();
+        assertThat(algorithm).isEqualTo(JWEAlgorithm.A256KW);
+    }
+
+    @Test(expected = ConfigurationException.class)
+    public void getDefaultJWEAlgorithmOCT_invalid() {
+        TestConfig.addConfigValue("jwt.jwe.algorithm.default.OCT", "RSA-OAEP-256");
+        configuration.getDefaultJWEAlgorithmOCT();
+
+    }
+
+    @Test(expected = ConfigurationException.class)
+    public void getDefaultJWEAlgorithmOCT_empty() {
+        TestConfig.addConfigValue("jwt.jwe.algorithm.default.OCT", "");
+        configuration.getDefaultJWEAlgorithmOCT();
+    }
+
 
     public static class TestKeyManager implements KeyManager {
 

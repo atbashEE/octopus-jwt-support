@@ -208,8 +208,6 @@ public class ContentCryptoProvider {
      * Decrypts the specified cipher text.
      *
      * @param header       The JWE header. Must not be {@code null}.
-     * @param encryptedKey The encrypted key, {@code null} if not
-     *                     specified.
      * @param iv           The initialisation vector (IV). Must not be
      *                     {@code null}.
      * @param cipherText   The cipher text. Must not be {@code null}.
@@ -223,7 +221,6 @@ public class ContentCryptoProvider {
      * @throws JOSEException If decryption failed.
      */
     public static byte[] decrypt(JWEHeader header,
-                                 Base64URLValue encryptedKey,  // FIXME Not used?
                                  Base64URLValue iv,
                                  Base64URLValue cipherText,
                                  Base64URLValue authTag,

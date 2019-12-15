@@ -94,7 +94,6 @@ public class ContentCryptoProviderTest {
 
 		assertThat(Arrays.equals(clearText, ContentCryptoProvider.decrypt(
                 header,
-                encryptedKey,
                 jweParts.getInitializationVector(),
                 jweParts.getCipherText(),
                 jweParts.getAuthenticationTag(),

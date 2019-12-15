@@ -16,6 +16,7 @@
 package be.atbash.ee.security.octopus.jwt.encoder;
 
 import be.atbash.ee.security.octopus.UnsupportedKeyType;
+import be.atbash.ee.security.octopus.config.JwtSupportConfiguration;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParameters;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersEncryption;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersSigning;
@@ -55,6 +56,9 @@ public class JWTEncoder {
     @Inject
     private JWEEncryptionFactory encryptionFactory;
 
+    @Inject
+    private JwtSupportConfiguration jwtSupportConfiguration;
+
     public String encode(Object data, JWTParameters parameters) {
         checkDependencies();
 
@@ -83,15 +87,9 @@ public class JWTEncoder {
 
     private String createEncryptedJWE(Object data, JWTParametersEncryption parameters) throws JOSEException {
 
-        JWEAlgorithm jweAlgorithm = null;
-        if (parameters.getKeyType() == KeyType.RSA) {
-            jweAlgorithm = JWEAlgorithm.RSA_OAEP_256;  // TODO Configurable, SPI ?
-        }
-        if (parameters.getKeyType() == KeyType.EC) {
-            jweAlgorithm = JWEAlgorithm.ECDH_ES_A256KW;// TODO Configurable, SPI ?
-        }
-        if (parameters.getKeyType() == KeyType.OCT) {
-            jweAlgorithm = JWEAlgorithm.A256KW;// TODO Configurable, SPI ?
+        JWEAlgorithm jweAlgorithm = parameters.getJweAlgorithm();
+        if (jweAlgorithm == null) {
+            jweAlgorithm = defineDefaultJWEAlgorithm(parameters);
         }
 
         if (jweAlgorithm == null) {
@@ -110,6 +108,21 @@ public class JWTEncoder {
 
         // Serialise to JWE compact form
         return jweObject.serialize();
+    }
+
+    private JWEAlgorithm defineDefaultJWEAlgorithm(JWTParametersEncryption parameters) {
+        JWEAlgorithm result = null;
+        if (parameters.getKeyType() == KeyType.RSA) {
+            result = JWEAlgorithm.RSA_OAEP_256;  // Only supported one, no configuration required
+        }
+        if (parameters.getKeyType() == KeyType.EC) {
+            result = jwtSupportConfiguration.getDefaultJWEAlgorithmEC();
+        }
+        if (parameters.getKeyType() == KeyType.OCT) {
+
+            result = jwtSupportConfiguration.getDefaultJWEAlgorithmOCT();
+        }
+        return result;
     }
 
     private String createSignedJWT(Object data, JWTParametersSigning parameters) throws JOSEException {

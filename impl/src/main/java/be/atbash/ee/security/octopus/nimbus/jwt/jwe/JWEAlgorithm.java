@@ -194,6 +194,7 @@ public final class JWEAlgorithm extends Algorithm {
         /**
          * AES GCM key wrap.
          */
+        // FIXME Verify how we can use it (or if it is possible) in JWEEncoder.
         public static final Family AES_GCM_KW = new Family(A128GCMKW, A192GCMKW, A256GCMKW);
 
 

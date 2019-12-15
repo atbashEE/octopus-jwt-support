@@ -241,7 +241,7 @@ public abstract class ECDHCryptoProvider extends BaseJWEProvider {
             throw new JOSEException("Unexpected JWE ECDH algorithm mode: " + algMode);
         }
 
-        return ContentCryptoProvider.decrypt(header, encryptedKey, iv, cipherText, authTag, cek, getJCAContext());
+        return ContentCryptoProvider.decrypt(header, iv, cipherText, authTag, cek, getJCAContext());
     }
 
 

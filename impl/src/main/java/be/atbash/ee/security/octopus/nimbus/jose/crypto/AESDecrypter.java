@@ -213,6 +213,6 @@ public class AESDecrypter extends AESCryptoProvider implements JWEDecrypter {
             throw new JOSEException(AlgorithmSupportMessage.unsupportedJWEAlgorithm(alg, SUPPORTED_ALGORITHMS));
         }
 
-        return ContentCryptoProvider.decrypt(header, encryptedKey, iv, cipherText, authTag, cek, getJCAContext());
+        return ContentCryptoProvider.decrypt(header, iv, cipherText, authTag, cek, getJCAContext());
     }
 }

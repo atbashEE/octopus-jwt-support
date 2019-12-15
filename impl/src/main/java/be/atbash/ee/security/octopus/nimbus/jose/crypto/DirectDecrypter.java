@@ -256,6 +256,6 @@ public class DirectDecrypter extends DirectCryptoProvider implements JWEDecrypte
 
         critPolicy.ensureHeaderPasses(header);
 
-        return ContentCryptoProvider.decrypt(header, null, iv, cipherText, authTag, getKey(), getJCAContext());
+        return ContentCryptoProvider.decrypt(header, iv, cipherText, authTag, getKey(), getJCAContext());
     }
 }

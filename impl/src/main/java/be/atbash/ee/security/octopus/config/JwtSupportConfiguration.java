@@ -27,6 +27,7 @@ import be.atbash.ee.security.octopus.keys.reader.DefaultKeyResourceTypeProvider;
 import be.atbash.ee.security.octopus.keys.reader.KeyResourceTypeProvider;
 import be.atbash.ee.security.octopus.keys.reader.password.ConfigKeyResourcePasswordLookup;
 import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup;
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import be.atbash.util.StringUtils;
 import be.atbash.util.reflection.CDICheck;
@@ -186,6 +187,28 @@ public class JwtSupportConfiguration extends AbstractConfiguration implements Mo
             throw new ConfigurationException(String.format("Clock skew value must be positive, parameter 'jwt.clock.skew.secs' is %s", result));
         }
         return result;
+    }
+
+    @ConfigProperty
+    public JWEAlgorithm getDefaultJWEAlgorithmEC() {
+        String configValue = getOptionalValue("jwt.jwe.algorithm.default.EC", "ECDH-ES+A256KW", String.class);
+        JWEAlgorithm jweAlgorithm = JWEAlgorithm.parse(configValue);
+        if (!JWEAlgorithm.Family.ECDH_ES.contains(jweAlgorithm)) {
+
+            throw new ConfigurationException("The default JWE Algorithm defined in parameter 'jwt.jwe.algorithm.default.EC' is not valid ");
+        }
+        return jweAlgorithm;
+    }
+
+    @ConfigProperty
+    public JWEAlgorithm getDefaultJWEAlgorithmOCT() {
+        String configValue = getOptionalValue("jwt.jwe.algorithm.default.OCT", "A256KW", String.class);
+        JWEAlgorithm jweAlgorithm = JWEAlgorithm.parse(configValue);
+        if (!JWEAlgorithm.Family.AES_KW.contains(jweAlgorithm)) {
+
+            throw new ConfigurationException("The default JWE Algorithm defined in parameter 'jwt.jwe.algorithm.default.OCT' is not valid ");
+        }
+        return jweAlgorithm;
     }
 
     // Java SE Support

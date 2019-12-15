@@ -169,6 +169,7 @@ public class RSAEncrypter extends RSACryptoProvider implements JWEEncrypter {
 
         if (alg.equals(JWEAlgorithm.RSA_OAEP_256)) {
 
+            // Encrypt the cek (used to encrypt the clearText) with the RSA public key.
             encryptedKey = Base64URLValue.encode(RSA_OAEP_256.encryptCEK(publicKey, cek, getJCAContext().getKeyEncryptionProvider()));
 
         } else {
@@ -176,6 +177,7 @@ public class RSAEncrypter extends RSACryptoProvider implements JWEEncrypter {
             throw new JOSEException(AlgorithmSupportMessage.unsupportedJWEAlgorithm(alg, SUPPORTED_ALGORITHMS));
         }
 
+        // Define All JWE Parts
         return ContentCryptoProvider.encrypt(header, clearText, cek, encryptedKey, getJCAContext());
     }
 }

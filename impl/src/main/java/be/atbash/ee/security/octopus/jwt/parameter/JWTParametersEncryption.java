@@ -18,6 +18,7 @@ package be.atbash.ee.security.octopus.jwt.parameter;
 import be.atbash.ee.security.octopus.jwt.JWTEncoding;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
 import be.atbash.util.PublicAPI;
 
 import java.security.Key;
@@ -31,12 +32,14 @@ public class JWTParametersEncryption extends JWTParametersHeader {
 
     private AtbashKey secretKeyEncryption;
     private JWTParametersSigning parametersSigning;
+    private JWEAlgorithm jweAlgorithm;
 
-    public JWTParametersEncryption(JWTParametersSigning parametersSigning, Map<String, Object> headerValues, AtbashKey secretKeyEncryption) {
+    public JWTParametersEncryption(JWTParametersSigning parametersSigning, Map<String, Object> headerValues, AtbashKey secretKeyEncryption, JWEAlgorithm jweAlgorithm) {
         super(headerValues);
         this.parametersSigning = parametersSigning;
 
         this.secretKeyEncryption = secretKeyEncryption;
+        this.jweAlgorithm = jweAlgorithm;
     }
 
     @Override
@@ -60,4 +63,7 @@ public class JWTParametersEncryption extends JWTParametersHeader {
         return parametersSigning;
     }
 
+    public JWEAlgorithm getJweAlgorithm() {
+        return jweAlgorithm;
+    }
 }

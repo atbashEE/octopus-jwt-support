@@ -17,6 +17,8 @@ package be.atbash.ee.security.octopus.jwt.parameter;
 
 import be.atbash.ee.security.octopus.jwt.JWTEncoding;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
+import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
 import be.atbash.util.PublicAPI;
 import be.atbash.util.Reviewed;
 import be.atbash.util.exception.AtbashIllegalActionException;
@@ -42,6 +44,8 @@ public final class JWTParametersBuilder {
 
     private AtbashKey secretKeyEncryption;
     private JWTParametersSigning parametersSigning;
+
+    private JWEAlgorithm jweAlgorithm;
 
     private JWTParametersBuilder(JWTEncoding encoding) {
         this.encoding = encoding;
@@ -83,6 +87,11 @@ public final class JWTParametersBuilder {
         return this;
     }
 
+    public JWTParametersBuilder withJWEAlgorithm(JWEAlgorithm jweAlgorithm) {
+        this.jweAlgorithm = jweAlgorithm;
+        return this;
+    }
+
     public JWTParameters build() {
         JWTParameters result;
 
@@ -100,7 +109,7 @@ public final class JWTParametersBuilder {
                 if (parametersSigning == null) {
                     parametersSigning = new JWTParametersSigning(headerValues, secretKeySigning);
                 }
-                result = new JWTParametersEncryption(parametersSigning, headerValues, secretKeyEncryption);
+                result = new JWTParametersEncryption(parametersSigning, headerValues, secretKeyEncryption, jweAlgorithm);
                 break;
             default:
                 throw new IllegalArgumentException(String.format("Unsupported value for JWTEncoding : %s", encoding));
@@ -128,6 +137,27 @@ public final class JWTParametersBuilder {
     private void validateJWEParameters() {
         if (secretKeyEncryption == null) {
             throw new AtbashIllegalActionException("(OCT-DEV-106) JWE encoding requires a JWK secret for the encryption");
+        }
+
+        if (jweAlgorithm == null) {
+            return;
+            // Default is defined later on.
+        }
+        KeyType keyType = secretKeyEncryption.getSecretKeyType().getKeyType();
+        boolean validJWEAlgorithm = true;
+        if (keyType == KeyType.RSA) {
+            validJWEAlgorithm = JWEAlgorithm.Family.RSA.contains(jweAlgorithm);
+        }
+        if (keyType == KeyType.EC) {
+            validJWEAlgorithm = JWEAlgorithm.Family.ECDH_ES.contains(jweAlgorithm);
+
+        }
+        if (keyType == KeyType.OCT) {
+            validJWEAlgorithm = JWEAlgorithm.Family.AES_KW.contains(jweAlgorithm);
+        }
+
+        if (!validJWEAlgorithm) {
+            throw new AtbashIllegalActionException("(OCT-DEV-111) JWE Algorithm not valid for key type.");
         }
 
     }
