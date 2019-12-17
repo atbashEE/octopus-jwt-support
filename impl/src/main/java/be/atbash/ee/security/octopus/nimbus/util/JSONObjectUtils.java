@@ -210,7 +210,8 @@ public final class JSONObjectUtils {
             case NUMBER:
                 JsonNumber jsonNumber = (JsonNumber) value;
                 if (jsonNumber.isIntegral()) {
-                    result = jsonNumber.longValue();
+
+                    result = jsonNumber.numberValue();
                 } else {
                     result = jsonNumber.doubleValue();
                 }
