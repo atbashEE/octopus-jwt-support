@@ -16,6 +16,9 @@
 package be.atbash.ee.security.octopus.nimbus.jwk;
 
 
+import be.atbash.ee.security.octopus.keys.AtbashKey;
+import be.atbash.ee.security.octopus.keys.generator.KeyGenerator;
+import be.atbash.ee.security.octopus.keys.generator.RSAGenerationParameters;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
@@ -26,6 +29,8 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
 import java.security.spec.ECParameterSpec;
 import java.text.ParseException;
 import java.util.*;
@@ -975,5 +980,35 @@ public class JWKSetTest {
         } catch (ParseException e) {
             assertThat(e.getMessage()).isEqualTo("Missing required \"keys\" member");
         }
+    }
+
+    @Test
+    public void getAtbashKeys() {
+        List<AtbashKey> atbashKeys = generateRSAKeys("kid");
+        RSAPrivateKey privateKey = null;
+        RSAPublicKey publicKey = null;
+        for (AtbashKey atbashKey : atbashKeys) {
+            if (atbashKey.getKey() instanceof RSAPrivateKey) {
+                privateKey = (RSAPrivateKey) atbashKey.getKey();
+            }
+            if (atbashKey.getKey() instanceof RSAPublicKey) {
+                publicKey = (RSAPublicKey) atbashKey.getKey();
+            }
+        }
+
+        RSAKey rsaKey = new RSAKey(publicKey, privateKey, KeyUse.SIGNATURE, null, null, "kid", null, null, null, null);
+        JWKSet jwkSet = new JWKSet(rsaKey);
+
+        List<AtbashKey> keys = jwkSet.getAtbashKeys();
+
+        assertThat(keys).hasSize(2);
+    }
+
+    private List<AtbashKey> generateRSAKeys(String kid) {
+        RSAGenerationParameters generationParameters = new RSAGenerationParameters.RSAGenerationParametersBuilder()
+                .withKeyId(kid)
+                .build();
+        KeyGenerator generator = new KeyGenerator();
+        return generator.generateKeys(generationParameters);
     }
 }

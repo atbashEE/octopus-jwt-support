@@ -11,6 +11,8 @@ User manual for Atbash configuration.
 
 === 1.0.0
 
+. RemoteKeyManager
+
 === 0.9.1
 
 . Improve usability KeyManager.
@@ -48,9 +50,9 @@ Breaking changes (although 0.5.0 was an alfa release and thus changes are expect
 
 == Requirements
 
-Runs on JDK 7, JDK 8 and JDK 11 ClassPath.
+Runs on JDK 8 and JDK 11 ClassPath.
 
-Unit testing fails on JDK 11 ClassPath.
+??Unit testing fails on JDK 11 ClassPath.
 
 == Introduction
 
@@ -132,9 +134,6 @@ The following example converts a signed JWT or a JWE.
 
 KeySelector -> Selector of the key based on the id found in the header using a default (but can be configured) keyManager which looks for all keys defined based on some location (see _keys.location_ and _key.manager.class_ configuration parameters)
 
-The default KeyManager now also supports the _jku_ header. When available, the URL is called to retrieve the keys (in the format of a JWK Set as defined in the specification). In this scenario, the parameter _keys.location_ is not required.
-The current version is a draft implementation and will be improved in the future (so that rotating keys are better supported and caching of those keys).
-
 See also https://github.com/rdebusscher/atbash-key-server for a Key management server implementation.
 
 MPBearerTokenVerifier -> Optional verifier for validating the JWT.
@@ -182,7 +181,7 @@ The _KeySelector_ however, is only responsible for selecting the matching key fr
 The _KeyManager_ is responsible for supplying the requested key to the _KeySelector_. (when verifying signature, when decrypting and so on)
 
 There is a default _KeyManager_ available called **LocalKeyManager** which is active when no specific configuration value is set (see further on or the configuration section in this manual).
-It is capable of reading a specific file with keys, or directory with several key files. It can even read from an URL resource, but will be used most of the times to read it from a local (from the point of the server process) location like the classpath or file and directory.
+It is capable of reading a specific file with keys, or directory with several key files.
 
 If you need another implementation, like reading it from a central managed storage or reading keys in a more dynamic way, you can implement the interface _be.atbash.ee.security.octopus.keys.KeyManager_.
 
@@ -344,7 +343,7 @@ When a custom JSON deserializer is required
 
 default : **be.atbash.ee.security.octopus.keys.LocalKeyManager**
 
-The _KeyManager_ that supplies the request key to the KeySelector.
+The _KeyManager_ that supplies the request key to the KeySelector. Other implementations which are supported by default are **be.atbash.ee.security.octopus.keys.RemoteKeyManager** (to support the jku header claim) and **be.atbash.ee.security.octopus.keys.CombinedKeyManager** which combines the functionality of LocalKeyManager and RemoteKeyManager.
 
 === keys.location
 

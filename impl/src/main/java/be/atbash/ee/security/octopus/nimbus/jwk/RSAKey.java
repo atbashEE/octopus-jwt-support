@@ -16,6 +16,7 @@
 package be.atbash.ee.security.octopus.nimbus.jwk;
 
 
+import be.atbash.ee.security.octopus.exception.InvalidKeyException;
 import be.atbash.ee.security.octopus.nimbus.jose.Algorithm;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.util.*;
@@ -1212,8 +1213,9 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
         this.e = e;
 
         if (getParsedX509CertChain() != null) {
-            if (!matches(getParsedX509CertChain().get(0)))
+            if (!matches(getParsedX509CertChain().get(0))) {
                 throw new IllegalArgumentException("The public subject key info of the first X.509 certificate in the chain must match the JWK type and public parameters");
+            }
         }
 
         // Private params, 1st representation
@@ -1613,12 +1615,11 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
      * representation of this RSA JWK.
      *
      * @return The public RSA key.
-     * @throws JOSEException If RSA is not supported by the underlying Java
-     *                       Cryptography (JCA) provider or if the JWK
-     *                       parameters are invalid for a public RSA key.
+     * @throws InvalidKeyException If RSA is not supported by the underlying Java
+     *                             Cryptography (JCA) provider or if the JWK
+     *                             parameters are invalid for a public RSA key.
      */
-    public RSAPublicKey toRSAPublicKey()
-            throws JOSEException {
+    public RSAPublicKey toRSAPublicKey() {
 
         BigInteger modulus = n.decodeToBigInteger();
         BigInteger exponent = e.decodeToBigInteger();
@@ -1632,7 +1633,7 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
 
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
 
-            throw new JOSEException(e.getMessage(), e);
+            throw new InvalidKeyException(e.getMessage(), e);
         }
     }
 
@@ -1643,12 +1644,11 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
      *
      * @return The private RSA key, {@code null} if not specified by this
      * JWK.
-     * @throws JOSEException If RSA is not supported by the underlying Java
-     *                       Cryptography (JCA) provider or if the JWK
-     *                       parameters are invalid for a private RSA key.
+     * @throws InvalidKeyException If RSA is not supported by the underlying Java
+     *                             Cryptography (JCA) provider or if the JWK
+     *                             parameters are invalid for a private RSA key.
      */
-    public RSAPrivateKey toRSAPrivateKey()
-            throws JOSEException {
+    public RSAPrivateKey toRSAPrivateKey() {
 
         if (d == null) {
             // no private key
@@ -1719,22 +1719,20 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
 
         } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
 
-            throw new JOSEException(e.getMessage(), e);
+            throw new InvalidKeyException(e.getMessage(), e);
         }
     }
 
 
     @Override
-    public PublicKey toPublicKey()
-            throws JOSEException {
+    public PublicKey toPublicKey() {
 
         return toRSAPublicKey();
     }
 
 
     @Override
-    public PrivateKey toPrivateKey()
-            throws JOSEException {
+    public PrivateKey toPrivateKey() {
 
         PrivateKey prv = toRSAPrivateKey();
 
@@ -1754,14 +1752,13 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
      *
      * @return The RSA key pair. The private RSA key will be {@code null}
      * if not specified.
-     * @throws JOSEException If RSA is not supported by the underlying Java
-     *                       Cryptography (JCA) provider or if the JWK
-     *                       parameters are invalid for a public and / or
-     *                       private RSA key.
+     * @throws InvalidKeyException If RSA is not supported by the underlying Java
+     *                             Cryptography (JCA) provider or if the JWK
+     *                             parameters are invalid for a public and / or
+     *                             private RSA key.
      */
     @Override
-    public KeyPair toKeyPair()
-            throws JOSEException {
+    public KeyPair toKeyPair() {
 
         return new KeyPair(toRSAPublicKey(), toPrivateKey());
     }

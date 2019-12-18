@@ -983,7 +983,7 @@ public class DefaultJWTProcessorTest {
                     key = jwkKey.toRSAPrivateKey();
 
                 }
-            } catch (ParseException | JOSEException e) {
+            } catch (ParseException e) {
                 fail(e.getMessage());
             }
         }

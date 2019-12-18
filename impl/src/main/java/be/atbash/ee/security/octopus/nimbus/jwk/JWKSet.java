@@ -16,10 +16,13 @@
 package be.atbash.ee.security.octopus.nimbus.jwk;
 
 
+import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.nimbus.util.JSONObjectUtils;
 
 import javax.json.*;
 import java.io.Serializable;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.text.ParseException;
 import java.util.*;
 
@@ -147,6 +150,32 @@ public class JWKSet implements Serializable {
         return keys;
     }
 
+    /**
+     * Gets the AtbashKey of this JSON Web Key (JWK) set.
+     *
+     * @return The keys, empty list if none.
+     */
+    public List<AtbashKey> getAtbashKeys() {
+
+        List<AtbashKey> result = new ArrayList<>();
+        for (JWK jwk : keys) {
+            if (jwk instanceof AsymmetricJWK) {
+                AsymmetricJWK asymmetricJWK = (AsymmetricJWK) jwk;
+                PrivateKey privateKey = asymmetricJWK.toPrivateKey();
+                if (privateKey != null) {
+                    result.add(new AtbashKey(jwk.getKeyID(), privateKey));
+                }
+                PublicKey publicKey = asymmetricJWK.toPublicKey();
+                if (publicKey != null) {
+                    result.add(new AtbashKey(jwk.getKeyID(), publicKey));
+                }
+            } else {
+                OctetSequenceKey octetSequenceKey = (OctetSequenceKey) jwk;
+                octetSequenceKey.toSecretKey("AES"); // FIXME Is this correct
+            }
+        }
+        return result;
+    }
 
     /**
      * Gets the key from this JSON Web Key (JWK) set as identified by its

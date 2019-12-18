@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ import java.util.Scanner;
  *
  */
 @Vetoed // This seems needed as multiple implementations can be available.
-public class LocalKeyManager implements KeyManager {
+public class LocalKeyManager extends AbstractKeyManager implements KeyManager {
 
     private static final Object LOCK = new Object();
 
@@ -67,44 +67,10 @@ public class LocalKeyManager implements KeyManager {
 
         if (selectorCriteria.getJku() == null) {
             checkKeyLoading();
-        } else {
-            checkDependencies();
         }
 
-        List<AtbashKey> result = filterKeys(filters);
+        return filterKeys(keys, filters);
 
-        if (result.isEmpty() && selectorCriteria.getJku() != null) {
-            loadRemoteKeys(selectorCriteria.getJku());
-            result = filterKeys(filters);
-        }
-
-        return result;
-
-    }
-
-    private void loadRemoteKeys(URI jkuURL) {
-        // FIXME use com.nimbusds.jose.jwk.source.RemoteJWKSet ??
-        String fileContent;
-        try {
-            URL url = jkuURL.toURL();
-            URLConnection uc = url.openConnection();
-            InputStream inputStream = uc.getInputStream();
-            fileContent = new Scanner(inputStream).useDelimiter("\\Z").next();
-            inputStream.close();
-        } catch (IOException e) {
-            throw new AtbashUnexpectedException(e);
-        }
-
-        List<AtbashKey> atbashKeys = keyReaderJWKSet.parseContent(null, passwordLookup, fileContent);
-        keys.addAll(atbashKeys);
-    }
-
-    private List<AtbashKey> filterKeys(List<KeyFilter> filters) {
-        List<AtbashKey> result = new ArrayList<>(keys);
-        for (KeyFilter filter : filters) {
-            result = filter.filter(result);
-        }
-        return result;
     }
 
     private void checkKeyLoading() {

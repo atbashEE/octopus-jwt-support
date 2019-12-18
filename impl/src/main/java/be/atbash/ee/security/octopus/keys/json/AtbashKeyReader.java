@@ -69,7 +69,7 @@ public class AtbashKeyReader implements JsonbDeserializer<AtbashKey> {
             if (!handled) {
                 throw new UnsupportedKeyType(jwk.getKeyType(), "Key JSON deserialization ");
             }
-        } catch (ParseException | JOSEException e) {
+        } catch (ParseException e) {
             throw new AtbashUnexpectedException(e);
         }
 

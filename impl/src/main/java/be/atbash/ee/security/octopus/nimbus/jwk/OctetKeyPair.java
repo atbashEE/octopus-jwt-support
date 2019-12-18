@@ -16,6 +16,7 @@
 package be.atbash.ee.security.octopus.nimbus.jwk;
 
 
+import be.atbash.ee.security.octopus.exception.InvalidKeyException;
 import be.atbash.ee.security.octopus.nimbus.jose.Algorithm;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
@@ -619,26 +620,23 @@ public class OctetKeyPair extends JWK implements AsymmetricJWK, CurveBasedJWK {
 
 
     @Override
-    public PublicKey toPublicKey()
-            throws JOSEException {
+    public PublicKey toPublicKey() {
 
-        throw new JOSEException("Export to java.security.PublicKey not supported");
+        throw new InvalidKeyException("Export to java.security.PublicKey not supported");
     }
 
 
     @Override
-    public PrivateKey toPrivateKey()
-            throws JOSEException {
+    public PrivateKey toPrivateKey() {
 
-        throw new JOSEException("Export to java.security.PrivateKey not supported");
+        throw new InvalidKeyException("Export to java.security.PrivateKey not supported");
     }
 
 
     @Override
-    public KeyPair toKeyPair()
-            throws JOSEException {
+    public KeyPair toKeyPair() {
 
-        throw new JOSEException("Export to java.security.KeyPair not supported");
+        throw new InvalidKeyException("Export to java.security.KeyPair not supported");
     }
 
 

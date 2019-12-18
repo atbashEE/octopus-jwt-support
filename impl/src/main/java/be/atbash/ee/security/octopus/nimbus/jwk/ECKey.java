@@ -16,6 +16,7 @@
 package be.atbash.ee.security.octopus.nimbus.jwk;
 
 
+import be.atbash.ee.security.octopus.exception.InvalidKeyException;
 import be.atbash.ee.security.octopus.nimbus.jose.Algorithm;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.utils.ECChecks;
@@ -760,29 +761,29 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
      * with the specified parameters. The private key is specified by its
      * PKCS#11 handle.
      *
-     * @param crv    The cryptographic curve. Must not be {@code null}.
-     * @param x      The public 'x' coordinate for the elliptic curve
-     *               point. It is represented as the Base64URL encoding of
-     *               the coordinate's big endian representation. Must not
-     *               be {@code null}.
-     * @param y      The public 'y' coordinate for the elliptic curve
-     *               point. It is represented as the Base64URL encoding of
-     *               the coordinate's big endian representation. Must not
-     *               be {@code null}.
-     * @param privateKey   The private key as a PKCS#11 handle, {@code null} if
-     *               not specified.
-     * @param use    The key use, {@code null} if not specified or if the
-     *               key is intended for signing as well as encryption.
-     * @param ops    The key operations, {@code null} if not specified.
-     * @param alg    The intended JOSE algorithm for the key, {@code null}
-     *               if not specified.
-     * @param kid    The key ID, {@code null} if not specified.
-     * @param x5u    The X.509 certificate URL, {@code null} if not
-     *               specified.
-     * @param x5t256 The X.509 certificate SHA-256 thumbprint, {@code null}
-     *               if not specified.
-     * @param x5c    The X.509 certificate chain, {@code null} if not
-     *               specified.
+     * @param crv        The cryptographic curve. Must not be {@code null}.
+     * @param x          The public 'x' coordinate for the elliptic curve
+     *                   point. It is represented as the Base64URL encoding of
+     *                   the coordinate's big endian representation. Must not
+     *                   be {@code null}.
+     * @param y          The public 'y' coordinate for the elliptic curve
+     *                   point. It is represented as the Base64URL encoding of
+     *                   the coordinate's big endian representation. Must not
+     *                   be {@code null}.
+     * @param privateKey The private key as a PKCS#11 handle, {@code null} if
+     *                   not specified.
+     * @param use        The key use, {@code null} if not specified or if the
+     *                   key is intended for signing as well as encryption.
+     * @param ops        The key operations, {@code null} if not specified.
+     * @param alg        The intended JOSE algorithm for the key, {@code null}
+     *                   if not specified.
+     * @param kid        The key ID, {@code null} if not specified.
+     * @param x5u        The X.509 certificate URL, {@code null} if not
+     *                   specified.
+     * @param x5t256     The X.509 certificate SHA-256 thumbprint, {@code null}
+     *                   if not specified.
+     * @param x5c        The X.509 certificate chain, {@code null} if not
+     *                   specified.
      */
     public ECKey(Curve crv, Base64URLValue x, Base64URLValue y, PrivateKey privateKey,
                  KeyUse use, Set<KeyOperation> ops, Algorithm alg, String kid,
@@ -986,12 +987,11 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
      * provider.
      *
      * @return The public Elliptic Curve key.
-     * @throws JOSEException If EC is not supported by the underlying Java
-     *                       Cryptography (JCA) provider or if the JWK
-     *                       parameters are invalid for a public EC key.
+     * @throws InvalidKeyException If EC is not supported by the underlying Java
+     *                             Cryptography (JCA) provider or if the JWK
+     *                             parameters are invalid for a public EC key.
      */
-    public ECPublicKey toECPublicKey()
-            throws JOSEException {
+    public ECPublicKey toECPublicKey() {
 
         return toECPublicKey(null);
     }
@@ -1004,17 +1004,16 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
      * @param provider The specific JCA provider to use, {@code null}
      *                 implies the default one.
      * @return The public Elliptic Curve key.
-     * @throws JOSEException If EC is not supported by the underlying Java
-     *                       Cryptography (JCA) provider or if the JWK
-     *                       parameters are invalid for a public EC key.
+     * @throws InvalidKeyException If EC is not supported by the underlying Java
+     *                             Cryptography (JCA) provider or if the JWK
+     *                             parameters are invalid for a public EC key.
      */
-    public ECPublicKey toECPublicKey(Provider provider)
-            throws JOSEException {
+    public ECPublicKey toECPublicKey(Provider provider) {
 
         ECParameterSpec spec = crv.toECParameterSpec();
 
         if (spec == null) {
-            throw new JOSEException("Couldn't get EC parameter spec for curve " + crv);
+            throw new InvalidKeyException("Couldn't get EC parameter spec for curve " + crv);
         }
 
         ECPoint w = new ECPoint(x.decodeToBigInteger(), y.decodeToBigInteger());
@@ -1034,7 +1033,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
 
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
 
-            throw new JOSEException(e.getMessage(), e);
+            throw new InvalidKeyException(e.getMessage(), e);
         }
     }
 
@@ -1046,12 +1045,11 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
      *
      * @return The private Elliptic Curve key, {@code null} if not
      * specified by this JWK.
-     * @throws JOSEException If EC is not supported by the underlying Java
-     *                       Cryptography (JCA) provider or if the JWK
-     *                       parameters are invalid for a private EC key.
+     * @throws InvalidKeyException If EC is not supported by the underlying Java
+     *                             Cryptography (JCA) provider or if the JWK
+     *                             parameters are invalid for a private EC key.
      */
-    public ECPrivateKey toECPrivateKey()
-            throws JOSEException {
+    public ECPrivateKey toECPrivateKey() {
 
         return toECPrivateKey(null);
     }
@@ -1065,12 +1063,11 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
      *                 implies the default one.
      * @return The private Elliptic Curve key, {@code null} if not
      * specified by this JWK.
-     * @throws JOSEException If EC is not supported by the underlying Java
-     *                       Cryptography (JCA) provider or if the JWK
-     *                       parameters are invalid for a private EC key.
+     * @throws InvalidKeyException If EC is not supported by the underlying Java
+     *                             Cryptography (JCA) provider or if the JWK
+     *                             parameters are invalid for a private EC key.
      */
-    public ECPrivateKey toECPrivateKey(Provider provider)
-            throws JOSEException {
+    public ECPrivateKey toECPrivateKey(Provider provider) {
 
         if (d == null) {
             // No private 'd' param
@@ -1080,7 +1077,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
         ECParameterSpec spec = crv.toECParameterSpec();
 
         if (spec == null) {
-            throw new JOSEException("Couldn't get EC parameter spec for curve " + crv);
+            throw new InvalidKeyException("Couldn't get EC parameter spec for curve " + crv);
         }
 
         ECPrivateKeySpec privateKeySpec = new ECPrivateKeySpec(d.decodeToBigInteger(), spec);
@@ -1098,22 +1095,20 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
 
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
 
-            throw new JOSEException(e.getMessage(), e);
+            throw new InvalidKeyException(e.getMessage(), e);
         }
     }
 
 
     @Override
-    public PublicKey toPublicKey()
-            throws JOSEException {
+    public PublicKey toPublicKey() {
 
         return toECPublicKey();
     }
 
 
     @Override
-    public PrivateKey toPrivateKey()
-            throws JOSEException {
+    public PrivateKey toPrivateKey() {
 
         PrivateKey prv = toECPrivateKey();
 
@@ -1133,14 +1128,13 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
      *
      * @return The Elliptic Curve key pair. The private Elliptic Curve key
      * will be {@code null} if not specified.
-     * @throws JOSEException If EC is not supported by the underlying Java
-     *                       Cryptography (JCA) provider or if the JWK
-     *                       parameters are invalid for a public and / or
-     *                       private EC key.
+     * @throws InvalidKeyException If EC is not supported by the underlying Java
+     *                             Cryptography (JCA) provider or if the JWK
+     *                             parameters are invalid for a public and / or
+     *                             private EC key.
      */
     @Override
-    public KeyPair toKeyPair()
-            throws JOSEException {
+    public KeyPair toKeyPair() {
 
         return toKeyPair(null);
     }
@@ -1154,13 +1148,12 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
      *                 implies the default one.
      * @return The Elliptic Curve key pair. The private Elliptic Curve key
      * will be {@code null} if not specified.
-     * @throws JOSEException If EC is not supported by the underlying Java
-     *                       Cryptography (JCA) provider or if the JWK
-     *                       parameters are invalid for a public and / or
-     *                       private EC key.
+     * @throws InvalidKeyException If EC is not supported by the underlying Java
+     *                             Cryptography (JCA) provider or if the JWK
+     *                             parameters are invalid for a public and / or
+     *                             private EC key.
      */
-    public KeyPair toKeyPair(Provider provider)
-            throws JOSEException {
+    public KeyPair toKeyPair(Provider provider) {
 
         if (privateKey != null) {
             // Private key as PKCS#11 handle
@@ -1201,11 +1194,13 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
      */
     private void ensureMatches(List<X509Certificate> chain) {
 
-        if (chain == null)
+        if (chain == null) {
             return;
+        }
 
-        if (!matches(chain.get(0)))
+        if (!matches(chain.get(0))) {
             throw new IllegalArgumentException("The public subject key info of the first X.509 certificate in the chain must match the JWK type and public parameters");
+        }
     }
 
 
@@ -1254,7 +1249,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
         return new ECKey(
                 getCurve(), getX(), getY(),
                 getKeyUse(), getKeyOperations(), getAlgorithm(), getKeyID(),
-                getX509CertURL(),  getX509CertSHA256Thumbprint(), getX509CertChain(),
+                getX509CertURL(), getX509CertSHA256Thumbprint(), getX509CertChain(),
                 getKeyStore());
     }
 
@@ -1481,9 +1476,15 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ECKey)) return false;
-        if (!super.equals(o)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ECKey)) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
         ECKey ecKey = (ECKey) o;
         return Objects.equals(crv, ecKey.crv) &&
                 Objects.equals(x, ecKey.x) &&
