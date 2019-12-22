@@ -29,6 +29,7 @@ import be.atbash.ee.security.octopus.keys.reader.password.ConfigKeyResourcePassw
 import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
+import be.atbash.ee.security.octopus.util.PeriodUtil;
 import be.atbash.util.StringUtils;
 import be.atbash.util.reflection.CDICheck;
 import be.atbash.util.reflection.ClassUtils;
@@ -209,6 +210,14 @@ public class JwtSupportConfiguration extends AbstractConfiguration implements Mo
             throw new ConfigurationException("The default JWE Algorithm defined in parameter 'jwt.jwe.algorithm.default.OCT' is not valid ");
         }
         return jweAlgorithm;
+    }
+
+    @ConfigProperty
+    public String getJWKSetCachePeriod() {
+        String configValue = getOptionalValue("jwt.remote.jwk.cache.period", "24h", String.class);
+        // Validate the expression
+        PeriodUtil.defineSecondsInPeriod(configValue);
+        return configValue;
     }
 
     // Java SE Support

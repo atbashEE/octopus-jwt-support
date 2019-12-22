@@ -30,8 +30,7 @@ public class JWKSetCacheTest {
 
         JWKSetCache cache = new JWKSetCache();
 
-        assertThat(JWKSetCache.DEFAULT_LIFESPAN_MINUTES).isEqualTo(5);
-        assertThat(cache.getLifespan(TimeUnit.MINUTES)).isEqualTo(JWKSetCache.DEFAULT_LIFESPAN_MINUTES);
+        assertThat(cache.getLifespan(TimeUnit.HOURS)).isEqualTo(24);
         assertThat(cache.get()).isNull();
         assertThat(cache.getPutTimestamp()).isEqualTo(-1L);
         assertThat(cache.isExpired()).isFalse();
@@ -52,50 +51,6 @@ public class JWKSetCacheTest {
         assertThat(cache.isExpired()).isFalse();
     }
 
-    @Test
-    public void testParamConstructor() throws InterruptedException {
-
-        JWKSetCache cache = new JWKSetCache(1L, TimeUnit.SECONDS);
-
-        assertThat(cache.getLifespan(TimeUnit.SECONDS)).isEqualTo(1L);
-        assertThat(cache.get()).isNull();
-        assertThat(cache.getPutTimestamp()).isEqualTo(-1L);
-        assertThat(cache.isExpired()).isFalse();
-
-        JWKSet jwkSet = new JWKSet();
-
-        cache.put(jwkSet);
-        Thread.sleep(20);
-
-        assertThat(cache.get()).isEqualTo(jwkSet);
-        assertThat(new Date().getTime()).isGreaterThan(cache.getPutTimestamp());
-        assertThat(cache.isExpired()).isFalse();
-
-        Thread.sleep(2 * 1000L);
-
-        assertThat(cache.get()).isNull();
-        assertThat(cache.isExpired()).isTrue();
-    }
-
-    @Test
-    public void testNoExpiration() throws InterruptedException {
-
-        JWKSetCache cache = new JWKSetCache(-1L, null);
-
-        assertThat(cache.getLifespan(TimeUnit.HOURS)).isEqualTo(-1L);
-        assertThat(cache.get()).isNull();
-        assertThat(cache.isExpired()).isFalse();
-        assertThat(cache.getPutTimestamp()).isEqualTo(-1L);
-
-        JWKSet jwkSet = new JWKSet();
-
-        cache.put(jwkSet);
-        Thread.sleep(20);
-
-        assertThat(cache.get()).isEqualTo(jwkSet);
-        assertThat(new Date().getTime()).isGreaterThan(cache.getPutTimestamp());
-        assertThat(cache.isExpired()).isFalse();
-    }
 
     @Test
     // https://bitbucket.org/connect2id/nimbus-jose-jwt/issues/289/clearing-the-jwksetcache-must-undefine-the
@@ -105,7 +60,6 @@ public class JWKSetCacheTest {
 
         assertThat(cache.get()).isNull();
         assertThat(cache.getPutTimestamp()).isEqualTo(-1L);
-        assertThat(cache.getLifespan(TimeUnit.MINUTES)).isEqualTo(JWKSetCache.DEFAULT_LIFESPAN_MINUTES);
         assertThat(cache.isExpired()).isFalse();
 
         JWKSet jwkSet = new JWKSet();
@@ -114,7 +68,6 @@ public class JWKSetCacheTest {
         Thread.sleep(20);
 
         assertThat(cache.getPutTimestamp() > 0).isTrue();
-        assertThat(cache.getLifespan(TimeUnit.MINUTES)).isEqualTo(JWKSetCache.DEFAULT_LIFESPAN_MINUTES);
         assertThat(cache.isExpired()).isFalse();
 
         // clear cache
@@ -122,7 +75,6 @@ public class JWKSetCacheTest {
 
         assertThat(cache.get()).isNull();
         assertThat(cache.getPutTimestamp()).isEqualTo(-1L);
-        assertThat(cache.getLifespan(TimeUnit.MINUTES)).isEqualTo(JWKSetCache.DEFAULT_LIFESPAN_MINUTES);
         assertThat(cache.isExpired()).isFalse();
     }
 }

@@ -16,7 +16,9 @@
 package be.atbash.ee.security.octopus.keys;
 
 
+import be.atbash.ee.security.octopus.config.JwtSupportConfiguration;
 import be.atbash.ee.security.octopus.nimbus.jwk.JWKSet;
+import be.atbash.ee.security.octopus.util.PeriodUtil;
 
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
@@ -30,24 +32,10 @@ import java.util.concurrent.TimeUnit;
  */
 public class JWKSetCache {
 
-
     /**
-     * The default lifespan for cached JWK sets (5 minutes).
-     */
-    public static final long DEFAULT_LIFESPAN_MINUTES = 5;  // FIXME Config
-
-
-    /**
-     * The lifespan the cached JWK set, in {@link #timeUnit}s, negative
-     * means no expiration
+     * The lifespan the cached JWK set, in milliseconds.
      */
     private final long lifespan;
-
-
-    /**
-     * The lifespan time unit, may be {@code null} if no expiration.
-     */
-    private final TimeUnit timeUnit;
 
 
     /**
@@ -62,27 +50,7 @@ public class JWKSetCache {
      */
     public JWKSetCache() {
 
-        this(DEFAULT_LIFESPAN_MINUTES, TimeUnit.MINUTES);
-    }
-
-
-    /**
-     * Creates a new JWK set cache.
-     *
-     * @param lifespan The lifespan of the cached JWK set before it
-     *                 expires, negative means no expiration.
-     * @param timeUnit The lifespan time unit, may be {@code null} if no
-     *                 expiration.
-     */
-    public JWKSetCache(long lifespan, TimeUnit timeUnit) {
-
-        this.lifespan = lifespan;
-
-        if (lifespan > -1 && timeUnit == null) {
-            throw new IllegalArgumentException("A time unit must be specified for non-negative lifespans");
-        }
-
-        this.timeUnit = timeUnit;
+        this.lifespan = PeriodUtil.defineSecondsInPeriod(JwtSupportConfiguration.getInstance().getJWKSetCachePeriod()) * 1000;
     }
 
 
@@ -134,8 +102,7 @@ public class JWKSetCache {
     public boolean isExpired() {
 
         return putTimestamp > -1 &&
-                lifespan > -1 &&
-                new Date().getTime() > putTimestamp + TimeUnit.MILLISECONDS.convert(lifespan, timeUnit);
+                new Date().getTime() > putTimestamp + lifespan;
     }
 
 
@@ -145,12 +112,8 @@ public class JWKSetCache {
      * @param timeUnit The time unit to use.
      * @return The configured lifespan, negative means no expiration.
      */
-    public long getLifespan(final TimeUnit timeUnit) {
+    public long getLifespan(TimeUnit timeUnit) {
 
-        if (lifespan < 0) {
-            return lifespan;
-        }
-
-        return timeUnit.convert(lifespan, timeUnit);
+        return timeUnit.convert(lifespan, TimeUnit.MILLISECONDS);
     }
 }

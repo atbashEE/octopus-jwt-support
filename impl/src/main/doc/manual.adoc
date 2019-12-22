@@ -422,10 +422,26 @@ Defines the clock skew value for verifying expiration dates of JWT tokens.
 
 default : **ECDH-ES+A256KW**
 
-Defines the default encryption method when a JWE is created without explicitly defining the method. For valid values, see `be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm.Family.ECDH_ES`
+Defines the default encryption method when a JWE is created without explicitly defining the method.
+For valid values, see `be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm.Family.ECDH_ES`
 
 === jwt.jwe.algorithm.default.OCT (since 1.0.0)
 
 default : **A256KW**
 
-Defines the default encryption method when a JWE is created without explicitly defining the method. For valid values, see `be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm.Family.AES_KW`
+Defines the default encryption method when a JWE is created without explicitly defining the method.
+For valid values, see `be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm.Family.AES_KW`
+
+=== jwt.remote.jwk.cache.period
+
+default : **24h**
+
+Defines the expiration period of the remote JWKSet data read from a `jku header claim.
+After that period, the dadta is discarded and needs to be reread fro the URI.
+
+The value has following format
+
+<v><unit>
+
+* v : A positive integral number
+* unit : s (seconds), m (minutes) or h (hours)

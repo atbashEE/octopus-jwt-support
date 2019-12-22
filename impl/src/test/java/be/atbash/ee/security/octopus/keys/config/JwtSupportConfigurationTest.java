@@ -269,6 +269,24 @@ public class JwtSupportConfigurationTest {
         configuration.getDefaultJWEAlgorithmOCT();
     }
 
+    @Test
+    public void getJWKSetCachePeriod_default() {
+        String cachePeriod = configuration.getJWKSetCachePeriod();
+        assertThat(cachePeriod).isEqualTo("24h");
+    }
+
+    @Test
+    public void getJWKSetCachePeriod() {
+        TestConfig.addConfigValue("jwt.remote.jwk.cache.period", "15m");
+        String cachePeriod = configuration.getJWKSetCachePeriod();
+        assertThat(cachePeriod).isEqualTo("15m");
+    }
+
+    @Test(expected = ConfigurationException.class)
+    public void getJWKSetCachePeriod_invalid() {
+        TestConfig.addConfigValue("jwt.remote.jwk.cache.period", "abc");
+        configuration.getJWKSetCachePeriod();
+    }
 
     public static class TestKeyManager implements KeyManager {
 
