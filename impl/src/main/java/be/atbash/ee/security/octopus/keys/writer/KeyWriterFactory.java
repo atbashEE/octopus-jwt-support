@@ -68,7 +68,7 @@ public class KeyWriterFactory {
         return keyStoreEncoder.encodeKey(atbashKey, parameters);
     }
 
-    public byte[] writeKeyAsJWK(AtbashKey atbashKey, KeyEncoderParameters parameters) throws IOException {
+    public byte[] writeKeyAsJWK(AtbashKey atbashKey, KeyEncoderParameters parameters) {
         if (atbashKey.getSecretKeyType().getAsymmetricPart() == AsymmetricPart.PRIVATE) {
             return privatePartJwkEncoder.encodeKey(atbashKey, parameters);
         } else {

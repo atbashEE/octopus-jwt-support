@@ -19,35 +19,25 @@ import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.writer.KeyEncoderParameters;
 import be.atbash.ee.security.octopus.keys.writer.KeyWriterFactory;
 
-import javax.json.Json;
-import javax.json.JsonBuilderFactory;
 import javax.json.bind.serializer.JsonbSerializer;
 import javax.json.bind.serializer.SerializationContext;
 import javax.json.stream.JsonGenerator;
-import java.io.IOException;
 import java.util.Base64;
 
 public class AtbashKeyWriter implements JsonbSerializer<AtbashKey> {
 
     private KeyWriterFactory keyWriterFactory;
-    private JsonBuilderFactory factory;
 
     public AtbashKeyWriter() {
         keyWriterFactory = new KeyWriterFactory();
         keyWriterFactory.init();
-        factory = Json.createBuilderFactory(null);
     }
 
     @Override
     public void serialize(AtbashKey atbashKey, JsonGenerator jsonGenerator, SerializationContext serializationContext) {
         KeyEncoderParameters parameters = new KeyEncoderParameters();
 
-        byte[] bytes = new byte[0];
-        try {
-            bytes = keyWriterFactory.writeKeyAsJWK(atbashKey, parameters);
-        } catch (IOException e) {
-            e.printStackTrace(); // FIXME
-        }
+        byte[] bytes = keyWriterFactory.writeKeyAsJWK(atbashKey, parameters);
 
         jsonGenerator.writeStartObject()
                 .writeKey("kid").write(atbashKey.getKeyId())
