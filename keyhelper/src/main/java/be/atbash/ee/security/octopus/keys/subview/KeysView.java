@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,18 +68,20 @@ public class KeysView extends SubView {
         TableColumn<AtbashKeyItem, String> idCol = new TableColumn<>("ID");
         TableColumn<AtbashKeyItem, String> typeCol = new TableColumn<>("Type");
         TableColumn<AtbashKeyItem, Boolean> privateCol = new TableColumn<>("Private/Public");
+        TableColumn<AtbashKeyItem, String> specificationCol = new TableColumn<>("Specification");
         TableColumn<AtbashKeyItem, Boolean> selectedCol = new TableColumn<>("Selected");
 
         idCol.setCellValueFactory(new PropertyValueFactory<>("kid"));
         idCol.setCellFactory(TextFieldTableCell.forTableColumn());
         typeCol.setCellValueFactory(new PropertyValueFactory<>("keyType"));
         privateCol.setCellValueFactory(new PropertyValueFactory<>("asymmetricText"));
+        specificationCol.setCellValueFactory(new PropertyValueFactory<>("specification"));
         selectedCol.setCellValueFactory(new PropertyValueFactory<>("selected"));
 
         selectedCol.setCellFactory(CheckBoxTableCell.forTableColumn(selectedCol));
         selectedCol.setEditable(true);
 
-        tableView.getColumns().addAll(idCol, typeCol, privateCol, selectedCol);
+        tableView.getColumns().addAll(idCol, typeCol, privateCol, specificationCol, selectedCol);
         tableView.setItems(getItemList());
 
     }

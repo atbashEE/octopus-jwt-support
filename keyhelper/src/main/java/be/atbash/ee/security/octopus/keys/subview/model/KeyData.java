@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.PasswordDialog;
 import be.atbash.ee.security.octopus.keys.reader.KeyReader;
 import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup;
+import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.StringProperty;
@@ -82,7 +83,7 @@ public class KeyData {
         item.kidProperty().setValue(atbashKey.getKeyId());
         item.setKeyType(atbashKey.getSecretKeyType().getKeyType().getValue());
         item.setAsymmetricPart(atbashKey.getSecretKeyType().getAsymmetricPart());
-
+        item.setSpecification(atbashKey.getSpecification());
         keyItems.add(item);
 
         new KidChangeListener(atbashKey, item.kidProperty());
@@ -135,5 +136,9 @@ public class KeyData {
         public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
 
         }
+    }
+
+    public AsymmetricPart defineAsymmetricPart() {
+        return keyItems.stream().filter(AtbashKeyItem::isSelected).map(AtbashKeyItem::getAsymmetricPart).findFirst().orElse(null);
     }
 }
