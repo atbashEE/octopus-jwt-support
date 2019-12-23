@@ -16,12 +16,17 @@
 package be.atbash.ee.security.octopus.keys.subview;
 
 import be.atbash.ee.security.octopus.keys.AtbashKey;
+import be.atbash.ee.security.octopus.keys.generator.ECGenerationParameters;
+import be.atbash.ee.security.octopus.keys.generator.GenerationParameters;
 import be.atbash.ee.security.octopus.keys.generator.KeyGenerator;
 import be.atbash.ee.security.octopus.keys.generator.RSAGenerationParameters;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.keys.selector.filter.AsymmetricPartKeyFilter;
 import be.atbash.ee.security.octopus.keys.subview.model.KeyData;
+import be.atbash.ee.security.octopus.nimbus.jwk.Curve;
 import be.atbash.util.exception.AtbashUnexpectedException;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Insets;
@@ -51,6 +56,9 @@ public class NewKeyView extends SubView {
     private StringProperty id = new SimpleStringProperty();
     private StringProperty keyType = new SimpleStringProperty();
     private StringProperty keySize = new SimpleStringProperty();
+    private StringProperty curveName = new SimpleStringProperty();
+    private BooleanProperty keySizeDisabled = new SimpleBooleanProperty();
+    private BooleanProperty curveNameDisabled = new SimpleBooleanProperty();
 
     protected NewKeyView(Stage primaryStage, BorderPane rootPane, KeyData keyData) {
         super(primaryStage, rootPane);
@@ -84,13 +92,36 @@ public class NewKeyView extends SubView {
 
         ComboBox keyTypeComboBox = new ComboBox();
         keyTypeComboBox.getItems().addAll(
-                "RSA"
+                "RSA", "EC"
         );
         keyTypeComboBox.valueProperty().bindBidirectional(keyType);
         grid.add(keyTypeComboBox, 1, 1);
 
+        keyTypeComboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            curveNameDisabled.set(true);
+            keySizeDisabled.set(true);
+            if ("RSA".equals(newValue)) {
+                keySizeDisabled.set(false);
+            }
+            if ("EC".equals(newValue)) {
+                curveNameDisabled.set(false);
+            }
+        });
+
+        Label curveLabel = new Label("Curve name :");
+        grid.add(curveLabel, 0, 2);
+
+        ComboBox curveComboBox = new ComboBox();
+        curveComboBox.getItems().addAll(
+                "P-256", "P-256K", "P-384", "P-521"
+        );
+        curveComboBox.valueProperty().bindBidirectional(curveName);
+        curveNameDisabled.set(true);
+        curveComboBox.disableProperty().bind(curveNameDisabled);
+        grid.add(curveComboBox, 1, 2);
+
         Label lengthLabel = new Label("Length :");
-        grid.add(lengthLabel, 0, 2);
+        grid.add(lengthLabel, 0, 3);
 
         ComboBox keyLengthComboBox = new ComboBox();
         keyLengthComboBox.getItems().addAll(
@@ -99,7 +130,10 @@ public class NewKeyView extends SubView {
                 "4096"
         );
         keyLengthComboBox.valueProperty().bindBidirectional(keySize);
-        grid.add(keyLengthComboBox, 1, 2);
+
+        keySizeDisabled.set(true);
+        keyLengthComboBox.disableProperty().bind(keySizeDisabled);
+        grid.add(keyLengthComboBox, 1, 3);
 
         HBox buttonPane = new HBox(10);
         Button saveButton = new Button("Apply");
@@ -110,22 +144,39 @@ public class NewKeyView extends SubView {
 
         buttonPane.getChildren().addAll(cancelButton, saveButton);
 
-        grid.add(buttonPane, 1, 3);
+        grid.add(buttonPane, 1, 4);
 
         rootPane.setCenter(grid);
     }
 
     private void createKey() {
+        GenerationParameters parameters = null;
+        if ("RSA".equals(keyType.get())) {
+            parameters = createRSAParameters();
+        }
+        if ("EC".equals(keyType.get())) {
+            parameters = createECParameters();
+        }
 
-        RSAGenerationParameters generationParameters = new RSAGenerationParameters.RSAGenerationParametersBuilder()
-                .withKeyId(id.getValue())
-                .withKeySize(Integer.parseInt(keySize.getValue()))
-                .build();
         KeyGenerator generator = new KeyGenerator();
-        List<AtbashKey> keys = generator.generateKeys(generationParameters);
+        List<AtbashKey> keys = generator.generateKeys(parameters);
         keyData.add(keys);
 
         new KeysView(primaryStage, rootPane, keyData).initialize();
+    }
+
+    private RSAGenerationParameters createRSAParameters() {
+        return new RSAGenerationParameters.RSAGenerationParametersBuilder()
+                .withKeyId(id.getValue())
+                .withKeySize(Integer.parseInt(keySize.getValue()))
+                .build();
+    }
+
+    private ECGenerationParameters createECParameters() {
+        return new ECGenerationParameters.ECGenerationParametersBuilder()
+                .withKeyId(id.getValue())
+                .withCurveName(Curve.parse(curveName.get()).getStdName())
+                .build();
     }
 
     private RSAPublicKey getPublicKey(List<AtbashKey> keys) {
