@@ -40,7 +40,7 @@ public final class ECCurveHelper {
         ECNamedCurveSpec ecPrivateKeySpec = (ECNamedCurveSpec) params;
         String namedCurve = ecPrivateKeySpec.getName();
 
-        return Curve.forStdName(namedCurve);
+        return Curve.parse(namedCurve);
     }
 
 }

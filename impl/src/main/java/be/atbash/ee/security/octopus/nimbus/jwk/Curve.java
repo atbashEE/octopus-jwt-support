@@ -259,35 +259,21 @@ public final class Curve implements Serializable {
             return X25519;
         } else if (value.equals(X448.getName())) {
             return X448;
-        } else {
-            return new Curve(value);
-        }
-    }
-
-
-    /**
-     * Gets the cryptographic curve for the specified standard
-     * name.
-     *
-     * @param stdName The standard curve name. May be {@code null}.
-     * @return The curve, {@code null} if it cannot be determined.
-     */
-    public static Curve forStdName(String stdName) {
-        if ("secp256r1".equals(stdName) || "prime256v1".equals(stdName)) {
+        } else if (P_256.getStdName().equals(value) || "prime256v1".equals(value)) {
             return P_256;
-        } else if ("secp256k1".equals(stdName)) {
+        } else if (P_256K.getStdName().equals(value)) {
             return P_256K;
-        } else if ("secp384r1".equals(stdName)) {
+        } else if (P_384.getStdName().equals(value)) {
             return P_384;
-        } else if ("secp521r1".equals(stdName)) {
+        } else if (P_521.getStdName().equals(value)) {
             return P_521;
-        } else if (Ed25519.getStdName().equals(stdName)) {
+        } else if (Ed25519.getStdName().equals(value)) {
             return Ed25519;
-        } else if (Ed448.getStdName().equals(stdName)) {
+        } else if (Ed448.getStdName().equals(value)) {
             return Ed448;
-        } else if (X25519.getStdName().equals(stdName)) {
+        } else if (X25519.getStdName().equals(value)) {
             return X25519;
-        } else if (X448.getStdName().equals(stdName)) {
+        } else if (X448.getStdName().equals(value)) {
             return X448;
         } else {
             return null;

@@ -17,10 +17,13 @@ package be.atbash.ee.security.octopus.keys;
 
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.keys.selector.SecretKeyType;
+import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import be.atbash.util.PublicAPI;
 import be.atbash.util.resource.ResourceUtil;
 
 import java.security.Key;
+import java.security.interfaces.ECKey;
+import java.security.interfaces.RSAKey;
 
 // Useful info https://www.cem.me/pki/
 @PublicAPI
@@ -54,6 +57,21 @@ public class AtbashKey {
 
     public Key getKey() {
         return key;
+    }
+
+    public String getSpecification() {
+        StringBuilder result = new StringBuilder();
+        if (KeyType.EC.equals(secretKeyType.getKeyType())) {
+            result.append("Curve name : ").append(ECCurveHelper.getCurve((ECKey) key).getName());
+        }
+        if (KeyType.RSA.equals(secretKeyType.getKeyType())) {
+            RSAKey rsaKey = (RSAKey) key;
+            result.append("key length : ").append(rsaKey.getModulus().bitLength());
+        }
+        if (KeyType.OCT.equals(secretKeyType.getKeyType())) {
+            result.append("key length : ").append(key.getEncoded().length * 8);
+        }
+        return result.toString();
     }
 
     private String defineKeyId(String value) {

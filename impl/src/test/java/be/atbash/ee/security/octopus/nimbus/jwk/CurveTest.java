@@ -102,22 +102,22 @@ public class CurveTest {
     @Test
     public void testCurveForStdName() {
 
-        assertThat(Curve.forStdName("secp256r1")).isEqualTo(Curve.P_256);
-        assertThat(Curve.forStdName("prime256v1")).isEqualTo(Curve.P_256);
+        assertThat(Curve.parse("secp256r1")).isEqualTo(Curve.P_256);
+        assertThat(Curve.parse("prime256v1")).isEqualTo(Curve.P_256);
 
-        assertThat(Curve.forStdName("secp256k1")).isEqualTo(Curve.P_256K);
+        assertThat(Curve.parse("secp256k1")).isEqualTo(Curve.P_256K);
 
-        assertThat(Curve.forStdName("secp384r1")).isEqualTo(Curve.P_384);
+        assertThat(Curve.parse("secp384r1")).isEqualTo(Curve.P_384);
 
-        assertThat(Curve.forStdName("secp521r1")).isEqualTo(Curve.P_521);
+        assertThat(Curve.parse("secp521r1")).isEqualTo(Curve.P_521);
 
-        assertThat(Curve.forStdName("Ed25519")).isEqualTo(Curve.Ed25519);
+        assertThat(Curve.parse("Ed25519")).isEqualTo(Curve.Ed25519);
 
-        assertThat(Curve.forStdName("Ed448")).isEqualTo(Curve.Ed448);
+        assertThat(Curve.parse("Ed448")).isEqualTo(Curve.Ed448);
 
-        assertThat(Curve.forStdName("X25519")).isEqualTo(Curve.X25519);
+        assertThat(Curve.parse("X25519")).isEqualTo(Curve.X25519);
 
-        assertThat(Curve.forStdName("X448")).isEqualTo(Curve.X448);
+        assertThat(Curve.parse("X448")).isEqualTo(Curve.X448);
     }
 
     @Test

@@ -15,6 +15,7 @@
  */
 package be.atbash.ee.security.octopus.keys.generator;
 
+import be.atbash.ee.security.octopus.nimbus.jwk.Curve;
 import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import be.atbash.util.PublicAPI;
 import be.atbash.util.StringUtils;
@@ -51,9 +52,18 @@ public class ECGenerationParameters extends GenerationParameters {
         public ECGenerationParametersBuilder withCurveName(String curveName) {
             ECParameterSpec ecSpec = ECNamedCurveTable.getParameterSpec(curveName);
             if (ecSpec == null) {
+                Curve curve = Curve.parse(curveName);
+                if (curve != null) {
+                    ecSpec = ECNamedCurveTable.getParameterSpec(curve.getStdName());
+                    this.curveName = curve.getStdName();
+                }
+            } else {
+                this.curveName = curveName;
+
+            }
+            if (ecSpec == null) {
                 throw new KeyGenerationParameterException(String.format("EC Curve name '%s' unknown", curveName));
             }
-            this.curveName = curveName;
             return this;
         }
     }
