@@ -19,10 +19,7 @@ import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.bc.BouncyCastleProviderSingleton;
-import be.atbash.ee.security.octopus.nimbus.jwk.AsymmetricJWK;
-import be.atbash.ee.security.octopus.nimbus.jwk.ECKey;
-import be.atbash.ee.security.octopus.nimbus.jwk.JWK;
-import be.atbash.ee.security.octopus.nimbus.jwk.RSAKey;
+import be.atbash.ee.security.octopus.nimbus.jwk.*;
 import be.atbash.ee.security.octopus.util.EncryptionHelper;
 import be.atbash.util.exception.AtbashUnexpectedException;
 import be.atbash.util.resource.ResourceUtil;
@@ -98,7 +95,7 @@ public class KeyReaderJWK {
         return processJWK(jwk);
     }
 
-    private List<AtbashKey> processJWK(JWK jwk) throws JOSEException {
+    private List<AtbashKey> processJWK(JWK jwk) {
         List<AtbashKey> result = new ArrayList<>();
         if (jwk instanceof AsymmetricJWK) {
 
@@ -116,6 +113,10 @@ public class KeyReaderJWK {
             if (publicKey != null) {
                 result.add(new AtbashKey(jwk.getKeyID(), publicKey));
             }
+        }
+        if (jwk instanceof OctetSequenceKey) {
+            OctetSequenceKey octKey = (OctetSequenceKey) jwk;
+            result.add(new AtbashKey(jwk.getKeyID(), octKey.toSecretKey()));
         }
         if (result.isEmpty() && jwk instanceof RSAKey) {
             // Support Payara because it has an old version of Nimbus which uses AssymmetricJWK

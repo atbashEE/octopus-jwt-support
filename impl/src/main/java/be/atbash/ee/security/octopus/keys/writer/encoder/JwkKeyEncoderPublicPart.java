@@ -50,7 +50,6 @@ public class JwkKeyEncoderPublicPart implements KeyEncoder {
         if (KeyType.EC.equals(atbashKey.getSecretKeyType().getKeyType())) {
             return encodeECKey(atbashKey);
         }
-        // FIXME Support for OCT.
         throw new UnsupportedKeyType(atbashKey.getSecretKeyType().getKeyType(), "writing JWK");
     }
 

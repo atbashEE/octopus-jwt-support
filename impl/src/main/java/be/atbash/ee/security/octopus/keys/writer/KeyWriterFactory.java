@@ -46,6 +46,7 @@ public class KeyWriterFactory {
 
     private JwkKeyEncoderPrivatePart privatePartJwkEncoder;
     private JwkKeyEncoderPublicPart publicPartJwkEncoder;
+    private JwkKeyEncoderSymmetric symmetricJwkEncoder;
 
     private KeyStoreEncoder keyStoreEncoder;
 
@@ -59,6 +60,7 @@ public class KeyWriterFactory {
 
         privatePartJwkEncoder = new JwkKeyEncoderPrivatePart();
         publicPartJwkEncoder = new JwkKeyEncoderPublicPart();
+        symmetricJwkEncoder = new JwkKeyEncoderSymmetric();
 
         keyStoreEncoder = new KeyStoreEncoder();
     }
@@ -69,11 +71,21 @@ public class KeyWriterFactory {
     }
 
     public byte[] writeKeyAsJWK(AtbashKey atbashKey, KeyEncoderParameters parameters) {
-        if (atbashKey.getSecretKeyType().getAsymmetricPart() == AsymmetricPart.PRIVATE) {
-            return privatePartJwkEncoder.encodeKey(atbashKey, parameters);
-        } else {
-            return publicPartJwkEncoder.encodeKey(atbashKey, parameters);
+        switch (atbashKey.getSecretKeyType().getAsymmetricPart()) {
+
+            case PUBLIC:
+                return publicPartJwkEncoder.encodeKey(atbashKey, parameters);
+
+            case PRIVATE:
+                return privatePartJwkEncoder.encodeKey(atbashKey, parameters);
+
+            case SYMMETRIC:
+                return symmetricJwkEncoder.encodeKey(atbashKey, parameters);
+
+            default:
+                throw new IllegalStateException("Unexpected value: " + atbashKey.getSecretKeyType().getAsymmetricPart());
         }
+
     }
 
     public byte[] writeKeyAsPEM(AtbashKey atbashKey, KeyEncoderParameters parameters) throws IOException {

@@ -36,6 +36,8 @@ public class KeyReaderJWKSetTest {
 
     private String data2 = "{\"keys\":[{\"kty\":\"RSA\",\"e\":\"AQAB\",\"kid\":\"dc74e5f1-92a3-4f77-b824-d41db51d6ceb\",\"n\":\"7D3dav0yQCF4iKULd1NAIHWJIVhwLAa_b3YPPKmEyYIR8diYvfa1N4joO8tZosRUK_kpJETeeiUuLKVmdV-Ei6Fv3lfAmszO41rp3_3dOQQ4c_ZKp5_VJpfS1Rynd9kTfBxGDeu14sJiQJ9RmN6nTNk2iv9il3MPGG3XFNjxtLtxGzkPn1UZ1zt3mjmH-PkFis4aAFDbYJbbl9moYr_jd5QOmmDnkSqWsXyREneqhPPHMx1UWbISTfDQwjyIW_gdE1FbNNwsXqwoguaH29z9HbnDgWzqK6UiZATHl8etuoRNuZUBymxOQan-mZOxlzo9Z5dGOCFCUoOeGGibY2d_vw\"}]}";
 
+    private String data3 = "{\"keys\":[{\"kty\":\"oct\",\"kid\":\"demo\",\"k\":\"eNbDd3kF8qW7rFjsdWZyBBN81_tnzOQS34FbAu6RmSfQ3tEOqCrMu0rhNhMKEt8C0UtrZ4lI5bQ2jikaZNdJVA\"}]}";
+
     @Test
     public void parseContent() {
 
@@ -64,6 +66,18 @@ public class KeyReaderJWKSetTest {
         AtbashKey atbashKey = keys.get(0);
         String data = atbashKey.getKeyId() + " - " + atbashKey.getSecretKeyType().getKeyType().getValue() + " - " + atbashKey.getSecretKeyType().getAsymmetricPart();
         assertThat(data).isEqualTo("dc74e5f1-92a3-4f77-b824-d41db51d6ceb - RSA - PUBLIC");
+
+    }
+
+    @Test
+    public void parseContent3() {
+
+        List<AtbashKey> keys = reader.parseContent(null, null, data3);
+        assertThat(keys).hasSize(1);
+
+        AtbashKey atbashKey = keys.get(0);
+        String data = atbashKey.getKeyId() + " - " + atbashKey.getSecretKeyType().getKeyType().getValue() + " - " + atbashKey.getSecretKeyType().getAsymmetricPart();
+        assertThat(data).isEqualTo("demo - oct - SYMMETRIC");
 
     }
 }

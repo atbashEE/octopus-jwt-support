@@ -12,6 +12,9 @@ User manual for Atbash configuration.
 === 1.0.0
 
 . RemoteKeyManager
+. Support for Reading and Writing OCT JWK.
+
+.Updated BouncyCastle to the latest version.
 
 === 0.9.1
 
