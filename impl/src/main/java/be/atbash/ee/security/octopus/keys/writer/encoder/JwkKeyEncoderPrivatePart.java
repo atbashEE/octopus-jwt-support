@@ -17,6 +17,7 @@ package be.atbash.ee.security.octopus.keys.writer.encoder;
 
 import be.atbash.ee.security.octopus.UnsupportedKeyType;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
+import be.atbash.ee.security.octopus.keys.ECCurveHelper;
 import be.atbash.ee.security.octopus.keys.writer.KeyEncoderParameters;
 import be.atbash.ee.security.octopus.nimbus.jwk.Curve;
 import be.atbash.ee.security.octopus.nimbus.jwk.ECKey;
@@ -24,17 +25,14 @@ import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import be.atbash.ee.security.octopus.nimbus.jwk.RSAKey;
 import be.atbash.util.exception.AtbashUnexpectedException;
 import org.bouncycastle.asn1.x9.X9ECParameters;
-import org.bouncycastle.jcajce.provider.asymmetric.util.EC5Util;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.spec.ECPublicKeySpec;
 import org.bouncycastle.math.ec.ECPoint;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.interfaces.*;
-import java.security.spec.ECParameterSpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
 
@@ -73,12 +71,8 @@ public class JwkKeyEncoderPrivatePart implements KeyEncoder {
     }
 
     private byte[] encodeECKey(AtbashKey atbashKey) {
-        Curve curve;
-        try {
-            curve = deriveCurve((PrivateKey) atbashKey.getKey());
-        } catch (GeneralSecurityException e) {
-            throw new AtbashUnexpectedException(e);
-        }
+        Curve curve = deriveCurve(atbashKey);
+
         ECKey jwk = new ECKey.Builder(curve, (ECPublicKey) getPublicKey(atbashKey.getKey(), curve)).keyID(atbashKey.getKeyId())
                 .privateKey((ECPrivateKey) atbashKey.getKey())
                 .build();
@@ -86,38 +80,14 @@ public class JwkKeyEncoderPrivatePart implements KeyEncoder {
         return jwk.toJSONObject().build().toString().getBytes(StandardCharsets.UTF_8);
     }
 
-    // Duplicated
-    private Curve deriveCurve(org.bouncycastle.jce.spec.ECParameterSpec ecParameterSpec) throws GeneralSecurityException {
+    private Curve deriveCurve(AtbashKey atbashKey) {
 
-        for (Curve supportedCurve : SUPPORTED_CURVES) {
-
-            String name = supportedCurve.getName();
-
-            X9ECParameters params = org.bouncycastle.asn1.x9.ECNamedCurveTable.getByName(name);
-
-            if (params != null) {
-                if (params.getN().equals(ecParameterSpec.getN())
-                        && params.getH().equals(ecParameterSpec.getH())
-                        && params.getCurve().equals(ecParameterSpec.getCurve())
-                        && params.getG().equals(ecParameterSpec.getG())) {
-                    return supportedCurve;
-                }
-            }
+        Curve curve = ECCurveHelper.getCurve((java.security.interfaces.ECKey) atbashKey.getKey());
+        if (curve == null) {
+            throw new AtbashUnexpectedException(String.format("Unable to determine EC Curve of %s", atbashKey.getKeyId()));
         }
+        return curve;
 
-        throw new GeneralSecurityException("Could not find name for curve");
-    }
-
-    private Curve deriveCurve(PrivateKey privateKey) throws GeneralSecurityException {
-        if (privateKey instanceof java.security.interfaces.ECPrivateKey) {
-            java.security.interfaces.ECPrivateKey pk = (java.security.interfaces.ECPrivateKey) privateKey;
-            ECParameterSpec params = pk.getParams();
-            return deriveCurve(EC5Util.convertSpec(params, false));
-        } else if (privateKey instanceof org.bouncycastle.jce.interfaces.ECPrivateKey) {
-            org.bouncycastle.jce.interfaces.ECPrivateKey pk = (org.bouncycastle.jce.interfaces.ECPrivateKey) privateKey;
-            return deriveCurve(pk.getParameters());
-        } else
-            throw new IllegalArgumentException("Can only be used with instances of ECPrivateKey (either jce or bc implementation)");
     }
 
     private PublicKey getPublicKey(Key key) {

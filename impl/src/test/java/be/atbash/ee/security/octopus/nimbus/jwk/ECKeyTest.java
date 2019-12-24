@@ -1097,7 +1097,7 @@ public class ECKeyTest {
             keyFactory.generatePublic(publicKeySpec);
             fail();
         } catch (Exception e) {
-            assertThat(e.getMessage()).isEqualTo("x value invalid for SecP256R1FieldElement");
+            assertThat(e.getCause().getMessage()).isEqualTo("x value invalid for SecP256R1FieldElement");
         }
     }
 

@@ -17,6 +17,7 @@ package be.atbash.ee.security.octopus.keys.writer.encoder;
 
 import be.atbash.ee.security.octopus.UnsupportedKeyType;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
+import be.atbash.ee.security.octopus.keys.ECCurveHelper;
 import be.atbash.ee.security.octopus.keys.writer.KeyEncoderParameters;
 import be.atbash.ee.security.octopus.nimbus.jwk.Curve;
 import be.atbash.ee.security.octopus.nimbus.jwk.ECKey;
@@ -24,14 +25,11 @@ import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import be.atbash.ee.security.octopus.nimbus.jwk.RSAKey;
 import be.atbash.util.exception.AtbashUnexpectedException;
 import org.bouncycastle.asn1.x9.X9ECParameters;
-import org.bouncycastle.jcajce.provider.asymmetric.util.EC5Util;
 
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
-import java.security.PublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
-import java.security.spec.ECParameterSpec;
 
 import static be.atbash.ee.security.octopus.nimbus.jwk.ECKey.SUPPORTED_CURVES;
 
@@ -64,11 +62,9 @@ public class JwkKeyEncoderPublicPart implements KeyEncoder {
     }
 
     private byte[] encodeECKey(AtbashKey atbashKey) {
-        Curve curve;
-        try {
-            curve = deriveCurve((PublicKey) atbashKey.getKey());
-        } catch (GeneralSecurityException e) {
-            throw new AtbashUnexpectedException(e);
+        Curve curve = ECCurveHelper.getCurve((java.security.interfaces.ECKey) atbashKey.getKey());
+        if (curve == null) {
+            throw new AtbashUnexpectedException(String.format("Unable to determine EC Curve of %s", atbashKey.getKeyId()));
         }
 
         ECKey ecKey = new ECKey.Builder(curve, (ECPublicKey) atbashKey.getKey()).keyID(atbashKey.getKeyId())
@@ -97,18 +93,5 @@ public class JwkKeyEncoderPublicPart implements KeyEncoder {
 
         throw new GeneralSecurityException("Could not find name for curve");
     }
-
-    private Curve deriveCurve(PublicKey publicKey) throws GeneralSecurityException {
-        if (publicKey instanceof ECPublicKey) {
-            ECPublicKey pk = (ECPublicKey) publicKey;
-            ECParameterSpec params = pk.getParams();
-            return deriveCurve(EC5Util.convertSpec(params, false));
-        } else if (publicKey instanceof org.bouncycastle.jce.interfaces.ECPublicKey) {
-            org.bouncycastle.jce.interfaces.ECPublicKey pk = (org.bouncycastle.jce.interfaces.ECPublicKey) publicKey;
-            return deriveCurve(pk.getParameters());
-        } else
-            throw new IllegalArgumentException("Can only be used with instances of ECPublicKey (either jce or bc implementation)");
-    }
-
 
 }
