@@ -15,11 +15,28 @@
  */
 package be.atbash.ee.security.octopus.config;
 
+import be.atbash.util.StringUtils;
+
+import java.util.Locale;
+
 /**
  *
  */
 
 public enum PemKeyEncryption {
 
-    PKCS8, PKCS1, NONE
+    PKCS8, PKCS1, NONE;
+
+    public static PemKeyEncryption parse(String value) {
+        PemKeyEncryption result = null;
+        if (StringUtils.hasText(value)) {
+            String modifiedValue = value.replaceAll("#", "").toUpperCase(Locale.ENGLISH).trim();
+            for (PemKeyEncryption pemKeyEncryption : PemKeyEncryption.values()) {
+                if (pemKeyEncryption.name().equals(modifiedValue)) {
+                    result = pemKeyEncryption;
+                }
+            }
+        }
+        return result;
+    }
 }

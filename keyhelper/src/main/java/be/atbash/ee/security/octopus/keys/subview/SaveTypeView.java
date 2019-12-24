@@ -15,9 +15,12 @@
  */
 package be.atbash.ee.security.octopus.keys.subview;
 
+import be.atbash.ee.security.octopus.ProgramConfigSource;
 import be.atbash.ee.security.octopus.ScreenArtifacts;
+import be.atbash.ee.security.octopus.config.PemKeyEncryption;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.reader.KeyResourceType;
+import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.keys.subview.model.AtbashKeyItem;
 import be.atbash.ee.security.octopus.keys.subview.model.KeyData;
 import be.atbash.ee.security.octopus.keys.writer.KeyWriter;
@@ -26,8 +29,10 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -49,6 +54,12 @@ public class SaveTypeView extends SubView {
     private ToggleGroupValue fileTypeToggleGroupValue;
     private StringProperty fileNameProperty;
     private BooleanProperty fileNameSelectedProperty;
+    private AsymmetricPart asymmetricPart;  // The asymmetricPart value when only 1 key selected.
+    private StringProperty encodingType = new SimpleStringProperty("PKCS#8");
+    private StringProperty password = new SimpleStringProperty();
+
+    private ComboBox encodingComboBox;
+    private PasswordField passwordField;
 
     protected SaveTypeView(Stage primaryStage, BorderPane rootPane, KeyData keyData) {
         super(primaryStage, rootPane);
@@ -71,6 +82,10 @@ public class SaveTypeView extends SubView {
 
         if (selectedCount == 1) {
             result.add(KeyResourceType.JWK);
+            asymmetricPart = keyData.defineAsymmetricPart();
+            if (asymmetricPart != null) {
+                result.add(KeyResourceType.PEM);
+            }
         }
 
         return result;
@@ -85,13 +100,60 @@ public class SaveTypeView extends SubView {
 
         VBox toggleGroupBox = defineToggleGroup(resourceTypes);
 
+        GridPane optionsPane = definePEMOptions();
+
         HBox filePane = defineFilePane();
 
         HBox buttonsPane = defineButtonsPane();
 
-        mainView.getChildren().addAll(title, toggleGroupBox, filePane, buttonsPane);
+        if (resourceTypes.contains(KeyResourceType.PEM)) {
+            mainView.getChildren().addAll(title, toggleGroupBox, optionsPane, filePane, buttonsPane);
+        } else {
+            mainView.getChildren().addAll(title, toggleGroupBox, filePane, buttonsPane);
+
+        }
 
         rootPane.setCenter(mainView);
+    }
+
+    private GridPane definePEMOptions() {
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER_LEFT);
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(25, 25, 25, 25));
+
+        Label titleLabel = new Label("PEM Options ");
+        titleLabel.setStyle("-fx-font-weight: bold");  // FIXME
+        grid.add(titleLabel, 0, 0);
+
+        Label encodingLabel = new Label("PEM encoding Private Key :");
+        grid.add(encodingLabel, 0, 1);
+
+        encodingComboBox = new ComboBox();
+        encodingComboBox.getItems().addAll(
+                "NONE", "PKCS#1", "PKCS#8"
+        );
+        encodingComboBox.setDisable(true);
+        encodingComboBox.valueProperty().bindBidirectional(encodingType);
+
+        grid.add(encodingComboBox, 1, 1);
+
+        encodingComboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+
+        });
+
+        Label passwordLabel = new Label("Password :");
+        grid.add(passwordLabel, 0, 2);
+
+        passwordField = new PasswordField();
+        passwordField.setPrefColumnCount(20);
+        passwordField.textProperty().bindBidirectional(password);
+
+        grid.add(passwordField, 1, 2);
+
+        return grid;
+
     }
 
     private HBox defineButtonsPane() {
@@ -149,9 +211,11 @@ public class SaveTypeView extends SubView {
         }
 
         //
-        RadioButton button3 = new RadioButton("PEM (supported in the future)");
+        RadioButton button3 = new RadioButton("PEM");
         button3.setToggleGroup(group);
-        button3.setDisable(true);
+        if (!resourceTypes.contains(KeyResourceType.PEM)) {
+            button3.setDisable(true);
+        }
 
         //
         RadioButton button4 = new RadioButton("KeyStore  (supported in the future)");
@@ -164,11 +228,21 @@ public class SaveTypeView extends SubView {
         fileTypeToggleGroupValue.add(button3, KeyResourceType.PEM);
         fileTypeToggleGroupValue.add(button4, KeyResourceType.KEYSTORE);
 
+        fileTypeToggleGroupValue.valueProperty().addListener((observable, oldValue, newValue) -> {
+            encodingComboBox.setDisable(true);
+            passwordField.setDisable(true);
+            if (KeyResourceType.PEM.equals(newValue) && AsymmetricPart.PRIVATE.equals(keyData.defineAsymmetricPart())) {
+                encodingComboBox.setDisable(false);
+                passwordField.setDisable(false);
+            }
+        });
+
         toggleGroupBox.getChildren().addAll(button1, button2, button3, button4);
         return toggleGroupBox;
     }
 
     private void saveFile() {
+        ProgramConfigSource.pemKeyEncryption = PemKeyEncryption.parse(encodingType.get());
         KeyResourceType keyResourceType = (KeyResourceType) fileTypeToggleGroupValue.getValue();
         String fileName = defineFileName(keyResourceType, fileNameProperty.getValue());
 
@@ -176,7 +250,7 @@ public class SaveTypeView extends SubView {
         List<AtbashKey> selectedKeys = keyData.getSelectedKeys();
         for (AtbashKey selectedKey : selectedKeys) {
 
-            keyWriter.writeKeyResource(selectedKey, keyResourceType, fileName, null, null);
+            keyWriter.writeKeyResource(selectedKey, keyResourceType, fileName, password.get().toCharArray(), null);
         }
 
         Alert alert = new Alert(Alert.AlertType.INFORMATION, "File saved", ButtonType.OK);
