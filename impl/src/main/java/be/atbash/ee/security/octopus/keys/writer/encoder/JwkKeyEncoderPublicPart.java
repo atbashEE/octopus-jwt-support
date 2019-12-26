@@ -19,19 +19,15 @@ import be.atbash.ee.security.octopus.UnsupportedKeyType;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.ECCurveHelper;
 import be.atbash.ee.security.octopus.keys.writer.KeyEncoderParameters;
-import be.atbash.ee.security.octopus.nimbus.jwk.Curve;
-import be.atbash.ee.security.octopus.nimbus.jwk.ECKey;
-import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
-import be.atbash.ee.security.octopus.nimbus.jwk.RSAKey;
+import be.atbash.ee.security.octopus.nimbus.jwk.*;
+import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.util.exception.AtbashUnexpectedException;
-import org.bouncycastle.asn1.x9.X9ECParameters;
+import org.bouncycastle.asn1.*;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.security.GeneralSecurityException;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
-
-import static be.atbash.ee.security.octopus.nimbus.jwk.ECKey.SUPPORTED_CURVES;
 
 
 /**
@@ -49,6 +45,9 @@ public class JwkKeyEncoderPublicPart implements KeyEncoder {
 
         if (KeyType.EC.equals(atbashKey.getSecretKeyType().getKeyType())) {
             return encodeECKey(atbashKey);
+        }
+        if (KeyType.OKP.equals(atbashKey.getSecretKeyType().getKeyType())) {
+            return encodeOKPKey(atbashKey);
         }
         throw new UnsupportedKeyType(atbashKey.getSecretKeyType().getKeyType(), "writing JWK");
     }
@@ -72,25 +71,29 @@ public class JwkKeyEncoderPublicPart implements KeyEncoder {
         return ecKey.toJSONObject().build().toString().getBytes(StandardCharsets.UTF_8);
     }
 
-    private Curve deriveCurve(org.bouncycastle.jce.spec.ECParameterSpec ecParameterSpec) throws GeneralSecurityException {
+    private byte[] encodeOKPKey(AtbashKey atbashKey) {
 
-        for (Curve supportedCurve : SUPPORTED_CURVES) {
+        // The next code statements are required to get access to the x value of the public Key.
+        // BouncyCastle should have support for it!
 
-            String name = supportedCurve.getName();
-
-            X9ECParameters params = org.bouncycastle.asn1.x9.ECNamedCurveTable.getByName(name);
-
-            if (params != null) {
-                if (params.getN().equals(ecParameterSpec.getN())
-                        && params.getH().equals(ecParameterSpec.getH())
-                        && params.getCurve().equals(ecParameterSpec.getCurve())
-                        && params.getG().equals(ecParameterSpec.getG())) {
-                    return supportedCurve;
-                }
-            }
+        ASN1InputStream stream = new ASN1InputStream(atbashKey.getKey().getEncoded());
+        ASN1Primitive primitive = null;
+        try {
+            primitive = stream.readObject();
+        } catch (IOException e) {
+            throw new AtbashUnexpectedException(e);
         }
+        //[[1.3.101.112], #032100238DBA14FF77991890E136DAF5B0844C1AB096E513A361F0F26FCEDCD7E9E7DA]
+        DLSequence sequence = (DLSequence) primitive;
 
-        throw new GeneralSecurityException("Could not find name for curve");
+        ASN1Encodable x1 = sequence.getObjectAt(1);
+        DERBitString publicBytes = (DERBitString) x1;
+
+        OctetKeyPair jwk = new OctetKeyPair.Builder(Curve.Ed25519, Base64URLValue.encode(publicBytes.getOctets()))
+                .keyID(atbashKey.getKeyId())
+                .build();
+
+        return jwk.toJSONObject().build().toString().getBytes(StandardCharsets.UTF_8);
     }
 
 }

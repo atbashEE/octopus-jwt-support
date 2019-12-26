@@ -17,6 +17,7 @@ package be.atbash.ee.security.octopus.keys.generator;
 
 import be.atbash.ee.security.octopus.UnsupportedKeyType;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
+import be.atbash.ee.security.octopus.nimbus.jose.crypto.bc.BouncyCastleProviderSingleton;
 import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import be.atbash.util.PublicAPI;
 import be.atbash.util.exception.AtbashUnexpectedException;
@@ -66,6 +67,9 @@ public class KeyGenerator {
         }
         if (KeyType.OCT.equals(parameters.getKeyType())) {
             result = generateOctKey((OCTGenerationParameters) parameters);
+        }
+        if (KeyType.OKP.equals(parameters.getKeyType())) {
+            result = generateOKPKeys((OKPGenerationParameters) parameters);
         }
         if (DHGenerationParameters.DH.equals(parameters.getKeyType())) {
             result = generateDHKeys((DHGenerationParameters) parameters);
@@ -132,6 +136,22 @@ public class KeyGenerator {
             result.add(new AtbashKey(generationParameters.getKid(), priv));
             return result;
         } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException | NoSuchProviderException e) {
+            throw new AtbashUnexpectedException(e);
+        }
+    }
+
+    private List<AtbashKey> generateOKPKeys(OKPGenerationParameters generationParameters) {
+        try {
+            KeyPairGenerator g = KeyPairGenerator.getInstance("Ed25519", BouncyCastleProviderSingleton.getInstance());
+            //g.initialize(256, new SecureRandom()); Not needed as 256 is the only allowed keySize and new SecureRandom() is taken by default.
+            KeyPair kp = g.generateKeyPair();
+
+
+            List<AtbashKey> result = new ArrayList<>();
+            result.add(new AtbashKey(generationParameters.getKid(), kp.getPublic()));
+            result.add(new AtbashKey(generationParameters.getKid(), kp.getPrivate()));
+            return result;
+        } catch (NoSuchAlgorithmException e) {
             throw new AtbashUnexpectedException(e);
         }
     }

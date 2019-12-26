@@ -18,6 +18,7 @@ package be.atbash.ee.security.octopus.keys.selector;
 import be.atbash.ee.security.octopus.keys.generator.DHGenerationParameters;
 import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import be.atbash.util.exception.AtbashIllegalActionException;
+import org.bouncycastle.jcajce.interfaces.EdDSAKey;
 
 import javax.crypto.SecretKey;
 import javax.crypto.interfaces.DHKey;
@@ -87,20 +88,9 @@ public class SecretKeyType {
         if (key instanceof DHKey) {
             result = new SecretKeyType(DHGenerationParameters.DH, determineAsymmetricPart(key));
         }
-        // FIXME OCTKEY (Edwards EC Key)
-        // OCTKEY https://tools.ietf.org/html/rfc8037
-        /*
-        Octet key pair (OKP)
-This key type is used by the EdDSA algorithms.
-
-signature with curves Ed25519 and Ed448
-encryption with curves X25519 nd X448
-At the moment, only Ed25519 and X25519 curves are supported.
-
-Public keys must contain crv (curve) and x values. Private keys will also contain a value d.
-
-see com.nimbusds.jose.jwk.gen.OctetKeyPairGenerator
-         */
+        if (key instanceof EdDSAKey) {
+            result = new SecretKeyType(KeyType.OKP, determineAsymmetricPart(key));
+        }
         if (result == null) {
             throw new IllegalArgumentException(String.format("Unsupported Key instance %s", key.getClass().getName()));
         }

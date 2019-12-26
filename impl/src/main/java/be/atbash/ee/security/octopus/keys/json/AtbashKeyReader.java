@@ -68,6 +68,16 @@ public class AtbashKeyReader implements JsonbDeserializer<AtbashKey> {
                 handled = true;
             }
 
+            if (KeyType.OKP.equals(jwk.getKeyType())) {
+                OctetKeyPair okpKey = (OctetKeyPair) jwk;
+                if (okpKey.isPrivate()) {
+                    builder.withKey(okpKey.toPrivateKey());
+                } else {
+                    builder.withKey(okpKey.toPublicKey());
+                }
+                handled = true;
+            }
+
             if (!handled) {
                 throw new UnsupportedKeyType(jwk.getKeyType(), "Key JSON deserialization ");
             }

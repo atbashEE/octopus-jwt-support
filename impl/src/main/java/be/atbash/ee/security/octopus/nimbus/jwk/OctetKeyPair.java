@@ -16,16 +16,23 @@
 package be.atbash.ee.security.octopus.nimbus.jwk;
 
 
-import be.atbash.ee.security.octopus.exception.InvalidKeyException;
 import be.atbash.ee.security.octopus.nimbus.jose.Algorithm;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.ee.security.octopus.nimbus.util.Base64Value;
 import be.atbash.ee.security.octopus.nimbus.util.ByteUtils;
 import be.atbash.ee.security.octopus.nimbus.util.JSONObjectUtils;
+import be.atbash.util.exception.AtbashUnexpectedException;
+import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
+import org.bouncycastle.crypto.params.Ed25519PrivateKeyParameters;
+import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters;
+import org.bouncycastle.jcajce.provider.asymmetric.edec.BCEdDSAPrivateKey;
+import org.bouncycastle.jcajce.provider.asymmetric.edec.BCEdDSAPublicKey;
 
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.security.KeyPair;
 import java.security.KeyStore;
@@ -622,21 +629,56 @@ public class OctetKeyPair extends JWK implements AsymmetricJWK, CurveBasedJWK {
     @Override
     public PublicKey toPublicKey() {
 
-        throw new InvalidKeyException("Export to java.security.PublicKey not supported");
+        Ed25519PublicKeyParameters keyInfo = new Ed25519PublicKeyParameters(x.decode(), 0);
+
+        BCEdDSAPublicKey publicKey = null;
+        // BCEdDSAPublicKey constructors are package scope !!!
+        Constructor<?>[] constructors = BCEdDSAPublicKey.class.getDeclaredConstructors();
+        for (Constructor constructor : constructors) {
+            if (AsymmetricKeyParameter.class.isAssignableFrom(constructor.getParameterTypes()[0])) {
+                constructor.setAccessible(true);
+                try {
+                    publicKey = (BCEdDSAPublicKey) constructor.newInstance(keyInfo);
+                } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                    throw new AtbashUnexpectedException(e);
+                }
+            }
+        }
+
+        return publicKey;
+
     }
 
 
     @Override
     public PrivateKey toPrivateKey() {
 
-        throw new InvalidKeyException("Export to java.security.PrivateKey not supported");
+        Ed25519PrivateKeyParameters keyInfo = new Ed25519PrivateKeyParameters(d.decode(), 0);
+
+        BCEdDSAPrivateKey privateKey = null;
+
+        // BCEdDSAPrivateKey constructors are package scope !!!
+        Constructor<?>[] constructors = BCEdDSAPrivateKey.class.getDeclaredConstructors();
+        for (Constructor constructor : constructors) {
+            if (AsymmetricKeyParameter.class.isAssignableFrom(constructor.getParameterTypes()[0])) {
+                constructor.setAccessible(true);
+                try {
+                    privateKey = (BCEdDSAPrivateKey) constructor.newInstance(keyInfo);
+                } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                    throw new AtbashUnexpectedException(e);
+                }
+            }
+        }
+
+        return privateKey;
+
     }
 
 
     @Override
     public KeyPair toKeyPair() {
 
-        throw new InvalidKeyException("Export to java.security.KeyPair not supported");
+        return new KeyPair(toPublicKey(), toPrivateKey());
     }
 
 

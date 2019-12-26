@@ -17,10 +17,7 @@ package be.atbash.ee.security.octopus.keys;
 
 import be.atbash.ee.security.octopus.keys.fake.FakeRSAPrivate;
 import be.atbash.ee.security.octopus.keys.fake.FakeRSAPublic;
-import be.atbash.ee.security.octopus.keys.generator.ECGenerationParameters;
-import be.atbash.ee.security.octopus.keys.generator.KeyGenerator;
-import be.atbash.ee.security.octopus.keys.generator.OCTGenerationParameters;
-import be.atbash.ee.security.octopus.keys.generator.RSAGenerationParameters;
+import be.atbash.ee.security.octopus.keys.generator.*;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.util.resource.ResourceUtil;
 import org.junit.Test;
@@ -164,6 +161,14 @@ public class AtbashKeyTest {
         }
     }
 
+    @Test
+    public void OKP_specification() {
+        List<AtbashKey> keys = generateOKPKeys("test");
+        for (AtbashKey key : keys) {
+            assertThat(key.getSpecification()).isEqualTo("");
+        }
+    }
+
     private List<AtbashKey> generateRSAKeys(String kid, int keySize) {
         RSAGenerationParameters generationParameters = new RSAGenerationParameters.RSAGenerationParametersBuilder()
                 .withKeyId(kid)
@@ -186,6 +191,14 @@ public class AtbashKeyTest {
         OCTGenerationParameters generationParameters = new OCTGenerationParameters.OCTGenerationParametersBuilder()
                 .withKeyId(kid)
                 .withKeySize(keySize)
+                .build();
+        KeyGenerator generator = new KeyGenerator();
+        return generator.generateKeys(generationParameters);
+    }
+
+    private List<AtbashKey> generateOKPKeys(String kid) {
+        OKPGenerationParameters generationParameters = new OKPGenerationParameters.OKPGenerationParametersBuilder()
+                .withKeyId(kid)
                 .build();
         KeyGenerator generator = new KeyGenerator();
         return generator.generateKeys(generationParameters);

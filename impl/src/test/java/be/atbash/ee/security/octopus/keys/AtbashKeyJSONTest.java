@@ -21,10 +21,7 @@ import be.atbash.ee.security.octopus.jwt.encoder.JWTEncoder;
 import be.atbash.ee.security.octopus.jwt.encoder.testclasses.Payload;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParameters;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersBuilder;
-import be.atbash.ee.security.octopus.keys.generator.ECGenerationParameters;
-import be.atbash.ee.security.octopus.keys.generator.KeyGenerator;
-import be.atbash.ee.security.octopus.keys.generator.OCTGenerationParameters;
-import be.atbash.ee.security.octopus.keys.generator.RSAGenerationParameters;
+import be.atbash.ee.security.octopus.keys.generator.*;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.keys.selector.KeySelector;
 import be.atbash.ee.security.octopus.keys.selector.SelectorCriteria;
@@ -158,6 +155,57 @@ public class AtbashKeyJSONTest {
                 .build();
         KeyGenerator generator = new KeyGenerator();
         return generator.generateKeys(generationParameters);
+    }
+
+    private List<AtbashKey> generateOKPKeys() {
+        OKPGenerationParameters generationParameters = new OKPGenerationParameters.OKPGenerationParametersBuilder()
+                .withKeyId(KID)
+                .build();
+
+        KeyGenerator generator = new KeyGenerator();
+        return generator.generateKeys(generationParameters);
+    }
+
+    @Test
+    public void testJSONSupport_OKPPrivate() {
+        ListKeyManager keyManager = new ListKeyManager(generateOKPKeys());
+
+        SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID).withAsymmetricPart(AsymmetricPart.PRIVATE).build();
+        List<AtbashKey> keyList = keyManager.retrieveKeys(criteria);
+
+        assertThat(keyList).hasSize(1);
+
+        JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.NONE).build();
+        String json = new JWTEncoder().encode(keyList.get(0), parameters);
+
+        AtbashKey key = new JWTDecoder().decode(json, AtbashKey.class);
+
+        assertThat(key.getKey().getAlgorithm()).isEqualTo(keyList.get(0).getKey().getAlgorithm());
+
+        // When encoded representation (PKCS#8) is the same, I guess both keys are the same
+        assertThat(key.getKey().getEncoded()).isEqualTo(keyList.get(0).getKey().getEncoded());
+
+    }
+
+    @Test
+    public void testJSONSupport_OKPPublic() {
+        ListKeyManager keyManager = new ListKeyManager(generateOKPKeys());
+
+        SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID).withAsymmetricPart(AsymmetricPart.PUBLIC).build();
+        List<AtbashKey> keyList = keyManager.retrieveKeys(criteria);
+
+        assertThat(keyList).hasSize(1);
+
+        JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.NONE).build();
+        String json = new JWTEncoder().encode(keyList.get(0), parameters);
+
+        AtbashKey key = new JWTDecoder().decode(json, AtbashKey.class);
+
+        assertThat(key.getKey().getAlgorithm()).isEqualTo(keyList.get(0).getKey().getAlgorithm());
+
+        // When encoded representation (PKCS#8) is the same, I guess both keys are the same
+        assertThat(key.getKey().getEncoded()).isEqualTo(keyList.get(0).getKey().getEncoded());
+
     }
 
     @Test

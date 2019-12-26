@@ -19,24 +19,25 @@ import be.atbash.ee.security.octopus.UnsupportedKeyType;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.ECCurveHelper;
 import be.atbash.ee.security.octopus.keys.writer.KeyEncoderParameters;
-import be.atbash.ee.security.octopus.nimbus.jwk.Curve;
 import be.atbash.ee.security.octopus.nimbus.jwk.ECKey;
-import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import be.atbash.ee.security.octopus.nimbus.jwk.RSAKey;
+import be.atbash.ee.security.octopus.nimbus.jwk.*;
+import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.util.exception.AtbashUnexpectedException;
-import org.bouncycastle.asn1.x9.X9ECParameters;
+import org.bouncycastle.asn1.*;
+import org.bouncycastle.jcajce.provider.asymmetric.edec.BCEdDSAPrivateKey;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.spec.ECPublicKeySpec;
 import org.bouncycastle.math.ec.ECPoint;
+import org.bouncycastle.math.ec.rfc8032.Ed25519;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.interfaces.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
-
-import static be.atbash.ee.security.octopus.nimbus.jwk.ECKey.SUPPORTED_CURVES;
 
 /**
  *
@@ -56,9 +57,11 @@ public class JwkKeyEncoderPrivatePart implements KeyEncoder {
         }
         if (KeyType.EC.equals(atbashKey.getSecretKeyType().getKeyType())) {
             return encodeECKey(atbashKey);
-
         }
-        // FIXME Support for OCT.
+        if (KeyType.OKP.equals(atbashKey.getSecretKeyType().getKeyType())) {
+            return encodeOKPKey(atbashKey);
+        }
+
         throw new UnsupportedKeyType(atbashKey.getSecretKeyType().getKeyType(), "writing JWK");
     }
 
@@ -75,6 +78,44 @@ public class JwkKeyEncoderPrivatePart implements KeyEncoder {
 
         ECKey jwk = new ECKey.Builder(curve, (ECPublicKey) getPublicKey(atbashKey.getKey(), curve)).keyID(atbashKey.getKeyId())
                 .privateKey((ECPrivateKey) atbashKey.getKey())
+                .build();
+
+        return jwk.toJSONObject().build().toString().getBytes(StandardCharsets.UTF_8);
+    }
+
+    private byte[] encodeOKPKey(AtbashKey atbashKey) {
+
+        // TODO Check if type from BouncyCastle especially when JKD has support for it.
+        BCEdDSAPrivateKey key = (BCEdDSAPrivateKey) atbashKey.getKey();
+
+        // The next code statements are required to get access to the x and d values of the private Key.
+        // BouncyCastle should have support for it!
+        ASN1InputStream stream = new ASN1InputStream(key.getEncoded());
+        ASN1Primitive primitive;
+        try {
+            primitive = stream.readObject();
+        } catch (IOException e) {
+            throw new AtbashUnexpectedException(e);
+        }
+        // [1, [1.3.101.112], #0420f615acda8498cfc96c45c00f80e2438aa490f9e8b1201320aba968d7e750095d, [1]#00f2c6678839670f1abaed87171ac938122cd4c62e4c6d24c7620f63da893ab682]
+        DLSequence sequence = (DLSequence) primitive;
+
+        ASN1Encodable item1 = sequence.getObjectAt(2);
+        DEROctetString privateBytes = (DEROctetString) item1;
+
+        byte[] dBytes = new byte[Ed25519.SECRET_KEY_SIZE];
+        System.arraycopy(privateBytes.getOctets(), 2, dBytes, 0, Ed25519.SECRET_KEY_SIZE);
+
+        ASN1Encodable item2 = sequence.getObjectAt(3);
+        DLTaggedObject publicPart = (DLTaggedObject) item2;
+        DEROctetString publicBytes = (DEROctetString) publicPart.getObject();
+
+        byte[] xBytes = new byte[Ed25519.SECRET_KEY_SIZE];
+        System.arraycopy(publicBytes.getOctets(), 1, xBytes, 0, Ed25519.SECRET_KEY_SIZE);
+
+        OctetKeyPair jwk = new OctetKeyPair.Builder(Curve.Ed25519, Base64URLValue.encode(xBytes))
+                .keyID(atbashKey.getKeyId())
+                .d(Base64URLValue.encode(dBytes))
                 .build();
 
         return jwk.toJSONObject().build().toString().getBytes(StandardCharsets.UTF_8);

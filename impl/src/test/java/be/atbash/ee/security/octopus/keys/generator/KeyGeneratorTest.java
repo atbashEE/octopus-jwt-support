@@ -97,4 +97,20 @@ public class KeyGeneratorTest {
         assertThat(keys.get(0).getKeyId()).isEqualTo(KID);
 
     }
+
+    @Test
+    public void generateKeys_OKP() {
+        OKPGenerationParameters generationParameters = new OKPGenerationParameters.OKPGenerationParametersBuilder()
+                .withKeyId(KID)
+                .build();
+
+        List<AtbashKey> keys = keyGenerator.generateKeys(generationParameters);
+
+        assertThat(keys).hasSize(2);
+        for (int i = 0; i < 2; i++) {
+            assertThat(keys.get(i).getSecretKeyType().getKeyType()).isEqualTo(KeyType.OKP);
+            assertThat(keys.get(i).getKeyId()).isEqualTo(KID);
+        }
+
+    }
 }
