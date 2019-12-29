@@ -36,7 +36,7 @@ import java.util.Set;
 
 
 /**
- * Ed25519 verifier of {@link com.nimbusds.jose.JWSObject JWS objects}.
+ * Ed25519 verifier of {@link be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSObject JWS objects}.
  * Expects a public {@link OctetKeyPair} with {@code "crv"} Ed25519.
  * Uses the Edwards-curve Digital Signature Algorithm (EdDSA).
  *
@@ -48,17 +48,16 @@ import java.util.Set;
  * <p>Supports the following algorithm:
  *
  * <ul>
- *     <li>{@link com.nimbusds.jose.JWSAlgorithm#EdDSA}
+ *     <li>{@link JWSAlgorithm#EdDSA}
  * </ul>
  *
  * <p>with the following curve:
  *
  * <ul>
- *     <li>{@link com.nimbusds.jose.jwk.Curve#Ed25519}
+ *     <li>{@link Curve#Ed25519}
  * </ul>
  *
- * @author Tim McLean
- * @version 2018-07-11
+ * based on code from Tim McLean
  */
 public class Ed25519Verifier extends EdDSAProvider implements JWSVerifier {
 

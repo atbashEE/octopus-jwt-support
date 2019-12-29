@@ -142,6 +142,7 @@ public class KeyGenerator {
 
     private List<AtbashKey> generateOKPKeys(OKPGenerationParameters generationParameters) {
         try {
+            // FIXME support for other algorithms
             KeyPairGenerator g = KeyPairGenerator.getInstance("Ed25519", BouncyCastleProviderSingleton.getInstance());
             //g.initialize(256, new SecureRandom()); Not needed as 256 is the only allowed keySize and new SecureRandom() is taken by default.
             KeyPair kp = g.generateKeyPair();
