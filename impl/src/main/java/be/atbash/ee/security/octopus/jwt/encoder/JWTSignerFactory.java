@@ -23,6 +23,7 @@ import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.KeyLengthException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.ECDSASigner;
+import be.atbash.ee.security.octopus.nimbus.jose.crypto.Ed25519Signer;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.MACSigner;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.RSASSASigner;
 import be.atbash.ee.security.octopus.nimbus.jwk.Curve;
@@ -30,6 +31,7 @@ import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSSigner;
 import be.atbash.util.exception.AtbashUnexpectedException;
+import org.bouncycastle.jcajce.provider.asymmetric.edec.BCEdDSAPrivateKey;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -83,6 +85,18 @@ public class JWTSignerFactory {
                 throw new UnsupportedKeyType(AsymmetricPart.PRIVATE, "JWS Signing");
             }
         }
+        if (KeyType.OKP.equals(parametersSigning.getKeyType())) {
+
+            if (parametersSigning.getKey() instanceof BCEdDSAPrivateKey) {
+                try {
+                    result = new Ed25519Signer((BCEdDSAPrivateKey) parametersSigning.getKey());
+                } catch (JOSEException e) {
+                    throw new UnsupportedECCurveException(e.getMessage());
+                }
+            } else {
+                throw new UnsupportedKeyType(AsymmetricPart.PRIVATE, "JWS Signing");
+            }
+        }
 
         if (result == null) {
             throw new UnsupportedKeyType(parametersSigning.getKeyType(), "JWT Signing");
@@ -98,6 +112,10 @@ public class JWTSignerFactory {
         if (KeyType.OCT.equals(parametersSigning.getKeyType())) {
 
             result = hmacAlgorithmFactory.determineOptimalAlgorithm(parametersSigning.getKey().getEncoded());
+        }
+        if (KeyType.OKP.equals(parametersSigning.getKeyType())) {
+
+            result = JWSAlgorithm.EdDSA;
         }
         if (KeyType.RSA.equals(parametersSigning.getKeyType())) {
 

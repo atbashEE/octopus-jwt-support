@@ -27,6 +27,7 @@ import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.ListKeyManager;
 import be.atbash.ee.security.octopus.keys.generator.ECGenerationParameters;
 import be.atbash.ee.security.octopus.keys.generator.KeyGenerator;
+import be.atbash.ee.security.octopus.keys.generator.OKPGenerationParameters;
 import be.atbash.ee.security.octopus.keys.generator.RSAGenerationParameters;
 import be.atbash.ee.security.octopus.keys.selector.*;
 import be.atbash.ee.security.octopus.util.HmacSecretUtil;
@@ -474,6 +475,93 @@ public class JWTTest {
         }
     }
 
+    @Test
+    public void encodingJWT_OKP() {
+        List<AtbashKey> keys = generateOKPKeys(KID_SIGN);
+
+        ListKeyManager keyManager = new ListKeyManager(keys);
+
+        SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PRIVATE).build();
+        List<AtbashKey> signKeyList = keyManager.retrieveKeys(criteria);
+
+        assertThat(signKeyList).as("We should have 1 Private key for signing").hasSize(1);
+
+        JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS)
+                .withSecretKeyForSigning(signKeyList.get(0))
+                .build();
+
+        String encoded = new JWTEncoder().encode(payload, parameters);
+
+        // Check algo in header
+        String header = new String(Base64.getDecoder().decode(encoded.split("\\.")[0]));
+        assertThat(header).contains("\"alg\":\"EdDSA\"");
+
+        criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PUBLIC).build();
+        List<AtbashKey> publicList = keyManager.retrieveKeys(criteria);
+
+        KeySelector keySelector = new SingleKeySelector(publicList.get(0));
+        Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector, null).getData();
+
+        assertThat(payload).isEqualToComparingFieldByField(data);
+    }
+
+    @Test(expected = InvalidJWTException.class)
+    public void encodingJWT_OKP_tamperedPayload() {
+        List<AtbashKey> keys = generateOKPKeys(KID_SIGN);
+
+        ListKeyManager keyManager = new ListKeyManager(keys);
+
+        SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PRIVATE).build();
+        List<AtbashKey> signKeyList = keyManager.retrieveKeys(criteria);
+
+        assertThat(signKeyList).as("We should have 1 Private key for signing").hasSize(1);
+
+        JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS)
+                .withSecretKeyForSigning(signKeyList.get(0))
+                .build();
+
+        String encoded = new JWTEncoder().encode(payload, parameters);
+        String updatedEncoded = tamperWithPayload(encoded);
+
+        // Check algo in header
+        String header = new String(Base64.getDecoder().decode(encoded.split("\\.")[0]));
+        assertThat(header).contains("\"alg\":\"EdDSA\"");
+
+        criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PUBLIC).build();
+        List<AtbashKey> publicList = keyManager.retrieveKeys(criteria);
+
+        KeySelector keySelector = new SingleKeySelector(publicList.get(0));
+        new JWTDecoder().decode(updatedEncoded, Payload.class, keySelector, null).getData();
+    }
+
+    @Test(expected = InvalidJWTException.class)
+    public void encodingJWT_OKP_wrongKey() {
+        List<AtbashKey> keys = generateOKPKeys(KID_SIGN);
+
+        ListKeyManager keyManager = new ListKeyManager(keys);
+
+        SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PRIVATE).build();
+        List<AtbashKey> signKeyList = keyManager.retrieveKeys(criteria);
+
+        assertThat(signKeyList).as("We should have 1 Private key for signing").hasSize(1);
+
+        JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS)
+                .withSecretKeyForSigning(signKeyList.get(0))
+                .build();
+
+        String encoded = new JWTEncoder().encode(payload, parameters);
+        String updatedEncoded = tamperWithPayload(encoded);
+
+        List<AtbashKey> keysOther = generateOKPKeys(KID_SIGN);
+        keyManager = new ListKeyManager(keysOther);
+
+        criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PUBLIC).build();
+        List<AtbashKey> publicList = keyManager.retrieveKeys(criteria);
+
+        KeySelector keySelector = new SingleKeySelector(publicList.get(0));
+        new JWTDecoder().decode(updatedEncoded, Payload.class, keySelector, null).getData();
+    }
+
     private AtbashKey generateOCTKey() {
         byte[] secret = new byte[32];
         new SecureRandom().nextBytes(secret);
@@ -497,4 +585,14 @@ public class JWTTest {
         KeyGenerator generator = new KeyGenerator();
         return generator.generateKeys(generationParameters);
     }
+
+    private List<AtbashKey> generateOKPKeys(String kid) {
+        OKPGenerationParameters generationParameters = new OKPGenerationParameters.OKPGenerationParametersBuilder()
+                .withKeyId(kid)
+                .build();
+
+        KeyGenerator generator = new KeyGenerator();
+        return generator.generateKeys(generationParameters);
+    }
+
 }

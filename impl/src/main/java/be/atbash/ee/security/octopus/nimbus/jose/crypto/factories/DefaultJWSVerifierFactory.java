@@ -19,6 +19,7 @@ package be.atbash.ee.security.octopus.nimbus.jose.crypto.factories;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.KeyTypeException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.ECDSAVerifier;
+import be.atbash.ee.security.octopus.nimbus.jose.crypto.Ed25519Verifier;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.MACVerifier;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.RSASSAVerifier;
 import be.atbash.ee.security.octopus.nimbus.jose.jca.JCAContext;
@@ -26,6 +27,7 @@ import be.atbash.ee.security.octopus.nimbus.jose.proc.JWSVerifierFactory;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSVerifier;
+import org.bouncycastle.jcajce.provider.asymmetric.edec.BCEdDSAPublicKey;
 
 import javax.crypto.SecretKey;
 import java.security.Key;
@@ -119,8 +121,15 @@ public class DefaultJWSVerifierFactory implements JWSVerifierFactory {
 
             verifier = new ECDSAVerifier(ecPublicKey);
 
-        } else {
+        } else if (Ed25519Verifier.SUPPORTED_ALGORITHMS.contains(header.getAlgorithm())) {
 
+            if (!(key instanceof BCEdDSAPublicKey)) {
+                throw new KeyTypeException(BCEdDSAPublicKey.class);
+            }
+
+            BCEdDSAPublicKey okpPublicKey = (BCEdDSAPublicKey) key;
+            verifier = new Ed25519Verifier(okpPublicKey);
+        } else {
             throw new JOSEException("Unsupported JWS algorithm: " + header.getAlgorithm());
         }
 
