@@ -73,6 +73,9 @@ public class AtbashKey {
         if (KeyType.OCT.equals(secretKeyType.getKeyType())) {
             result.append("key length : ").append(key.getEncoded().length * 8);
         }
+        if (KeyType.OKP.equals(secretKeyType.getKeyType())) {
+            result.append("Curve name : Ed25519");  // TODO Support for other EdDSA algorithms.
+        }
         return result.toString();
     }
 
