@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -101,7 +101,7 @@ public class KeyReaderJWK {
 
             PrivateKey privateKey;
             if (jwk instanceof ECKey) {
-                // We need to use the BouncyCastle p^^ovider, otherwise we have a EC P¨¨ivate Key based on sun packages!
+                // We need to use the BouncyCastle provider, otherwise we have a EC Private Key based on sun packages!
                 privateKey = ((ECKey) jwk).toECPrivateKey(BouncyCastleProviderSingleton.getInstance());
             } else {
                 privateKey = ((AsymmetricJWK) jwk).toPrivateKey();
