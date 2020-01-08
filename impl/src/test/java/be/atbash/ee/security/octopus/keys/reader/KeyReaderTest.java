@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,9 @@ import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.TestPasswordLookup;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.util.resource.ResourceUtil;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
@@ -79,8 +80,8 @@ public class KeyReaderTest {
         assertThat(keys.get(0).getKey()).isInstanceOf(RSAPublicKey.class);
     }
 
-    //@Test
-    @Ignore
+    @Test
+    @Disabled
     // OpenSSL generated output ( isn't working javax.crypto.BadPaddingException: pad block corrupted)
     // Also XCA exported file isn't working
     public void readKeyResource_scenario3() {
@@ -309,18 +310,17 @@ public class KeyReaderTest {
 
     }
 
-    @Test(expected = UnknownKeyResourceTypeException.class)
+    @Test
     public void readKeyResource_scenario13() {
         // unknown key type from path
-        keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "key.txt", null);
+        Assertions.assertThrows(UnknownKeyResourceTypeException.class, () -> keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "key.txt", null));
     }
 
 
-    @Test(expected = InvalidJWKSetFormatException.class)
+    @Test
     public void readKeyResource_scenario14() {
         // JWKSet (but same Id)
-
-        keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "duplicate-id.jwkset", new TestPasswordLookup(null, null));
+        Assertions.assertThrows(InvalidJWKSetFormatException.class, () -> keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "duplicate-id.jwkset", new TestPasswordLookup(null, null)));
 
     }
 

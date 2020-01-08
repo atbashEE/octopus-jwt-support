@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,8 @@ import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -49,8 +50,6 @@ import java.security.spec.ECPublicKeySpec;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.fail;
 
 
 /**
@@ -142,13 +141,12 @@ public class ECKeyTest {
     @Test
     public void testUnknownCurve() {
 
-        try {
-            new ECKey.Builder(new Curve("unknown"), ExampleKeyP256.X, ExampleKeyP256.Y).build();
-            fail();
-        } catch (IllegalStateException e) {
-            assertThat(e.getMessage()).isEqualTo("Unknown / unsupported curve: unknown");
-            assertThat(e.getCause()).isInstanceOf(IllegalArgumentException.class);
-        }
+        IllegalStateException e = Assertions.assertThrows(IllegalStateException.class,
+                () -> new ECKey.Builder(new Curve("unknown"), ExampleKeyP256.X, ExampleKeyP256.Y).build());
+
+        assertThat(e.getMessage()).isEqualTo("Unknown / unsupported curve: unknown");
+        assertThat(e.getCause()).isInstanceOf(IllegalArgumentException.class);
+
     }
 
     @Test
@@ -882,12 +880,10 @@ public class ECKeyTest {
         X509Certificate cert = X509CertUtils.parse(pemEncodedCert);
         assertThat(cert).isNotNull();
 
-        try {
-            ECKey.parse(cert);
-            fail();
-        } catch (JOSEException e) {
-            assertThat(e.getMessage()).isEqualTo("The public key of the X.509 certificate is not EC");
-        }
+        JOSEException e = Assertions.assertThrows(JOSEException.class,
+                () -> ECKey.parse(cert));
+
+        assertThat(e.getMessage()).isEqualTo("The public key of the X.509 certificate is not EC");
     }
 
     @Test
@@ -942,13 +938,12 @@ public class ECKeyTest {
         assertThat(ecKey.getKeyStore()).isEqualTo(keyStore);
 
         // Try to load with bad pin
-        try {
-            ECKey.load(keyStore, "1", "".toCharArray());
-            fail();
-        } catch (JOSEException e) {
-            assertThat(e.getMessage()).isEqualTo("Couldn't retrieve private EC key (bad pin?): Cannot recover key");
-            assertThat(e.getCause()).isInstanceOf(UnrecoverableKeyException.class);
-        }
+        JOSEException e = Assertions.assertThrows(JOSEException.class,
+                () -> ECKey.load(keyStore, "1", "".toCharArray()));
+
+        assertThat(e.getMessage()).isEqualTo("Couldn't retrieve private EC key (bad pin?): Cannot recover key");
+        assertThat(e.getCause()).isInstanceOf(UnrecoverableKeyException.class);
+
     }
 
     @Test
@@ -990,12 +985,9 @@ public class ECKeyTest {
 
         keyStore.setCertificateEntry("1", cert);
 
-        try {
-            ECKey.load(keyStore, "1", null);
-            fail();
-        } catch (JOSEException e) {
-            assertThat(e.getMessage()).isEqualTo("Couldn't load EC JWK: The key algorithm is not EC");
-        }
+        JOSEException e = Assertions.assertThrows(JOSEException.class,
+                () -> ECKey.load(keyStore, "1", null));
+        assertThat(e.getMessage()).isEqualTo("Couldn't load EC JWK: The key algorithm is not EC");
     }
 
     @Test
@@ -1013,43 +1005,37 @@ public class ECKeyTest {
     @Test
     // iss #217
     public void testEnsurePublicXYCoordinatesOnCurve() {
+        // FIXME Multiple tests
+        IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> new ECKey(
+                        Curve.P_256,
+                        ExampleKeyP384Alt.X, // on diff curve
+                        ExampleKeyP384Alt.Y, // on diff curve
+                        KeyUse.SIGNATURE,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null));
+        assertThat(e.getMessage()).isEqualTo("Invalid EC JWK: The 'x' and 'y' public coordinates are not on the P-256 curve");
 
-        try {
-            new ECKey(
-                    Curve.P_256,
-                    ExampleKeyP384Alt.X, // on diff curve
-                    ExampleKeyP384Alt.Y, // on diff curve
-                    KeyUse.SIGNATURE,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null);
-            fail();
-        } catch (IllegalArgumentException e) {
-            assertThat(e.getMessage()).isEqualTo("Invalid EC JWK: The 'x' and 'y' public coordinates are not on the P-256 curve");
-        }
-
-        try {
-            new ECKey(
-                    Curve.P_256,
-                    ExampleKeyP384Alt.X, // on diff curve
-                    ExampleKeyP384Alt.Y, // on diff curve
-                    ExampleKeyP256.D,    // private D coordinate
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null);
-            fail();
-        } catch (IllegalArgumentException e) {
-            assertThat(e.getMessage()).isEqualTo("Invalid EC JWK: The 'x' and 'y' public coordinates are not on the P-256 curve");
-        }
+        IllegalArgumentException e2 = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> new ECKey(
+                        Curve.P_256,
+                        ExampleKeyP384Alt.X, // on diff curve
+                        ExampleKeyP384Alt.Y, // on diff curve
+                        ExampleKeyP256.D,    // private D coordinate
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null));
+        assertThat(e2.getMessage()).isEqualTo("Invalid EC JWK: The 'x' and 'y' public coordinates are not on the P-256 curve");
     }
 
     @Test
@@ -1083,22 +1069,16 @@ public class ECKeyTest {
         ECPublicKeySpec publicKeySpec = new ECPublicKeySpec(w, Curve.P_256.toECParameterSpec());
 
         // Default Sun provider
-        try {
-            KeyFactory keyFactory = KeyFactory.getInstance("EC");
-            keyFactory.generatePublic(publicKeySpec);
-            fail();
-        } catch (RuntimeException e) {
-            assertThat(e.getMessage()).isEqualTo("Point coordinates do not match field size");
-        }
+        KeyFactory keyFactory = KeyFactory.getInstance("EC");
+        RuntimeException e = Assertions.assertThrows(RuntimeException.class,
+                () -> keyFactory.generatePublic(publicKeySpec));
+        assertThat(e.getMessage()).isEqualTo("Point coordinates do not match field size");
 
         // BouncyCastle provider
-        try {
-            KeyFactory keyFactory = KeyFactory.getInstance("EC", BouncyCastleProviderSingleton.getInstance());
-            keyFactory.generatePublic(publicKeySpec);
-            fail();
-        } catch (Exception e) {
-            assertThat(e.getCause().getMessage()).isEqualTo("x value invalid for SecP256R1FieldElement");
-        }
+        KeyFactory keyFactory2 = KeyFactory.getInstance("EC", BouncyCastleProviderSingleton.getInstance());
+        Exception e2 = Assertions.assertThrows(Exception.class,
+                () -> keyFactory2.generatePublic(publicKeySpec));
+        assertThat(e2.getCause().getMessage()).isEqualTo("x value invalid for SecP256R1FieldElement");
     }
 
     @Test
@@ -1152,6 +1132,6 @@ public class ECKeyTest {
         //When
 
         //Then
-        assertNotEquals(ecKeyA, ecKeyB);
+        assertThat(ecKeyA).isNotEqualTo(ecKeyB);
     }
 }

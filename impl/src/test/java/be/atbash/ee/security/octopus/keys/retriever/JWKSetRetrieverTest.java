@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,10 @@ import be.atbash.ee.security.octopus.nimbus.jwk.JWKSet;
 import be.atbash.ee.security.octopus.nimbus.jwk.RSAKey;
 import be.atbash.util.TestReflectionUtils;
 import net.jadler.Jadler;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -37,7 +38,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
 
 
 public class JWKSetRetrieverTest {
@@ -77,13 +77,13 @@ public class JWKSetRetrieverTest {
         assertThat((Integer) TestReflectionUtils.getValueOf(resourceRetriever, "sizeLimit")).isEqualTo(0);
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         Jadler.initJadler();
     }
 
 
-    @After
+    @AfterEach
     public void tearDown() {
         Jadler.closeJadler();
     }
@@ -229,12 +229,9 @@ public class JWKSetRetrieverTest {
 
         JWKSetRetriever resourceRetriever = new JWKSetRetriever(50, 0);
 
-        try {
-            resourceRetriever.retrieveResource(new URL("http://localhost:" + port + "/c2id/jwks.json"));
-            fail();
-        } catch (IOException e) {
-            assertThat(e.getMessage()).startsWith("Connection refused");
-        }
+        IOException e = Assertions.assertThrows(IOException.class, () -> resourceRetriever.retrieveResource(new URL("http://localhost:" + port + "/c2id/jwks.json")));
+        assertThat(e.getMessage()).startsWith("Connection refused");
+
     }
 
     @Test
@@ -247,12 +244,9 @@ public class JWKSetRetrieverTest {
         JWKSetRetriever resourceRetriever = new JWKSetRetriever(50, 0);
         resourceRetriever.setProxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress("localhost", proxyPort)));
 
-        try {
-            resourceRetriever.retrieveResource(new URL("http://localhost:" + Jadler.port() + "/c2id/jwks.json"));
-            fail();
-        } catch (IOException e) {
-            assertThat(e.getMessage()).startsWith("Connection refused");
-        }
+        IOException e = Assertions.assertThrows(IOException.class, () -> resourceRetriever.retrieveResource(new URL("http://localhost:" + Jadler.port() + "/c2id/jwks.json")));
+        assertThat(e.getMessage()).startsWith("Connection refused");
+
     }
 
     @Test
@@ -272,12 +266,9 @@ public class JWKSetRetrieverTest {
 
         JWKSetRetriever resourceRetriever = new JWKSetRetriever(0, 50);
 
-        try {
-            resourceRetriever.retrieveResource(new URL("http://localhost:" + Jadler.port() + "/c2id/jwks.json"));
-            fail();
-        } catch (IOException e) {
-            assertThat(e.getMessage()).isEqualTo("Read timed out");
-        }
+        IOException e = Assertions.assertThrows(IOException.class, () -> resourceRetriever.retrieveResource(new URL("http://localhost:" + Jadler.port() + "/c2id/jwks.json")));
+        assertThat(e.getMessage()).isEqualTo("Read timed out");
+
     }
 
     @Test
@@ -299,14 +290,11 @@ public class JWKSetRetrieverTest {
 
         URL url = new URL("http://localhost:" + Jadler.port() + "/c2id/jwks.json");
 
-        try {
-            resourceRetriever.retrieveResource(url);
-            fail();
-        } catch (IOException e) {
-            // Size overrun exception poses as file not found
-            // FIXME Can we bring this message back?
-            assertThat(e.getMessage()).startsWith("Parsing of content of 'http://localhost:");
-        }
+        IOException e = Assertions.assertThrows(IOException.class, () -> resourceRetriever.retrieveResource(url));
+        // Size overrun exception poses as file not found
+        // FIXME Can we bring this message back?
+        assertThat(e.getMessage()).startsWith("Parsing of content of 'http://localhost:");
+
     }
 
     private RSAPublicKey generateRSAKeys() {

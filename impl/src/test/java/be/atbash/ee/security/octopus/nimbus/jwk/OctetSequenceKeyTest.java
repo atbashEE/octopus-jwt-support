@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,8 @@ import be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.ee.security.octopus.nimbus.util.Base64Value;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -38,7 +39,6 @@ import java.security.UnrecoverableKeyException;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
 
 
 /**
@@ -198,15 +198,12 @@ public class OctetSequenceKeyTest {
     @Test
     public void testRejectKeyUseNotConsistentWithOps() {
 
-        try {
-            new OctetSequenceKey.Builder(new Base64URLValue("GawgguFyGrWKav7AX4VKUg"))
-                    .keyUse(KeyUse.SIGNATURE)
-                    .keyOperations(Collections.singleton(KeyOperation.ENCRYPT))
-                    .build();
-            fail();
-        } catch (IllegalStateException e) {
-            assertThat(e.getMessage()).isEqualTo("The key use \"use\" and key options \"key_opts\" parameters are not consistent, see RFC 7517, section 4.3");
-        }
+        IllegalStateException e = Assertions.assertThrows(IllegalStateException.class,
+                () -> new OctetSequenceKey.Builder(new Base64URLValue("GawgguFyGrWKav7AX4VKUg"))
+                        .keyUse(KeyUse.SIGNATURE)
+                        .keyOperations(Collections.singleton(KeyOperation.ENCRYPT))
+                        .build());
+        assertThat(e.getMessage()).isEqualTo("The key use \"use\" and key options \"key_opts\" parameters are not consistent, see RFC 7517, section 4.3");
     }
 
     @Test
@@ -535,13 +532,10 @@ public class OctetSequenceKeyTest {
 
         keyStore.setEntry("1", new KeyStore.SecretKeyEntry(secretKey), new KeyStore.PasswordProtection("1234".toCharArray()));
 
-        try {
-            OctetSequenceKey.load(keyStore, "1", "badpin".toCharArray());
-            fail();
-        } catch (Exception e) {
-            assertThat(e.getMessage()).contains("Couldn't retrieve secret key (bad pin?)");
-            assertThat(e.getCause()).isInstanceOf(UnrecoverableKeyException.class);
-        }
+        Exception e = Assertions.assertThrows(Exception.class,
+                () -> OctetSequenceKey.load(keyStore, "1", "badpin".toCharArray()));
+        assertThat(e.getMessage()).contains("Couldn't retrieve secret key (bad pin?)");
+        assertThat(e.getCause()).isInstanceOf(UnrecoverableKeyException.class);
     }
 
     @Test

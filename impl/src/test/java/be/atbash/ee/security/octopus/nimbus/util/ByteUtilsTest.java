@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,13 @@
 package be.atbash.ee.security.octopus.nimbus.util;
 
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
 
 
 /**
@@ -80,12 +80,12 @@ public class ByteUtilsTest {
     @Test
     public void testSafeBitLength_IntegerOverflow() {
 
-        try {
-            ByteUtils.safeBitLength(Integer.MAX_VALUE);
-            fail();
-        } catch (IntegerOverflowException e) {
-            assertThat(e.getMessage()).isEqualTo("Integer overflow");
-        }
+        IntegerOverflowException e = Assertions.assertThrows(IntegerOverflowException.class,
+                () -> ByteUtils.safeBitLength(Integer.MAX_VALUE));
+
+
+        assertThat(e.getMessage()).isEqualTo("Integer overflow");
+
     }
 
     @Test
@@ -100,13 +100,9 @@ public class ByteUtilsTest {
     @Test
     public void testArraySafeBitLength_IntegerOverflow() {
 
-        try {
-            ByteUtils.safeBitLength(new byte[Integer.MAX_VALUE]);
-            fail();
-        } catch (OutOfMemoryError e) {
-            System.out.println("Test not run due to " + e);
-        } catch (IntegerOverflowException e) {
-            assertThat(e.getMessage()).isEqualTo("Integer overflow");
-        }
+        IntegerOverflowException e = Assertions.assertThrows(IntegerOverflowException.class,
+                () -> ByteUtils.safeBitLength(new byte[Integer.MAX_VALUE / 8 + 1]));
+        assertThat(e.getMessage()).isEqualTo("Integer overflow");
+
     }
 }

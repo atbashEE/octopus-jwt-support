@@ -22,8 +22,9 @@ import be.atbash.ee.security.octopus.keys.generator.RSAGenerationParameters;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.nimbus.jwk.JWKSet;
 import be.atbash.ee.security.octopus.nimbus.jwk.RSAKey;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
@@ -33,13 +34,13 @@ public class KeyWriterFactoryTest {
 
     private KeyWriterFactory factory;
 
-    @Before
+    @BeforeEach
     public void setup() {
         factory = new KeyWriterFactory();
         factory.init();
     }
 
-    @Test(expected = DuplicateKeyIdException.class)
+    @Test
     public void writeKeyAsJWKSet_duplicateKeyId() {
 
         List<AtbashKey> atbashKeys = generateRSAKeys("kid");
@@ -53,7 +54,7 @@ public class KeyWriterFactoryTest {
         JWKSet jwkSet = new JWKSet(rsaKey);
         KeyEncoderParameters parameters = new KeyEncoderParameters(jwkSet);
 
-        factory.writeKeyAsJWKSet(atbashKeys.get(1), parameters);
+        Assertions.assertThrows(DuplicateKeyIdException.class, () -> factory.writeKeyAsJWKSet(atbashKeys.get(1), parameters));
     }
 
     @Test

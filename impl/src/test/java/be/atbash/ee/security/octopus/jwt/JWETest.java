@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,12 +39,13 @@ import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEObject;
 import be.atbash.util.TestReflectionUtils;
 import be.atbash.util.exception.AtbashUnexpectedException;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.org.lidalia.slf4jext.Level;
 import uk.org.lidalia.slf4jtest.TestLogger;
 import uk.org.lidalia.slf4jtest.TestLoggerFactory;
@@ -54,10 +55,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class JWETest {
 
     private static final String KID_SIGN = "sign";
@@ -71,7 +71,7 @@ public class JWETest {
 
     private JWTEncoder jwtEncoder = new JWTEncoder();
 
-    @Before
+    @BeforeEach
     public void setup() throws NoSuchFieldException {
         payload = new Payload();
         payload.setValue("JUnit");
@@ -84,7 +84,7 @@ public class JWETest {
         TestReflectionUtils.setFieldValue(jwtEncoder, "jwtSupportConfiguration", jwtSupportConfigurationMock);
     }
 
-    @After
+    @AfterEach
     public void teardown() {
         TestLoggerFactory.clear();
     }
@@ -155,8 +155,9 @@ public class JWETest {
 
     }
 
-    @Test(expected = UnsupportedECCurveException.class)
+    @Test
     public void encodingJWE_EC_unsupportedCurve() {
+
         when(jwtSupportConfigurationMock.getDefaultJWEAlgorithmEC()).thenReturn(JWEAlgorithm.ECDH_ES_A256KW);
 
         List<AtbashKey> keys = generateECKeys(KID_SIGN, "prime192v1");
@@ -178,8 +179,7 @@ public class JWETest {
                 .withSecretKeyForSigning(signKeyList.get(0))
                 .withSecretKeyForEncryption(encryptKeyList.get(0))
                 .build();
-
-        jwtEncoder.encode(payload, parameters);
+        Assertions.assertThrows(UnsupportedECCurveException.class, () -> jwtEncoder.encode(payload, parameters));
     }
 
     @Test
@@ -247,7 +247,7 @@ public class JWETest {
 
     }
 
-    @Test(expected = UnsupportedKeyType.class)
+    @Test
     public void encodingJWE_RSA_WrongKeyType() {
 
         List<AtbashKey> keys = generateRSAKeys(KID_SIGN);
@@ -270,7 +270,7 @@ public class JWETest {
                 .withSecretKeyForEncryption(encryptKeyList.get(0))
                 .build();
 
-        jwtEncoder.encode(payload, parameters);
+        Assertions.assertThrows(UnsupportedKeyType.class, () -> jwtEncoder.encode(payload, parameters));
     }
 
     @Test
@@ -304,7 +304,7 @@ public class JWETest {
 
     }
 
-    @Test(expected = InvalidJWTException.class)
+    @Test
     public void encodingJWE_NoKeyMatch() {
 
         List<AtbashKey> signKeys = generateRSAKeys(KID_SIGN);
@@ -332,22 +332,19 @@ public class JWETest {
 
         keyManager = new ListKeyManager(signKeys);  // Missing keys from encryption
         KeySelector keySelector = new TestKeySelector(keyManager);
-        try {
-            new JWTDecoder().decode(encoded, Payload.class, keySelector, null);
-        } finally {
-            assertThat(logger.getLoggingEvents()).hasSize(1);
-            assertThat(logger.getLoggingEvents().get(0).getLevel()).isEqualTo(Level.ERROR);
-            assertThat(logger.getLoggingEvents().get(0).getMessage()).isEqualTo("(OCT-KEY-010) No or multiple keys found for criteria :\n" +
-                    " KeySelectorCriteria{\n" +
-                    "     KeyFilter{keyId='encrypt'}\n" +
-                    "     KeyFilter{part='PRIVATE'}\n" +
-                    "}");
+        Assertions.assertThrows(InvalidJWTException.class, () -> new JWTDecoder().decode(encoded, Payload.class, keySelector, null));
+        assertThat(logger.getLoggingEvents()).hasSize(1);
+        assertThat(logger.getLoggingEvents().get(0).getLevel()).isEqualTo(Level.ERROR);
+        assertThat(logger.getLoggingEvents().get(0).getMessage()).isEqualTo("(OCT-KEY-010) No or multiple keys found for criteria :\n" +
+                " KeySelectorCriteria{\n" +
+                "     KeyFilter{keyId='encrypt'}\n" +
+                "     KeyFilter{part='PRIVATE'}\n" +
+                "}");
 
-        }
 
     }
 
-    @Test(expected = UnsupportedKeyLengthException.class)
+    @Test
     public void encodingJWE_OCT_wrongKeyLength() {
         when(jwtSupportConfigurationMock.getDefaultJWEAlgorithmOCT()).thenReturn(JWEAlgorithm.A256KW);
 
@@ -364,7 +361,7 @@ public class JWETest {
                 .withSecretKeyForEncryption(encryptKeyList.get(0))
                 .build();
 
-        jwtEncoder.encode(payload, parameters);
+        Assertions.assertThrows(UnsupportedKeyLengthException.class, () -> jwtEncoder.encode(payload, parameters));
     }
 
     @Test
@@ -398,14 +395,12 @@ public class JWETest {
         keyManager = new ListKeyManager(signKeys);
 
         KeySelector keySelector = new TestKeySelector(keyManager);
-        try {
-            new JWTDecoder().decode(encoded, Payload.class, keySelector, null);
-            fail("Decryption with wrong key should fail");
-        } catch (Exception e) {
-            assertThat(e).isInstanceOf(AtbashUnexpectedException.class);
-            assertThat(e.getCause()).isInstanceOf(JOSEException.class);
-            // Message can vary
-        }
+
+        Exception e = Assertions.assertThrows(AtbashUnexpectedException.class, () -> new JWTDecoder().decode(encoded, Payload.class, keySelector, null));
+        assertThat(e).isInstanceOf(AtbashUnexpectedException.class);
+        assertThat(e.getCause()).isInstanceOf(JOSEException.class);
+        // Message can vary
+
     }
 
     @Test
@@ -434,14 +429,13 @@ public class JWETest {
         String encoded = jwtEncoder.encode(payload, parameters);
 
         KeySelector keySelector = new TestKeySelector(keyManager);
-        try {
-            new JWTDecoder().decode(new StringBuilder(encoded).deleteCharAt(450).insert(450, "1").toString(), Payload.class, keySelector, null);
-            fail("Decryption with tampered payload should fail");
-        } catch (Exception e) {
-            assertThat(e).isInstanceOf(AtbashUnexpectedException.class);
-            assertThat(e.getCause()).isInstanceOf(JOSEException.class);
-            assertThat(e.getCause().getCause().getMessage()).isEqualTo("Tag mismatch!");
-        }
+
+        Exception e = Assertions.assertThrows(AtbashUnexpectedException.class, () -> new JWTDecoder().decode(new StringBuilder(encoded).deleteCharAt(450).insert(450, "1").toString(), Payload.class, keySelector, null));
+
+        assertThat(e).isInstanceOf(AtbashUnexpectedException.class);
+        assertThat(e.getCause()).isInstanceOf(JOSEException.class);
+        assertThat(e.getCause().getCause().getMessage()).isEqualTo("Tag mismatch!");
+
     }
 
     @Test
@@ -470,14 +464,13 @@ public class JWETest {
         String encoded = jwtEncoder.encode(payload, parameters);
 
         KeySelector keySelector = new TestKeySelector(keyManager);
-        try {
-            new JWTDecoder().decode(new StringBuilder(encoded).deleteCharAt(440).insert(440, "1").toString(), Payload.class, keySelector, null);
-            fail("Decryption with tampered payload should fail");
-        } catch (Exception e) {
-            assertThat(e).isInstanceOf(AtbashUnexpectedException.class);
-            assertThat(e.getCause()).isInstanceOf(JOSEException.class);
-            assertThat(e.getCause().getCause().getMessage()).isEqualTo("Tag mismatch!");
-        }
+
+        Exception e = Assertions.assertThrows(AtbashUnexpectedException.class, () -> new JWTDecoder().decode(new StringBuilder(encoded).deleteCharAt(440).insert(440, "1").toString(), Payload.class, keySelector, null));
+
+        assertThat(e).isInstanceOf(AtbashUnexpectedException.class);
+        assertThat(e.getCause()).isInstanceOf(JOSEException.class);
+        assertThat(e.getCause().getCause().getMessage()).isEqualTo("Tag mismatch!");
+
     }
 
     @Test

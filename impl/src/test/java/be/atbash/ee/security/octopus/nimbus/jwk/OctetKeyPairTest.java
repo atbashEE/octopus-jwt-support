@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@ import be.atbash.ee.security.octopus.nimbus.SampleCertificates;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.ee.security.octopus.nimbus.util.Base64Value;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import javax.json.JsonObject;
 import java.net.URI;
@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
 
 
 public class OctetKeyPairTest {
@@ -73,9 +72,9 @@ public class OctetKeyPairTest {
         assertThat(okp.getKeyType()).isEqualTo(KeyType.OKP);
         assertThat(okp.getCurve()).isEqualTo(Curve.Ed25519);
         assertThat(okp.getX()).isEqualTo(new Base64URLValue("11qYAYKxCrfVS_7TyWQHOg7hcvPapiMlrwIaaPcHURo"));
-        Assert.assertArrayEquals(okp.getX().decode(), okp.getDecodedX());
+        assertThat(okp.getDecodedX()).isEqualTo(okp.getX().decode());
         assertThat(okp.getD()).isEqualTo(new Base64URLValue("nWGxne_9WmC6hEr0kuwsxERJxWl7MmkZcDusAxyuf2A"));
-        Assert.assertArrayEquals(okp.getD().decode(), okp.getDecodedD());
+        assertThat(okp.getDecodedD()).isEqualTo(okp.getD().decode());
 
         assertThat(okp.isPrivate()).isTrue();
 
@@ -83,7 +82,7 @@ public class OctetKeyPairTest {
         assertThat(pubOKP.getKeyType()).isEqualTo(KeyType.OKP);
         assertThat(pubOKP.getCurve()).isEqualTo(Curve.Ed25519);
         assertThat(pubOKP.getX()).isEqualTo(okp.getX());
-        Assert.assertArrayEquals(okp.getX().decode(), pubOKP.getDecodedX());
+        assertThat(pubOKP.getDecodedX()).isEqualTo(okp.getX().decode());
         assertThat(pubOKP.getD()).isNull();
         assertThat(pubOKP.getDecodedD()).isNull();
 
@@ -102,7 +101,7 @@ public class OctetKeyPairTest {
         assertThat(okp.getKeyType()).isEqualTo(KeyType.OKP);
         assertThat(okp.getCurve()).isEqualTo(Curve.Ed25519);
         assertThat(okp.getX()).isEqualTo(new Base64URLValue("11qYAYKxCrfVS_7TyWQHOg7hcvPapiMlrwIaaPcHURo"));
-        Assert.assertArrayEquals(okp.getX().decode(), okp.getDecodedX());
+        assertThat(okp.getDecodedX()).isEqualTo(okp.getX().decode());
         assertThat(okp.getD()).isNull();
         assertThat(okp.getDecodedD()).isNull();
 
@@ -120,7 +119,7 @@ public class OctetKeyPairTest {
         assertThat(okp.getKeyType()).isEqualTo(KeyType.OKP);
         assertThat(okp.getCurve()).isEqualTo(Curve.Ed25519);
         assertThat(okp.getX()).isEqualTo(new Base64URLValue("11qYAYKxCrfVS_7TyWQHOg7hcvPapiMlrwIaaPcHURo"));
-        Assert.assertArrayEquals(okp.getX().decode(), okp.getDecodedX());
+        assertThat(okp.getDecodedX()).isEqualTo(okp.getX().decode());
         assertThat(okp.getD()).isNull();
         assertThat(okp.getDecodedD()).isNull();
 
@@ -175,9 +174,9 @@ public class OctetKeyPairTest {
 
         assertThat(key.getCurve()).isEqualTo(Curve.Ed25519);
         assertThat(key.getX()).isEqualTo(EXAMPLE_OKP_ED25519.X);
-        Assert.assertArrayEquals(EXAMPLE_OKP_ED25519.X.decode(), key.getDecodedX());
+        assertThat(key.getDecodedX()).isEqualTo(EXAMPLE_OKP_ED25519.X.decode());
         assertThat(key.getD()).isEqualTo(EXAMPLE_OKP_ED25519.D);
-        Assert.assertArrayEquals(EXAMPLE_OKP_ED25519.D.decode(), key.getDecodedD());
+        assertThat(key.getDecodedD()).isEqualTo(EXAMPLE_OKP_ED25519.D.decode());
 
         assertThat(key.isPrivate()).isTrue();
 
@@ -199,9 +198,9 @@ public class OctetKeyPairTest {
 
         assertThat(key.getCurve()).isEqualTo(Curve.Ed25519);
         assertThat(key.getX()).isEqualTo(EXAMPLE_OKP_ED25519.X);
-        Assert.assertArrayEquals(EXAMPLE_OKP_ED25519.X.decode(), key.getDecodedX());
+        assertThat(key.getDecodedX()).isEqualTo(EXAMPLE_OKP_ED25519.X.decode());
         assertThat(key.getD()).isEqualTo(EXAMPLE_OKP_ED25519.D);
-        Assert.assertArrayEquals(EXAMPLE_OKP_ED25519.D.decode(), key.getDecodedD());
+        assertThat(key.getDecodedD()).isEqualTo(EXAMPLE_OKP_ED25519.D.decode());
 
         assertThat(key.isPrivate()).isTrue();
 
@@ -221,7 +220,7 @@ public class OctetKeyPairTest {
 
         assertThat(key.getCurve()).isEqualTo(Curve.Ed25519);
         assertThat(key.getX()).isEqualTo(EXAMPLE_OKP_ED25519.X);
-        Assert.assertArrayEquals(EXAMPLE_OKP_ED25519.X.decode(), key.getDecodedX());
+        assertThat(key.getDecodedX()).isEqualTo(EXAMPLE_OKP_ED25519.X.decode());
         assertThat(key.getD()).isNull();
         assertThat(key.getDecodedD()).isNull();
 
@@ -257,7 +256,7 @@ public class OctetKeyPairTest {
 
         assertThat(key.getCurve()).isEqualTo(Curve.Ed25519);
         assertThat(key.getX()).isEqualTo(EXAMPLE_OKP_ED25519.X);
-        Assert.assertArrayEquals(EXAMPLE_OKP_ED25519.X.decode(), key.getDecodedX());
+        assertThat(key.getDecodedX()).isEqualTo(EXAMPLE_OKP_ED25519.X.decode());
         assertThat(key.getD()).isNull();
         assertThat(key.getDecodedD()).isNull();
 
@@ -281,7 +280,7 @@ public class OctetKeyPairTest {
 
         assertThat(key.getCurve()).isEqualTo(Curve.Ed25519);
         assertThat(key.getX()).isEqualTo(EXAMPLE_OKP_ED25519.X);
-        Assert.assertArrayEquals(EXAMPLE_OKP_ED25519.X.decode(), key.getDecodedX());
+        assertThat(key.getDecodedX()).isEqualTo(EXAMPLE_OKP_ED25519.X.decode());
         assertThat(key.getD()).isNull();
         assertThat(key.getDecodedD()).isNull();
 
@@ -322,9 +321,9 @@ public class OctetKeyPairTest {
 
         assertThat(key.getCurve()).isEqualTo(Curve.Ed25519);
         assertThat(key.getX()).isEqualTo(EXAMPLE_OKP_ED25519.X);
-        Assert.assertArrayEquals(EXAMPLE_OKP_ED25519.X.decode(), key.getDecodedX());
+        assertThat(key.getDecodedX()).isEqualTo(EXAMPLE_OKP_ED25519.X.decode());
         assertThat(key.getD()).isEqualTo(EXAMPLE_OKP_ED25519.D);
-        Assert.assertArrayEquals(EXAMPLE_OKP_ED25519.D.decode(), key.getDecodedD());
+        assertThat(key.getDecodedD()).isEqualTo(EXAMPLE_OKP_ED25519.D.decode());
 
         assertThat(key.isPrivate()).isTrue();
 
@@ -342,9 +341,9 @@ public class OctetKeyPairTest {
 
         assertThat(key.getCurve()).isEqualTo(Curve.Ed25519);
         assertThat(key.getX()).isEqualTo(EXAMPLE_OKP_ED25519.X);
-        Assert.assertArrayEquals(EXAMPLE_OKP_ED25519.X.decode(), key.getDecodedX());
+        assertThat(key.getDecodedX()).isEqualTo(EXAMPLE_OKP_ED25519.X.decode());
         assertThat(key.getD()).isEqualTo(EXAMPLE_OKP_ED25519.D);
-        Assert.assertArrayEquals(EXAMPLE_OKP_ED25519.D.decode(), key.getDecodedD());
+        assertThat(key.getDecodedD()).isEqualTo(EXAMPLE_OKP_ED25519.D.decode());
 
         assertThat(key.isPrivate()).isTrue();
 
@@ -363,7 +362,7 @@ public class OctetKeyPairTest {
 
         assertThat(key.getCurve()).isEqualTo(Curve.Ed25519);
         assertThat(key.getX()).isEqualTo(EXAMPLE_OKP_ED25519.X);
-        Assert.assertArrayEquals(EXAMPLE_OKP_ED25519.X.decode(), key.getDecodedX());
+        assertThat(key.getDecodedX()).isEqualTo(EXAMPLE_OKP_ED25519.X.decode());
         assertThat(key.getD()).isNull();
         assertThat(key.getDecodedD()).isNull();
 
@@ -405,9 +404,9 @@ public class OctetKeyPairTest {
 
         assertThat(key.getCurve()).isEqualTo(Curve.Ed25519);
         assertThat(key.getX()).isEqualTo(EXAMPLE_OKP_ED25519.X);
-        Assert.assertArrayEquals(EXAMPLE_OKP_ED25519.X.decode(), key.getDecodedX());
+        assertThat(key.getDecodedX()).isEqualTo(EXAMPLE_OKP_ED25519.X.decode());
         assertThat(key.getD()).isEqualTo(EXAMPLE_OKP_ED25519.D);
-        Assert.assertArrayEquals(EXAMPLE_OKP_ED25519.D.decode(), key.getDecodedD());
+        assertThat(key.getDecodedD()).isEqualTo(EXAMPLE_OKP_ED25519.D.decode());
 
         assertThat(key.isPrivate()).isTrue();
     }
@@ -429,29 +428,20 @@ public class OctetKeyPairTest {
         for (Curve crv : new HashSet<>(Arrays.asList(Curve.P_256, Curve.P_384, Curve.P_521))) {
 
             // public OKP
-            try {
-                new OctetKeyPair(crv, EXAMPLE_OKP_ED25519.X, null, null, null, null, null, null, null, null, null);
-                fail();
-            } catch (IllegalArgumentException e) {
-                assertThat(e.getMessage()).isEqualTo("Unknown / unsupported curve: " + crv);
-            }
+            IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
+                    () -> new OctetKeyPair(crv, EXAMPLE_OKP_ED25519.X, null, null, null, null, null, null, null, null, null));
+            assertThat(e.getMessage()).isEqualTo("Unknown / unsupported curve: " + crv);
 
             // public / private OKP
-            try {
-                new OctetKeyPair(crv, EXAMPLE_OKP_ED25519.X, EXAMPLE_OKP_ED25519.D, null, null, null, null, null, null, null, null);
-                fail();
-            } catch (IllegalArgumentException e) {
-                assertThat(e.getMessage()).isEqualTo("Unknown / unsupported curve: " + crv);
-            }
+            e = Assertions.assertThrows(IllegalArgumentException.class,
+                    () -> new OctetKeyPair(crv, EXAMPLE_OKP_ED25519.X, EXAMPLE_OKP_ED25519.D, null, null, null, null, null, null, null, null));
+            assertThat(e.getMessage()).isEqualTo("Unknown / unsupported curve: " + crv);
 
             // builder
-            try {
-                new OctetKeyPair.Builder(crv, EXAMPLE_OKP_ED25519.X).build();
-                fail();
-            } catch (IllegalStateException e) {
-                assertThat(e.getMessage()).isEqualTo("Unknown / unsupported curve: " + crv);
-                assertThat(e.getCause() instanceof IllegalArgumentException).isTrue();
-            }
+            IllegalStateException e2 = Assertions.assertThrows(IllegalStateException.class,
+                    () -> new OctetKeyPair.Builder(crv, EXAMPLE_OKP_ED25519.X).build());
+            assertThat(e2.getMessage()).isEqualTo("Unknown / unsupported curve: " + crv);
+            assertThat(e2.getCause() instanceof IllegalArgumentException).isTrue();
         }
     }
 

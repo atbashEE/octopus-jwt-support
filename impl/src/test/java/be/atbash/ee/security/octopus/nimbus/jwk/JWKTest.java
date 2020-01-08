@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,8 @@ import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -41,7 +42,7 @@ import java.util.Arrays;
 import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
 
 /**
@@ -170,13 +171,10 @@ public class JWKTest {
         assertThat(rsaKey.isPrivate()).isTrue();
 
         // Try to load with bad pin
-        try {
-            JWK.load(keyStore, "1", "".toCharArray());
-            fail();
-        } catch (JOSEException e) {
-            assertThat(e.getMessage()).isEqualTo("Couldn't retrieve private RSA key (bad pin?): Cannot recover key");
-            assertThat(e.getCause() instanceof UnrecoverableKeyException).isTrue();
-        }
+        JOSEException e = Assertions.assertThrows(JOSEException.class,
+                () -> JWK.load(keyStore, "1", "".toCharArray()));
+        assertThat(e.getMessage()).isEqualTo("Couldn't retrieve private RSA key (bad pin?): Cannot recover key");
+        assertThat(e.getCause() instanceof UnrecoverableKeyException).isTrue();
     }
 
     @Test
@@ -230,13 +228,10 @@ public class JWKTest {
         assertThat(ecKey.isPrivate()).isTrue();
 
         // Try to load with bad pin
-        try {
-            JWK.load(keyStore, "1", "".toCharArray());
-            fail();
-        } catch (JOSEException e) {
-            assertThat(e.getMessage()).isEqualTo("Couldn't retrieve private EC key (bad pin?): Cannot recover key");
-            assertThat(e.getCause() instanceof UnrecoverableKeyException).isTrue();
-        }
+        JOSEException e = Assertions.assertThrows(JOSEException.class,
+                () -> JWK.load(keyStore, "1", "".toCharArray()));
+        assertThat(e.getMessage()).isEqualTo("Couldn't retrieve private EC key (bad pin?): Cannot recover key");
+        assertThat(e.getCause() instanceof UnrecoverableKeyException).isTrue();
     }
 
     @Test

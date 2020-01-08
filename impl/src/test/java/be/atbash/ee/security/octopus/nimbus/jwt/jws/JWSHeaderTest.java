@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,8 @@ import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.ee.security.octopus.nimbus.util.Base64Value;
 import be.atbash.ee.security.octopus.nimbus.util.JSONObjectUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -36,7 +37,6 @@ import java.text.ParseException;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
 
 
 /**
@@ -252,15 +252,8 @@ public class JWSHeaderTest {
     @Test
     public void testRejectNone() {
 
-        try {
-            new JWSHeader(new JWSAlgorithm("none"));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> new JWSHeader(new JWSAlgorithm("none")));
 
-            fail("Failed to raise exception");
-
-        } catch (IllegalArgumentException e) {
-
-            // ok
-        }
     }
 
     @Test
@@ -330,12 +323,8 @@ public class JWSHeaderTest {
                 customParams(customParams).
                 build();
 
-        try {
-            header.getCustomParams().put("x", "3");
-            fail();
-        } catch (UnsupportedOperationException e) {
-            // ok
-        }
+        Assertions.assertThrows(UnsupportedOperationException.class, () -> header.getCustomParams().put("x", "3"));
+
     }
 
     @Test
@@ -345,12 +334,7 @@ public class JWSHeaderTest {
                 criticalParams(new HashSet<>(Arrays.asList("exp", "nbf"))).
                 build();
 
-        try {
-            header.getCriticalParams().remove("exp");
-            fail();
-        } catch (UnsupportedOperationException e) {
-            // ok
-        }
+        Assertions.assertThrows(UnsupportedOperationException.class, () -> header.getCriticalParams().remove("exp"));
     }
 
     @Test

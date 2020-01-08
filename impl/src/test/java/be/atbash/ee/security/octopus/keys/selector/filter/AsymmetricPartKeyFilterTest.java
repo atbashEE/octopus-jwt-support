@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,9 @@ import be.atbash.ee.security.octopus.keys.generator.OCTGenerationParameters;
 import be.atbash.ee.security.octopus.keys.generator.RSAGenerationParameters;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.util.exception.AtbashIllegalActionException;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +42,7 @@ public class AsymmetricPartKeyFilterTest {
 
     private AsymmetricPartKeyFilter keyFilter;
 
-    @BeforeClass
+    @BeforeAll
     public static void defineKeys() {
         KeyGenerator generator = new KeyGenerator();
 
@@ -107,11 +108,11 @@ public class AsymmetricPartKeyFilterTest {
 
     }
 
-    @Test(expected = AtbashIllegalActionException.class)
+    @Test
     public void filter_NullArgument() {
 
         keyFilter = new AsymmetricPartKeyFilter(AsymmetricPart.PRIVATE);
-        keyFilter.filter(null);
+        Assertions.assertThrows(AtbashIllegalActionException.class, () -> keyFilter.filter(null));
 
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,12 @@ package be.atbash.ee.security.octopus.nimbus.jose;
 
 
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.text.ParseException;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
 
 
 /**
@@ -40,21 +40,16 @@ public class JOSEObjectTest {
         // Implies JWS
         String data = "abc.def.ghi";
 
-        Base64URLValue[] parts = null;
+        Assertions.assertDoesNotThrow(() -> {
 
-        try {
-            parts = JOSEObject.split(data);
+            Base64URLValue[] parts = JOSEObject.split(data);
 
-        } catch (ParseException e) {
+            assertThat(parts.length).isEqualTo(3);
 
-            fail(e.getMessage());
-        }
-
-        assertThat(parts.length).isEqualTo(3);
-
-        assertThat(parts[0].toString()).isEqualTo("abc");
-        assertThat(parts[1].toString()).isEqualTo("def");
-        assertThat(parts[2].toString()).isEqualTo("ghi");
+            assertThat(parts[0].toString()).isEqualTo("abc");
+            assertThat(parts[1].toString()).isEqualTo("def");
+            assertThat(parts[2].toString()).isEqualTo("ghi");
+        });
     }
 
     @Test
@@ -63,23 +58,17 @@ public class JOSEObjectTest {
         // Implies JWE
         String data = "abc.def.ghi.jkl.mno";
 
-        Base64URLValue[] parts = null;
+        Assertions.assertDoesNotThrow(() -> {
+            Base64URLValue[] parts = JOSEObject.split(data);
 
-        try {
-            parts = JOSEObject.split(data);
+            assertThat(parts.length).isEqualTo(5);
 
-        } catch (ParseException e) {
-
-            fail(e.getMessage());
-        }
-
-        assertThat(parts.length).isEqualTo(5);
-
-        assertThat(parts[0].toString()).isEqualTo("abc");
-        assertThat(parts[1].toString()).isEqualTo("def");
-        assertThat(parts[2].toString()).isEqualTo("ghi");
-        assertThat(parts[3].toString()).isEqualTo("jkl");
-        assertThat(parts[4].toString()).isEqualTo("mno");
+            assertThat(parts[0].toString()).isEqualTo("abc");
+            assertThat(parts[1].toString()).isEqualTo("def");
+            assertThat(parts[2].toString()).isEqualTo("ghi");
+            assertThat(parts[3].toString()).isEqualTo("jkl");
+            assertThat(parts[4].toString()).isEqualTo("mno");
+        });
     }
 
     @Test
@@ -88,21 +77,15 @@ public class JOSEObjectTest {
         // Implies plain JOSE object
         String data = "abc.def.";
 
-        Base64URLValue[] parts = null;
+        Assertions.assertDoesNotThrow(() -> {
+            Base64URLValue[] parts = JOSEObject.split(data);
 
-        try {
-            parts = JOSEObject.split(data);
+            assertThat(parts.length).isEqualTo(3);
 
-        } catch (ParseException e) {
-
-            fail(e.getMessage());
-        }
-
-        assertThat(parts.length).isEqualTo(3);
-
-        assertThat(parts[0].toString()).isEqualTo("abc");
-        assertThat(parts[1].toString()).isEqualTo("def");
-        assertThat(parts[2].toString()).isEqualTo("");
+            assertThat(parts[0].toString()).isEqualTo("abc");
+            assertThat(parts[1].toString()).isEqualTo("def");
+            assertThat(parts[2].toString()).isEqualTo("");
+        });
     }
 
     @Test
@@ -111,21 +94,15 @@ public class JOSEObjectTest {
         // JWS with empty payload
         String data = "abc..ghi";
 
-        Base64URLValue[] parts = null;
+        Assertions.assertDoesNotThrow(() -> {
+            Base64URLValue[] parts = JOSEObject.split(data);
 
-        try {
-            parts = JOSEObject.split(data);
+            assertThat(parts.length).isEqualTo(3);
 
-        } catch (ParseException e) {
-
-            fail(e.getMessage());
-        }
-
-        assertThat(parts.length).isEqualTo(3);
-
-        assertThat(parts[0].toString()).isEqualTo("abc");
-        assertThat(parts[1].toString()).isEqualTo("");
-        assertThat(parts[2].toString()).isEqualTo("ghi");
+            assertThat(parts[0].toString()).isEqualTo("abc");
+            assertThat(parts[1].toString()).isEqualTo("");
+            assertThat(parts[2].toString()).isEqualTo("ghi");
+        });
     }
 
     @Test
@@ -134,23 +111,17 @@ public class JOSEObjectTest {
         // JWS with empty payload
         String data = "....";
 
-        Base64URLValue[] parts = null;
+        Assertions.assertDoesNotThrow(() -> {
+            Base64URLValue[] parts = JOSEObject.split(data);
 
-        try {
-            parts = JOSEObject.split(data);
+            assertThat(parts.length).isEqualTo(5);
 
-        } catch (ParseException e) {
-
-            fail(e.getMessage());
-        }
-
-        assertThat(parts.length).isEqualTo(5);
-
-        assertThat(parts[0].toString()).isEqualTo("");
-        assertThat(parts[1].toString()).isEqualTo("");
-        assertThat(parts[2].toString()).isEqualTo("");
-        assertThat(parts[3].toString()).isEqualTo("");
-        assertThat(parts[4].toString()).isEqualTo("");
+            assertThat(parts[0].toString()).isEqualTo("");
+            assertThat(parts[1].toString()).isEqualTo("");
+            assertThat(parts[2].toString()).isEqualTo("");
+            assertThat(parts[3].toString()).isEqualTo("");
+            assertThat(parts[4].toString()).isEqualTo("");
+        });
     }
 
     @Test
@@ -159,15 +130,8 @@ public class JOSEObjectTest {
         // Illegal JOSE
         String data = "abc.def";
 
-        try {
-            JOSEObject.split(data);
+        Assertions.assertThrows(ParseException.class, () -> JOSEObject.split(data));
 
-            fail("Failed to raise exception");
-
-        } catch (ParseException e) {
-
-            // ok
-        }
     }
 
     @Test

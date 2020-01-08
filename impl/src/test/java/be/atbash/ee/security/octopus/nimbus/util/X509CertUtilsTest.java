@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,8 @@ package be.atbash.ee.security.octopus.nimbus.util;
 import be.atbash.ee.security.octopus.nimbus.IOUtil;
 import be.atbash.ee.security.octopus.nimbus.jwk.Curve;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.security.MessageDigest;
 import java.security.cert.CertificateException;
@@ -28,7 +29,6 @@ import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
 
 
 /**
@@ -128,34 +128,28 @@ public class X509CertUtilsTest {
     @Test
     public void testParsePEMWithException_noBeginMarker() {
 
-        try {
-            X509CertUtils.parseWithException(PEM_CERT.replace("-----BEGIN CERTIFICATE-----", ""));
-            fail();
-        } catch (CertificateException e) {
-            assertThat(e.getMessage()).isEqualTo("PEM begin marker not found");
-        }
+        CertificateException e = Assertions.assertThrows(CertificateException.class,
+                () -> X509CertUtils.parseWithException(PEM_CERT.replace("-----BEGIN CERTIFICATE-----", "")));
+        assertThat(e.getMessage()).isEqualTo("PEM begin marker not found");
+
     }
 
     @Test
     public void testParsePEMWithException_noEndMarker() {
 
-        try {
-            X509CertUtils.parseWithException(PEM_CERT.replace("-----END CERTIFICATE-----", ""));
-            fail();
-        } catch (CertificateException e) {
-            assertThat(e.getMessage()).isEqualTo("PEM end marker not found");
-        }
+        CertificateException e = Assertions.assertThrows(CertificateException.class,
+                () -> X509CertUtils.parseWithException(PEM_CERT.replace("-----END CERTIFICATE-----", "")));
+        assertThat(e.getMessage()).isEqualTo("PEM end marker not found");
+
     }
 
     @Test
     public void testParsePEMWithException_corruptedContent() {
 
-        try {
-            X509CertUtils.parseWithException("-----BEGIN CERTIFICATE-----MIIFKjCCBBKgAwIBAgIIM1RIMykkp1AwDQYJKoZIhvcNAQELBQAwgbQxCzAJBgNV-----END CERTIFICATE-----");
-            fail();
-        } catch (CertificateException e) {
-            assertThat(e.getMessage()).isEqualTo("Could not parse certificate: java.io.IOException: Incomplete BER/DER data");
-        }
+        CertificateException e = Assertions.assertThrows(CertificateException.class,
+                () -> X509CertUtils.parseWithException("-----BEGIN CERTIFICATE-----MIIFKjCCBBKgAwIBAgIIM1RIMykkp1AwDQYJKoZIhvcNAQELBQAwgbQxCzAJBgNV-----END CERTIFICATE-----"));
+        assertThat(e.getMessage()).isEqualTo("Could not parse certificate: java.io.IOException: Incomplete BER/DER data");
+
     }
 
     @Test

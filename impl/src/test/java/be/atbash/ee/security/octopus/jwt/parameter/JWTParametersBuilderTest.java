@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,8 @@ import be.atbash.ee.security.octopus.keys.fake.FakeRSAPrivate;
 import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import be.atbash.ee.security.octopus.util.HmacSecretUtil;
 import be.atbash.util.exception.AtbashIllegalActionException;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
@@ -90,10 +91,10 @@ public class JWTParametersBuilderTest {
         assertThat(parameters).isInstanceOf(JWTParametersNone.class);
     }
 
-    @Test(expected = AtbashIllegalActionException.class)
+    @Test
     public void validate_requiredKeys() {
 
-        JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS).build();
+        Assertions.assertThrows(AtbashIllegalActionException.class, () -> JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS).build());
     }
 
     @Test

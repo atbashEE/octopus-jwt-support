@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,12 @@ import be.atbash.ee.security.octopus.nimbus.jwt.SignedJWT;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSObject;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
 
 
 /**
@@ -131,24 +131,21 @@ public class PayloadTest {
     @Test
     public void testRejectUnsignedJWS() {
 
-        try {
-            new Payload(new JWSObject(new JWSHeader(JWSAlgorithm.HS256), new Payload("test")));
-            fail();
-        } catch (IllegalArgumentException e) {
-            assertThat(e.getMessage()).isEqualTo("The JWS object must be signed");
-        }
+        IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class, () ->
+                new Payload(new JWSObject(new JWSHeader(JWSAlgorithm.HS256), new Payload("test"))));
+
+        assertThat(e.getMessage()).isEqualTo("The JWS object must be signed");
+
     }
 
     @Test
     public void testRejectUnsignedJWT() {
 
-        try {
-            new Payload(new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), new JWTClaimsSet.Builder().build()));
-            fail();
-        } catch (IllegalArgumentException e) {
-            assertThat(e.getMessage()).isEqualTo("The JWT must be signed");
-        }
-    }
+        IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> new Payload(new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), new JWTClaimsSet.Builder().build())));
 
+        assertThat(e.getMessage()).isEqualTo("The JWT must be signed");
+
+    }
 
 }

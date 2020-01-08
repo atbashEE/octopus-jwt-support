@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,8 @@ import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import javax.json.JsonArray;
 import javax.json.JsonObject;
@@ -45,7 +46,6 @@ import java.security.spec.RSAPrivateKeySpec;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
 
 /**
  * Tests the RSA JWK class.
@@ -1274,12 +1274,9 @@ public class RSAKeyTest {
         X509Certificate cert = X509CertUtils.parse(pemEncodedCert);
         assertThat(cert).isNotNull();
 
-        try {
-            RSAKey.parse(cert);
-            fail();
-        } catch (JOSEException e) {
-            assertThat(e.getMessage()).isEqualTo("The public key of the X.509 certificate is not RSA");
-        }
+        JOSEException e = Assertions.assertThrows(JOSEException.class,
+                () -> RSAKey.parse(cert));
+        assertThat(e.getMessage()).isEqualTo("The public key of the X.509 certificate is not RSA");
     }
 
     @Test
@@ -1414,13 +1411,10 @@ public class RSAKeyTest {
         assertThat(rsaKey.getKeyStore()).isEqualTo(keyStore);
 
         // Try to load with bad pin
-        try {
-            RSAKey.load(keyStore, "1", "".toCharArray());
-            fail();
-        } catch (JOSEException e) {
-            assertThat(e.getMessage()).isEqualTo("Couldn't retrieve private RSA key (bad pin?): Cannot recover key");
-            assertThat(e.getCause()).isInstanceOf(UnrecoverableKeyException.class);
-        }
+        JOSEException e = Assertions.assertThrows(JOSEException.class,
+                () -> RSAKey.load(keyStore, "1", "".toCharArray()));
+        assertThat(e.getMessage()).isEqualTo("Couldn't retrieve private RSA key (bad pin?): Cannot recover key");
+        assertThat(e.getCause()).isInstanceOf(UnrecoverableKeyException.class);
     }
 
     @Test
@@ -1462,12 +1456,9 @@ public class RSAKeyTest {
 
         keyStore.setCertificateEntry("1", cert);
 
-        try {
-            RSAKey.load(keyStore, "1", null);
-            fail();
-        } catch (JOSEException e) {
-            assertThat(e.getMessage()).isEqualTo("Couldn't load RSA JWK: The key algorithm is not RSA");
-        }
+        JOSEException e = Assertions.assertThrows(JOSEException.class,
+                () -> RSAKey.load(keyStore, "1", null));
+        assertThat(e.getMessage()).isEqualTo("Couldn't load RSA JWK: The key algorithm is not RSA");
     }
 
     @Test

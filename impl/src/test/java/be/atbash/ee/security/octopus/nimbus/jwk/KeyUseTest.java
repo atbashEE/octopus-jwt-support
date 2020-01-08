@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,8 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigInteger;
 import java.security.KeyPair;
@@ -33,7 +34,6 @@ import java.text.ParseException;
 import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
 
 
 /**
@@ -80,27 +80,19 @@ public class KeyUseTest {
     @Test
     public void testParseException_empty() {
 
-        try {
-            KeyUse.parse("");
+        ParseException e = Assertions.assertThrows(ParseException.class,
+                () -> KeyUse.parse(""));
 
-            fail();
-
-        } catch (ParseException e) {
-            assertThat(e.getMessage()).isEqualTo("JWK use value must not be empty or blank");
-        }
+        assertThat(e.getMessage()).isEqualTo("JWK use value must not be empty or blank");
     }
 
     @Test
     public void testParseException_blank() {
 
-        try {
-            KeyUse.parse("  ");
+        ParseException e = Assertions.assertThrows(ParseException.class,
+                () -> KeyUse.parse("  "));
 
-            fail();
-
-        } catch (ParseException e) {
-            assertThat(e.getMessage()).isEqualTo("JWK use value must not be empty or blank");
-        }
+        assertThat(e.getMessage()).isEqualTo("JWK use value must not be empty or blank");
     }
 
     @Test

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,9 +31,10 @@ import be.atbash.ee.security.octopus.keys.generator.OKPGenerationParameters;
 import be.atbash.ee.security.octopus.keys.generator.RSAGenerationParameters;
 import be.atbash.ee.security.octopus.keys.selector.*;
 import be.atbash.ee.security.octopus.util.HmacSecretUtil;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.org.lidalia.slf4jext.Level;
 import uk.org.lidalia.slf4jtest.TestLogger;
 import uk.org.lidalia.slf4jtest.TestLoggerFactory;
@@ -56,7 +57,7 @@ public class JWTTest {
     private TestLogger logger;
     private Payload payload;
 
-    @Before
+    @BeforeEach
     public void setup() {
         payload = new Payload();
         payload.setValue("JUnit");
@@ -67,7 +68,7 @@ public class JWTTest {
         logger = TestLoggerFactory.getTestLogger(KeySelector.class);
     }
 
-    @After
+    @AfterEach
     public void teardown() {
         TestLoggerFactory.clear();
         TestConfig.resetConfig();
@@ -100,7 +101,7 @@ public class JWTTest {
         assertThat(payload).isEqualToComparingFieldByField(data);
     }
 
-    @Test(expected = InvalidJWTException.class)
+    @Test
     public void encodingJWT_HMAC_WrongKey() {
 
         SecureRandom random = new SecureRandom();
@@ -119,10 +120,10 @@ public class JWTTest {
         String encoded = new JWTEncoder().encode(payload, parameters);
 
         KeySelector keySelector = new SingleKeySelector(key2);
-        new JWTDecoder().decode(encoded, Payload.class, keySelector, null);
+        Assertions.assertThrows(InvalidJWTException.class, () -> new JWTDecoder().decode(encoded, Payload.class, keySelector, null));
     }
 
-    @Test(expected = InvalidJWTException.class)
+    @Test
     public void encodingJWT__hmac_TamperedPayload() {
 
         AtbashKey key = generateOCTKey();
@@ -135,7 +136,7 @@ public class JWTTest {
         String updatedEncoded = tamperWithPayload(encoded);
 
         KeySelector keySelector = new SingleKeySelector(key);
-        new JWTDecoder().decode(updatedEncoded, Payload.class, keySelector, null);
+        Assertions.assertThrows(InvalidJWTException.class, () -> new JWTDecoder().decode(updatedEncoded, Payload.class, keySelector, null));
     }
 
     private String tamperWithPayload(String encoded) {
@@ -210,7 +211,7 @@ public class JWTTest {
         assertThat(payload).isEqualToComparingFieldByField(data);
     }
 
-    @Test(expected = InvalidJWTException.class)
+    @Test
     public void encodingJWT_RSA_WrongKeyForVerification() {
 
         List<AtbashKey> keys = generateRSAKeys(KID_SIGN);
@@ -236,10 +237,10 @@ public class JWTTest {
         List<AtbashKey> publicList = keyManager.retrieveKeys(criteria);
 
         KeySelector keySelector = new SingleKeySelector(publicList.get(0));
-        new JWTDecoder().decode(encoded, Payload.class, keySelector, null);
+        Assertions.assertThrows(InvalidJWTException.class, () -> new JWTDecoder().decode(encoded, Payload.class, keySelector, null));
     }
 
-    @Test(expected = InvalidJWTException.class)
+    @Test
     public void encodingJWT_RSA_tamperedPayload() {
 
         List<AtbashKey> keys = generateRSAKeys(KID_SIGN);
@@ -263,11 +264,11 @@ public class JWTTest {
         List<AtbashKey> publicList = keyManager.retrieveKeys(criteria);
 
         KeySelector keySelector = new SingleKeySelector(publicList.get(0));
-        new JWTDecoder().decode(updatedEncoded, Payload.class, keySelector, null);
+        Assertions.assertThrows(InvalidJWTException.class, () -> new JWTDecoder().decode(updatedEncoded, Payload.class, keySelector, null));
 
     }
 
-    @Test(expected = UnsupportedKeyType.class)
+    @Test
     public void encodingJWT_RSA_WrongKeyType() {
 
         List<AtbashKey> keys = generateRSAKeys(KID_SIGN);
@@ -281,7 +282,7 @@ public class JWTTest {
                 .withSecretKeyForSigning(signKeyList.get(0))
                 .build();
 
-        new JWTEncoder().encode(payload, parameters);
+        Assertions.assertThrows(UnsupportedKeyType.class, () -> new JWTEncoder().encode(payload, parameters));
 
     }
 
@@ -347,7 +348,7 @@ public class JWTTest {
         assertThat(payload).isEqualToComparingFieldByField(data);
     }
 
-    @Test(expected = InvalidJWTException.class)
+    @Test
     public void encodingJWT_EC_WrongKeyForVerification() {
 
         List<AtbashKey> keys = generateECKeys(KID_SIGN, "P-256");
@@ -365,7 +366,6 @@ public class JWTTest {
 
         String encoded = new JWTEncoder().encode(payload, parameters);
 
-
         List<AtbashKey> keysOther = generateECKeys(KID_SIGN, "P-256");
         keyManager = new ListKeyManager(keysOther);
 
@@ -373,10 +373,10 @@ public class JWTTest {
         List<AtbashKey> publicList = keyManager.retrieveKeys(criteria);
 
         KeySelector keySelector = new SingleKeySelector(publicList.get(0));
-        new JWTDecoder().decode(encoded, Payload.class, keySelector, null);
+        Assertions.assertThrows(InvalidJWTException.class, () -> new JWTDecoder().decode(encoded, Payload.class, keySelector, null));
     }
 
-    @Test(expected = InvalidJWTException.class)
+    @Test
     public void encodingJWT_EC_tamperedPayload() {
 
         List<AtbashKey> keys = generateECKeys(KID_SIGN, "P-256");
@@ -400,11 +400,11 @@ public class JWTTest {
         List<AtbashKey> publicList = keyManager.retrieveKeys(criteria);
 
         KeySelector keySelector = new SingleKeySelector(publicList.get(0));
-        new JWTDecoder().decode(updatedEncoded, Payload.class, keySelector, null);
+        Assertions.assertThrows(InvalidJWTException.class, () -> new JWTDecoder().decode(updatedEncoded, Payload.class, keySelector, null));
 
     }
 
-    @Test(expected = UnsupportedKeyType.class)
+    @Test
     public void encodingJWT_EC_WrongKeyType() {
 
         List<AtbashKey> keys = generateECKeys(KID_SIGN, "P-256");
@@ -418,11 +418,11 @@ public class JWTTest {
                 .withSecretKeyForSigning(signKeyList.get(0))
                 .build();
 
-        new JWTEncoder().encode(payload, parameters);
+        Assertions.assertThrows(UnsupportedKeyType.class, () -> new JWTEncoder().encode(payload, parameters));
 
     }
 
-    @Test(expected = UnsupportedECCurveException.class)
+    @Test
     public void encodingJWT_EC_unsupportedCurve() {
 
         List<AtbashKey> keys = generateECKeys(KID_SIGN, "prime192v1");
@@ -438,10 +438,10 @@ public class JWTTest {
                 .withSecretKeyForSigning(signKeyList.get(0))
                 .build();
 
-        new JWTEncoder().encode(payload, parameters);
+        Assertions.assertThrows(UnsupportedECCurveException.class, () -> new JWTEncoder().encode(payload, parameters));
     }
 
-    @Test(expected = InvalidJWTException.class)
+    @Test
     public void encodingJWT_noKeyMatch() {
 
         List<AtbashKey> keys = generateRSAKeys(KID_SIGN);
@@ -461,18 +461,15 @@ public class JWTTest {
 
         keys.clear();  // remove all keys
         KeySelector keySelector = new TestKeySelector(keyManager);
-        try {
-            new JWTDecoder().decode(encoded, Payload.class, keySelector, null);
-        } finally {
+        Assertions.assertThrows(InvalidJWTException.class, () -> new JWTDecoder().decode(encoded, Payload.class, keySelector, null));
 
-            assertThat(logger.getLoggingEvents()).hasSize(1);
-            assertThat(logger.getLoggingEvents().get(0).getLevel()).isEqualTo(Level.ERROR);
-            assertThat(logger.getLoggingEvents().get(0).getMessage()).isEqualTo("(OCT-KEY-010) No or multiple keys found for criteria :\n" +
-                    " KeySelectorCriteria{\n" +
-                    "     KeyFilter{keyId='sign'}\n" +
-                    "     KeyFilter{part='PUBLIC'}\n" +
-                    "}");
-        }
+        assertThat(logger.getLoggingEvents()).hasSize(1);
+        assertThat(logger.getLoggingEvents().get(0).getLevel()).isEqualTo(Level.ERROR);
+        assertThat(logger.getLoggingEvents().get(0).getMessage()).isEqualTo("(OCT-KEY-010) No or multiple keys found for criteria :\n" +
+                " KeySelectorCriteria{\n" +
+                "     KeyFilter{keyId='sign'}\n" +
+                "     KeyFilter{part='PUBLIC'}\n" +
+                "}");
     }
 
     @Test
@@ -505,7 +502,7 @@ public class JWTTest {
         assertThat(payload).isEqualToComparingFieldByField(data);
     }
 
-    @Test(expected = InvalidJWTException.class)
+    @Test
     public void encodingJWT_OKP_tamperedPayload() {
         List<AtbashKey> keys = generateOKPKeys(KID_SIGN);
 
@@ -531,10 +528,10 @@ public class JWTTest {
         List<AtbashKey> publicList = keyManager.retrieveKeys(criteria);
 
         KeySelector keySelector = new SingleKeySelector(publicList.get(0));
-        new JWTDecoder().decode(updatedEncoded, Payload.class, keySelector, null).getData();
+        Assertions.assertThrows(InvalidJWTException.class, () -> new JWTDecoder().decode(updatedEncoded, Payload.class, keySelector, null).getData());
     }
 
-    @Test(expected = InvalidJWTException.class)
+    @Test
     public void encodingJWT_OKP_wrongKey() {
         List<AtbashKey> keys = generateOKPKeys(KID_SIGN);
 
@@ -559,7 +556,7 @@ public class JWTTest {
         List<AtbashKey> publicList = keyManager.retrieveKeys(criteria);
 
         KeySelector keySelector = new SingleKeySelector(publicList.get(0));
-        new JWTDecoder().decode(updatedEncoded, Payload.class, keySelector, null).getData();
+        Assertions.assertThrows(InvalidJWTException.class, () -> new JWTDecoder().decode(updatedEncoded, Payload.class, keySelector, null).getData());
     }
 
     private AtbashKey generateOCTKey() {

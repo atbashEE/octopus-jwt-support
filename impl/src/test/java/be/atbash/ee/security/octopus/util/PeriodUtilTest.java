@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,8 @@
 package be.atbash.ee.security.octopus.util;
 
 import be.atbash.config.exception.ConfigurationException;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -40,24 +41,24 @@ public class PeriodUtilTest {
         assertThat(PeriodUtil.defineSecondsInPeriod("1h")).isEqualTo(3600);
     }
 
-    @Test(expected = ConfigurationException.class)
+    @Test
     public void defineSecondsInPeriod_empty() {
 
-        PeriodUtil.defineSecondsInPeriod("");
+        Assertions.assertThrows(ConfigurationException.class, () -> PeriodUtil.defineSecondsInPeriod(""));
 
     }
 
-    @Test(expected = ConfigurationException.class)
+    @Test
     public void defineSecondsInPeriod_null() {
 
-        PeriodUtil.defineSecondsInPeriod(null);
+        Assertions.assertThrows(ConfigurationException.class, () -> PeriodUtil.defineSecondsInPeriod(null));
 
     }
 
-    @Test(expected = ConfigurationException.class)
+    @Test
     public void defineSecondsInPeriod_mixed() {
 
-        PeriodUtil.defineSecondsInPeriod("3m10s");
+        Assertions.assertThrows(ConfigurationException.class, () -> PeriodUtil.defineSecondsInPeriod("3m10s"));
 
     }
 

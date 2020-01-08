@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,8 +26,9 @@ import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.nimbus.jwk.JWKSet;
 import be.atbash.util.TestReflectionUtils;
 import be.atbash.util.resource.ResourceUtil;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import javax.json.JsonObject;
@@ -56,7 +57,7 @@ public class KeyWriterTest {
 
     private KeyWriter keyWriter;
 
-    @Before
+    @BeforeEach
     public void setup() throws IllegalAccessException {
         jwtSupportConfigurationMock = Mockito.mock(JwtSupportConfiguration.class);
 
@@ -179,7 +180,7 @@ public class KeyWriterTest {
 
     }
 
-    @Test(expected = MissingPasswordException.class)
+    @Test
     public void writeKeyResource_scenario7_missingKeyPassword() {
         // scenario 7 RSA private key as KeyStore
         when(jwtSupportConfigurationMock.getKeyStoreType()).thenReturn("jks");
@@ -188,11 +189,11 @@ public class KeyWriterTest {
 
         AtbashKey privateKey = filterKeys(keys, AsymmetricPart.PRIVATE);
 
-        keyWriter.writeKeyResource(privateKey, KeyResourceType.KEYSTORE, null, "atbash".toCharArray());
+        Assertions.assertThrows(MissingPasswordException.class, () -> keyWriter.writeKeyResource(privateKey, KeyResourceType.KEYSTORE, null, "atbash".toCharArray()));
 
     }
 
-    @Test(expected = MissingPasswordException.class)
+    @Test
     public void writeKeyResource_scenario7_missingFilePassword() {
         // scenario 7 RSA private key as KeyStore
         when(jwtSupportConfigurationMock.getKeyStoreType()).thenReturn("jks");
@@ -201,7 +202,7 @@ public class KeyWriterTest {
 
         AtbashKey privateKey = filterKeys(keys, AsymmetricPart.PRIVATE);
 
-        keyWriter.writeKeyResource(privateKey, KeyResourceType.KEYSTORE,  "atbash".toCharArray(), null);
+        Assertions.assertThrows(MissingPasswordException.class, () -> keyWriter.writeKeyResource(privateKey, KeyResourceType.KEYSTORE, "atbash".toCharArray(), null));
 
     }
 

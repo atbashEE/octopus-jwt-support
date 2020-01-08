@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,8 @@ package be.atbash.ee.security.octopus.nimbus.jose;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -117,10 +118,10 @@ public class AlgorithmTest {
         assertThat(algorithm).isEqualTo(JWEAlgorithm.A256KW);
     }
 
-    @Test(expected = ParseException.class)
-    public void testParseAlgorithm_nullAlg() throws ParseException {
+    @Test
+    public void testParseAlgorithm_nullAlg() {
 
-        Algorithm.parseAlgorithm(Json.createObjectBuilder().build());
+        Assertions.assertThrows(ParseException.class, () -> Algorithm.parseAlgorithm(Json.createObjectBuilder().build()));
 
     }
 

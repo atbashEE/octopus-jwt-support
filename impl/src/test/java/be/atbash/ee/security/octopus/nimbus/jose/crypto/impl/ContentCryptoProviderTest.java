@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,8 @@ import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWECryptoParts;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEHeader;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.ee.security.octopus.nimbus.util.ByteUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -34,7 +35,6 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
 
 
 /**
@@ -105,58 +105,50 @@ public class ContentCryptoProviderTest {
 	public void test_A256CBC_HS512_cekTooShort()
             throws Exception {
 
-        JWEHeader header = new JWEHeader(JWEAlgorithm.DIR, EncryptionMethod.A256CBC_HS512);
-        byte[] clearText = "Hello world!".getBytes(StandardCharsets.UTF_8);
+		JWEHeader header = new JWEHeader(JWEAlgorithm.DIR, EncryptionMethod.A256CBC_HS512);
+		byte[] clearText = "Hello world!".getBytes(StandardCharsets.UTF_8);
 		byte[] cekBytes = new byte[32];
 		new SecureRandom().nextBytes(cekBytes);
 		SecretKey cek = new SecretKeySpec(cekBytes, "AES");
-        Base64URLValue encryptedKey = null;
-        JWEJCAContext jcaProvider = new JWEJCAContext();
+		Base64URLValue encryptedKey = null;
+		JWEJCAContext jcaProvider = new JWEJCAContext();
 		jcaProvider.setProvider(BouncyCastleProviderSingleton.getInstance());
 
-		try {
-			ContentCryptoProvider.encrypt(
-                    header,
-                    clearText,
-                    cek,
-                    encryptedKey,
-                    jcaProvider);
+		KeyLengthException e = Assertions.assertThrows(KeyLengthException.class,
+				() -> ContentCryptoProvider.encrypt(
+						header,
+						clearText,
+						cek,
+						encryptedKey,
+						jcaProvider));
 
-			fail();
-
-		} catch (KeyLengthException e) {
-
-			assertThat(e.getMessage()).isEqualTo("The Content Encryption Key (CEK) length for A256CBC-HS512 must be 512 bits");
-		}
+		assertThat(e.getMessage()).isEqualTo("The Content Encryption Key (CEK) length for A256CBC-HS512 must be 512 bits");
 	}
 
 	@Test
 	public void test_A256GCM_cekTooShort()
             throws Exception {
 
-        JWEHeader header = new JWEHeader(JWEAlgorithm.DIR, EncryptionMethod.A256GCM);
-        byte[] clearText = "Hello world!".getBytes(StandardCharsets.UTF_8);
+		JWEHeader header = new JWEHeader(JWEAlgorithm.DIR, EncryptionMethod.A256GCM);
+		byte[] clearText = "Hello world!".getBytes(StandardCharsets.UTF_8);
 		byte[] cekBytes = new byte[16];
 		new SecureRandom().nextBytes(cekBytes);
 		SecretKey cek = new SecretKeySpec(cekBytes, "AES");
-        Base64URLValue encryptedKey = null;
-        JWEJCAContext jcaProvider = new JWEJCAContext();
+		Base64URLValue encryptedKey = null;
+		JWEJCAContext jcaProvider = new JWEJCAContext();
 		jcaProvider.setProvider(BouncyCastleProviderSingleton.getInstance());
 
-		try {
-			ContentCryptoProvider.encrypt(
-                    header,
-                    clearText,
-                    cek,
-                    encryptedKey,
-                    jcaProvider);
+		KeyLengthException e = Assertions.assertThrows(KeyLengthException.class,
+				() -> ContentCryptoProvider.encrypt(
+						header,
+						clearText,
+						cek,
+						encryptedKey,
+						jcaProvider));
 
-			fail();
 
-		} catch (KeyLengthException e) {
+		assertThat(e.getMessage()).isEqualTo("The Content Encryption Key (CEK) length for A256GCM must be 256 bits");
 
-			assertThat(e.getMessage()).isEqualTo("The Content Encryption Key (CEK) length for A256GCM must be 256 bits");
-		}
 	}
 
 	@Test

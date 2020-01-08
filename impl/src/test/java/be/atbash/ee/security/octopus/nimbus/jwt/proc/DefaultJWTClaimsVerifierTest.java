@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@ import be.atbash.config.test.TestConfig;
 import be.atbash.ee.security.octopus.jwt.decoder.JWTVerifier;
 import be.atbash.ee.security.octopus.nimbus.jwt.JWTClaimsSet;
 import be.atbash.util.TestReflectionUtils;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import uk.org.lidalia.slf4jtest.LoggingEvent;
 import uk.org.lidalia.slf4jtest.TestLogger;
 import uk.org.lidalia.slf4jtest.TestLoggerFactory;
@@ -33,7 +33,7 @@ public class DefaultJWTClaimsVerifierTest {
 
     private TestLogger logger = TestLoggerFactory.getTestLogger(DefaultJWTClaimsVerifier.class);
 
-    @After
+    @AfterEach
     public void tearDown() {
         logger.clear();
         TestConfig.resetConfig();

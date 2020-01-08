@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,8 @@ package be.atbash.ee.security.octopus.keys.selector;
 import be.atbash.ee.security.octopus.keys.fake.*;
 import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import be.atbash.util.exception.AtbashIllegalActionException;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -74,10 +75,10 @@ public class SecretKeyTypeTest {
         assertThat(keyType.getAsymmetricPart()).isEqualTo(AsymmetricPart.SYMMETRIC);
     }
 
-    @Test(expected = AtbashIllegalActionException.class)
+    @Test
     public void init_1() {
         // OCT type, asymmetric specified
-        new SecretKeyType(KeyType.OCT, AsymmetricPart.PRIVATE);
+        Assertions.assertThrows(AtbashIllegalActionException.class, () -> new SecretKeyType(KeyType.OCT, AsymmetricPart.PRIVATE));
     }
 
     @Test
@@ -87,16 +88,16 @@ public class SecretKeyTypeTest {
         new SecretKeyType(KeyType.OCT);
     }
 
-    @Test(expected = AtbashIllegalActionException.class)
+    @Test
     public void init_3() {
         // RSA type, no asymmetric
-        new SecretKeyType(KeyType.RSA, null);
+        Assertions.assertThrows(AtbashIllegalActionException.class, () -> new SecretKeyType(KeyType.RSA, null));
     }
 
-    @Test(expected = AtbashIllegalActionException.class)
+    @Test
     public void init_4() {
         // EC type, no asymmetric
-        new SecretKeyType(KeyType.EC, null);
+        Assertions.assertThrows(AtbashIllegalActionException.class, () -> new SecretKeyType(KeyType.EC, null));
     }
 
     @Test
@@ -106,17 +107,11 @@ public class SecretKeyTypeTest {
         new SecretKeyType(KeyType.EC, AsymmetricPart.PUBLIC);
     }
 
-    @Test(expected = AtbashIllegalActionException.class)
+    @Test
     public void init_6() {
         // RSA type, no asymmetric
-        new SecretKeyType(KeyType.RSA);
-        new SecretKeyType(KeyType.EC, AsymmetricPart.PUBLIC);
-    }
+        Assertions.assertThrows(AtbashIllegalActionException.class, () -> new SecretKeyType(KeyType.RSA));
 
-    @Test(expected = AtbashIllegalActionException.class)
-    public void init_7() {
-        // EC type, no asymmetric
-        new SecretKeyType(KeyType.EC);
     }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,8 @@ package be.atbash.ee.security.octopus.jwt.encoder;
 
 import be.atbash.config.exception.ConfigurationException;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.security.SecureRandom;
 
@@ -58,13 +59,14 @@ public class HMACAlgorithmFactoryTest {
         assertThat(algorithm).isEqualTo(JWSAlgorithm.HS512);
     }
 
-    @Test(expected = ConfigurationException.class)
+    @Test
     public void tooShort() {
 
         byte[] secret = defineSecret(184 / 8 + 1);
         HMACAlgorithmFactory factory = new HMACAlgorithmFactory();
-
-        factory.determineOptimalAlgorithm(secret);
+        Assertions.assertThrows(ConfigurationException.class, () -> {
+            factory.determineOptimalAlgorithm(secret);
+        });
 
     }
 

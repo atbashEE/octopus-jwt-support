@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto.impl;
 
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -109,7 +109,7 @@ public class AESKWTest {
                 (byte) 161, (byte) 131, (byte) 36, (byte) 55, (byte) 202, (byte) 236, (byte) 185, (byte) 172,
                 (byte) 129, (byte) 23, (byte) 153, (byte) 194, (byte) 195, (byte) 48, (byte) 253, (byte) 182};
 
-        assertThat(Arrays.equals(expectedCEK, cek.getEncoded())).isTrue();
+        assertThat(cek.getEncoded()).isEqualTo(expectedCEK);
         assertThat(cek.getAlgorithm()).isEqualTo("AES");
     }
 }

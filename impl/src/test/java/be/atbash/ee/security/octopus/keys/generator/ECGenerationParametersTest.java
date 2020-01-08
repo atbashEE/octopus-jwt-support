@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,8 @@
 package be.atbash.ee.security.octopus.keys.generator;
 
 import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -36,28 +37,33 @@ public class ECGenerationParametersTest {
 
     }
 
-    @Test(expected = KeyGenerationParameterException.class)
+    @Test
     public void ecGenerationParameters_invalidCurve() {
-         new ECGenerationParameters.ECGenerationParametersBuilder()
-                .withKeyId("kid")
-                .withCurveName("secp256x1")
-                .build();
-
+        Assertions.assertThrows(KeyGenerationParameterException.class, () ->
+                new ECGenerationParameters.ECGenerationParametersBuilder()
+                        .withKeyId("kid")
+                        .withCurveName("secp256x1")
+                        .build()
+        );
     }
 
-    @Test(expected = KeyGenerationParameterException.class)
+    @Test
     public void ecGenerationParameters_kidRequired() {
-        new ECGenerationParameters.ECGenerationParametersBuilder()
-                .withCurveName("secp256r1")
-                .build();
+        Assertions.assertThrows(KeyGenerationParameterException.class, () ->
+                new ECGenerationParameters.ECGenerationParametersBuilder()
+                        .withCurveName("secp256r1")
+                        .build()
+        );
 
     }
 
-    @Test(expected = KeyGenerationParameterException.class)
+    @Test
     public void ecGenerationParameters_curveRequired() {
-        new ECGenerationParameters.ECGenerationParametersBuilder()
-                .withKeyId("kid")
-                .build();
+        Assertions.assertThrows(KeyGenerationParameterException.class, () ->
+                new ECGenerationParameters.ECGenerationParametersBuilder()
+                        .withKeyId("kid")
+                        .build()
+        );
 
     }
 

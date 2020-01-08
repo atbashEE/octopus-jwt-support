@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,8 @@ import be.atbash.ee.security.octopus.nimbus.jwk.OctetSequenceKey;
 import be.atbash.ee.security.octopus.nimbus.jwk.RSAKey;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.ee.security.octopus.nimbus.util.Base64Value;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -33,7 +34,6 @@ import java.text.ParseException;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
 
 
 /**
@@ -241,15 +241,9 @@ public class JWEHeaderTest {
     @Test
     public void testRejectNone() {
 
-        try {
-            new JWEHeader(new JWEAlgorithm("none"), EncryptionMethod.A128CBC_HS256);
+        Assertions.assertThrows(IllegalArgumentException.class, () ->
+                new JWEHeader(new JWEAlgorithm("none"), EncryptionMethod.A128CBC_HS256));
 
-            fail("Failed to raise exception");
-
-        } catch (IllegalArgumentException e) {
-
-            // ok
-        }
     }
 
     @Test

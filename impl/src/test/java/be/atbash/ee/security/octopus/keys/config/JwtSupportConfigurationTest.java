@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,9 +30,10 @@ import be.atbash.ee.security.octopus.keys.reader.password.ConfigKeyResourcePassw
 import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup;
 import be.atbash.ee.security.octopus.keys.selector.SelectorCriteria;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
@@ -46,13 +47,13 @@ public class JwtSupportConfigurationTest {
 
     private JwtSupportConfiguration configuration;
 
-    @Before
+    @BeforeEach
     public void setup() {
         configuration = new JwtSupportConfiguration();
         TestConfig.registerDefaultConverters();
     }
 
-    @After
+    @AfterEach
     public void cleanup() {
         TestConfig.resetConfig();
     }
@@ -87,17 +88,17 @@ public class JwtSupportConfigurationTest {
         assertThat(lookup).isInstanceOf(TestPasswordLookup.class);
     }
 
-    @Test(expected = ConfigurationException.class)
+    @Test
     public void getPasswordLookup_required() {
         TestConfig.addConfigValue("lookup.password.class", " ");
-        configuration.getPasswordLookup();
+        Assertions.assertThrows(ConfigurationException.class, () -> configuration.getPasswordLookup());
 
     }
 
-    @Test(expected = ConfigurationException.class)
+    @Test
     public void getPasswordLookup_WrongType() {
         TestConfig.addConfigValue("lookup.password.class", String.class.getName());
-        configuration.getPasswordLookup();
+        Assertions.assertThrows(ConfigurationException.class, () -> configuration.getPasswordLookup());
     }
 
     @Test
@@ -115,17 +116,17 @@ public class JwtSupportConfigurationTest {
         assertThat(keyManager).isInstanceOf(TestKeyManager.class);
     }
 
-    @Test(expected = ConfigurationException.class)
+    @Test
     public void getKeyManager_required() {
         TestConfig.addConfigValue("key.manager.class", " ");
-        configuration.getKeyManager();
+        Assertions.assertThrows(ConfigurationException.class, () -> configuration.getKeyManager());
 
     }
 
-    @Test(expected = ConfigurationException.class)
+    @Test
     public void getKeyManager_WrongType() {
         TestConfig.addConfigValue("key.manager.class", String.class.getName());
-        configuration.getKeyManager();
+        Assertions.assertThrows(ConfigurationException.class, () -> configuration.getKeyManager());
     }
 
     //
@@ -145,17 +146,17 @@ public class JwtSupportConfigurationTest {
         assertThat(provider).isInstanceOf(TestKeyResourceTypeProvider.class);
     }
 
-    @Test(expected = ConfigurationException.class)
+    @Test
     public void getKeyResourceTypeProvider_required() {
         TestConfig.addConfigValue("key.resourcetype.provider.class", " ");
-        configuration.getKeyResourceTypeProvider();
+        Assertions.assertThrows(ConfigurationException.class, () -> configuration.getKeyResourceTypeProvider());
 
     }
 
-    @Test(expected = ConfigurationException.class)
+    @Test
     public void getKeyResourceTypeProvider_WrongType() {
         TestConfig.addConfigValue("key.resourcetype.provider.class", String.class.getName());
-        configuration.getKeyResourceTypeProvider();
+        Assertions.assertThrows(ConfigurationException.class, () -> configuration.getKeyResourceTypeProvider());
     }
 
     //
@@ -174,12 +175,12 @@ public class JwtSupportConfigurationTest {
         assertThat(encryption).isEqualTo(PemKeyEncryption.PKCS1);
     }
 
-    @Test(expected = ConfigurationException.class)
+    @Test
     public void getPemKeyEncryption_Wrong() {
         TestConfig.addConfigValue("key.pem.encryption", "value");
         TestConfig.registerDefaultConverters();
 
-        configuration.getPemKeyEncryption();
+        Assertions.assertThrows(ConfigurationException.class, () -> configuration.getPemKeyEncryption());
 
     }
 
@@ -203,16 +204,16 @@ public class JwtSupportConfigurationTest {
         assertThat(configuration.getClockSkewSeconds()).isEqualTo(0);
     }
 
-    @Test(expected = ConfigurationException.class)
+    @Test
     public void getClockSkewSeconds_invalid() {
         TestConfig.addConfigValue("jwt.clock.skew.secs", "-1");
-        configuration.getClockSkewSeconds();
+        Assertions.assertThrows(ConfigurationException.class, () -> configuration.getClockSkewSeconds());
     }
 
-    @Test(expected = ConfigurationException.class)
+    @Test
     public void getClockSkewSeconds_wrongType() {
         TestConfig.addConfigValue("jwt.clock.skew.secs", "12.34");
-        configuration.getClockSkewSeconds();
+        Assertions.assertThrows(ConfigurationException.class, () -> configuration.getClockSkewSeconds());
     }
 
     @Test
@@ -229,17 +230,17 @@ public class JwtSupportConfigurationTest {
         assertThat(algorithm).isEqualTo(JWEAlgorithm.ECDH_ES_A256KW);
     }
 
-    @Test(expected = ConfigurationException.class)
+    @Test
     public void getDefaultJWEAlgorithmEC_invalid() {
         TestConfig.addConfigValue("jwt.jwe.algorithm.default.EC", "RSA-OAEP-256");
-        configuration.getDefaultJWEAlgorithmEC();
+        Assertions.assertThrows(ConfigurationException.class, () -> configuration.getDefaultJWEAlgorithmEC());
 
     }
 
-    @Test(expected = ConfigurationException.class)
+    @Test
     public void getDefaultJWEAlgorithmEC_empty() {
         TestConfig.addConfigValue("jwt.jwe.algorithm.default.EC", "");
-        configuration.getDefaultJWEAlgorithmEC();
+        Assertions.assertThrows(ConfigurationException.class, () -> configuration.getDefaultJWEAlgorithmEC());
     }
 
     @Test
@@ -256,17 +257,17 @@ public class JwtSupportConfigurationTest {
         assertThat(algorithm).isEqualTo(JWEAlgorithm.A256KW);
     }
 
-    @Test(expected = ConfigurationException.class)
+    @Test
     public void getDefaultJWEAlgorithmOCT_invalid() {
         TestConfig.addConfigValue("jwt.jwe.algorithm.default.OCT", "RSA-OAEP-256");
-        configuration.getDefaultJWEAlgorithmOCT();
+        Assertions.assertThrows(ConfigurationException.class, () -> configuration.getDefaultJWEAlgorithmOCT());
 
     }
 
-    @Test(expected = ConfigurationException.class)
+    @Test
     public void getDefaultJWEAlgorithmOCT_empty() {
         TestConfig.addConfigValue("jwt.jwe.algorithm.default.OCT", "");
-        configuration.getDefaultJWEAlgorithmOCT();
+        Assertions.assertThrows(ConfigurationException.class, () -> configuration.getDefaultJWEAlgorithmOCT());
     }
 
     @Test
@@ -282,10 +283,10 @@ public class JwtSupportConfigurationTest {
         assertThat(cachePeriod).isEqualTo("15m");
     }
 
-    @Test(expected = ConfigurationException.class)
+    @Test
     public void getJWKSetCachePeriod_invalid() {
         TestConfig.addConfigValue("jwt.remote.jwk.cache.period", "abc");
-        configuration.getJWKSetCachePeriod();
+        Assertions.assertThrows(ConfigurationException.class, () -> configuration.getJWKSetCachePeriod());
     }
 
     public static class TestKeyManager implements KeyManager {

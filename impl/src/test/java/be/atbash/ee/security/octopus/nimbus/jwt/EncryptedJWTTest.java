@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,8 @@ import be.atbash.ee.security.octopus.nimbus.jose.crypto.bc.BouncyCastleProviderS
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEHeader;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -40,7 +41,6 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
 
 
 /**
@@ -144,7 +144,7 @@ public class EncryptedJWTTest {
 
 
     static {
-        try {
+        Assertions.assertDoesNotThrow(() -> {
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
 
             RSAPublicKeySpec publicKeySpec = new RSAPublicKeySpec(new BigInteger(1, mod), new BigInteger(1, exp));
@@ -153,10 +153,7 @@ public class EncryptedJWTTest {
             publicKey = (RSAPublicKey) keyFactory.generatePublic(publicKeySpec);
             privateKey = (RSAPrivateKey) keyFactory.generatePrivate(privateKeySpec);
 
-        } catch (Exception e) {
-
-            fail(e.getMessage());
-        }
+        });
     }
 
     @Test

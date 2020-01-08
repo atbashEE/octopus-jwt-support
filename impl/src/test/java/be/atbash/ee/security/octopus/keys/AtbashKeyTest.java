@@ -20,7 +20,8 @@ import be.atbash.ee.security.octopus.keys.fake.FakeRSAPublic;
 import be.atbash.ee.security.octopus.keys.generator.*;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.util.resource.ResourceUtil;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
@@ -71,14 +72,14 @@ public class AtbashKeyTest {
         assertThat(key.isMatch("test", AsymmetricPart.PUBLIC)).isFalse();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void create_missingPath() {
-        new AtbashKey(null, new FakeRSAPrivate());
+        Assertions.assertThrows(IllegalArgumentException.class, () -> new AtbashKey(null, new FakeRSAPrivate()));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void create_missingKey() {
-        new AtbashKey(ResourceUtil.CLASSPATH_PREFIX + "test.pem", null);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> new AtbashKey(ResourceUtil.CLASSPATH_PREFIX + "test.pem", null));
     }
 
     @Test

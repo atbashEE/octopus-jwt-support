@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,8 @@ package be.atbash.ee.security.octopus.util;
 
 import be.atbash.ee.security.octopus.exception.DecryptionFailedException;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import javax.crypto.SecretKey;
 import java.security.SecureRandom;
@@ -37,11 +38,11 @@ public class EncryptionHelperTest {
         assertThat(decoded).isEqualTo("This is the text which needs to encrypted");
     }
 
-    @Test(expected = DecryptionFailedException.class)
+    @Test
     public void encode_decode_WrongPassword() {
 
         String encoded = EncryptionHelper.encode("This is the text which needs to encrypted", "pw".toCharArray());
-        EncryptionHelper.decode(encoded, "Atbash".toCharArray());
+        Assertions.assertThrows(DecryptionFailedException.class, () -> EncryptionHelper.decode(encoded, "Atbash".toCharArray()));
 
     }
 

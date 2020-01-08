@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,9 @@ import be.atbash.ee.security.octopus.keys.selector.SelectorCriteria;
 import be.atbash.ee.security.octopus.nimbus.jwk.JWKSet;
 import be.atbash.ee.security.octopus.nimbus.jwk.RSAKey;
 import net.jadler.Jadler;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 import java.security.interfaces.RSAPublicKey;
@@ -35,13 +35,13 @@ public class RemoteKeyManagerTest {
 
     private RemoteKeyManager remoteKeyManager = new RemoteKeyManager();
 
-    @Before
+    @BeforeEach
     public void setUp() {
         Jadler.initJadler();
     }
 
 
-    @After
+    @AfterEach
     public void tearDown() {
         Jadler.closeJadler();
     }
