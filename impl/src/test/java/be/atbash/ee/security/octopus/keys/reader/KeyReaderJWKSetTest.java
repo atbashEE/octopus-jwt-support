@@ -15,8 +15,10 @@
  */
 package be.atbash.ee.security.octopus.keys.reader;
 
+import be.atbash.ee.security.octopus.exception.ResourceNotFoundException;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.TestPasswordLookup;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
@@ -79,5 +81,10 @@ public class KeyReaderJWKSetTest {
         String data = atbashKey.getKeyId() + " - " + atbashKey.getSecretKeyType().getKeyType().getValue() + " - " + atbashKey.getSecretKeyType().getAsymmetricPart();
         assertThat(data).isEqualTo("demo - oct - SYMMETRIC");
 
+    }
+
+    @Test
+    public void readResource() {
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> reader.readResource("./not-existent", null));
     }
 }

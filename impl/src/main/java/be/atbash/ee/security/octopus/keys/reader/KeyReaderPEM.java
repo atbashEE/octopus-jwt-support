@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package be.atbash.ee.security.octopus.keys.reader;
 
 import be.atbash.ee.security.octopus.exception.MissingPasswordException;
+import be.atbash.ee.security.octopus.exception.ResourceNotFoundException;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup;
 import be.atbash.util.StringUtils;
@@ -54,8 +55,12 @@ public class KeyReaderPEM {
         try {
             Security.addProvider(new BouncyCastleProvider());
 
-            // FIXME Should we first use .resourceExists ?
-            InputStream inputStream = ResourceUtil.getInstance().getStream(path);
+            ResourceUtil resourceUtil = ResourceUtil.getInstance();
+            if (!resourceUtil.resourceExists(path)) {
+                throw new ResourceNotFoundException(path);
+            }
+
+            InputStream inputStream = resourceUtil.getStream(path);
             if (inputStream == null) {
                 throw new KeyResourceNotFoundException(path);
             }

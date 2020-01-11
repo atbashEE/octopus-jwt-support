@@ -15,6 +15,7 @@
  */
 package be.atbash.ee.security.octopus.keys.reader;
 
+import be.atbash.ee.security.octopus.exception.ResourceNotFoundException;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
@@ -44,8 +45,12 @@ public class KeyReaderJWK {
         List<AtbashKey> result;
         InputStream inputStream = null;
         try {
-            // FIXME Should we first use .resourceExists ?
-            inputStream = ResourceUtil.getInstance().getStream(path);
+            ResourceUtil resourceUtil = ResourceUtil.getInstance();
+            if (!resourceUtil.resourceExists(path)) {
+                throw new ResourceNotFoundException(path);
+            }
+
+            inputStream = resourceUtil.getStream(path);
             if (inputStream == null) {
                 throw new KeyResourceNotFoundException(path);
             }
