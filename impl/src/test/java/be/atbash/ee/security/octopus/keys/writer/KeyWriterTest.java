@@ -97,7 +97,7 @@ public class KeyWriterTest {
 
         AtbashKey privateKey = filterKeys(keys, AsymmetricPart.PUBLIC);
 
-        byte[] bytes = keyWriter.writeKeyResource(privateKey, KeyResourceType.PEM, null, null);
+        byte[] bytes = keyWriter.writeKeyResource(privateKey, KeyResourceType.PEM);
 
         String pemFile = new String(bytes);
 
@@ -148,7 +148,7 @@ public class KeyWriterTest {
 
         AtbashKey privateKey = filterKeys(keys, AsymmetricPart.PRIVATE);
 
-        byte[] bytes = keyWriter.writeKeyResource(privateKey, KeyResourceType.JWK, null, null);
+        byte[] bytes = keyWriter.writeKeyResource(privateKey, KeyResourceType.JWK);
 
         String jwk = new String(bytes);
 
@@ -189,7 +189,7 @@ public class KeyWriterTest {
 
         AtbashKey privateKey = filterKeys(keys, AsymmetricPart.PRIVATE);
 
-        Assertions.assertThrows(MissingPasswordException.class, () -> keyWriter.writeKeyResource(privateKey, KeyResourceType.KEYSTORE, null, "atbash".toCharArray()));
+        Assertions.assertThrows(MissingPasswordException.class, () -> keyWriter.writeKeyResource(privateKey, KeyResourceType.KEYSTORE, "atbash".toCharArray()));
 
     }
 
@@ -213,7 +213,7 @@ public class KeyWriterTest {
 
         AtbashKey privateKey = filterKeys(keys, AsymmetricPart.PRIVATE);
 
-        byte[] bytes = keyWriter.writeKeyResource(privateKey, KeyResourceType.JWKSET, null, null);
+        byte[] bytes = keyWriter.writeKeyResource(privateKey, KeyResourceType.JWKSET);
 
         JWKSet jwkSet = JWKSet.parse(new String(bytes));
         assertThat(jwkSet.getKeys()).hasSize(1);
