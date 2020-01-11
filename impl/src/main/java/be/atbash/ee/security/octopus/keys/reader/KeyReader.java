@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,10 +50,44 @@ public class KeyReader {
         }
     }
 
+    public List<AtbashKey> readKeyResource(KeyResourceType keyResourceType, String path) {
+        return this.readKeyResource(keyResourceType, path, null);
+    }
+
+    public List<AtbashKey> readKeyResource(KeyResourceType keyResourceType, String path, KeyResourcePasswordLookup passwordLookup) {
+        checkDependencies();
+
+        List<AtbashKey> result;
+
+        switch (keyResourceType) {
+
+            case JWK:
+                result = keyReaderJWK.readResource(path, passwordLookup);
+                break;
+            case JWKSET:
+                result = keyReaderJWKSet.readResource(path, passwordLookup);
+                break;
+            case PEM:
+                result = keyReaderPEM.readResource(path, passwordLookup);
+                break;
+            case KEYSTORE:
+                result = keyReaderKeyStore.readResource(path, passwordLookup);
+                break;
+            default:
+                throw new IllegalArgumentException(String.format("Unknown KeyResourceType %s", keyResourceType));
+        }
+
+        return result;
+    }
+
+    public List<AtbashKey> readKeyResource(String path) {
+        return this.readKeyResource(path, null);
+    }
+
     public List<AtbashKey> readKeyResource(String path, KeyResourcePasswordLookup passwordLookup) {
         checkDependencies();
 
-        List<AtbashKey> result ;
+        List<AtbashKey> result;
 
         KeyResourceType keyResourceType = keyResourceTypeProvider.determineKeyResourceType(path);
         if (keyResourceType == null) {

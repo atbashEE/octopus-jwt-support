@@ -73,7 +73,7 @@ public class KeyReaderTest {
     @Test
     public void readKeyResource_scenario2() {
         // RSA public key
-        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.pub.pem", null);
+        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.pub.pem");
 
         assertThat(keys).hasSize(1);
         assertThat(keys.get(0).getKeyId()).isEqualTo("rsa.pub");  // filename without extension
@@ -127,7 +127,7 @@ public class KeyReaderTest {
     @Test
     public void readKeyResource_scenario5() {
         // EC public key
-        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "ecpubkey.pem", null);
+        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "ecpubkey.pem");
 
         assertThat(keys).hasSize(1);
         assertThat(keys.get(0).getKeyId()).isEqualTo("ecpubkey");  // filename without extension
@@ -150,7 +150,7 @@ public class KeyReaderTest {
     public void readKeyResource_scenario7() {
         // RSA JWK
 
-        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.jwk", null);
+        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.jwk");
         assertThat(keys).hasSize(2);
 
         boolean privateKey = false;
@@ -179,7 +179,7 @@ public class KeyReaderTest {
     public void readKeyResource_scenario8() {
         // EC JWK
 
-        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "ec.jwk", null);
+        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "ec.jwk");
         assertThat(keys).hasSize(2);
 
         boolean privateKey = false;
@@ -313,7 +313,7 @@ public class KeyReaderTest {
     @Test
     public void readKeyResource_scenario13() {
         // unknown key type from path
-        Assertions.assertThrows(UnknownKeyResourceTypeException.class, () -> keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "key.txt", null));
+        Assertions.assertThrows(UnknownKeyResourceTypeException.class, () -> keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "key.txt"));
     }
 
 
@@ -327,7 +327,7 @@ public class KeyReaderTest {
     @Test
     public void readKeyResource_scenario15() {
         // JWK, RSA public only
-        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.pub.jwk", null);
+        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.pub.jwk");
         assertThat(keys).hasSize(1);
     }
 
@@ -335,7 +335,7 @@ public class KeyReaderTest {
     public void readKeyResource_scenario16() {
         // JWKSet (RSA Public)
 
-        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "test2.jwkset", null);
+        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "test2.jwkset");
         assertThat(keys).hasSize(1);
         assertThat(keys.get(0).getSecretKeyType().getAsymmetricPart()).isEqualTo(AsymmetricPart.PUBLIC);
 

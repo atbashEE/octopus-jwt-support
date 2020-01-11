@@ -79,7 +79,7 @@ public class KeyWriterTest {
 
         AtbashKey privateKey = filterKeys(keys, AsymmetricPart.PRIVATE);
 
-        byte[] bytes = keyWriter.writeKeyResource(privateKey, KeyResourceType.PEM, PASSWORD, null);
+        byte[] bytes = keyWriter.writeKeyResource(privateKey, KeyResourceType.PEM, PASSWORD);
 
         String pemFile = new String(bytes);
 
@@ -144,7 +144,7 @@ public class KeyWriterTest {
     @Test
     public void writeKeyResource_scenario5() throws IOException {
         // scenario 5 RSA private key as JWK
-        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.jwk", null);
+        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.jwk");
 
         AtbashKey privateKey = filterKeys(keys, AsymmetricPart.PRIVATE);
 
@@ -168,7 +168,7 @@ public class KeyWriterTest {
         // scenario 7 RSA private key as KeyStore
         when(jwtSupportConfigurationMock.getKeyStoreType()).thenReturn("jks");
 
-        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.jwk", null);
+        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.jwk");
 
         AtbashKey privateKey = filterKeys(keys, AsymmetricPart.PRIVATE);
 
@@ -185,7 +185,7 @@ public class KeyWriterTest {
         // scenario 7 RSA private key as KeyStore
         when(jwtSupportConfigurationMock.getKeyStoreType()).thenReturn("jks");
 
-        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.jwk", null);
+        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.jwk");
 
         AtbashKey privateKey = filterKeys(keys, AsymmetricPart.PRIVATE);
 
@@ -198,7 +198,7 @@ public class KeyWriterTest {
         // scenario 7 RSA private key as KeyStore
         when(jwtSupportConfigurationMock.getKeyStoreType()).thenReturn("jks");
 
-        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.jwk", null);
+        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.jwk");
 
         AtbashKey privateKey = filterKeys(keys, AsymmetricPart.PRIVATE);
 
@@ -209,7 +209,7 @@ public class KeyWriterTest {
     @Test
     public void writeKeyResource_scenario9() throws IOException, ParseException {
         // scenario 9 RSA private key as JWKSet
-        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.jwk", null);
+        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.jwk");
 
         AtbashKey privateKey = filterKeys(keys, AsymmetricPart.PRIVATE);
 
