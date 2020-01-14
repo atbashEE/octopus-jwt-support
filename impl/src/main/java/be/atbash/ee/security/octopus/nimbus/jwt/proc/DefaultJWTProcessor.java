@@ -16,6 +16,7 @@
 package be.atbash.ee.security.octopus.nimbus.jwt.proc;
 
 
+import be.atbash.ee.security.octopus.jwt.InvalidJWTException;
 import be.atbash.ee.security.octopus.jwt.decoder.JWTVerifier;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.keys.selector.KeySelector;
@@ -31,6 +32,8 @@ import be.atbash.ee.security.octopus.nimbus.jwt.*;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEDecrypter;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSVerifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.security.Key;
@@ -80,6 +83,7 @@ import java.text.ParseException;
  */
 public class DefaultJWTProcessor {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(KeySelector.class);
 
     /**
      * The JWS key selector.
@@ -97,12 +101,14 @@ public class DefaultJWTProcessor {
      * The JWS verifier factory.
      */
     private JWSVerifierFactory jwsVerifierFactory = new DefaultJWSVerifierFactory();
+    // FIXME This is now not configurable
 
 
     /**
      * The JWE decrypter factory.
      */
     private JWEDecrypterFactory jweDecrypterFactory = new DefaultJWEDecrypterFactory();
+    // FIXME This is now not configurable
 
 
     /**
@@ -225,19 +231,23 @@ public class DefaultJWTProcessor {
             throw new JOSEException("No JWS verifier is configured");
         }
 
-        // FIXME When MAC verification, it is not a Public Key
         Key secretKey = selectKeys(jwsKeySelector, signedJWT.getHeader(), AsymmetricPart.PUBLIC);
-
         if (secretKey == null) {
-            // FIXME Verify error message 'Another algorithm expected'
-            throw new BadJOSEException("Signed JWT rejected: Another algorithm expected, or no matching key(s) found");
+            secretKey = selectKeys(jwsKeySelector, signedJWT.getHeader(), AsymmetricPart.SYMMETRIC);
         }
 
+        if (secretKey == null) {
+            if (LOGGER.isErrorEnabled()) {
+                LOGGER.error(String.format("(OCT-KEY-010) No or multiple keys found for criteria :%n %s", defineKeyCriteria(signedJWT.getHeader(), AsymmetricPart.PUBLIC)));
+
+            }
+            throw new InvalidJWTException(String.format("No key found for keyId '%s'", signedJWT.getHeader().getKeyID()));
+        }
 
         JWSVerifier verifier = jwsVerifierFactory.createJWSVerifier(signedJWT.getHeader(), secretKey);
 
         if (verifier == null) {
-            throw new BadJOSEException("Signed JWT rejected: Another algorithm expected, or no matching key(s) found");
+            throw new InvalidJWTException("Signed JWT rejected: Another algorithm expected, or no matching key(s) found");
         }
 
         boolean validSignature = signedJWT.verify(verifier);
@@ -247,7 +257,7 @@ public class DefaultJWTProcessor {
             return verifyClaims(signedJWT.getHeader(), claimsSet);
         }
 
-        throw new BadJWTException("Signed JWT rejected: Invalid signature");
+        throw new InvalidJWTException("Signed JWT rejected: Invalid signature");
 
     }
 
@@ -265,8 +275,15 @@ public class DefaultJWTProcessor {
         Key secretKey = selectKeys(jweKeySelector, encryptedJWT.getHeader(), AsymmetricPart.PRIVATE);
 
         if (secretKey == null) {
-            // FIXME Verify 'Another algorithm expected'
-            throw new BadJOSEException("Encrypted JWT rejected: Another algorithm expected, or no matching key(s) found");
+            secretKey = selectKeys(jweKeySelector, encryptedJWT.getHeader(), AsymmetricPart.SYMMETRIC);
+        }
+
+        if (secretKey == null) {
+            if (LOGGER.isErrorEnabled()) {
+                LOGGER.error(String.format("(OCT-KEY-010) No or multiple keys found for criteria :%n %s", defineKeyCriteria(encryptedJWT.getHeader(), AsymmetricPart.PRIVATE)));
+
+            }
+            throw new InvalidJWTException(String.format("No key found for keyId '%s'", encryptedJWT.getHeader().getKeyID()));
         }
 
         JWEDecrypter decrypter = jweDecrypterFactory.createJWEDecrypter(encryptedJWT.getHeader(), secretKey);

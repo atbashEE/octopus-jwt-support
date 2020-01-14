@@ -18,20 +18,12 @@ package be.atbash.ee.security.octopus.jwt.decoder;
 import be.atbash.ee.security.octopus.jwt.InvalidJWTException;
 import be.atbash.ee.security.octopus.jwt.JWTEncoding;
 import be.atbash.ee.security.octopus.jwt.serializer.spi.SerializerProvider;
-import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.keys.selector.KeySelector;
-import be.atbash.ee.security.octopus.keys.selector.SelectorCriteria;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
-import be.atbash.ee.security.octopus.nimbus.jose.crypto.factories.DefaultJWEDecrypterFactory;
-import be.atbash.ee.security.octopus.nimbus.jose.crypto.factories.DefaultJWSVerifierFactory;
-import be.atbash.ee.security.octopus.nimbus.jose.proc.JWEDecrypterFactory;
-import be.atbash.ee.security.octopus.nimbus.jose.proc.JWSVerifierFactory;
+import be.atbash.ee.security.octopus.nimbus.jwt.EncryptedJWT;
+import be.atbash.ee.security.octopus.nimbus.jwt.JWTClaimsSet;
 import be.atbash.ee.security.octopus.nimbus.jwt.SignedJWT;
-import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
-import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEDecrypter;
-import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEObject;
-import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
-import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSVerifier;
+import be.atbash.ee.security.octopus.nimbus.jwt.proc.DefaultJWTProcessor;
 import be.atbash.util.PublicAPI;
 import be.atbash.util.StringUtils;
 import be.atbash.util.exception.AtbashIllegalActionException;
@@ -43,8 +35,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
-import java.net.URI;
-import java.security.Key;
 import java.text.ParseException;
 
 /**
@@ -53,13 +43,6 @@ import java.text.ParseException;
 @PublicAPI
 @ApplicationScoped
 public class JWTDecoder {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(KeySelector.class);
-
-    // TODO Do we ever need some customer factory implementations? Should we made these configurable?
-    private JWSVerifierFactory jwsVerifierFactory = new DefaultJWSVerifierFactory();
-
-    private JWEDecrypterFactory jweDecrypterFactory = new DefaultJWEDecrypterFactory();
 
     public <T> T decode(String data, Class<T> classType) {
         return decode(data, classType, null, null).getData();
@@ -103,80 +86,44 @@ public class JWTDecoder {
 
     private <T> JWTData<T> readEncryptedJWT(String data, KeySelector keySelector, Class<T> classType, JWTVerifier verifier) throws ParseException, JOSEException {
 
-        JWEObject jweObject = JWEObject.parse(data);
 
-        String keyID = jweObject.getHeader().getKeyID();
+        EncryptedJWT encryptedJWT = EncryptedJWT.parse(data);
 
-        SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(keyID).withAsymmetricPart(AsymmetricPart.PRIVATE).build();
-        Key key = keySelector.selectSecretKey(criteria);
+        String keyID = encryptedJWT.getHeader().getKeyID();
 
-        if (key == null) {
-            JWEAlgorithm algorithm = jweObject.getHeader().getAlgorithm();
-            if (algorithm.equals(JWEAlgorithm.A256KW)) {  // TODO Test also for other algorithms
-                // We are using a symmetric algo
-                criteria = SelectorCriteria.newBuilder().withId(keyID).build();
-                key = keySelector.selectSecretKey(criteria);
-            }
+        DefaultJWTProcessor processor = new DefaultJWTProcessor();
+        processor.setJWSKeySelector(keySelector);
+        processor.setJWEKeySelector(keySelector);
+        JWTClaimsSet jwtClaimsSet = processor.process(encryptedJWT);
+
+        MetaJWTData metaJWTData = new MetaJWTData(keyID, encryptedJWT.getHeader().getCustomParams());
+
+        if (classType.equals(JWTClaimsSet.class)) {
+            return new JWTData<T>((T) jwtClaimsSet, metaJWTData);
         }
-
-        if (key == null) {
-            if (LOGGER.isErrorEnabled()) {
-                LOGGER.error(String.format("(OCT-KEY-010) No or multiple keys found for criteria :%n %s", criteria.toString()));
-            }
-            throw new InvalidJWTException(String.format("No key found for %s", keyID));
-        }
-
-        // Decrypt with private key
-        JWEDecrypter decrypter = jweDecrypterFactory.createJWEDecrypter(jweObject.getHeader(), key);
-        jweObject.decrypt(decrypter);
-
-        // Now we have a signedJWT
-        return readSignedJWT(jweObject.getPayload().toString(), keySelector, classType, verifier);
+        return readJSONString(jwtClaimsSet.toJSONObject().toString(), classType, metaJWTData);
 
     }
 
     private <T> JWTData<T> readSignedJWT(String data, KeySelector keySelector, Class<T> classType, JWTVerifier verifier) throws ParseException, JOSEException {
         SignedJWT signedJWT = SignedJWT.parse(data);
 
-        String keyID = signedJWT.getHeader().getKeyID();
-        URI jwkURI = signedJWT.getHeader().getJWKURL();
-
-        SelectorCriteria criteria = SelectorCriteria.newBuilder()
-                .withId(keyID)
-                .withJKU(jwkURI)
-                .withAsymmetricPart(AsymmetricPart.PUBLIC)
-                .build();
-        Key key = keySelector.selectSecretKey(criteria);
-
-        if (key == null) {
-            if (signedJWT.getHeader().getAlgorithm() == JWSAlgorithm.HS256) { // FIXME Other algorithms
-                criteria = SelectorCriteria.newBuilder()
-                        .withId(keyID)
-                        .withJKU(jwkURI)
-                        .build();
-                key = keySelector.selectSecretKey(criteria);
-            }
-        }
-        if (key == null) {
-            if (LOGGER.isErrorEnabled()) {
-                LOGGER.error(String.format("(OCT-KEY-010) No or multiple keys found for criteria :%n %s", criteria.toString()));
-            }
-            throw new InvalidJWTException(String.format("No key found for keyId '%s'", keyID));
-        }
-
-        JWSVerifier jwsVerifier = jwsVerifierFactory.createJWSVerifier(signedJWT.getHeader(), key);
-
-        if (!signedJWT.verify(jwsVerifier)) {
-            throw new InvalidJWTException("JWT Signature verification failed");
-        }
+        DefaultJWTProcessor processor = new DefaultJWTProcessor();
+        processor.setJWSKeySelector(keySelector);
+        JWTClaimsSet jwtClaimsSet = processor.process(signedJWT);
 
         if (verifier != null) {
             if (!verifier.verify(signedJWT.getHeader(), signedJWT.getJWTClaimsSet())) {
                 throw new InvalidJWTException("JWT verification failed");
             }
         }
+
+        String keyID = signedJWT.getHeader().getKeyID();
         MetaJWTData metaJWTData = new MetaJWTData(keyID, signedJWT.getHeader().getCustomParams());
 
+        if (classType.equals(JWTClaimsSet.class)) {
+            return new JWTData<T>((T) jwtClaimsSet, metaJWTData);
+        }
         return readJSONString(signedJWT.getPayload().toString(), classType, metaJWTData);
     }
 
@@ -209,6 +156,7 @@ public class JWTDecoder {
             if (occurrences == 4) {
                 result = JWTEncoding.JWE;
             }
+            // FIXME occurences = 1 -> PlainJWT, Add new JWTEncoding
         }
         return result;
     }

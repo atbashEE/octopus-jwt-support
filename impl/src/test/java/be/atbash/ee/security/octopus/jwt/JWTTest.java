@@ -24,6 +24,7 @@ import be.atbash.ee.security.octopus.jwt.encoder.testclasses.Payload;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParameters;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersBuilder;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
+import be.atbash.ee.security.octopus.keys.KeyManager;
 import be.atbash.ee.security.octopus.keys.ListKeyManager;
 import be.atbash.ee.security.octopus.keys.generator.ECGenerationParameters;
 import be.atbash.ee.security.octopus.keys.generator.KeyGenerator;
@@ -41,6 +42,7 @@ import uk.org.lidalia.slf4jtest.TestLoggerFactory;
 
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
@@ -95,7 +97,10 @@ public class JWTTest {
                 .build();
         String encoded = new JWTEncoder().encode(payload, parameters);
 
-        KeySelector keySelector = new SingleKeySelector(key);
+        List<AtbashKey> keys = new ArrayList<>();
+        keys.add(key);
+        KeyManager keyManager = new ListKeyManager(keys);
+        TestKeySelector keySelector = new TestKeySelector(keyManager);  // Using TestKeySelector with ListKeyManager is more realistic for Key selection
         Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector, null).getData();
 
         assertThat(payload).isEqualToComparingFieldByField(data);

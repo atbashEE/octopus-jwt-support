@@ -15,6 +15,7 @@
  */
 package be.atbash.ee.security.octopus.nimbus.jwt.proc;
 
+import be.atbash.ee.security.octopus.jwt.InvalidJWTException;
 import be.atbash.ee.security.octopus.jwt.decoder.JWTVerifier;
 import be.atbash.ee.security.octopus.keys.selector.KeySelector;
 import be.atbash.ee.security.octopus.keys.selector.SelectorCriteria;
@@ -186,8 +187,54 @@ public class DefaultJWTProcessorTest {
         processor.setJWSKeySelector(new TestKeySelector(invalidKey));
 
 
-        BadJOSEException e = Assertions.assertThrows(BadJOSEException.class, () -> processor.process(jwt));
+        InvalidJWTException e = Assertions.assertThrows(InvalidJWTException.class, () -> processor.process(jwt));
         assertThat(e.getMessage()).isEqualTo("Signed JWT rejected: Invalid signature");
+    }
+
+    @Test
+    public void testProcessHmac() throws Exception {
+
+        JWTClaimsSet claims = new JWTClaimsSet.Builder().subject("alice").build();
+        SignedJWT jwt = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), claims);
+
+        SecureRandom random = new SecureRandom();
+
+        byte[] keyBytes = new byte[32];
+        random.nextBytes(keyBytes);
+        SecretKey key = new SecretKeySpec(keyBytes, "HMAC");
+
+        jwt.sign(new MACSigner(key));
+
+        DefaultJWTProcessor processor = new DefaultJWTProcessor();
+
+        processor.setJWSKeySelector(new TestKeySelector(key));
+
+        JWTClaimsSet claimsSet = processor.process(jwt);
+        assertThat(claimsSet.getClaims()).hasSize(1);
+        assertThat(claimsSet.getSubject()).isEqualTo("alice");
+    }
+
+    @Test
+    public void testProcessAES() throws Exception {
+
+        JWTClaimsSet claims = new JWTClaimsSet.Builder().subject("alice").build();
+        SignedJWT jwt = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), claims);
+
+        SecureRandom random = new SecureRandom();
+
+        byte[] keyBytes = new byte[32];
+        random.nextBytes(keyBytes);
+        SecretKey key = new SecretKeySpec(keyBytes, "AES");
+
+        jwt.sign(new MACSigner(key));
+
+        DefaultJWTProcessor processor = new DefaultJWTProcessor();
+
+        processor.setJWSKeySelector(new TestKeySelector(key));
+
+        JWTClaimsSet claimsSet = processor.process(jwt);
+        assertThat(claimsSet.getClaims()).hasSize(1);
+        assertThat(claimsSet.getSubject()).isEqualTo("alice");
     }
 
     @Test
@@ -316,7 +363,7 @@ public class DefaultJWTProcessorTest {
     }
 
     @Test
-    public void testNoJWSKeyCandidates() throws Exception {
+    public void testNoJWSKeyCandidates() {
 
         // See http://tools.ietf.org/html/rfc7515#appendix-A.1
         String jws = "eyJ0eXAiOiJKV1QiLA0KICJhbGciOiJIUzI1NiJ9" +
@@ -328,15 +375,15 @@ public class DefaultJWTProcessorTest {
 
         DefaultJWTProcessor processor = new DefaultJWTProcessor();
 
+        // FIXME Another test where no keyId in header but a single private Key in KeySelector. Then that one should be picked up.
         processor.setJWSKeySelector(new TestKeySelector(null));
 
-        BadJOSEException e = Assertions.assertThrows(BadJOSEException.class, () -> processor.process(jws));
-        assertThat(e.getMessage()).isEqualTo("Signed JWT rejected: Another algorithm expected, or no matching key(s) found");
+        InvalidJWTException e = Assertions.assertThrows(InvalidJWTException.class, () -> processor.process(jws));
+        assertThat(e.getMessage()).isEqualTo("No key found for keyId 'null'");
     }
 
     @Test
-    public void testNoJWEKeyCandidates()
-            throws Exception {
+    public void testNoJWEKeyCandidates() {
 
         String jwt = "eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwiY3R5IjoiSldU" +
                 "In0." +
@@ -361,14 +408,14 @@ public class DefaultJWTProcessorTest {
 
         DefaultJWTProcessor processor = new DefaultJWTProcessor();
 
-        processor.setJWEKeySelector(new TestKeySelector(null));
+        processor.setJWEKeySelector(new TestKeySelector(null));  // FIXME Test where a single key is in the selector which then gets used for keyId null.
 
-        BadJOSEException e = Assertions.assertThrows(BadJOSEException.class, () -> processor.process(jwt));
-        assertThat(e.getMessage()).isEqualTo("Encrypted JWT rejected: Another algorithm expected, or no matching key(s) found");
+        InvalidJWTException e = Assertions.assertThrows(InvalidJWTException.class, () -> processor.process(jwt));
+        assertThat(e.getMessage()).isEqualTo("No key found for keyId 'null'");
     }
 
     @Test
-    public void testNoJWSKeySelector() throws Exception {
+    public void testNoJWSKeySelector() {
 
         String jws = "eyJ0eXAiOiJKV1QiLA0KICJhbGciOiJIUzI1NiJ9" +
                 "." +
@@ -384,7 +431,7 @@ public class DefaultJWTProcessorTest {
     }
 
     @Test
-    public void testNoJWSFactory() throws Exception {
+    public void testNoJWSFactory() {
 
         String jws = "eyJ0eXAiOiJKV1QiLA0KICJhbGciOiJIUzI1NiJ9" +
                 "." +
@@ -406,7 +453,7 @@ public class DefaultJWTProcessorTest {
     }
 
     @Test
-    public void testNoJWEKeySelector() throws Exception {
+    public void testNoJWEKeySelector() {
 
         String jwe = "eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwiY3R5IjoiSldU" +
                 "In0." +
@@ -437,7 +484,7 @@ public class DefaultJWTProcessorTest {
     }
 
     @Test
-    public void testNoJWEFactory() throws Exception {
+    public void testNoJWEFactory() {
 
         String jwe = "eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwiY3R5IjoiSldU" +
                 "In0." +
