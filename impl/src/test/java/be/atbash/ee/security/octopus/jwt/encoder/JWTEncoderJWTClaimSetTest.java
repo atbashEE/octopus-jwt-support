@@ -143,7 +143,7 @@ public class JWTEncoderJWTClaimSetTest {
 
     private Map<String, Object> getJson(String jwtPart) {
         String decoded = new String(Base64.getDecoder().decode(jwtPart));
-        return new JWTDecoder().decode(decoded, HashMap.class);
+        return new JWTDecoder().decode(decoded, HashMap.class).getData();
     }
 
     private List<AtbashKey> generateRSAKeys(String kid) {

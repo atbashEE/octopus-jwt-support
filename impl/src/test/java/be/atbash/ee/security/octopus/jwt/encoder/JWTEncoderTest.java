@@ -22,6 +22,7 @@ import be.atbash.ee.security.octopus.jwt.encoder.testclasses.Payload;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParameters;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersBuilder;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersNone;
+import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersPlain;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.ListKeyManager;
 import be.atbash.ee.security.octopus.keys.generator.KeyGenerator;
@@ -29,16 +30,14 @@ import be.atbash.ee.security.octopus.keys.generator.RSAGenerationParameters;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.keys.selector.SelectorCriteria;
 import be.atbash.ee.security.octopus.nimbus.jwt.JWT;
+import be.atbash.ee.security.octopus.nimbus.jwt.JWTClaimsSet;
 import be.atbash.ee.security.octopus.nimbus.jwt.JWTParser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -68,6 +67,67 @@ public class JWTEncoderTest {
         assertThat(json).contains("\"number\":42");
         assertThat(json).contains("\"myList\":[\"permission1\",\"permission2\"]");
         assertThat(json).contains("\"value\":\"JUnit\"");
+    }
+
+    @Test
+    public void encodeObject_plain() {
+        // Encode a POJO to JWT but not signed.
+
+        JWTParameters parameters = new JWTParametersPlain();
+
+        JWTEncoder encoder = new JWTEncoder();
+        String json = encoder.encode(payload, parameters);
+
+        assertThat(json).endsWith(".");
+        String[] jwtParts = json.split("\\.");
+        assertThat(jwtParts).hasSize(2);
+
+        Map<String, Object> header = getJson(jwtParts[0]);
+        assertThat(header).hasSize(1);
+        assertThat(header).containsEntry("alg", "none");
+
+        Map<String, Object> content = getJson(jwtParts[1]);
+        assertThat(content).hasSize(3);
+        assertThat(content).containsEntry("number", BigDecimal.valueOf(42));
+        assertThat(content).containsKey("myList");
+        List<String> list = (List<String>) content.get("myList");
+        assertThat(list).containsOnly("permission1", "permission2");
+        assertThat(content).containsEntry("value", "JUnit");
+
+    }
+
+    @Test
+    public void encode_JwtClaimSet_plain() {
+        JWTClaimsSet.Builder builder = new JWTClaimsSet.Builder();
+        Date exp = new Date();
+        builder.issuer("http://atbash.be")
+                .audience("someClient")
+                .subject("theSubject")
+                .expirationTime(exp);
+
+        JWTClaimsSet jwtClaimsSet = builder.build();
+
+        JWTParameters parameters = new JWTParametersPlain();
+
+        JWTEncoder encoder = new JWTEncoder();
+        String json = encoder.encode(jwtClaimsSet, parameters);
+
+        assertThat(json).endsWith(".");
+        String[] jwtParts = json.split("\\.");
+        assertThat(jwtParts).hasSize(2);
+
+        Map<String, Object> header = getJson(jwtParts[0]);
+        assertThat(header).hasSize(1);
+        assertThat(header).containsEntry("alg", "none");
+
+        Map<String, Object> content = getJson(jwtParts[1]);
+        assertThat(content).hasSize(4);
+        assertThat(content.keySet()).containsOnly("aud", "sub", "iss", "exp");
+
+        assertThat(content.get("aud")).isEqualTo("someClient");
+        assertThat(content.get("sub")).isEqualTo("theSubject");
+        assertThat(content.get("iss")).isEqualTo("http://atbash.be");
+        assertThat(content.get("exp")).isEqualTo(BigDecimal.valueOf(exp.getTime() / 1000));
     }
 
     @Test
@@ -167,7 +227,7 @@ public class JWTEncoderTest {
 
     private Map<String, Object> getJson(String jwtPart) {
         String decoded = new String(Base64.getDecoder().decode(jwtPart));
-        return new JWTDecoder().decode(decoded, HashMap.class);
+        return new JWTDecoder().decode(decoded, HashMap.class).getData();
     }
 
     private List<AtbashKey> generateRSAKeys(String kid) {

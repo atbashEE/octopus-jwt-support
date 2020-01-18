@@ -69,7 +69,7 @@ public class JWTDecoderJWTClaimSetTest {
         List<AtbashKey> publicList = keyManager.retrieveKeys(criteria);
 
         KeySelector keySelector = new SingleKeySelector(publicList.get(0));
-        JWTClaimsSet claimsSet = new JWTDecoder().decode(encoded, JWTClaimsSet.class, keySelector, null).getData();
+        JWTClaimsSet claimsSet = new JWTDecoder().decode(encoded, JWTClaimsSet.class, keySelector).getData();
 
         Map<String, Object> data = claimsSet.getClaims();
         Map<String, Object> expected = jwtClaimsSet.getClaims();

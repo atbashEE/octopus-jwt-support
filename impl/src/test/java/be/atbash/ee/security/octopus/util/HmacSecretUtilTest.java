@@ -52,7 +52,7 @@ public class HmacSecretUtilTest {
         String encoded = encoder.encode(new SomeToken("Atbash", 123), parameters);
 
         JWTDecoder decoder = new JWTDecoder();
-        JWTData<SomeToken> data = decoder.decode(encoded, SomeToken.class, new SingleKeySelector(atbashKey), null);
+        JWTData<SomeToken> data = decoder.decode(encoded, SomeToken.class, new SingleKeySelector(atbashKey));
 
         assertThat(data.getData().getStringProperty()).isEqualTo("Atbash");
         assertThat(data.getData().getIntProperty()).isEqualTo(123);

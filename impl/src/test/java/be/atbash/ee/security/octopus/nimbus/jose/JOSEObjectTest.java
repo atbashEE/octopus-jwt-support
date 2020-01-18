@@ -20,8 +20,6 @@ import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.text.ParseException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 
@@ -89,6 +87,23 @@ public class JOSEObjectTest {
     }
 
     @Test
+    public void testSplitMissingDiotForPlain() {
+
+        // Implies plain JOSE object
+        String data = "abc.def";
+
+        Assertions.assertDoesNotThrow(() -> {
+            Base64URLValue[] parts = JOSEObject.split(data);
+
+            assertThat(parts.length).isEqualTo(3);
+
+            assertThat(parts[0].toString()).isEqualTo("abc");
+            assertThat(parts[1].toString()).isEqualTo("def");
+            assertThat(parts[2].toString()).isEqualTo("");
+        });
+    }
+
+    @Test
     public void testSplitEmptySecondPart() {
 
         // JWS with empty payload
@@ -122,16 +137,6 @@ public class JOSEObjectTest {
             assertThat(parts[3].toString()).isEqualTo("");
             assertThat(parts[4].toString()).isEqualTo("");
         });
-    }
-
-    @Test
-    public void testSplitException() {
-
-        // Illegal JOSE
-        String data = "abc.def";
-
-        Assertions.assertThrows(ParseException.class, () -> JOSEObject.split(data));
-
     }
 
     @Test

@@ -13,14 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.ee.security.octopus.jwt;
+package be.atbash.ee.security.octopus.jwt.parameter;
 
+import be.atbash.ee.security.octopus.jwt.JWTEncoding;
 import be.atbash.util.PublicAPI;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
  */
 @PublicAPI
-public enum JWTEncoding {
-    NONE, PLAIN, JWS, JWE
+public class JWTParametersPlain extends JWTParametersHeader {
+
+    public JWTParametersPlain() {
+        super(new HashMap<>());
+    }
+
+    public JWTParametersPlain(Map<String, Object> headerValues) {
+        super(headerValues);
+    }
+
+    @Override
+    public JWTEncoding getEncoding() {
+        return JWTEncoding.PLAIN;
+    }
 }

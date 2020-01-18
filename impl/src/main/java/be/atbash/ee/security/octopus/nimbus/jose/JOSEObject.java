@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -210,7 +210,13 @@ public abstract class JOSEObject implements Serializable {
         int dot2 = t.indexOf(".", dot1 + 1);
 
         if (dot2 == -1) {
-            throw new ParseException("Invalid serialized unsecured/JWS/JWE object: Missing second delimiter", 0);
+            // plainJWT without the ending .
+            Base64URLValue[] parts = new Base64URLValue[3];
+            parts[0] = new Base64URLValue(t.substring(0, dot1));
+            parts[1] = new Base64URLValue(t.substring(dot1 + 1));
+            parts[2] = new Base64URLValue("");
+            return parts;
+
         }
 
         // Third dot for JWE only

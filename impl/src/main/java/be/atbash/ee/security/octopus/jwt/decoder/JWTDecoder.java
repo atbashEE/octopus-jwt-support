@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,14 +22,13 @@ import be.atbash.ee.security.octopus.keys.selector.KeySelector;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jwt.EncryptedJWT;
 import be.atbash.ee.security.octopus.nimbus.jwt.JWTClaimsSet;
+import be.atbash.ee.security.octopus.nimbus.jwt.PlainJWT;
 import be.atbash.ee.security.octopus.nimbus.jwt.SignedJWT;
 import be.atbash.ee.security.octopus.nimbus.jwt.proc.DefaultJWTProcessor;
 import be.atbash.util.PublicAPI;
 import be.atbash.util.StringUtils;
 import be.atbash.util.exception.AtbashIllegalActionException;
 import be.atbash.util.exception.AtbashUnexpectedException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.json.bind.Jsonb;
@@ -44,8 +43,16 @@ import java.text.ParseException;
 @ApplicationScoped
 public class JWTDecoder {
 
-    public <T> T decode(String data, Class<T> classType) {
-        return decode(data, classType, null, null).getData();
+    public <T> JWTData<T> decode(String data, Class<T> classType) {
+        return decode(data, classType, null, null);
+    }
+
+    public <T> JWTData<T> decode(String data, Class<T> classType, KeySelector keySelector) {
+        return decode(data, classType, keySelector, null);
+    }
+
+    public <T> JWTData<T> decode(String data, Class<T> classType, JWTVerifier verifier) {
+        return decode(data, classType, null, verifier);
     }
 
     public <T> JWTData<T> decode(String data, Class<T> classType, KeySelector keySelector, JWTVerifier verifier) {
@@ -60,6 +67,9 @@ public class JWTDecoder {
 
                 case NONE:
                     result = readJSONString(data, classType);
+                    break;
+                case PLAIN:
+                    result = readPlainJWT(data, classType);
                     break;
                 case JWS:
                     if (keySelector == null) {
@@ -84,9 +94,22 @@ public class JWTDecoder {
         return result;
     }
 
+    private <T> JWTData<T> readPlainJWT(String data, Class<T> classType) throws ParseException {
+        PlainJWT plainJWT = PlainJWT.parse(data);
+
+        MetaJWTData metaJWTData = new MetaJWTData(null, plainJWT.getHeader().getCustomParams());
+
+
+        JWTClaimsSet jwtClaimsSet = plainJWT.getJWTClaimsSet();
+        if (classType.equals(JWTClaimsSet.class)) {
+            return new JWTData<>((T) jwtClaimsSet, metaJWTData);
+        }
+        return readJSONString(jwtClaimsSet.toJSONObject().toString(), classType, metaJWTData);
+    }
+
     private <T> JWTData<T> readEncryptedJWT(String data, KeySelector keySelector, Class<T> classType, JWTVerifier verifier) throws ParseException, JOSEException {
 
-
+        // FIXME JWTVerifier parameter is unused!
         EncryptedJWT encryptedJWT = EncryptedJWT.parse(data);
 
         String keyID = encryptedJWT.getHeader().getKeyID();
@@ -99,7 +122,7 @@ public class JWTDecoder {
         MetaJWTData metaJWTData = new MetaJWTData(keyID, encryptedJWT.getHeader().getCustomParams());
 
         if (classType.equals(JWTClaimsSet.class)) {
-            return new JWTData<T>((T) jwtClaimsSet, metaJWTData);
+            return new JWTData<>((T) jwtClaimsSet, metaJWTData);
         }
         return readJSONString(jwtClaimsSet.toJSONObject().toString(), classType, metaJWTData);
 
@@ -122,7 +145,7 @@ public class JWTDecoder {
         MetaJWTData metaJWTData = new MetaJWTData(keyID, signedJWT.getHeader().getCustomParams());
 
         if (classType.equals(JWTClaimsSet.class)) {
-            return new JWTData<T>((T) jwtClaimsSet, metaJWTData);
+            return new JWTData<>((T) jwtClaimsSet, metaJWTData);
         }
         return readJSONString(signedJWT.getPayload().toString(), classType, metaJWTData);
     }
@@ -150,13 +173,20 @@ public class JWTDecoder {
 
         if (data.startsWith("ey")) {
             int occurrences = StringUtils.countOccurrences(data, '.');
+            if (occurrences == 1) {
+                result = JWTEncoding.PLAIN;
+            }
             if (occurrences == 2) {
-                result = JWTEncoding.JWS;
+                int lastDot = data.lastIndexOf('.');
+                if (lastDot == data.length() - 1) {
+                    result = JWTEncoding.PLAIN;
+                } else {
+                    result = JWTEncoding.JWS;
+                }
             }
             if (occurrences == 4) {
                 result = JWTEncoding.JWE;
             }
-            // FIXME occurences = 1 -> PlainJWT, Add new JWTEncoding
         }
         return result;
     }

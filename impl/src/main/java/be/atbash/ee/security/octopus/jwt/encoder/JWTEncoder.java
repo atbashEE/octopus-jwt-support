@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,16 @@ import be.atbash.ee.security.octopus.UnsupportedKeyType;
 import be.atbash.ee.security.octopus.config.JwtSupportConfiguration;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParameters;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersEncryption;
+import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersPlain;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersSigning;
 import be.atbash.ee.security.octopus.jwt.serializer.spi.SerializerProvider;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEObjectType;
 import be.atbash.ee.security.octopus.nimbus.jose.Payload;
+import be.atbash.ee.security.octopus.nimbus.jose.PlainHeader;
 import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import be.atbash.ee.security.octopus.nimbus.jwt.JWTClaimsSet;
+import be.atbash.ee.security.octopus.nimbus.jwt.PlainJWT;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEHeader;
@@ -33,6 +36,7 @@ import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEObject;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSObject;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSSigner;
+import be.atbash.ee.security.octopus.nimbus.util.JSONObjectUtils;
 import be.atbash.util.PublicAPI;
 import be.atbash.util.exception.AtbashUnexpectedException;
 
@@ -42,6 +46,7 @@ import javax.json.JsonObject;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
+import java.text.ParseException;
 
 /**
  *
@@ -69,6 +74,9 @@ public class JWTEncoder {
                 case NONE:
                     result = createJSONString(data);
                     break;
+                case PLAIN:
+                    result = createPlainJWT(data, (JWTParametersPlain) parameters);
+                    break;
                 case JWS:
                     result = createSignedJWT(data, (JWTParametersSigning) parameters);
                     break;
@@ -83,6 +91,24 @@ public class JWTEncoder {
         }
         return result;
 
+    }
+
+    private String createPlainJWT(Object data, JWTParametersPlain parameters) {
+        PlainHeader header = new PlainHeader.Builder().customParams(parameters.getHeaderValues()).build();
+
+        PlainJWT plainJWT;
+        if (data instanceof JWTClaimsSet) {
+            plainJWT = new PlainJWT(header, (JWTClaimsSet) data);
+        } else {
+            String payload = createJSONString(data);
+            try {
+                plainJWT = new PlainJWT(header, JSONObjectUtils.parse(payload));
+            } catch (ParseException e) {
+                throw new AtbashUnexpectedException(String.format("JSON string can't be parsed which is unexpected \n%s\n%s", payload, e.getMessage()));
+            }
+        }
+
+        return plainJWT.serialize();
     }
 
     private String createEncryptedJWE(Object data, JWTParametersEncryption parameters) throws JOSEException {

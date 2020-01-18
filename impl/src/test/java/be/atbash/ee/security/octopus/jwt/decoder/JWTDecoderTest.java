@@ -45,7 +45,7 @@ public class JWTDecoderTest {
 
         String data = "{\"pets\":\"dog,cat\",\"dateValue\":\"2017-11-15\",\"valueForClass\":\"Atbash\"}";
 
-        Map<String, String> result = decoder.decode(data, HashMap.class);
+        Map<String, String> result = decoder.decode(data, HashMap.class).getData();
 
 
         assertThat(result.keySet()).containsOnlyOnce("pets", "dateValue", "valueForClass");
@@ -62,13 +62,48 @@ public class JWTDecoderTest {
 
         String json = encoder.encode(claims, parameters);
 
-        JWTData<MyColor> myColor = decoder.decode(json, MyColor.class, new TestKeySelector(keyManager), null);
+        JWTData<MyColor> myColor = decoder.decode(json, MyColor.class, new TestKeySelector(keyManager));
         assertThat(myColor).isNotNull();
         MyColor data = myColor.getData();
         assertThat(data).isNotNull();
         assertThat(data.getR()).isEqualTo(200);
         assertThat(data.getG()).isEqualTo(150);
         assertThat(data.getB()).isEqualTo(100);
+
+    }
+
+    @Test
+    public void decode_plainJWT() {
+        String json = "eyJhbGciOiJub25lIn0.eyJzdWIiOiJhbGljZSJ9.";
+        JWTData<Map> jwtData = decoder.decode(json, Map.class);
+
+        assertThat(jwtData).isNotNull();
+        Map map = jwtData.getData();
+        assertThat(map).hasSize(1);
+        assertThat(map).containsEntry("sub", "alice");
+    }
+
+    @Test
+    public void decode_plainJWT_omittedDot() {
+        String json = "eyJhbGciOiJub25lIn0.eyJzdWIiOiJhbGljZSJ9";  // Explicitly omitted the end . (But not recommended !)
+        JWTData<Map> jwtData = decoder.decode(json, Map.class);
+
+        assertThat(jwtData).isNotNull();
+        Map map = jwtData.getData();
+        assertThat(map).hasSize(1);
+        assertThat(map).containsEntry("sub", "alice");
+    }
+
+    @Test
+    public void decode_plainJWT_ClaimSet() {
+        String json = "eyJhbGciOiJub25lIn0.eyJpc3MiOiJodHRwOi8vYXRiYXNoLmJlIiwiYXVkIjoic29tZUNsaWVudCIsInN1YiI6InRoZVN1YmplY3QiLCJleHAiOjE1NzkzNTgxODN9.";
+        JWTData<JWTClaimsSet> jwtData = decoder.decode(json, JWTClaimsSet.class);
+        assertThat(jwtData).isNotNull();
+        JWTClaimsSet jwtClaimsSet = jwtData.getData();
+
+        Map<String, Object> claims = jwtClaimsSet.getClaims();
+        assertThat(claims).hasSize(4);
+        assertThat(claims).containsKeys("aud", "sub", "iss", "exp");
 
     }
 

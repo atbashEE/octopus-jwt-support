@@ -82,7 +82,7 @@ public class JWTTest {
         JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.NONE).build();
         String encoded = new JWTEncoder().encode(payload, parameters);
 
-        Payload data = new JWTDecoder().decode(encoded, Payload.class);
+        Payload data = new JWTDecoder().decode(encoded, Payload.class).getData();
 
         assertThat(payload).isEqualToComparingFieldByField(data);
     }
@@ -101,7 +101,7 @@ public class JWTTest {
         keys.add(key);
         KeyManager keyManager = new ListKeyManager(keys);
         TestKeySelector keySelector = new TestKeySelector(keyManager);  // Using TestKeySelector with ListKeyManager is more realistic for Key selection
-        Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector, null).getData();
+        Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector).getData();
 
         assertThat(payload).isEqualToComparingFieldByField(data);
     }
@@ -125,7 +125,7 @@ public class JWTTest {
         String encoded = new JWTEncoder().encode(payload, parameters);
 
         KeySelector keySelector = new SingleKeySelector(key2);
-        Assertions.assertThrows(InvalidJWTException.class, () -> new JWTDecoder().decode(encoded, Payload.class, keySelector, null));
+        Assertions.assertThrows(InvalidJWTException.class, () -> new JWTDecoder().decode(encoded, Payload.class, keySelector));
     }
 
     @Test
@@ -141,7 +141,7 @@ public class JWTTest {
         String updatedEncoded = tamperWithPayload(encoded);
 
         KeySelector keySelector = new SingleKeySelector(key);
-        Assertions.assertThrows(InvalidJWTException.class, () -> new JWTDecoder().decode(updatedEncoded, Payload.class, keySelector, null));
+        Assertions.assertThrows(InvalidJWTException.class, () -> new JWTDecoder().decode(updatedEncoded, Payload.class, keySelector));
     }
 
     private String tamperWithPayload(String encoded) {
@@ -179,7 +179,7 @@ public class JWTTest {
         List<AtbashKey> publicList = keyManager.retrieveKeys(criteria);
 
         KeySelector keySelector = new SingleKeySelector(publicList.get(0));
-        Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector, null).getData();
+        Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector).getData();
 
         assertThat(payload).isEqualToComparingFieldByField(data);
     }
@@ -211,7 +211,7 @@ public class JWTTest {
         List<AtbashKey> publicList = keyManager.retrieveKeys(criteria);
 
         KeySelector keySelector = new SingleKeySelector(publicList.get(0));
-        Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector, null).getData();
+        Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector).getData();
 
         assertThat(payload).isEqualToComparingFieldByField(data);
     }
@@ -242,7 +242,7 @@ public class JWTTest {
         List<AtbashKey> publicList = keyManager.retrieveKeys(criteria);
 
         KeySelector keySelector = new SingleKeySelector(publicList.get(0));
-        Assertions.assertThrows(InvalidJWTException.class, () -> new JWTDecoder().decode(encoded, Payload.class, keySelector, null));
+        Assertions.assertThrows(InvalidJWTException.class, () -> new JWTDecoder().decode(encoded, Payload.class, keySelector));
     }
 
     @Test
@@ -269,7 +269,7 @@ public class JWTTest {
         List<AtbashKey> publicList = keyManager.retrieveKeys(criteria);
 
         KeySelector keySelector = new SingleKeySelector(publicList.get(0));
-        Assertions.assertThrows(InvalidJWTException.class, () -> new JWTDecoder().decode(updatedEncoded, Payload.class, keySelector, null));
+        Assertions.assertThrows(InvalidJWTException.class, () -> new JWTDecoder().decode(updatedEncoded, Payload.class, keySelector));
 
     }
 
@@ -317,7 +317,7 @@ public class JWTTest {
         List<AtbashKey> publicList = keyManager.retrieveKeys(criteria);
 
         KeySelector keySelector = new SingleKeySelector(publicList.get(0));
-        Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector, null).getData();
+        Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector).getData();
 
         assertThat(payload).isEqualToComparingFieldByField(data);
     }
@@ -348,7 +348,7 @@ public class JWTTest {
         List<AtbashKey> publicList = keyManager.retrieveKeys(criteria);
 
         KeySelector keySelector = new SingleKeySelector(publicList.get(0));
-        Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector, null).getData();
+        Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector).getData();
 
         assertThat(payload).isEqualToComparingFieldByField(data);
     }
@@ -378,7 +378,7 @@ public class JWTTest {
         List<AtbashKey> publicList = keyManager.retrieveKeys(criteria);
 
         KeySelector keySelector = new SingleKeySelector(publicList.get(0));
-        Assertions.assertThrows(InvalidJWTException.class, () -> new JWTDecoder().decode(encoded, Payload.class, keySelector, null));
+        Assertions.assertThrows(InvalidJWTException.class, () -> new JWTDecoder().decode(encoded, Payload.class, keySelector));
     }
 
     @Test
@@ -405,7 +405,7 @@ public class JWTTest {
         List<AtbashKey> publicList = keyManager.retrieveKeys(criteria);
 
         KeySelector keySelector = new SingleKeySelector(publicList.get(0));
-        Assertions.assertThrows(InvalidJWTException.class, () -> new JWTDecoder().decode(updatedEncoded, Payload.class, keySelector, null));
+        Assertions.assertThrows(InvalidJWTException.class, () -> new JWTDecoder().decode(updatedEncoded, Payload.class, keySelector));
 
     }
 
@@ -466,7 +466,7 @@ public class JWTTest {
 
         keys.clear();  // remove all keys
         KeySelector keySelector = new TestKeySelector(keyManager);
-        Assertions.assertThrows(InvalidJWTException.class, () -> new JWTDecoder().decode(encoded, Payload.class, keySelector, null));
+        Assertions.assertThrows(InvalidJWTException.class, () -> new JWTDecoder().decode(encoded, Payload.class, keySelector));
 
         assertThat(logger.getLoggingEvents()).hasSize(1);
         assertThat(logger.getLoggingEvents().get(0).getLevel()).isEqualTo(Level.ERROR);
@@ -502,7 +502,7 @@ public class JWTTest {
         List<AtbashKey> publicList = keyManager.retrieveKeys(criteria);
 
         KeySelector keySelector = new SingleKeySelector(publicList.get(0));
-        Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector, null).getData();
+        Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector).getData();
 
         assertThat(payload).isEqualToComparingFieldByField(data);
     }
@@ -533,7 +533,7 @@ public class JWTTest {
         List<AtbashKey> publicList = keyManager.retrieveKeys(criteria);
 
         KeySelector keySelector = new SingleKeySelector(publicList.get(0));
-        Assertions.assertThrows(InvalidJWTException.class, () -> new JWTDecoder().decode(updatedEncoded, Payload.class, keySelector, null).getData());
+        Assertions.assertThrows(InvalidJWTException.class, () -> new JWTDecoder().decode(updatedEncoded, Payload.class, keySelector));
     }
 
     @Test
@@ -561,7 +561,7 @@ public class JWTTest {
         List<AtbashKey> publicList = keyManager.retrieveKeys(criteria);
 
         KeySelector keySelector = new SingleKeySelector(publicList.get(0));
-        Assertions.assertThrows(InvalidJWTException.class, () -> new JWTDecoder().decode(updatedEncoded, Payload.class, keySelector, null).getData());
+        Assertions.assertThrows(InvalidJWTException.class, () -> new JWTDecoder().decode(updatedEncoded, Payload.class, keySelector, null));
     }
 
     private AtbashKey generateOCTKey() {

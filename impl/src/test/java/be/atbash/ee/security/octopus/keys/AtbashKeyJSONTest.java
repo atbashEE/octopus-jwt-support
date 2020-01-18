@@ -48,7 +48,7 @@ public class AtbashKeyJSONTest {
         JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.NONE).build();
         String json = new JWTEncoder().encode(keyList.get(0), parameters);
 
-        AtbashKey key = new JWTDecoder().decode(json, AtbashKey.class);
+        AtbashKey key = new JWTDecoder().decode(json, AtbashKey.class).getData();
 
         assertThat(key.getKey().getAlgorithm()).isEqualTo(keyList.get(0).getKey().getAlgorithm());
         // When encoded representation (PKCS#8) is the same, I guess both keys are the same
@@ -68,7 +68,7 @@ public class AtbashKeyJSONTest {
         JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.NONE).build();
         String json = new JWTEncoder().encode(keyList.get(0), parameters);
 
-        AtbashKey key = new JWTDecoder().decode(json, AtbashKey.class);
+        AtbashKey key = new JWTDecoder().decode(json, AtbashKey.class).getData();
 
         assertThat(key.getKey().getAlgorithm()).isEqualTo(keyList.get(0).getKey().getAlgorithm());
         // When encoded representation (PKCS#8) is the same, I guess both keys are the same
@@ -88,7 +88,7 @@ public class AtbashKeyJSONTest {
         JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.NONE).build();
         String json = new JWTEncoder().encode(keyList.get(0), parameters);
 
-        AtbashKey key = new JWTDecoder().decode(json, AtbashKey.class);
+        AtbashKey key = new JWTDecoder().decode(json, AtbashKey.class).getData();
 
         //assertThat(key.getKey().getAlgorithm()).isEqualTo(keyList.get(0).getKey().getAlgorithm());
         assertThat(key.getKey().getAlgorithm()).isEqualTo("EC"); // Original is ECDSA
@@ -110,7 +110,7 @@ public class AtbashKeyJSONTest {
         JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.NONE).build();
         String json = new JWTEncoder().encode(keyList.get(0), parameters);
 
-        AtbashKey key = new JWTDecoder().decode(json, AtbashKey.class);
+        AtbashKey key = new JWTDecoder().decode(json, AtbashKey.class).getData();
 
         //assertThat(key.getKey().getAlgorithm()).isEqualTo(keyList.get(0).getKey().getAlgorithm());
         assertThat(key.getKey().getAlgorithm()).isEqualTo("EC"); // Original is ECDSA
@@ -127,7 +127,7 @@ public class AtbashKeyJSONTest {
         JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.NONE).build();
         String json = new JWTEncoder().encode(keys.get(0), parameters);
 
-        AtbashKey key = new JWTDecoder().decode(json, AtbashKey.class);
+        AtbashKey key = new JWTDecoder().decode(json, AtbashKey.class).getData();
         // key.getKey().getAlgorithm());  FIXME NONE, is this OK? or should it be AES?
         assertThat(key.getKey().getEncoded()).isEqualTo(keys.get(0).getKey().getEncoded());
     }
@@ -178,7 +178,7 @@ public class AtbashKeyJSONTest {
         JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.NONE).build();
         String json = new JWTEncoder().encode(keyList.get(0), parameters);
 
-        AtbashKey key = new JWTDecoder().decode(json, AtbashKey.class);
+        AtbashKey key = new JWTDecoder().decode(json, AtbashKey.class).getData();
 
         assertThat(key.getKey().getAlgorithm()).isEqualTo(keyList.get(0).getKey().getAlgorithm());
 
@@ -199,7 +199,7 @@ public class AtbashKeyJSONTest {
         JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.NONE).build();
         String json = new JWTEncoder().encode(keyList.get(0), parameters);
 
-        AtbashKey key = new JWTDecoder().decode(json, AtbashKey.class);
+        AtbashKey key = new JWTDecoder().decode(json, AtbashKey.class).getData();
 
         assertThat(key.getKey().getAlgorithm()).isEqualTo(keyList.get(0).getKey().getAlgorithm());
 
@@ -237,7 +237,7 @@ public class AtbashKeyJSONTest {
         JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.NONE).build();
         String json = new JWTEncoder().encode(privateOriginalKey, parameters);
 
-        AtbashKey privateManipulatedKey = new JWTDecoder().decode(json, AtbashKey.class);
+        AtbashKey privateManipulatedKey = new JWTDecoder().decode(json, AtbashKey.class).getData();
 
         // 2. Test with the manipulated private against public
         testWithKeys(privateManipulatedKey, publicOriginalKey);
@@ -246,7 +246,7 @@ public class AtbashKeyJSONTest {
         parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.NONE).build();
         json = new JWTEncoder().encode(publicOriginalKey, parameters);
 
-        AtbashKey publicManipulatedKey = new JWTDecoder().decode(json, AtbashKey.class);
+        AtbashKey publicManipulatedKey = new JWTDecoder().decode(json, AtbashKey.class).getData();
 
         // 2. Test with the manipulated public against private
         testWithKeys(privateOriginalKey, publicManipulatedKey);
@@ -266,7 +266,7 @@ public class AtbashKeyJSONTest {
         String encoded = encoder.encode(payload, parameters);
 
         KeySelector keySelector = new SingleKeySelector(publicOriginalKey);
-        Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector, null).getData();
+        Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector).getData();
 
         assertThat(payload).isEqualToComparingFieldByField(data);
     }

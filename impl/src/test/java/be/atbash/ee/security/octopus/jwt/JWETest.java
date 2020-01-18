@@ -115,7 +115,7 @@ public class JWETest {
         String encoded = jwtEncoder.encode(payload, parameters);
 
         KeySelector keySelector = new TestKeySelector(keyManager);
-        Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector, null).getData();
+        Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector).getData();
         assertThat(data).isEqualToComparingFieldByField(payload);
 
     }
@@ -147,7 +147,7 @@ public class JWETest {
         String encoded = jwtEncoder.encode(payload, parameters);
 
         KeySelector keySelector = new TestKeySelector(keyManager);
-        Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector, null).getData();
+        Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector).getData();
         assertThat(data).isEqualToComparingFieldByField(payload);
 
         JWEObject jweObject = JWEObject.parse(encoded);
@@ -210,7 +210,7 @@ public class JWETest {
         String encoded = jwtEncoder.encode(payload, parameters);
 
         KeySelector keySelector = new TestKeySelector(keyManager);
-        Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector, null).getData();
+        Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector).getData();
         assertThat(data).isEqualToComparingFieldByField(payload);
 
     }
@@ -242,7 +242,7 @@ public class JWETest {
         String encoded = jwtEncoder.encode(payload, parameters);
 
         KeySelector keySelector = new TestKeySelector(keyManager);
-        Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector, null).getData();
+        Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector).getData();
         assertThat(data).isEqualToComparingFieldByField(payload);
 
     }
@@ -299,7 +299,7 @@ public class JWETest {
         ListKeyManager keyManager = new ListKeyManager(keys);
 
         KeySelector keySelector = new TestKeySelector(keyManager);
-        Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector, null).getData();
+        Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector).getData();
         assertThat(data).isEqualToComparingFieldByField(payload);
 
     }
@@ -332,7 +332,7 @@ public class JWETest {
 
         keyManager = new ListKeyManager(signKeys);  // Missing keys from encryption
         KeySelector keySelector = new TestKeySelector(keyManager);
-        Assertions.assertThrows(InvalidJWTException.class, () -> new JWTDecoder().decode(encoded, Payload.class, keySelector, null));
+        Assertions.assertThrows(InvalidJWTException.class, () -> new JWTDecoder().decode(encoded, Payload.class, keySelector));
         assertThat(logger.getLoggingEvents()).hasSize(1);
         assertThat(logger.getLoggingEvents().get(0).getLevel()).isEqualTo(Level.ERROR);
         assertThat(logger.getLoggingEvents().get(0).getMessage()).isEqualTo("(OCT-KEY-010) No or multiple keys found for criteria :\n" +
@@ -396,7 +396,7 @@ public class JWETest {
 
         KeySelector keySelector = new TestKeySelector(keyManager);
 
-        Exception e = Assertions.assertThrows(AtbashUnexpectedException.class, () -> new JWTDecoder().decode(encoded, Payload.class, keySelector, null));
+        Exception e = Assertions.assertThrows(AtbashUnexpectedException.class, () -> new JWTDecoder().decode(encoded, Payload.class, keySelector));
         assertThat(e).isInstanceOf(AtbashUnexpectedException.class);
         assertThat(e.getCause()).isInstanceOf(JOSEException.class);
         // Message can vary
@@ -430,7 +430,7 @@ public class JWETest {
 
         KeySelector keySelector = new TestKeySelector(keyManager);
 
-        Exception e = Assertions.assertThrows(AtbashUnexpectedException.class, () -> new JWTDecoder().decode(new StringBuilder(encoded).deleteCharAt(450).insert(450, "1").toString(), Payload.class, keySelector, null));
+        Exception e = Assertions.assertThrows(AtbashUnexpectedException.class, () -> new JWTDecoder().decode(new StringBuilder(encoded).deleteCharAt(450).insert(450, "1").toString(), Payload.class, keySelector));
 
         assertThat(e).isInstanceOf(AtbashUnexpectedException.class);
         assertThat(e.getCause()).isInstanceOf(JOSEException.class);
@@ -465,7 +465,7 @@ public class JWETest {
 
         KeySelector keySelector = new TestKeySelector(keyManager);
 
-        Exception e = Assertions.assertThrows(AtbashUnexpectedException.class, () -> new JWTDecoder().decode(new StringBuilder(encoded).deleteCharAt(440).insert(440, "1").toString(), Payload.class, keySelector, null));
+        Exception e = Assertions.assertThrows(AtbashUnexpectedException.class, () -> new JWTDecoder().decode(new StringBuilder(encoded).deleteCharAt(440).insert(440, "1").toString(), Payload.class, keySelector));
 
         assertThat(e).isInstanceOf(AtbashUnexpectedException.class);
         assertThat(e.getCause()).isInstanceOf(JOSEException.class);
@@ -500,7 +500,7 @@ public class JWETest {
         String encoded = jwtEncoder.encode(payload, parameters);
 
         KeySelector keySelector = new TestKeySelector(keyManager);
-        Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector, null).getData();
+        Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector).getData();
         assertThat(data).isEqualToComparingFieldByField(payload);
 
         JWEObject jweObject = JWEObject.parse(encoded);
