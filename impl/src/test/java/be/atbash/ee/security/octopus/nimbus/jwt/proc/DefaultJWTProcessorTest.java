@@ -238,31 +238,28 @@ public class DefaultJWTProcessorTest {
     }
 
     @Test
-    @Disabled // FIXME Recreate jwt with correct JWE algorithm
     public void testProcessNestedJWT() throws Exception {
 
         // See http://tools.ietf.org/html/rfc7519#appendix-A.2
 
-        String jwt = "eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwiY3R5IjoiSldU" +
-                "In0." +
-                "g_hEwksO1Ax8Qn7HoN-BVeBoa8FXe0kpyk_XdcSmxvcM5_P296JXXtoHISr_DD_M" +
-                "qewaQSH4dZOQHoUgKLeFly-9RI11TG-_Ge1bZFazBPwKC5lJ6OLANLMd0QSL4fYE" +
-                "b9ERe-epKYE3xb2jfY1AltHqBO-PM6j23Guj2yDKnFv6WO72tteVzm_2n17SBFvh" +
-                "DuR9a2nHTE67pe0XGBUS_TK7ecA-iVq5COeVdJR4U4VZGGlxRGPLRHvolVLEHx6D" +
-                "YyLpw30Ay9R6d68YCLi9FYTq3hIXPK_-dmPlOUlKvPr1GgJzRoeC9G5qCvdcHWsq" +
-                "JGTO_z3Wfo5zsqwkxruxwA." +
-                "UmVkbW9uZCBXQSA5ODA1Mg." +
-                "VwHERHPvCNcHHpTjkoigx3_ExK0Qc71RMEParpatm0X_qpg-w8kozSjfNIPPXiTB" +
-                "BLXR65CIPkFqz4l1Ae9w_uowKiwyi9acgVztAi-pSL8GQSXnaamh9kX1mdh3M_TT" +
-                "-FZGQFQsFhu0Z72gJKGdfGE-OE7hS1zuBD5oEUfk0Dmb0VzWEzpxxiSSBbBAzP10" +
-                "l56pPfAtrjEYw-7ygeMkwBl6Z_mLS6w6xUgKlvW6ULmkV-uLC4FUiyKECK4e3WZY" +
-                "Kw1bpgIqGYsw2v_grHjszJZ-_I5uM-9RA8ycX9KqPRp9gc6pXmoU_-27ATs9XCvr" +
-                "ZXUtK2902AUzqpeEUJYjWWxSNsS-r1TJ1I-FMJ4XyAiGrfmo9hQPcNBYxPz3GQb2" +
-                "8Y5CLSQfNgKSGt0A4isp1hBUXBHAndgtcslt7ZoQJaKe_nNJgNliWtWpJ_ebuOpE" +
-                "l8jdhehdccnRMIwAmU1n7SPkmhIl1HlSOpvcvDfhUN5wuqU955vOBvfkBOh5A11U" +
-                "zBuo2WlgZ6hYi9-e3w29bR0C2-pp3jbqxEDw3iWaf2dc5b-LnR0FEYXvI_tYk5rd" +
-                "_J9N0mg0tQ6RbpxNEMNoA9QWk5lgdPvbh9BaO195abQ." +
-                "AVO9iT5AV4CzvDJCdhSFlQ";
+        String jwt = "eyJhbGciOiJSU0EtT0FFUC0yNTYiLCJjdHkiOiJKV1QiLCJraWQiOiJlbmNLZXkiLCJlbmMiOiJBMjU2R0NNIn0" +
+                "." +
+                "sCtCeowKnWY6ZU9uLvOZh6yw_lOGKpE5xyHrcJt0U5QsgxCYl3aPerOB_wHanl8lYLh0g-byZ0xx1qrqI0-vFvVsFDyD" +
+                "yXEedXXDwLPQF-U5RNPm8r_HBg-ikq7AkovhZue24Cl6omJ8hZXyz2G_BuYo_w_Oj1f8GmLT0sucFgZX8Y4tdJZ3STNd" +
+                "pKtqeSgHJvmcdIQKu3EEWx38ivkaE4DE90Bzul_hn8Qb4-FDEq8Px_86UiwghHCgeAAgWDk9KWLYSguSdL3MFBdcqlwa" +
+                "No5ApQzVPtfmk_pnI8fGRnhx9zLDV5nyZ8H7m-K_ERmD7EX3Uf-mKTfCXmTaXtEISQ" +
+                "." +
+                "GpJ6PUx02A0qVYTK" +
+                "." +
+                "4GLZJZ9OLkQizidz3jQpkUxoRUqgRLZ5SUKrYizTMZKUn8YrYkWiyJb30Ap-qpUyChH74PjkRkHTKzISNLa5k-UPMGCBL3Yt_4yu" +
+                "HgmOmoA6vPpOALZ-oWo95rtVy9jv6qPlSiQy_MVDaRQWFROkrn_5w-VgwWYKuHQ4Zj9zahkgW6eRiyMqFlp8B0tnO7IR" +
+                "vafk93muniDcqEkhKNCgCKR0Nwsk2Xrh0ARPBc9CuqzU55PltYOtaZQCdzhEIdzs69DvISRBP9XxqzmzRaSUoIkn-UNf" +
+                "jFPHHToyrqV6E12zhZAbVyI9eibYV9v2rV5ADcA7swYWjIKfyhq8yCTiI2XaP6RJcfL_al4JY5a4et05sC7fTwMULorc" +
+                "5ANE5Q6kZU6fQvZ9lejYn9QVkBgCggzQBm5wikvxa1V_4QMX3XUf7p1Qg-abIn4Z-UOSmS-aoZfrnSrcNqYwuCu50HMS" +
+                "9O5gdi0XX7KXxuf8rgoFszut7qLoD9_P0982y4JoMWL1VIqDOGtwekoWHF1Fv_lAc56seMgVwskeLSMLjSBfnKclQwiY" +
+                "eMf0v2ELQOPL_NfdoRsu25s0V0DIzo3HVQ5PO5cGxAMSrwacY50j2qv5tUScogh3r3ezPqz9y-vGkj1GyENyV13CtLY" +
+                "." +
+                "xHMtsysUarhiXQ5ylDxpwg";
 
         DefaultJWTProcessor processor = new DefaultJWTProcessor();
         processor.setJWTClaimsSetVerifier(null); // Remove claims verifier, JWT past expiration timestamp
@@ -643,6 +640,10 @@ public class DefaultJWTProcessorTest {
         // also gracefully handle key-rollover
         JWKSource<SecurityContext> keySource = new RemoteJWKSet<>(new URL("https://demo.c2id.com/c2id/jwks.json"));
 
+        https://demo.c2id.com/c2id/jwks.json
+        {"keys":[{"kty":"RSA","e":"AQAB","use":"sig","kid":"CXup","n":"hrwD-lc-IwzwidCANmy4qsiZk11yp9kHykOuP0yOnwi36VomYTQVEzZXgh2sDJpGgAutdQudgwLoV8tVSsTG9SQHgJjH9Pd_9V4Ab6PANyZNG6DSeiq1QfiFlEP6Obt0JbRB3W7X2vkxOVaNoWrYskZodxU2V0ogeVL_LkcCGAyNu2jdx3j0DjJatNVk7ystNxb9RfHhJGgpiIkO5S3QiSIVhbBKaJHcZHPF1vq9g0JMGuUCI-OTSVg6XBkTLEGw1C_R73WD_oVEBfdXbXnLukoLHBS11p3OxU7f4rfxA_f_72_UwmWGJnsqS3iahbms3FkvqoL9x_Vj3GhuJSf97Q"},{"kty":"EC","use":"sig","crv":"P-256","kid":"yGvt","x":"pvgdqM3RCshljmuCF1D2Ez1w5ei5k7-bpimWLPNeEHI","y":"JSmUhbUTqiFclVLEdw6dz038F7Whw4URobjXbAReDuM"},{"kty":"EC","use":"sig","crv":"P-384","kid":"9nHY","x":"JPKhjhE0Bj579Mgj3Cn3ERGA8fKVYoGOaV9BPKhtnEobphf8w4GSeigMesL-038W","y":"UbJa1QRX7fo9LxSlh7FOH5ABT5lEtiQeQUcX9BW0bpJFlEVGqwec80tYLdOIl59M"},{"kty":"EC","use":"sig","crv":"P-521","kid":"tVzS","x":"AZgkRHlIyNQJlPIwTWdHqouw41k9dS3GJO04BDEnJnd_Dd1owlCn9SMXA-JuXINn4slwbG4wcECbctXb2cvdGtmn","y":"AdBC6N9lpupzfzcIY3JLIuc8y8MnzV-ItmzHQcC5lYWMTbuM9NU_FlvINeVo8g6i4YZms2xFB-B0VVdaoF9kUswC"},{"kty":"RSA","e":"AQAB","use":"enc","kid":"IHMc","n":"lLrhwERiPmq7XOz6Rwk8q4ey_OGcL4P56Ip01mzKMUfysIwo-nUdwDI_9ntYohpvqiTjnrtZOENhhoqne5M4hqpSfBMmCWSvWL_3wa8FanRWd6lPgGdKJ1a3vV0gLxnCbmdho1CSuSszV4736WkjdDhLcXSRN1kWwWbok94FdPD_egCyBY3cwhvuRzmUgE8LDh-VnNRh1BYc7e9yEMublza8qJpW-N5ljHEU0on08X-lsyl4djEac74H7taDcmtchPLYZy0-ZIxgLmosQ2aYIt6xycfPYsm5x9CGetUqhClpLLaTcyTGq_pH4ECdZtkYHcYJM-3q-XDZTqB6wUaggw"},{"kty":"EC","use":"enc","crv":"P-256","kid":"1yFA","x":"_-aKZeuwWDv4v89dPGdKtpOuOepc_0qDZDhcv3omzX0","y":"Gc5b7muOqbi4QvYJO24a4IqQoOY1pPM69DcpI605Vmw"},{"kty":"EC","use":"enc","crv":"P-384","kid":"TqZ6","x":"3Ex0yUSLvhaOriP8U78kZEEJXxkC0oQmwo1zHTe_nhgKx2YPS97-qmDdRMkByxJ9","y":"MCosrhjIYP4lkoan45MxAZE3QB6IKau5nZHpQ_qDXH8jgcIo2l3M8wdN6iI08kcW"},{"kty":"EC","use":"enc","crv":"P-521","kid":"h38C","x":"AVMBSexPHgq536pZQjN6Si1HAdUdfiW4xrdYzNHR2A9z4zovnKi5xrQ9hWX8QUs4ejVQ3bE9ufhOYL3D7oTwx9Jb","y":"AeMeo858k_6ktxNhlpxBSwGL2hmTI1nBeGi2ZrMVl2qzdjOFf-AVFRSsE9DhAD9sWVUrGrzwONbfmqwIlgbjeH7L"}]}
+
+
         // The expected JWS algorithm of the access tokens (agreed out-of-band)
         JWSAlgorithm expectedJWSAlg = JWSAlgorithm.RS256;
 
@@ -675,6 +676,7 @@ public class DefaultJWTProcessorTest {
     @Disabled
     public void testGoogleIDToken() {
 
+        // FIXME, We need some kind of RemoteKetManager which doesn't depend on jwkURI in the header.
         /*
         // ID token from Google
         String token = "eyJhbGciOiJSUzI1NiIsImtpZCI6ImU3ZGJmNTI2ZjYzOWMyMTRjZDc3YjM5NmVjYjlkN2Y4MWQ0N2IzODIifQ.eyJpc3MiOiJhY2NvdW50cy5nb29nbGUuY29tIiwiYXRfaGFzaCI6ImdYM0ZJYzFxVUZzXy16RTNYYVMtZUEiLCJhdWQiOiI0MDc0MDg3MTgxOTIuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIiOiIxMTI4OTY5MTg4OTk2MjY2OTEzNzQiLCJhenAiOiI0MDc0MDg3MTgxOTIuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJpYXQiOjE0NjMxMzg2NDksImV4cCI6MTQ2MzE0MjI0OX0.GqQ0DPQQ5ixOGGAxcEu_5vqbMS7RyNzLrcn21AEid-61eQU0roq7gMVmCrTLeSghenNKNgFWQeErPe5i-6gxqV0r89dOdXRegpCLPAq7d-acPK_8bw-gOtbEo9Hhzcc56r51FwnZ3IUDgyKB_ZRNdp1LMnBgX--c6vPhy4_ZkVnJvmCzTz6bz-pdZNGFhtKd-xt35qVuyUok9tiGumKh-Tjrov5KPuZI90leRfLpoWDj_ktTClg3VUvXAtvDFhW94xEOS4s8DcvbxP9OrR3zhp4bgLohF-B0OrEqc9pTpYO87HyGJlvT74Re288tGZfCRJFX92BT1M063yt3QPrE8W";

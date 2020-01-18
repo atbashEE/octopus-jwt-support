@@ -546,8 +546,7 @@ public class RSAKeyTest {
     }
 
     @Test
-    public void testRSAPublicKeyExportAndImport()
-            throws Exception {
+    public void testRSAPublicKeyExportAndImport() {
 
 
         RSAKey key = new RSAKey(new Base64URLValue(n), new Base64URLValue(e),
@@ -568,8 +567,7 @@ public class RSAKeyTest {
     }
 
     @Test
-    public void testRSAPrivateKeyExportAndImport()
-            throws Exception {
+    public void testRSAPrivateKeyExportAndImport() {
 
         RSAKey key = new RSAKey(new Base64URLValue(n), new Base64URLValue(e), new Base64URLValue(d),
                 new Base64URLValue(p), new Base64URLValue(q),
@@ -665,8 +663,7 @@ public class RSAKeyTest {
     }
 
     @Test
-    public void testPublicKeyExportAndImport()
-            throws Exception {
+    public void testPublicKeyExportAndImport() {
 
 
         RSAKey key = new RSAKey(new Base64URLValue(n), new Base64URLValue(e),
@@ -1472,25 +1469,6 @@ public class RSAKeyTest {
 
         assertThat(RSAKey.load(keyStore, "1", null)).isNull();
     }
-
-    //FIXME
-	/*
-    // https://bitbucket.org/connect2id/nimbus-jose-jwt/issues/274/compile-error-when-using-any-of-the
-    public void testGenerator_fromOutsidePackage()
-            throws JOSEException {
-
-
-        RSAKey senderJWK = new RSAKeyGenerator(2048)
-                .keyID("123")
-                .keyUse(KeyUse.SIGNATURE)
-                .generate();
-
-        assertThat(senderJWK.size()).isEqualTo(2048);
-        assertThat(senderJWK.getKeyID()).isEqualTo("123");
-        assertThat(senderJWK.getKeyUse()).isEqualTo(KeyUse.SIGNATURE);
-    }
-
-	 */
 
     @Test
     public void testEqualsSuccess()

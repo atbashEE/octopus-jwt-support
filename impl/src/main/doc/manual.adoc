@@ -13,8 +13,11 @@ User manual for Atbash configuration.
 
 . RemoteKeyManager
 . Support for Reading and Writing OCT JWK.
+. Support OCT keys in various places
+. PlainJWT support by JWTEncode and JWTDecoder.
 
 .Updated BouncyCastle to the latest version.
+. Various small fixes and updates.
 
 === 0.9.1
 

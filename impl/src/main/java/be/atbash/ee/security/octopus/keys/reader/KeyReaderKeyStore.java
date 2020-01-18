@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,13 @@
  */
 package be.atbash.ee.security.octopus.keys.reader;
 
+import be.atbash.ee.security.octopus.exception.ResourceNotFoundException;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup;
 import be.atbash.util.exception.AtbashUnexpectedException;
 import be.atbash.util.resource.ResourceUtil;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.*;
@@ -43,8 +45,9 @@ public class KeyReaderKeyStore {
         } catch (KeyStoreException e) {
             throw new AtbashUnexpectedException(e);
         }
-        // FIXME .getStream can return null ....
+
         try (InputStream inputStream = ResourceUtil.getInstance().getStream(path)) {
+            // When path not found, FileNotFoundException is thrown by getStream
             keyStore.load(inputStream, passwordLookup.getResourcePassword(path));
 
             for (Enumeration<String> keyAliases = keyStore.aliases(); keyAliases.hasMoreElements(); ) {
@@ -55,6 +58,8 @@ public class KeyReaderKeyStore {
                 }
 
             }
+        } catch (FileNotFoundException e) {
+            throw new ResourceNotFoundException(path);
         } catch (KeyStoreException | IOException | NoSuchAlgorithmException | CertificateException | UnrecoverableKeyException e) {
             throw new AtbashUnexpectedException(e);
         }

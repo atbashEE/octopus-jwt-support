@@ -21,6 +21,7 @@ import be.atbash.ee.security.octopus.nimbus.jwk.ECKey;
 import be.atbash.ee.security.octopus.nimbus.jwk.JWK;
 import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import be.atbash.ee.security.octopus.nimbus.jwk.RSAKey;
+import be.atbash.util.exception.AtbashUnexpectedException;
 import be.atbash.util.resource.ResourceUtil;
 
 import java.security.PublicKey;
@@ -83,7 +84,12 @@ public class JWKCreator {
             }
         }
 
-        // FIXME Check to see if we have private and public key.
+        if (publicKey == null) {
+            throw new AtbashUnexpectedException("Public Key not found");
+        }
+        if (privateKey == null) {
+            throw new AtbashUnexpectedException("Public Key not found");
+        }
         return new RSAKey.Builder((RSAPublicKey) publicKey)
                 .privateKey(privateKey)
                 .keyID(keyId)
@@ -103,7 +109,12 @@ public class JWKCreator {
             }
         }
 
-        // FIXME Check to see if we have private and public key.
+        if (publicKey == null) {
+            throw new AtbashUnexpectedException("Public Key not found");
+        }
+        if (privateKey == null) {
+            throw new AtbashUnexpectedException("Public Key not found");
+        }
         return new ECKey.Builder(ECCurveHelper.getCurve(privateKey), (ECPublicKey) publicKey)
                 .privateKey(privateKey)
                 .keyID(keyId)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
  */
 package be.atbash.ee.security.octopus.nimbus.util;
 
+
+import be.atbash.ee.security.octopus.jwt.serializer.spi.SerializerProvider;
 
 import javax.json.*;
 import javax.json.bind.Jsonb;
@@ -41,19 +43,7 @@ public final class JSONObjectUtils {
     /**
      * Parses a JSON object.
      *
-     * <p>Specific JSON to Java entity mapping (as per JSON Smart): FIXME javadoc correction
-     *
-     * <ul>
-     *     <li>JSON true|false map to {@code java.lang.Boolean}.
-     *     <li>JSON numbers map to {@code java.lang.Number}.
-     *         <ul>
-     *             <li>JSON integer numbers map to {@code long}.
-     *             <li>JSON fraction numbers map to {@code double}.
-     *         </ul>
-     *     <li>JSON strings map to {@code java.lang.String}.
-     *     <li>JSON arrays map to {@code net.minidev.json.JSONArray}.
-     *     <li>JSON objects map to {@code net.minidev.json.JSONObject}.
-     * </ul>
+     * <p>Specific JSON string to JsonObject by JSONB.
      *
      * @param value The JSON object string to parse. Must not be {@code null}.
      * @return The JSON object.
@@ -66,7 +56,9 @@ public final class JSONObjectUtils {
         JsonObject result;
 
         try {
+            // FIXME Centralize this as used on several places.
             JsonbConfig config = new JsonbConfig();
+            config.withDeserializers(SerializerProvider.getInstance().getDeserializers());
             Jsonb jsonb = JsonbBuilder.create(config);
 
             result = jsonb.fromJson(value, JsonObject.class);

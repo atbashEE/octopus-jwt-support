@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,8 +40,6 @@ import java.math.BigInteger;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.security.interfaces.RSAPrivateCrtKey;
-import java.security.spec.RSAPublicKeySpec;
 import java.util.Calendar;
 import java.util.List;
 
@@ -49,7 +47,7 @@ import java.util.List;
  *
  */
 
-public class KeyStoreEncoder implements KeyEncoder {
+public class KeyStoreEncoder extends AbstractEncoder implements KeyEncoder {
 
     private JwtSupportConfiguration configuration;
 
@@ -116,25 +114,6 @@ public class KeyStoreEncoder implements KeyEncoder {
 
         } catch (GeneralSecurityException | OperatorCreationException ex) {
             throw new AtbashUnexpectedException(ex);
-        }
-    }
-
-    // FIXME Also in JwkKeyEncoderPrivatePart
-    private PublicKey getPublicKey(Key key) {
-        if (key instanceof RSAPrivateCrtKey) {
-            RSAPrivateCrtKey rsaPrivateCrtKey = (RSAPrivateCrtKey) key;
-
-            RSAPublicKeySpec publicKeySpec = new java.security.spec.RSAPublicKeySpec(rsaPrivateCrtKey.getModulus(), rsaPrivateCrtKey.getPublicExponent());
-            try {
-                // FIXME What about EC ??
-                KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-
-                return keyFactory.generatePublic(publicKeySpec);
-            } catch (Exception e) {
-                throw new AtbashUnexpectedException(e);
-            }
-        } else {
-            throw new UnsupportedOperationException("TODO");
         }
     }
 

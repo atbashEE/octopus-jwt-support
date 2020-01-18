@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -171,7 +171,7 @@ public class JWKSet implements Serializable {
                 }
             } else {
                 OctetSequenceKey octetSequenceKey = (OctetSequenceKey) jwk;
-                octetSequenceKey.toSecretKey("AES"); // FIXME Is this correct
+                octetSequenceKey.toSecretKey("AES"); // AES is ok, HMAC is another option.
             }
         }
         return result;

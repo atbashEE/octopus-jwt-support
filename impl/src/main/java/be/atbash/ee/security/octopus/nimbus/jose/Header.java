@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -391,8 +391,6 @@ public abstract class Header implements Serializable {
             throw new AssertionError("Unexpected algorithm type: " + alg);
         }
     }
-
-    // FIXME Are these parse() methods used  ??
 
     /**
      * Parses a {@link PlainHeader}, {@link JWSHeader} or {@link JWEHeader}

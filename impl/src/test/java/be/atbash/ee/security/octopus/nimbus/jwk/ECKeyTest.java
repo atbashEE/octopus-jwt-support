@@ -450,8 +450,7 @@ public class ECKeyTest {
     }
 
     @Test
-    public void testP256ExportAndImport()
-            throws Exception {
+    public void testP256ExportAndImport() {
 
         // Public + private
 
@@ -481,8 +480,7 @@ public class ECKeyTest {
     }
 
     @Test
-    public void testP256AltExportAndImport()
-            throws Exception {
+    public void testP256AltExportAndImport() {
 
         ECKey key = new ECKey.Builder(ExampleKeyP256Alt.CRV, ExampleKeyP256Alt.X, ExampleKeyP256Alt.Y).build();
 
@@ -504,8 +502,7 @@ public class ECKeyTest {
     }
 
     @Test
-    public void testP384AltExportAndImport()
-            throws Exception {
+    public void testP384AltExportAndImport() {
 
         ECKey key = new ECKey.Builder(ExampleKeyP384Alt.CRV, ExampleKeyP384Alt.X, ExampleKeyP384Alt.Y).build();
 
@@ -527,8 +524,7 @@ public class ECKeyTest {
     }
 
     @Test
-    public void testP521AltExportAndImport()
-            throws Exception {
+    public void testP521AltExportAndImport() {
 
         ECKey key = new ECKey.Builder(ExampleKeyP521Alt.CRV, ExampleKeyP521Alt.X, ExampleKeyP521Alt.Y).build();
 
@@ -833,24 +829,14 @@ public class ECKeyTest {
     }
 
     @Test
-    public void testX509CertificateChain_xAndYdontMatch()
-            throws Exception {
+    public void testX509CertificateChain_xAndYdontMatch() {
 
-        List<X509Certificate> chain = X509CertChainUtils.parse(SampleCertificates.SAMPLE_X5C_EC);
+        IllegalStateException e = Assertions.assertThrows(IllegalStateException.class, () ->
+                new ECKey.Builder(Curve.P_256, ExampleKeyP256.X, ExampleKeyP256.Y)
+                        .x509CertChain(SampleCertificates.SAMPLE_X5C_EC)
+                        .build());
 
-        ECPublicKey ecPublicKey = (ECPublicKey) chain.get(0).getPublicKey();
-
-        ECKey jwk = new ECKey.Builder(Curve.P_256, ecPublicKey)
-                .build();  // TODO is this to check it isn't throwing exception?
-        // FIXME Multiple tests?
-
-        try {
-            new ECKey.Builder(Curve.P_256, ExampleKeyP256.X, ExampleKeyP256.Y)
-                    .x509CertChain(SampleCertificates.SAMPLE_X5C_EC)
-                    .build();
-        } catch (IllegalStateException e) {
-            assertThat(e.getMessage()).isEqualTo("The public subject key info of the first X.509 certificate in the chain must match the JWK type and public parameters");
-        }
+        assertThat(e.getMessage()).isEqualTo("The public subject key info of the first X.509 certificate in the chain must match the JWK type and public parameters");
     }
 
     @Test
@@ -1004,8 +990,8 @@ public class ECKeyTest {
 
     @Test
     // iss #217
-    public void testEnsurePublicXYCoordinatesOnCurve() {
-        // FIXME Multiple tests
+    public void testEnsurePublicXYCoordinatesOnCurve_1() {
+
         IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
                 () -> new ECKey(
                         Curve.P_256,
@@ -1020,6 +1006,11 @@ public class ECKeyTest {
                         null,
                         null));
         assertThat(e.getMessage()).isEqualTo("Invalid EC JWK: The 'x' and 'y' public coordinates are not on the P-256 curve");
+    }
+
+    @Test
+    // iss #217
+    public void testEnsurePublicXYCoordinatesOnCurve_2() {
 
         IllegalArgumentException e2 = Assertions.assertThrows(IllegalArgumentException.class,
                 () -> new ECKey(
@@ -1039,8 +1030,7 @@ public class ECKeyTest {
     }
 
     @Test
-    // iss #217
-    public void testCurveMismatch()
+    public void ECKeyBuilder_correctCurve_1()
             throws Exception {
 
         // EC key on P_256
@@ -1048,20 +1038,40 @@ public class ECKeyTest {
         KeyPairGenerator generator = KeyPairGenerator.getInstance("EC");
         generator.initialize(ecParameterSpec);
         KeyPair keyPair = generator.generateKeyPair();
-        ECKey ecJWK_p256 = new ECKey.Builder(Curve.P_256, (ECPublicKey) keyPair.getPublic())
+        new ECKey.Builder(Curve.P_256, (ECPublicKey) keyPair.getPublic())
                 .privateKey((ECPrivateKey) keyPair.getPrivate())
                 .build();
-        // FIXME Multiple Tests
+
+    }
+
+    @Test
+    public void ECKeyBuilder_correctCurve_2()
+            throws Exception {
 
         // EC key on P_384
-        ecParameterSpec = Curve.P_384.toECParameterSpec();
-        generator = KeyPairGenerator.getInstance("EC");
+        ECParameterSpec ecParameterSpec = Curve.P_384.toECParameterSpec();
+        KeyPairGenerator generator = KeyPairGenerator.getInstance("EC");
         generator.initialize(ecParameterSpec);
-        keyPair = generator.generateKeyPair();
+        KeyPair keyPair = generator.generateKeyPair();
+        new ECKey.Builder(Curve.P_384, (ECPublicKey) keyPair.getPublic())
+                .privateKey((ECPrivateKey) keyPair.getPrivate())
+                .build();
+
+    }
+
+    @Test
+    // iss #217
+    public void testCurveMismatch()
+            throws Exception {
+
+        // EC key on P_384
+        ECParameterSpec ecParameterSpec = Curve.P_384.toECParameterSpec();
+        KeyPairGenerator generator = KeyPairGenerator.getInstance("EC");
+        generator.initialize(ecParameterSpec);
+        KeyPair keyPair = generator.generateKeyPair();
         ECKey ecJWK_p384 = new ECKey.Builder(Curve.P_384, (ECPublicKey) keyPair.getPublic())
                 .privateKey((ECPrivateKey) keyPair.getPrivate())
                 .build();
-
 
         // Try to create EC key with P_256 params, but with x and y from P_384 curve key
 

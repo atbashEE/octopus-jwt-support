@@ -13,34 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.ee.security.octopus.nimbus.jose;
+package be.atbash.ee.security.octopus.keys.reader;
 
-
+import be.atbash.ee.security.octopus.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-
-/**
- * Tests the JOSE object type header parameter.
- */
-public class JOSEObjectTypeTest {
+class KeyReaderKeyStoreTest {
 
     @Test
-    public void testConstants() {
-
-        assertThat(JOSEObjectType.JOSE.getType()).isEqualTo("JOSE");
-        assertThat(JOSEObjectType.JOSE_JSON.getType()).isEqualTo("JOSE+JSON");
-        assertThat(JOSEObjectType.JWT.getType()).isEqualTo("JWT");
+    void readResource() {
+        KeyReaderKeyStore keyStore = new KeyReaderKeyStore();
+        ResourceNotFoundException notFoundException = assertThrows(ResourceNotFoundException.class, () -> keyStore.readResource("./non-existing.path", null));
+        assertThat(notFoundException.getMessage()).isEqualTo("Path not found : ./non-existing.path");
     }
-
-
-    @Test
-    public void testToString() {
-
-        assertThat(JOSEObjectType.JOSE.toString()).isEqualTo(JOSEObjectType.JOSE.getType());
-        assertThat(JOSEObjectType.JOSE_JSON.toString()).isEqualTo(JOSEObjectType.JOSE_JSON.getType());
-        assertThat(JOSEObjectType.JWT.toString()).isEqualTo(JOSEObjectType.JWT.getType());
-    }
-
 }

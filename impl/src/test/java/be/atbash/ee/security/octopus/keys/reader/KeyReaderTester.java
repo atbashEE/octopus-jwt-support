@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 package be.atbash.ee.security.octopus.keys.reader;
 
 import be.atbash.ee.security.octopus.keys.AtbashKey;
-import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup;
+import be.atbash.ee.security.octopus.keys.TestPasswordLookup;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.nimbus.jwk.RSAKey;
 import be.atbash.util.resource.ResourceUtil;
@@ -80,23 +80,4 @@ public class KeyReaderTester {
         pemWriter.close();
     }
 
-    private static class TestPasswordLookup implements KeyResourcePasswordLookup {
-        // FIXME Use be.atbash.ee.security.octopus.keys.TestPasswordLookup
-        private char[] password;
-
-        public TestPasswordLookup(char[] password) {
-
-            this.password = password;
-        }
-
-        @Override
-        public char[] getResourcePassword(String path) {
-            return password;
-        }
-
-        @Override
-        public char[] getKeyPassword(String path, String keyId) {
-            return new char[0];
-        }
-    }
 }

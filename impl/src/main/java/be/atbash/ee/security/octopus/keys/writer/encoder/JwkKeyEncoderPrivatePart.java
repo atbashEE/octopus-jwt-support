@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,6 @@ import be.atbash.ee.security.octopus.UnsupportedKeyType;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.ECCurveHelper;
 import be.atbash.ee.security.octopus.keys.writer.KeyEncoderParameters;
-import be.atbash.ee.security.octopus.nimbus.jwk.ECKey;
-import be.atbash.ee.security.octopus.nimbus.jwk.RSAKey;
 import be.atbash.ee.security.octopus.nimbus.jwk.*;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.util.exception.AtbashUnexpectedException;
@@ -35,15 +33,17 @@ import org.bouncycastle.math.ec.rfc8032.Ed25519;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
-import java.security.interfaces.*;
+import java.security.interfaces.ECPrivateKey;
+import java.security.interfaces.ECPublicKey;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
-import java.security.spec.RSAPublicKeySpec;
 
 /**
  *
  */
 
-public class JwkKeyEncoderPrivatePart implements KeyEncoder {
+public class JwkKeyEncoderPrivatePart extends AbstractEncoder implements KeyEncoder {
 
     public JwkKeyEncoderPrivatePart() {
         Security.addProvider(new BouncyCastleProvider());
@@ -128,23 +128,6 @@ public class JwkKeyEncoderPrivatePart implements KeyEncoder {
             throw new AtbashUnexpectedException(String.format("Unable to determine EC Curve of %s", atbashKey.getKeyId()));
         }
         return curve;
-
-    }
-
-    private PublicKey getPublicKey(Key key) {
-        if (key instanceof RSAPrivateCrtKey) {
-            RSAPrivateCrtKey rsaPrivateCrtKey = (RSAPrivateCrtKey) key;
-
-            RSAPublicKeySpec publicKeySpec = new java.security.spec.RSAPublicKeySpec(rsaPrivateCrtKey.getModulus(), rsaPrivateCrtKey.getPublicExponent());
-            try {
-                KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-
-                return keyFactory.generatePublic(publicKeySpec);
-            } catch (Exception e) {
-                throw new AtbashUnexpectedException(e);
-            }
-        }
-        throw new UnsupportedOperationException("TODO");
 
     }
 

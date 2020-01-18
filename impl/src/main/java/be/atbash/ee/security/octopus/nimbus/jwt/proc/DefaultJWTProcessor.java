@@ -297,7 +297,6 @@ public class DefaultJWTProcessor {
 
         } catch (JOSEException e) {
 
-            // No more keys to try
             throw new BadJWEException("Encrypted JWT rejected: " + e.getMessage(), e);
         }
 

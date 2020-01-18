@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -188,6 +188,7 @@ public final class ECDH {
      * @return The derived shared secret ('Z'), with algorithm "AES".
      * @throws JOSEException If derivation of the shared secret failed.
      */
+    // FIXME How do we use this? And if not, can be removed
     public static SecretKey deriveSharedSecret(OctetKeyPair publicKey, OctetKeyPair privateKey)
             throws JOSEException {
 
