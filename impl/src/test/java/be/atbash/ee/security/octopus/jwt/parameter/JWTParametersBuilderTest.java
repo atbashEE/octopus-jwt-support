@@ -17,6 +17,7 @@ package be.atbash.ee.security.octopus.jwt.parameter;
 
 import be.atbash.ee.security.octopus.jwt.JWTEncoding;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
+import be.atbash.ee.security.octopus.keys.fake.FakeECPublic;
 import be.atbash.ee.security.octopus.keys.fake.FakeRSAPrivate;
 import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import be.atbash.ee.security.octopus.util.HmacSecretUtil;
@@ -92,10 +93,51 @@ public class JWTParametersBuilderTest {
     }
 
     @Test
-    public void validate_requiredKeys() {
+    public void validate_requiredKeys_jws() {
 
         Assertions.assertThrows(AtbashIllegalActionException.class, () -> JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS).build());
     }
+
+    @Test
+    public void validate_requiredKeys_jwe() {
+
+        AtbashKey rsa = new AtbashKey("somePath", new FakeRSAPrivate());
+        JWTParametersBuilder builder = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWE)
+                .withSecretKeyForSigning(rsa);
+
+        AtbashIllegalActionException exception = Assertions.assertThrows(AtbashIllegalActionException.class, () -> builder.build());
+        assertThat(exception.getMessage()).isEqualTo("(OCT-DEV-106) JWE encoding requires a JWK secret for the encryption");
+    }
+
+    @Test
+    public void validate_requiredKeys_jwe_2() {
+
+        AtbashKey rsa = new AtbashKey("somePath", new FakeRSAPrivate());
+        JWTParametersBuilder builder = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWE)
+                .withSecretKeyForEncryption(rsa);
+
+        AtbashIllegalActionException exception = Assertions.assertThrows(AtbashIllegalActionException.class, () -> builder.build());
+        assertThat(exception.getMessage()).isEqualTo("(OCT-DEV-112) JWE encoding requires a JWK secret for the signing");
+    }
+
+    @Test
+    public void validate_requiredKeys_jwe_3() {
+
+        AtbashKey rsa = new AtbashKey("somePath", new FakeRSAPrivate());
+        AtbashKey ec = new AtbashKey("somePath", new FakeECPublic());
+        JWTParametersBuilder builder = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWE)
+                .withSecretKeyForSigning(rsa)
+                .withSecretKeyForEncryption(ec);
+
+        JWTParameters parameters = builder.build();
+        assertThat(parameters).isInstanceOf(JWTParametersEncryption.class);
+        JWTParametersEncryption parametersEncryption = (JWTParametersEncryption) parameters;
+        assertThat(parametersEncryption.getEncoding()).isEqualTo(JWTEncoding.JWE);
+
+        assertThat(parametersEncryption.getKeyType()).isEqualTo(KeyType.EC);
+        assertThat(parametersEncryption.getParametersSigning().getKeyType()).isEqualTo(KeyType.RSA);
+    }
+
 
     @Test
     public void JWKKeyType_RSA() {

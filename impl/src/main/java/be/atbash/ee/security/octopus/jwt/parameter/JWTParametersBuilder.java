@@ -138,6 +138,9 @@ public final class JWTParametersBuilder {
         if (secretKeyEncryption == null) {
             throw new AtbashIllegalActionException("(OCT-DEV-106) JWE encoding requires a JWK secret for the encryption");
         }
+        if (secretKeySigning == null) {
+            throw new AtbashIllegalActionException("(OCT-DEV-112) JWE encoding requires a JWK secret for the signing");
+        }
 
         if (jweAlgorithm == null) {
             return;
