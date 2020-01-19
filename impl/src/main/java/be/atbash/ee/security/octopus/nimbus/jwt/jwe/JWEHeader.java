@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ import javax.json.JsonObjectBuilder;
 import java.net.URI;
 import java.text.ParseException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -789,7 +790,7 @@ public final class JWEHeader extends CommonJWTHeader {
                      Map<String, Object> customParams,
                      Base64URLValue parsedBase64URL) {
 
-        super(alg, typ, cty, crit, jku, jwk, x5u, x5t256, x5c, kid, customParams, parsedBase64URL);
+        super(alg, typ, cty, crit, jku, jwk, x5u, x5t256, x5c, kid, filter(customParams), parsedBase64URL);
 
         if (alg.getName().equals(Algorithm.NONE.getName())) {
             throw new IllegalArgumentException("The JWE algorithm cannot be \"none\"");
@@ -809,10 +810,42 @@ public final class JWEHeader extends CommonJWTHeader {
         this.zip = zip;
         this.apu = apu;
         this.apv = apv;
-        this.p2s = p2s;
-        this.p2c = p2c;
+        if (p2s == null && customParams != null) {
+            this.p2s = (Base64URLValue) customParams.get("p2s");  // FIXME We need to checking for this typecast
+        } else {
+            this.p2s = p2s;
+        }
+        if (p2c == 0  && customParams != null) {
+            // FIXME We need to checking for this typecast
+            Integer value = (Integer) customParams.get("p2c");
+            if (value != null) {
+                // casting fails in case of null.
+                this.p2c = value;
+            } else {
+                this.p2c = 0;
+            }
+        } else {
+            this.p2c = p2c;
+        }
         this.iv = iv;
         this.tag = tag;
+    }
+
+    /**
+     * Filter out the keys which are default supported ones.
+     *
+     * @param customParams
+     * @return
+     */
+    private static Map<String, Object> filter(Map<String, Object> customParams) {
+
+        if (customParams == null) {
+            return new HashMap<>();
+        }
+        return customParams.entrySet().stream()
+                .filter(entry -> !REGISTERED_PARAMETER_NAMES.contains(entry.getKey()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
     }
 
 

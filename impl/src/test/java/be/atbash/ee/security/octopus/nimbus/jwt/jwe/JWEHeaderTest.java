@@ -400,4 +400,19 @@ public class JWEHeaderTest {
         JWEHeader header = JWEHeader.parse(jsonObject.toString());
         assertThat(header.getCompressionAlgorithm()).isNull();
     }
+
+    @Test
+    public void testFilterCustomClaims() {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("p2s", Base64URLValue.encode("something"));
+        claims.put("p2c", 1234);
+        JWEHeader header = new JWEHeader.Builder(JWEAlgorithm.A128KW, EncryptionMethod.A128GCM)
+                .customParams(claims)
+                .build();
+
+        // Test if values from Custom Claims are migrated to 'real' properties
+        assertThat(header.getPBES2Salt().decode()).isEqualTo("something".getBytes());
+        assertThat(header.getPBES2Count()).isEqualTo(1234);
+        assertThat(header.getCustomParams()).isEmpty();
+    }
 }
