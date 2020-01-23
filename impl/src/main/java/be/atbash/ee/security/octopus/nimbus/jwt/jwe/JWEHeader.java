@@ -97,20 +97,12 @@ public final class JWEHeader extends CommonJWTHeader {
     static {
         Set<String> claims = new HashSet<>();
 
-        claims.add("alg");
+        // FIXME Some of the claims not maintained here but in super classes are removed.
+        // This mainly for the filter() method
+        // But now functionality is altered since the getRegisteredParameterNames() doesn't return all names anymore
         claims.add("enc");
         claims.add("epk");
         claims.add("zip");
-        claims.add("jku");
-        claims.add("jwk");
-        claims.add("x5u");
-        claims.add("x5t");
-        claims.add("x5t#S256");
-        claims.add("x5c");
-        claims.add("kid");
-        claims.add("typ");
-        claims.add("cty");
-        claims.add("crit");
         claims.add("apu");
         claims.add("apv");
         claims.add("p2s");
@@ -120,7 +112,6 @@ public final class JWEHeader extends CommonJWTHeader {
 
         REGISTERED_PARAMETER_NAMES = Collections.unmodifiableSet(claims);
     }
-
 
     /**
      * Builder for constructing JSON Web Encryption (JWE) headers.

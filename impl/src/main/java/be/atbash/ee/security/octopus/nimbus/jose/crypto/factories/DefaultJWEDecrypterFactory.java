@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,7 @@ package be.atbash.ee.security.octopus.nimbus.jose.crypto.factories;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.KeyLengthException;
 import be.atbash.ee.security.octopus.nimbus.jose.KeyTypeException;
-import be.atbash.ee.security.octopus.nimbus.jose.crypto.AESDecrypter;
-import be.atbash.ee.security.octopus.nimbus.jose.crypto.DirectDecrypter;
-import be.atbash.ee.security.octopus.nimbus.jose.crypto.ECDHDecrypter;
-import be.atbash.ee.security.octopus.nimbus.jose.crypto.RSADecrypter;
+import be.atbash.ee.security.octopus.nimbus.jose.crypto.*;
 import be.atbash.ee.security.octopus.nimbus.jose.jca.JWEJCAContext;
 import be.atbash.ee.security.octopus.nimbus.jose.proc.JWEDecrypterFactory;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod;
@@ -167,18 +164,16 @@ public class DefaultJWEDecrypterFactory implements JWEDecrypterFactory {
 
             decrypter = aesDecrypter;
 
-        } /* FIXME
+        }
 		else if (PasswordBasedDecrypter.SUPPORTED_ALGORITHMS.contains(header.getAlgorithm()) &&
-			PasswordBasedDecrypter.SUPPORTED_ENCRYPTION_METHODS.contains(header.getEncryptionMethod())) {
+                PasswordBasedDecrypter.SUPPORTED_ENCRYPTION_METHODS.contains(header.getEncryptionMethod())) {
 
-			if (!(key instanceof SecretKey)) {
-				throw new KeyTypeException(SecretKey.class);
-			}
+            if (!(key instanceof SecretKey)) {
+                throw new KeyTypeException(SecretKey.class);
+            }
+            decrypter = new PasswordBasedDecrypter((SecretKey) key);
 
-			byte[] password = key.getEncoded();
-			decrypter = new PasswordBasedDecrypter(password);
-
-		} */ else {
+        } else {
 
             throw new JOSEException("Unsupported JWE algorithm or encryption method");
         }

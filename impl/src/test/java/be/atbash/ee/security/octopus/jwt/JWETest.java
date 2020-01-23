@@ -30,10 +30,7 @@ import be.atbash.ee.security.octopus.keys.generator.ECGenerationParameters;
 import be.atbash.ee.security.octopus.keys.generator.KeyGenerator;
 import be.atbash.ee.security.octopus.keys.generator.OCTGenerationParameters;
 import be.atbash.ee.security.octopus.keys.generator.RSAGenerationParameters;
-import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
-import be.atbash.ee.security.octopus.keys.selector.KeySelector;
-import be.atbash.ee.security.octopus.keys.selector.SelectorCriteria;
-import be.atbash.ee.security.octopus.keys.selector.TestKeySelector;
+import be.atbash.ee.security.octopus.keys.selector.*;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEObject;
@@ -87,6 +84,7 @@ public class JWETest {
     @AfterEach
     public void teardown() {
         TestLoggerFactory.clear();
+        System.setProperty("atbash.utils.cdi.check", "");
     }
 
     @Test
@@ -299,6 +297,30 @@ public class JWETest {
         ListKeyManager keyManager = new ListKeyManager(keys);
 
         KeySelector keySelector = new TestKeySelector(keyManager);
+        Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector).getData();
+        assertThat(data).isEqualToComparingFieldByField(payload);
+
+    }
+
+    @Test
+    public void encodingJWE_Password() {
+
+        System.setProperty("atbash.utils.cdi.check", "false");
+        AtbashKey key = generateOCTKeys(KID_SIGN, 256).get(0);
+
+        JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWE)
+                .withSecretKeyForSigning(key)
+                .withSecretKeyForEncryption(KID_ENCRYPT, "JUnit".toCharArray())
+                .build();
+
+        String encoded = jwtEncoder.encode(payload, parameters);
+
+        List<AtbashKey> keys = new ArrayList<>();
+        keys.add(key);
+
+        ListKeyManager keyManager = new ListKeyManager(keys);
+
+        KeySelector keySelector = new PasswordKeySelector(keyManager);
         Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector).getData();
         assertThat(data).isEqualToComparingFieldByField(payload);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.KeyLengthException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.AESEncrypter;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.ECDHEncrypter;
+import be.atbash.ee.security.octopus.nimbus.jose.crypto.PasswordBasedEncrypter;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.RSAEncrypter;
 import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEEncrypter;
@@ -65,10 +66,14 @@ public class JWEEncryptionFactory {
         }
 
         if (KeyType.OCT.equals(parametersEncryption.getKeyType())) {
-            try {
-                result = new AESEncrypter((SecretKey) parametersEncryption.getKey());
-            } catch (KeyLengthException e) {
-                throw new UnsupportedKeyLengthException("Unsupported Key length");
+            if (parametersEncryption.getHeaderValues().containsKey("p2s")) {
+                result = new PasswordBasedEncrypter((SecretKey) parametersEncryption.getKey());
+            } else {
+                try {
+                    result = new AESEncrypter((SecretKey) parametersEncryption.getKey());
+                } catch (KeyLengthException e) {
+                    throw new UnsupportedKeyLengthException("Unsupported Key length");
+                }
             }
         }
         if (result == null) {

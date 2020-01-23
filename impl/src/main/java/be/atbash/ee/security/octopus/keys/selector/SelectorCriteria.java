@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@ package be.atbash.ee.security.octopus.keys.selector;
 
 import be.atbash.ee.security.octopus.keys.selector.filter.*;
 import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
+import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.util.PublicAPI;
 import be.atbash.util.StringUtils;
 
@@ -36,6 +38,11 @@ public class SelectorCriteria {
     private AsymmetricPart asymmetricPart;
     private URI jku;
     private Object discriminator;
+    // The following 3 properties are there to support password based encryption.
+    // TODO Verify if this is a proper solution and that it still matches the idea of criteria for selecting the appropriate key.
+    private Base64URLValue PBE2Salt;
+    private int PBE2Count;
+    private JWEAlgorithm jweAlgorithm;
 
     private SelectorCriteria() {
     }
@@ -62,6 +69,18 @@ public class SelectorCriteria {
 
     public Object getDiscriminator() {
         return discriminator;
+    }
+
+    public Base64URLValue getPBE2Salt() {
+        return PBE2Salt;
+    }
+
+    public int getPBE2Count() {
+        return PBE2Count;
+    }
+
+    public JWEAlgorithm getJweAlgorithm() {
+        return jweAlgorithm;
     }
 
     public List<KeyFilter> asKeyFilters() {
@@ -131,6 +150,21 @@ public class SelectorCriteria {
 
         public Builder withDiscriminator(Object discriminator) {
             criteria.discriminator = discriminator;
+            return this;
+        }
+
+        public Builder withPBE2Salt(Base64URLValue pbe2Salt) {
+            criteria.PBE2Salt = pbe2Salt;
+            return this;
+        }
+
+        public Builder withPBE2Count(int count) {
+            criteria.PBE2Count = count;
+            return this;
+        }
+
+        public Builder withJWEAlgorithm(JWEAlgorithm jweAlgorithm) {
+            criteria.jweAlgorithm = jweAlgorithm;
             return this;
         }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,21 @@ package be.atbash.ee.security.octopus.jwt.parameter;
 
 import be.atbash.ee.security.octopus.jwt.JWTEncoding;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
+import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
+import be.atbash.ee.security.octopus.nimbus.jose.crypto.PasswordBasedEncrypter;
+import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.PBKDF;
+import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.PRFParams;
 import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
+import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.util.PublicAPI;
 import be.atbash.util.Reviewed;
 import be.atbash.util.exception.AtbashIllegalActionException;
+import be.atbash.util.exception.AtbashUnexpectedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,6 +53,11 @@ public final class JWTParametersBuilder {
     private JWTParametersSigning parametersSigning;
 
     private JWEAlgorithm jweAlgorithm;
+
+    // For the PBE2 keys
+    private String kid;
+    private char[] password;
+    private int iterationCount;
 
     private JWTParametersBuilder(JWTEncoding encoding) {
         this.encoding = encoding;
@@ -81,6 +93,21 @@ public final class JWTParametersBuilder {
         return this;
     }
 
+    public JWTParametersBuilder withSecretKeyForEncryption(String kid, char[] password) {
+        return this.withSecretKeyForEncryption(kid, password, PasswordBasedEncrypter.MIN_RECOMMENDED_ITERATION_COUNT);
+    }
+
+    public JWTParametersBuilder withSecretKeyForEncryption(String kid, char[] password, int iterationCount) {
+        if (encoding != JWTEncoding.JWE) {
+            logger.warn("SecretKey value for encryption only needed for JWTEncoding.JWE");
+        }
+        jweAlgorithm = JWEAlgorithm.PBES2_HS512_A256KW;
+        this.password = password;
+        this.iterationCount = iterationCount;
+        this.kid = kid;
+        return this;
+    }
+
     public JWTParametersBuilder withSigningParameters(JWTParametersSigning parametersSigning) {
 
         this.parametersSigning = parametersSigning;
@@ -95,6 +122,15 @@ public final class JWTParametersBuilder {
     public JWTParameters build() {
         JWTParameters result;
 
+        if (encoding == JWTEncoding.JWE) {
+            if (password != null) {
+                try {
+                    defineKeyBasedOnPassword();
+                } catch (JOSEException e) {
+                    throw new AtbashUnexpectedException(e);
+                }
+            }
+        }
         validateParameters();
 
         switch (encoding) {
@@ -115,6 +151,17 @@ public final class JWTParametersBuilder {
                 throw new IllegalArgumentException(String.format("Unsupported value for JWTEncoding : %s", encoding));
         }
         return result;
+    }
+
+    private void defineKeyBasedOnPassword() throws JOSEException {
+        byte[] salt = new byte[PasswordBasedEncrypter.MIN_SALT_LENGTH];  // FIXME Config
+        new SecureRandom().nextBytes(salt);  // FIXME Make this configurable from a central point.
+
+        PRFParams prfParams = PRFParams.resolve(jweAlgorithm);
+        secretKeyEncryption = new AtbashKey(kid, PBKDF.deriveKey(password, salt, iterationCount, prfParams));
+
+        headerValues.put("p2s", Base64URLValue.encode(salt));
+        headerValues.put("p2c", iterationCount);
     }
 
     private void validateParameters() {
@@ -156,7 +203,11 @@ public final class JWTParametersBuilder {
 
         }
         if (keyType == KeyType.OCT) {
-            validJWEAlgorithm = JWEAlgorithm.Family.AES_KW.contains(jweAlgorithm);
+            if (password == null) {
+                validJWEAlgorithm = JWEAlgorithm.Family.AES_KW.contains(jweAlgorithm);
+            } else {
+                validJWEAlgorithm = JWEAlgorithm.Family.PBES2.contains(jweAlgorithm);
+            }
         }
 
         if (!validJWEAlgorithm) {

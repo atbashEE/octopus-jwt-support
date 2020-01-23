@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,8 +35,16 @@ public class KeySelector {
 
     private KeyManager keyManager;
 
+    public KeySelector() {
+    }
+
+    public KeySelector(KeyManager keyManager) {
+        this.keyManager = keyManager;
+    }
+
     @PostConstruct
     public void init() {
+        // CDI Version, so the no-op constructor is used. or programmatic and keyManager not explicitly set.
         keyManager = CDIUtils.retrieveOptionalInstance(KeyManager.class);
     }
 

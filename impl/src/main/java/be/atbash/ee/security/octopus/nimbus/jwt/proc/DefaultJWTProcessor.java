@@ -30,6 +30,7 @@ import be.atbash.ee.security.octopus.nimbus.jose.proc.JWEDecrypterFactory;
 import be.atbash.ee.security.octopus.nimbus.jose.proc.JWSVerifierFactory;
 import be.atbash.ee.security.octopus.nimbus.jwt.*;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEDecrypter;
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEHeader;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSVerifier;
 import org.slf4j.Logger;
@@ -175,11 +176,17 @@ public class DefaultJWTProcessor {
         String keyID = header.getKeyID();
         URI jwkURI = header.getJWKURL();
 
-        return SelectorCriteria.newBuilder()
+        SelectorCriteria.Builder builder = SelectorCriteria.newBuilder()
                 .withId(keyID)
                 .withJKU(jwkURI)
-                .withAsymmetricPart(asymmetricPart)
-                .build();
+                .withAsymmetricPart(asymmetricPart);
+        if (header instanceof JWEHeader) {
+            JWEHeader jweHeader = (JWEHeader) header;
+            builder.withPBE2Salt(jweHeader.getPBES2Salt())
+                    .withPBE2Count(jweHeader.getPBES2Count())
+                    .withJWEAlgorithm(jweHeader.getAlgorithm());
+        }
+        return builder.build();
     }
 
 
