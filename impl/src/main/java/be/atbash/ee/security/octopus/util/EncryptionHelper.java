@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,30 +17,30 @@ package be.atbash.ee.security.octopus.util;
 
 import be.atbash.ee.security.octopus.exception.DecryptionFailedException;
 import be.atbash.ee.security.octopus.exception.MissingPasswordException;
+import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
+import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.PBKDF;
+import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.PRFParams;
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
 import be.atbash.util.PublicAPI;
 import be.atbash.util.StringUtils;
 import be.atbash.util.exception.AtbashUnexpectedException;
 
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
-import java.security.spec.InvalidKeySpecException;
 import java.security.spec.InvalidParameterSpecException;
 import java.util.Base64;
 
 @PublicAPI
 public final class EncryptionHelper {
 
-    private static final String PBKDF_ALGO = "PBKDF2WithHmacSHA1";
-    private static final int ITERATION_COUNT = 65556;
-    private static final int KEYSIZE = 256;
-    private static final String AES = "AES";
     private static final String AES_ALGO = "AES/CBC/PKCS5Padding"; // TODO Config
-                  // This is maybe a bit better AES/GCM/NoPadding -> for 1.0 version as breaking change.
+    // This is maybe a bit better AES/GCM/NoPadding -> for 1.0 version as breaking change.
+
+    private static final int ITERATION_COUNT = 65556;
 
     private static final SecureRandom random = new SecureRandom();
 
@@ -62,10 +62,7 @@ public final class EncryptionHelper {
 
         try {
             // Derive the key
-            SecretKeyFactory factory = SecretKeyFactory.getInstance(PBKDF_ALGO);
-            PBEKeySpec spec = new PBEKeySpec(password, saltBytes, ITERATION_COUNT, KEYSIZE);
-            SecretKey secretKey = factory.generateSecret(spec);
-            SecretKeySpec secret = new SecretKeySpec(secretKey.getEncoded(), AES);
+            SecretKey secret = PBKDF.deriveKey(password, saltBytes, ITERATION_COUNT, PRFParams.resolve(JWEAlgorithm.PBES2_HS512_A256KW));
 
             //encrypting the word
             Cipher cipher = Cipher.getInstance(AES_ALGO);
@@ -80,7 +77,7 @@ public final class EncryptionHelper {
             System.arraycopy(ivBytes, 0, buffer, saltBytes.length, ivBytes.length);
             System.arraycopy(encryptedTextBytes, 0, buffer, saltBytes.length + ivBytes.length, encryptedTextBytes.length);
             return Base64.getEncoder().encodeToString(buffer);
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException | InvalidKeyException | NoSuchPaddingException | IllegalBlockSizeException | InvalidParameterSpecException | BadPaddingException e) {
+        } catch (NoSuchAlgorithmException | InvalidKeyException | NoSuchPaddingException | IllegalBlockSizeException | InvalidParameterSpecException | BadPaddingException | JOSEException e) {
             throw new AtbashUnexpectedException(e);
         }
     }
@@ -103,17 +100,16 @@ public final class EncryptionHelper {
 
             buffer.get(encryptedTextBytes);
             // Deriving the key
-            SecretKeyFactory factory = SecretKeyFactory.getInstance(PBKDF_ALGO);
-            PBEKeySpec spec = new PBEKeySpec(password, saltBytes, ITERATION_COUNT, 256);
-            SecretKey secretKey = factory.generateSecret(spec);
-            SecretKeySpec secret = new SecretKeySpec(secretKey.getEncoded(), AES);
+
+            SecretKey secret = PBKDF.deriveKey(password, saltBytes, ITERATION_COUNT, PRFParams.resolve(JWEAlgorithm.PBES2_HS512_A256KW));
+
             cipher.init(Cipher.DECRYPT_MODE, secret, new IvParameterSpec(ivBytes));
 
             decryptedTextBytes = cipher.doFinal(encryptedTextBytes);
         } catch (BadPaddingException e) {
             // BadPaddingException -> Wrong PW
             throw new DecryptionFailedException();
-        } catch (IllegalBlockSizeException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | InvalidKeyException | InvalidKeySpecException | NoSuchPaddingException e) {
+        } catch (JOSEException | IllegalBlockSizeException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | InvalidKeyException | NoSuchPaddingException e) {
             throw new AtbashUnexpectedException(e);
         }
 
@@ -164,7 +160,7 @@ public final class EncryptionHelper {
 
             buffer.get(encryptedTextBytes);
 
-            SecretKeySpec secret = new SecretKeySpec(secretKey.getEncoded(), AES);
+            SecretKeySpec secret = new SecretKeySpec(secretKey.getEncoded(), "AES");
             cipher.init(Cipher.DECRYPT_MODE, secret, new IvParameterSpec(ivBytes));
 
             decryptedTextBytes = cipher.doFinal(encryptedTextBytes);
