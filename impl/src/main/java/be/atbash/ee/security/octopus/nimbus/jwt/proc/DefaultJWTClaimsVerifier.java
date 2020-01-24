@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ package be.atbash.ee.security.octopus.nimbus.jwt.proc;
 
 import be.atbash.ee.security.octopus.config.JwtSupportConfiguration;
 import be.atbash.ee.security.octopus.jwt.decoder.JWTVerifier;
+import be.atbash.ee.security.octopus.nimbus.jwt.CommonJWTHeader;
 import be.atbash.ee.security.octopus.nimbus.jwt.JWTClaimsSet;
-import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
 import be.atbash.ee.security.octopus.nimbus.jwt.util.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +40,6 @@ import java.util.*;
  *         before the current time, else the JWT claims set is rejected.
  * </ol>
  *
- * <p>This class may be extended to perform additional checks.
  *
  * @author Vladimir Dzhuvinov
  * @version 2019-10-17
@@ -169,7 +168,7 @@ public class DefaultJWTClaimsVerifier implements JWTVerifier {
     }
 
     @Override
-    public boolean verify(JWSHeader header, JWTClaimsSet claimsSet) {
+    public boolean verify(CommonJWTHeader header, JWTClaimsSet claimsSet) {
 
         // Check audience
         if (acceptedAudienceValues != null) {

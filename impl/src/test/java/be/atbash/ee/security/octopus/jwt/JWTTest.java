@@ -53,7 +53,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Focusing on no wrapping in JWT, or using signed JWT
  */
 public class JWTTest {
-
+    // FIXME Rename to JWSTest as it is about signing
     private static final String KID_SIGN = "sign";
 
     private TestLogger logger;

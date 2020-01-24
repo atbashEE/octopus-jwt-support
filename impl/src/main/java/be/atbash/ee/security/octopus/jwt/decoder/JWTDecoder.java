@@ -109,7 +109,6 @@ public class JWTDecoder {
 
     private <T> JWTData<T> readEncryptedJWT(String data, KeySelector keySelector, Class<T> classType, JWTVerifier verifier) throws ParseException, JOSEException {
 
-        // FIXME JWTVerifier parameter is unused!
         EncryptedJWT encryptedJWT = EncryptedJWT.parse(data);
 
         String keyID = encryptedJWT.getHeader().getKeyID();
@@ -118,6 +117,12 @@ public class JWTDecoder {
         processor.setJWSKeySelector(keySelector);
         processor.setJWEKeySelector(keySelector);
         JWTClaimsSet jwtClaimsSet = processor.process(encryptedJWT);
+
+        if (verifier != null) {
+            if (!verifier.verify(encryptedJWT.getHeader(), jwtClaimsSet)) {
+                throw new InvalidJWTException("JWT verification failed");
+            }
+        }
 
         MetaJWTData metaJWTData = new MetaJWTData(keyID, encryptedJWT.getHeader().getCustomParams());
 

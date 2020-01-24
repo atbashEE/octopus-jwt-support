@@ -152,6 +152,17 @@ MPBearerTokenVerifier -> Optional verifier for validating the JWT.
 
 TODO : Describe the default verifications.
 
+== Additional verification
+
+As indicated in the above example, an optional verifier, of type `be.atbash.ee.security.octopus.jwt.decoder.JWTVerifier` can be passed to the decode() method.  The interface has the following verification method:
+
+----
+     boolean verify(CommonJWTHeader header, JWTClaimsSet jwtClaimsSet);
+----
+
+The header parameter has the header, either the header for the JWS (signed JWT) or the JWE (encrypted JWT).
+The jwtClaimsSet parameter contains the payload of the JWT. The claims value are still in basic format, so if there is an converter defined, it is not yet applied.
+
 == Creating JWE
 
 Creating a JWE, the JWT variant which uses encryption, is very similar in creating a signed version. This is done on purpose so that creating a signed JWT or an encrypted JWT is similar and developers don't need to learn different patterns.

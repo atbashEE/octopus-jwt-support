@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package be.atbash.ee.security.octopus.jwt.decoder;
 
+import be.atbash.ee.security.octopus.nimbus.jwt.CommonJWTHeader;
 import be.atbash.ee.security.octopus.nimbus.jwt.JWTClaimsSet;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
 import be.atbash.util.PublicAPI;
@@ -23,7 +24,8 @@ import be.atbash.util.PublicAPI;
  *
  */
 @PublicAPI
+@FunctionalInterface
 public interface JWTVerifier {
 
-    boolean verify(JWSHeader header, JWTClaimsSet jwtClaimsSet);
+    boolean verify(CommonJWTHeader header, JWTClaimsSet jwtClaimsSet);
 }

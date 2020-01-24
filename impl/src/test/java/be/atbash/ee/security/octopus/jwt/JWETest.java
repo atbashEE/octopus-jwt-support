@@ -20,6 +20,7 @@ import be.atbash.ee.security.octopus.config.JwtSupportConfiguration;
 import be.atbash.ee.security.octopus.exception.UnsupportedECCurveException;
 import be.atbash.ee.security.octopus.exception.UnsupportedKeyLengthException;
 import be.atbash.ee.security.octopus.jwt.decoder.JWTDecoder;
+import be.atbash.ee.security.octopus.jwt.decoder.JWTVerifier;
 import be.atbash.ee.security.octopus.jwt.encoder.JWTEncoder;
 import be.atbash.ee.security.octopus.jwt.encoder.testclasses.Payload;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParameters;
@@ -527,6 +528,90 @@ public class JWETest {
 
         JWEObject jweObject = JWEObject.parse(encoded);
         assertThat(jweObject.getHeader().getAlgorithm()).isEqualTo(JWEAlgorithm.ECDH_ES);
+    }
+
+    @Test
+    public void encodingJWE_verifier() {
+
+        List<AtbashKey> keys = generateRSAKeys(KID_SIGN);
+        keys.addAll(generateRSAKeys(KID_ENCRYPT));
+
+        ListKeyManager keyManager = new ListKeyManager(keys);
+
+        SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PRIVATE).build();
+        List<AtbashKey> signKeyList = keyManager.retrieveKeys(criteria);
+
+        assertThat(signKeyList).as("We should have 1 Private key for signing").hasSize(1);
+
+        criteria = SelectorCriteria.newBuilder().withId(KID_ENCRYPT).withAsymmetricPart(AsymmetricPart.PUBLIC).build();
+        List<AtbashKey> encryptKeyList = keyManager.retrieveKeys(criteria);
+
+        assertThat(encryptKeyList).as("We should have 1 Public key for encryption").hasSize(1);
+
+        JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWE)
+                .withSecretKeyForSigning(signKeyList.get(0))
+                .withSecretKeyForEncryption(encryptKeyList.get(0))
+                .build();
+
+        String encoded = jwtEncoder.encode(payload, parameters);
+
+        KeySelector keySelector = new TestKeySelector(keyManager);
+
+        JWTVerifier verifier = (header, jwtClaimsSet) -> {
+            boolean result = true;
+            if (!"JWT".equals(header.getContentType())) {
+                result = false;
+            }
+            if (!jwtClaimsSet.getClaim("number").equals(42)) {
+                result = false;
+            }
+
+            return result;
+        };
+
+        Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector, verifier).getData();
+        assertThat(data).isEqualToComparingFieldByField(payload);
+
+    }
+
+    @Test
+    public void encodingJWE_verifier_false() {
+
+        List<AtbashKey> keys = generateRSAKeys(KID_SIGN);
+        keys.addAll(generateRSAKeys(KID_ENCRYPT));
+
+        ListKeyManager keyManager = new ListKeyManager(keys);
+
+        SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PRIVATE).build();
+        List<AtbashKey> signKeyList = keyManager.retrieveKeys(criteria);
+
+        assertThat(signKeyList).as("We should have 1 Private key for signing").hasSize(1);
+
+        criteria = SelectorCriteria.newBuilder().withId(KID_ENCRYPT).withAsymmetricPart(AsymmetricPart.PUBLIC).build();
+        List<AtbashKey> encryptKeyList = keyManager.retrieveKeys(criteria);
+
+        assertThat(encryptKeyList).as("We should have 1 Public key for encryption").hasSize(1);
+
+        JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWE)
+                .withSecretKeyForSigning(signKeyList.get(0))
+                .withSecretKeyForEncryption(encryptKeyList.get(0))
+                .build();
+
+        String encoded = jwtEncoder.encode(payload, parameters);
+
+        KeySelector keySelector = new TestKeySelector(keyManager);
+
+        JWTVerifier verifier = (header, jwtClaimsSet) -> {
+            boolean result = true;
+
+            if (!jwtClaimsSet.getClaim("number").equals(41)) {
+                result = false;
+            }
+
+            return result;
+        };
+
+        Assertions.assertThrows(InvalidJWTException.class, () -> new JWTDecoder().decode(encoded, Payload.class, keySelector, verifier));
     }
 
     private List<AtbashKey> generateRSAKeys(String kid) {
