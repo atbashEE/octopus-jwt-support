@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package be.atbash.ee.security.octopus.nimbus.jwt;
 
 
 import be.atbash.ee.security.octopus.nimbus.jose.Algorithm;
+import be.atbash.ee.security.octopus.nimbus.jose.CustomParameterNameException;
 import be.atbash.ee.security.octopus.nimbus.jose.Header;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEObjectType;
 import be.atbash.ee.security.octopus.nimbus.jwk.JWK;
@@ -95,6 +96,27 @@ abstract public class CommonJWTHeader extends Header {
      */
     private final String kid;
 
+    /**
+     * The registered parameter names.
+     */
+    static final Set<String> REGISTERED_PARAMETER_NAMES;
+
+
+    /*
+     * Initialises the registered parameter name set.
+     */
+    static {
+        Set<String> claims = new HashSet<>();
+
+        claims.add("kid");
+        claims.add("x5c");
+        claims.add("x5t256");
+        claims.add("x5u");
+        claims.add("jwk");
+        claims.add("jku");
+
+        REGISTERED_PARAMETER_NAMES = Collections.unmodifiableSet(claims);
+    }
 
     /**
      * Creates a new common JWS and JWE header.
@@ -137,7 +159,7 @@ abstract public class CommonJWTHeader extends Header {
                               List<Base64Value> x5c,
                               String kid,
                               Map<String, Object> customParams,
-                              Base64URLValue parsedBase64URL) {
+                              Base64URLValue parsedBase64URL) throws CustomParameterNameException {
 
         super(alg, typ, cty, crit, customParams, parsedBase64URL);
 
@@ -297,5 +319,9 @@ abstract public class CommonJWTHeader extends Header {
         }
 
         return result;
+    }
+
+    public static Set<String> getRegisteredParameterNames() {
+        return REGISTERED_PARAMETER_NAMES;
     }
 }

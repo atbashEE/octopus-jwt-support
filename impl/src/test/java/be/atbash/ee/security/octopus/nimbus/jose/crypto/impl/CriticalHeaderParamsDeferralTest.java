@@ -16,6 +16,7 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto.impl;
 
 
+import be.atbash.ee.security.octopus.nimbus.jose.CustomParameterNameException;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
 import org.junit.jupiter.api.Test;
@@ -57,7 +58,7 @@ public class CriticalHeaderParamsDeferralTest {
     }
 
     @Test
-    public void testPassMissingCritHeader() {
+    public void testPassMissingCritHeader() throws CustomParameterNameException {
 
         CriticalHeaderParamsDeferral checker = new CriticalHeaderParamsDeferral();
 
@@ -67,7 +68,7 @@ public class CriticalHeaderParamsDeferralTest {
     }
 
     @Test
-    public void testPassIgnoredCritParams() {
+    public void testPassIgnoredCritParams() throws CustomParameterNameException {
 
         CriticalHeaderParamsDeferral checker = new CriticalHeaderParamsDeferral();
         checker.setDeferredCriticalHeaderParams(new HashSet<>(Collections.singletonList("exp")));
@@ -82,7 +83,7 @@ public class CriticalHeaderParamsDeferralTest {
     }
 
     @Test
-    public void testReject() {
+    public void testReject() throws CustomParameterNameException {
 
         CriticalHeaderParamsDeferral checker = new CriticalHeaderParamsDeferral();
 

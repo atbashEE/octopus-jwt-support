@@ -22,10 +22,7 @@ import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersEncryption;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersPlain;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersSigning;
 import be.atbash.ee.security.octopus.jwt.serializer.spi.SerializerProvider;
-import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
-import be.atbash.ee.security.octopus.nimbus.jose.JOSEObjectType;
-import be.atbash.ee.security.octopus.nimbus.jose.Payload;
-import be.atbash.ee.security.octopus.nimbus.jose.PlainHeader;
+import be.atbash.ee.security.octopus.nimbus.jose.*;
 import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import be.atbash.ee.security.octopus.nimbus.jwt.JWTClaimsSet;
 import be.atbash.ee.security.octopus.nimbus.jwt.PlainJWT;
@@ -94,7 +91,12 @@ public class JWTEncoder {
     }
 
     private String createPlainJWT(Object data, JWTParametersPlain parameters) {
-        PlainHeader header = new PlainHeader.Builder().customParams(parameters.getHeaderValues()).build();
+        PlainHeader header;
+        try {
+            header = new PlainHeader.Builder().customParams(parameters.getHeaderValues()).build();
+        } catch (CustomParameterNameException e) {
+            throw new AtbashUnexpectedException(e);
+        }
 
         PlainJWT plainJWT;
         if (data instanceof JWTClaimsSet) {

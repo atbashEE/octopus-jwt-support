@@ -16,6 +16,7 @@
 package be.atbash.ee.security.octopus.nimbus.jwt.jws;
 
 
+import be.atbash.ee.security.octopus.nimbus.jose.CustomParameterNameException;
 import be.atbash.ee.security.octopus.nimbus.jose.Header;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEObjectType;
 import be.atbash.ee.security.octopus.nimbus.jwk.KeyUse;
@@ -48,7 +49,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class JWSHeaderTest {
 
     @Test
-    public void testMinimalConstructor() {
+    public void testMinimalConstructor() throws CustomParameterNameException {
 
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS256);
 
@@ -297,7 +298,7 @@ public class JWSHeaderTest {
     }
 
     @Test
-    public void testBuilderWithCustomParams() {
+    public void testBuilderWithCustomParams() throws CustomParameterNameException {
 
         Map<String, Object> customParams = new HashMap<>();
         customParams.put("x", "1");
@@ -313,7 +314,7 @@ public class JWSHeaderTest {
     }
 
     @Test
-    public void testImmutableCustomParams() {
+    public void testImmutableCustomParams() throws CustomParameterNameException {
 
         Map<String, Object> customParams = new HashMap<>();
         customParams.put("x", "1");
@@ -328,7 +329,7 @@ public class JWSHeaderTest {
     }
 
     @Test
-    public void testImmutableCritHeaders() {
+    public void testImmutableCritHeaders() throws CustomParameterNameException {
 
         JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.HS256).
                 criticalParams(new HashSet<>(Arrays.asList("exp", "nbf"))).
@@ -348,12 +349,12 @@ public class JWSHeaderTest {
 
         assertThat(header.getAlgorithm()).isEqualTo(JWSAlgorithm.HS256);
 
-        List<?> audList = (List) header.getCustomParam("aud");
+        List<?> audList = (List<?>) header.getCustomParam("aud");
         assertThat(audList.get(0)).isEqualTo("a");
         assertThat(audList.get(1)).isEqualTo("b");
         assertThat(audList.size()).isEqualTo(2);
 
-        List<?> testList = (List) header.getCustomParam("test");
+        List<?> testList = (List<?>) header.getCustomParam("test");
         assertThat(testList.get(0)).isEqualTo("a");
         assertThat(testList.get(1)).isEqualTo("b");
         assertThat(testList.size()).isEqualTo(2);
@@ -361,7 +362,7 @@ public class JWSHeaderTest {
 
     @Test
     // https://bitbucket.org/connect2id/nimbus-jose-jwt/issues/154/list-of-strings-as-custom-claim-will-add
-    public void testSetCustomParamListOfStrings() {
+    public void testSetCustomParamListOfStrings() throws CustomParameterNameException {
 
         List<String> audList = new LinkedList<>();
         audList.add("a");
@@ -479,6 +480,40 @@ public class JWSHeaderTest {
 
         JWSHeader header = JWSHeader.parse(jsonObject);
         assertThat(header.getJWK()).isNull();
+    }
+
+    @Test
+    public void customParam_denyRegisteredNames() {
+        Set<String> registeredParameterNames = JWSHeader.getRegisteredParameterNames();
+
+        for (String name : registeredParameterNames) {
+
+            CustomParameterNameException exception = Assertions.assertThrows(CustomParameterNameException.class, () ->
+                    new JWSHeader.Builder(JWSAlgorithm.HS256)
+                            .customParam(name, new Object()));
+            assertThat(exception.getMessage()).isEqualTo(String.format("The parameter name \"%s\" matches a registered name", name));
+        }
+    }
+
+    @Test
+    public void customParam_denyRegisteredNames_asMap() {
+        Set<String> registeredParameterNames = JWSHeader.getRegisteredParameterNames();
+        for (String name : registeredParameterNames) {
+
+            CustomParameterNameException exception = Assertions.assertThrows(CustomParameterNameException.class, () -> {
+
+                Map<String, Object> map = new HashMap<>();
+                map.put(name, new Object());
+                new JWSHeader.Builder(JWSAlgorithm.HS256)
+                        .customParams(map);
+            });
+            assertThat(exception.getMessage()).isEqualTo(String.format("The parameter name \"%s\" matches a registered name", name));
+        }
+    }
+
+    @Test
+    public void getRegisteredParameterNames() {
+        assertThat(JWSHeader.getRegisteredParameterNames()).hasSize(10);
     }
 }
 

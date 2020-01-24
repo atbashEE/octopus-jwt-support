@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,14 @@
 package be.atbash.ee.security.octopus.nimbus.jwt.jws;
 
 
-import be.atbash.ee.security.octopus.nimbus.jose.Algorithm;
-import be.atbash.ee.security.octopus.nimbus.jose.JOSEObjectType;
-import be.atbash.ee.security.octopus.nimbus.jose.PlainHeader;
+import be.atbash.ee.security.octopus.nimbus.jose.*;
 import be.atbash.ee.security.octopus.nimbus.jwk.JWK;
 import be.atbash.ee.security.octopus.nimbus.jwt.CommonJWTHeader;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.ee.security.octopus.nimbus.util.Base64Value;
 import be.atbash.ee.security.octopus.nimbus.util.JSONObjectUtils;
 import be.atbash.ee.security.octopus.nimbus.util.X509CertChainUtils;
+import be.atbash.util.exception.AtbashUnexpectedException;
 
 import javax.json.JsonObject;
 import java.net.URI;
@@ -71,34 +70,6 @@ public final class JWSHeader extends CommonJWTHeader {
 
 
     private static final long serialVersionUID = 1L;
-
-
-    /**
-     * The registered parameter names.
-     */
-    private static final Set<String> REGISTERED_PARAMETER_NAMES;
-
-
-    /*
-     * Initialises the registered parameter name set.
-     */
-    static {
-        Set<String> claims = new HashSet<>();
-
-        claims.add("alg");
-        claims.add("jku");
-        claims.add("jwk");
-        claims.add("x5u");
-        claims.add("x5t");
-        claims.add("x5t#S256");
-        claims.add("x5c");
-        claims.add("kid");
-        claims.add("typ");
-        claims.add("cty");
-        claims.add("crit");
-
-        REGISTERED_PARAMETER_NAMES = Collections.unmodifiableSet(claims);
-    }
 
 
     /**
@@ -368,14 +339,14 @@ public final class JWSHeader extends CommonJWTHeader {
          *              to a valid JSON entity, {@code null} if not
          *              specified.
          * @return This builder.
-         * @throws IllegalArgumentException If the specified parameter
-         *                                  name matches a registered
-         *                                  parameter name.
+         * @throws CustomParameterNameException If the specified parameter
+         *                                      name matches a registered
+         *                                      parameter name.
          */
-        public Builder customParam(String name, Object value) {
+        public Builder customParam(String name, Object value) throws CustomParameterNameException {
 
             if (getRegisteredParameterNames().contains(name)) {
-                throw new IllegalArgumentException("The parameter name \"" + name + "\" matches a registered name");
+                throw new CustomParameterNameException(name);
             }
 
             if (customParams == null) {
@@ -396,9 +367,12 @@ public final class JWSHeader extends CommonJWTHeader {
          *                         {@code null} if none.
          * @return This builder.
          */
-        public Builder customParams(Map<String, Object> customParameters) {
+        public Builder customParams(Map<String, Object> customParameters) throws CustomParameterNameException {
 
-            this.customParams = customParameters;
+            for (Map.Entry<String, Object> entry : customParameters.entrySet()) {
+                customParam(entry.getKey(), entry.getValue());
+            }
+
             return this;
         }
 
@@ -422,7 +396,7 @@ public final class JWSHeader extends CommonJWTHeader {
          *
          * @return The JWS header.
          */
-        public JWSHeader build() {
+        public JWSHeader build() throws CustomParameterNameException {
 
             return new JWSHeader(
                     alg, typ, cty, crit,
@@ -441,7 +415,7 @@ public final class JWSHeader extends CommonJWTHeader {
      * @param alg The JWS algorithm ({@code alg}) parameter. Must not be
      *            "none" or {@code null}.
      */
-    public JWSHeader(JWSAlgorithm alg) {
+    public JWSHeader(JWSAlgorithm alg) throws CustomParameterNameException {
 
         this(alg, null, null, null, null, null, null, null, null, null, null, null);
     }
@@ -491,7 +465,7 @@ public final class JWSHeader extends CommonJWTHeader {
                      List<Base64Value> x5c,
                      String kid,
                      Map<String, Object> customParams,
-                     Base64URLValue parsedBase64URL) {
+                     Base64URLValue parsedBase64URL) throws CustomParameterNameException {
 
         super(alg, typ, cty, crit, jku, jwk, x5u, x5t256, x5c, kid, customParams, parsedBase64URL);
 
@@ -506,7 +480,7 @@ public final class JWSHeader extends CommonJWTHeader {
      *
      * @param jwsHeader The JWS header to copy. Must not be {@code null}.
      */
-    public JWSHeader(JWSHeader jwsHeader) {
+    public JWSHeader(JWSHeader jwsHeader) throws CustomParameterNameException {
 
         this(
                 jwsHeader.getAlgorithm(),
@@ -532,7 +506,10 @@ public final class JWSHeader extends CommonJWTHeader {
      */
     public static Set<String> getRegisteredParameterNames() {
 
-        return REGISTERED_PARAMETER_NAMES;
+        // No Additional name for JWS.
+        Set<String> result = new HashSet<>(CommonJWTHeader.getRegisteredParameterNames());
+        result.addAll(Header.getRegisteredParameterNames());
+        return result;
     }
 
 
@@ -627,11 +604,19 @@ public final class JWSHeader extends CommonJWTHeader {
             } else if ("kid".equals(name)) {
                 header = header.keyID(jsonObject.getString(name));
             } else {
-                header = header.customParam(name, JSONObjectUtils.getJsonValueAsObject(jsonObject.get(name)));
+                try {
+                    header = header.customParam(name, JSONObjectUtils.getJsonValueAsObject(jsonObject.get(name)));
+                } catch (CustomParameterNameException e) {
+                    throw new AtbashUnexpectedException(e);
+                }
             }
         }
 
-        return header.build();
+        try {
+            return header.build();
+        } catch (CustomParameterNameException e) {
+            throw new AtbashUnexpectedException(e);
+        }
     }
 
 

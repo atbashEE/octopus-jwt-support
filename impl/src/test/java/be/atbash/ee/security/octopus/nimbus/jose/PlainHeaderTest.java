@@ -169,7 +169,7 @@ public class PlainHeaderTest {
     }
 
     @Test
-    public void testBuilderWithCustomParams() {
+    public void testBuilderWithCustomParams() throws CustomParameterNameException {
 
         Map<String, Object> customParams = new HashMap<>();
         customParams.put("x", "1");

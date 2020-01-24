@@ -67,7 +67,7 @@ public class JWECryptoPartsTest {
 
 
     @Test
-    public void testConstructorWithHeader() {
+    public void testConstructorWithHeader() throws CustomParameterNameException {
 
         JWEHeader header = new JWEHeader(JWEAlgorithm.A128KW, EncryptionMethod.A128GCM);
 

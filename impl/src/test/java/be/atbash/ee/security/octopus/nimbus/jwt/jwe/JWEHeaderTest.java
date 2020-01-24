@@ -16,6 +16,7 @@
 package be.atbash.ee.security.octopus.nimbus.jwt.jwe;
 
 import be.atbash.ee.security.octopus.nimbus.jose.CompressionAlgorithm;
+import be.atbash.ee.security.octopus.nimbus.jose.CustomParameterNameException;
 import be.atbash.ee.security.octopus.nimbus.jose.Header;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEObjectType;
 import be.atbash.ee.security.octopus.nimbus.jwk.KeyUse;
@@ -46,7 +47,7 @@ public class JWEHeaderTest {
 
 
     @Test
-    public void testMinimalConstructor() {
+    public void testMinimalConstructor() throws CustomParameterNameException {
 
         JWEHeader header = new JWEHeader(JWEAlgorithm.A128KW, EncryptionMethod.A128GCM);
 
@@ -322,7 +323,7 @@ public class JWEHeaderTest {
     }
 
     @Test
-    public void testBuilderWithCustomParams() {
+    public void testBuilderWithCustomParams() throws CustomParameterNameException {
 
         Map<String, Object> customParams = new HashMap<>();
         customParams.put("x", "1");
@@ -402,7 +403,7 @@ public class JWEHeaderTest {
     }
 
     @Test
-    public void testFilterCustomClaims() {
+    public void testFilterCustomClaims() throws CustomParameterNameException {
         Map<String, Object> claims = new HashMap<>();
         claims.put("p2s", Base64URLValue.encode("something"));
         claims.put("p2c", 1234);
@@ -414,5 +415,83 @@ public class JWEHeaderTest {
         assertThat(header.getPBES2Salt().decode()).isEqualTo("something".getBytes());
         assertThat(header.getPBES2Count()).isEqualTo(1234);
         assertThat(header.getCustomParams()).isEmpty();
+    }
+
+    @Test
+    public void customParam_denyRegisteredNames() {
+        Set<String> registeredParameterNames = JWEHeader.getRegisteredParameterNames();
+        Set<String> specialCases = new HashSet<>();
+        specialCases.add("p2s");
+        specialCases.add("p2c");
+
+        registeredParameterNames.removeAll(specialCases);
+
+        for (String name : registeredParameterNames) {
+
+            CustomParameterNameException exception = Assertions.assertThrows(CustomParameterNameException.class, () ->
+                    new JWEHeader.Builder(JWEAlgorithm.A128KW, EncryptionMethod.A128GCM)
+                            .customParam(name, new Object()));
+            assertThat(exception.getMessage()).isEqualTo(String.format("The parameter name \"%s\" matches a registered name", name));
+        }
+    }
+
+    @Test
+    public void customParam_denyRegisteredNames_asMap() {
+        Set<String> registeredParameterNames = JWEHeader.getRegisteredParameterNames();
+        Set<String> specialCases = new HashSet<>();
+        specialCases.add("p2s");
+        specialCases.add("p2c");
+
+        registeredParameterNames.removeAll(specialCases);
+
+        for (String name : registeredParameterNames) {
+
+            CustomParameterNameException exception = Assertions.assertThrows(CustomParameterNameException.class, () -> {
+
+                Map<String, Object> map = new HashMap<>();
+                map.put(name, new Object());
+                new JWEHeader.Builder(JWEAlgorithm.A128KW, EncryptionMethod.A128GCM)
+                        .customParams(map);
+            });
+            assertThat(exception.getMessage()).isEqualTo(String.format("The parameter name \"%s\" matches a registered name", name));
+        }
+    }
+
+    @Test
+    public void customParam_supportSpecialCases() throws CustomParameterNameException {
+        Base64URLValue salt = Base64URLValue.encode("test");
+        JWEHeader header = new JWEHeader.Builder(JWEAlgorithm.A128KW, EncryptionMethod.A128GCM)
+                .customParam("p2s", salt)
+                .customParam("p2c", 123)
+                .build();
+
+        assertThat(header.getCustomParams()).isEmpty();  // They are all converted to the correct property
+        assertThat(header.getPBES2Count()).isEqualTo(123);
+        assertThat(header.getPBES2Salt().decode()).isEqualTo("test".getBytes());
+    }
+
+    @Test
+    public void customParam_specialCases_type1() {
+
+        IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class, () ->
+                new JWEHeader.Builder(JWEAlgorithm.A128KW, EncryptionMethod.A128GCM)
+                        .customParam("p2s", new Object()));
+
+        assertThat(exception.getMessage()).isEqualTo("The type of the parameter \"p2s\" must be Base64URLValue.");
+    }
+
+    @Test
+    public void customParam_specialCases_type2() {
+
+        IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class, () ->
+                new JWEHeader.Builder(JWEAlgorithm.A128KW, EncryptionMethod.A128GCM)
+                        .customParam("p2c", new Object()));
+
+        assertThat(exception.getMessage()).isEqualTo("The type of the parameter \"p2c\" must be Integer.");
+    }
+
+    @Test
+    public void getRegisteredParameterNames() {
+        assertThat(JWEHeader.getRegisteredParameterNames()).hasSize(19);
     }
 }

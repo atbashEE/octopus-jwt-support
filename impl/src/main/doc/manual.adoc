@@ -16,8 +16,14 @@ User manual for Atbash configuration.
 . Support OCT keys in various places
 . PlainJWT support by JWTEncode and JWTDecoder.
 
-.Updated BouncyCastle to the latest version.
+. Updated BouncyCastle to the latest version.
 . Various small fixes and updates.
+
+Breaking changes
+
+- Custom parameter for the headers can't contain any registered names anymore and a `CustomParameterNameException` is thrown.
+The exceptions are p2c and p2s for a JWEHeader which is properly handled (as regular claim value)
+- be.atbash.ee.security.octopus.jwt.decoder.JWTDecoder.decode(java.lang.String, java.lang.Class<T>) has a changed return type.
 
 === 0.9.1
 
@@ -277,7 +283,7 @@ The kind of keys which are generated, depend on the parameter you supply, which 
 
 The default size of the generated key is 2048, but you can define it using the method _.withKeySize_ on the builder.
 
-There are also builders for Elliptic Curve (EC) and Octec sequence (used in MAC and symmetric encryption) available.
+There are also builders for Elliptic Curve (EC) and Octet sequence (used in MAC and symmetric encryption) available.
 
 The key id is always required and for EC keys, the curve name is also required.
 
@@ -443,7 +449,7 @@ For valid values, see `be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm
 default : **24h**
 
 Defines the expiration period of the remote JWKSet data read from a `jku header claim.
-After that period, the dadta is discarded and needs to be reread fro the URI.
+After that period, the data is discarded and needs to be reread from the URI.
 
 The value has following format
 

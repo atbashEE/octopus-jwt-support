@@ -16,16 +16,14 @@
 package be.atbash.ee.security.octopus.nimbus.jwt.jwe;
 
 
-import be.atbash.ee.security.octopus.nimbus.jose.Algorithm;
-import be.atbash.ee.security.octopus.nimbus.jose.CompressionAlgorithm;
-import be.atbash.ee.security.octopus.nimbus.jose.JOSEObjectType;
-import be.atbash.ee.security.octopus.nimbus.jose.PlainHeader;
+import be.atbash.ee.security.octopus.nimbus.jose.*;
 import be.atbash.ee.security.octopus.nimbus.jwk.JWK;
 import be.atbash.ee.security.octopus.nimbus.jwt.CommonJWTHeader;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.ee.security.octopus.nimbus.util.Base64Value;
 import be.atbash.ee.security.octopus.nimbus.util.JSONObjectUtils;
 import be.atbash.ee.security.octopus.nimbus.util.X509CertChainUtils;
+import be.atbash.util.exception.AtbashUnexpectedException;
 
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
@@ -97,9 +95,6 @@ public final class JWEHeader extends CommonJWTHeader {
     static {
         Set<String> claims = new HashSet<>();
 
-        // FIXME Some of the claims not maintained here but in super classes are removed.
-        // This mainly for the filter() method
-        // But now functionality is altered since the getRegisteredParameterNames() doesn't return all names anymore
         claims.add("enc");
         claims.add("epk");
         claims.add("zip");
@@ -566,15 +561,19 @@ public final class JWEHeader extends CommonJWTHeader {
          *              to a valid JSON entity, {@code null} if not
          *              specified.
          * @return This builder.
-         * @throws IllegalArgumentException If the specified parameter
-         *                                  name matches a registered
-         *                                  parameter name.
+         * @throws CustomParameterNameException If the specified parameter
+         *                                      name matches a registered
+         *                                      parameter name.
          */
-        public Builder customParam(String name, Object value) {
+        public Builder customParam(String name, Object value) throws CustomParameterNameException {
 
-            if (getRegisteredParameterNames().contains(name)) {
-                throw new IllegalArgumentException("The parameter name \"" + name + "\" matches a registered name");
+            if (handleExceptionalParameter(name, value)) {
+                return this;
             }
+            if (getRegisteredParameterNames().contains(name)) {
+                throw new CustomParameterNameException(name);
+            }
+
 
             if (customParams == null) {
                 customParams = new HashMap<>();
@@ -583,6 +582,33 @@ public final class JWEHeader extends CommonJWTHeader {
             customParams.put(name, value);
 
             return this;
+        }
+
+        /**
+         * Due to JWTParametersBuilder#defineKeyBasedOnPassword() where p2s and p2c are defined as custom.
+         * TODO search for a better alternative.
+         *
+         * @param name The parameter name
+         * @param value The parameter value
+         * @return Is the parameter name one of the special names and handled by this method.
+         */
+        private boolean handleExceptionalParameter(String name, Object value) {
+            boolean result = false;
+            if ("p2s".equals(name)) {
+                if (!(value instanceof Base64URLValue)) {
+                    throw new IllegalArgumentException("The type of the parameter \"p2s\" must be Base64URLValue.");
+                }
+                this.p2s = (Base64URLValue) value;
+                result = true;
+            }
+            if ("p2c".equals(name)) {
+                if (!(value instanceof Integer)) {
+                    throw new IllegalArgumentException("The type of the parameter \"p2c\" must be Integer.");
+                }
+                this.p2c = (Integer) value;
+                result = true;
+            }
+            return result;
         }
 
 
@@ -594,9 +620,11 @@ public final class JWEHeader extends CommonJWTHeader {
          *                         {@code null} if none.
          * @return This builder.
          */
-        public Builder customParams(Map<String, Object> customParameters) {
+        public Builder customParams(Map<String, Object> customParameters) throws CustomParameterNameException {
 
-            this.customParams = customParameters;
+            for (Map.Entry<String, Object> entry : customParameters.entrySet()) {
+                customParam(entry.getKey(), entry.getValue());
+            }
             return this;
         }
 
@@ -620,7 +648,7 @@ public final class JWEHeader extends CommonJWTHeader {
          *
          * @return The JWE header.
          */
-        public JWEHeader build() {
+        public JWEHeader build() throws CustomParameterNameException {
 
             return new JWEHeader(
                     alg, enc, typ, cty, crit,
@@ -697,7 +725,7 @@ public final class JWEHeader extends CommonJWTHeader {
      * @param enc The encryption method parameter. Must not be
      *            {@code null}.
      */
-    public JWEHeader(JWEAlgorithm alg, EncryptionMethod enc) {
+    public JWEHeader(JWEAlgorithm alg, EncryptionMethod enc) throws CustomParameterNameException {
 
         this(
                 alg, enc,
@@ -779,7 +807,7 @@ public final class JWEHeader extends CommonJWTHeader {
                      Base64URLValue iv,
                      Base64URLValue tag,
                      Map<String, Object> customParams,
-                     Base64URLValue parsedBase64URL) {
+                     Base64URLValue parsedBase64URL) throws CustomParameterNameException {
 
         super(alg, typ, cty, crit, jku, jwk, x5u, x5t256, x5c, kid, filter(customParams), parsedBase64URL);
 
@@ -823,10 +851,10 @@ public final class JWEHeader extends CommonJWTHeader {
     }
 
     /**
-     * Filter out the keys which are default supported ones.
+     * Filter out the keys which are default supported ones by this JWE Header constructor.
      *
-     * @param customParams
-     * @return
+     * @param customParams All custom parameters
+     * @return Filtered custom parameters
      */
     private static Map<String, Object> filter(Map<String, Object> customParams) {
 
@@ -845,7 +873,7 @@ public final class JWEHeader extends CommonJWTHeader {
      *
      * @param jweHeader The JWE header to copy. Must not be {@code null}.
      */
-    public JWEHeader(JWEHeader jweHeader) {
+    public JWEHeader(JWEHeader jweHeader) throws CustomParameterNameException {
 
         this(
                 jweHeader.getAlgorithm(),
@@ -879,8 +907,10 @@ public final class JWEHeader extends CommonJWTHeader {
      * @return The registered parameter names, as an unmodifiable set.
      */
     public static Set<String> getRegisteredParameterNames() {
-
-        return REGISTERED_PARAMETER_NAMES;
+        HashSet<String> result = new HashSet<>(Header.getRegisteredParameterNames());
+        result.addAll(CommonJWTHeader.getRegisteredParameterNames());
+        result.addAll(REGISTERED_PARAMETER_NAMES);
+        return result;
     }
 
 
@@ -1204,11 +1234,19 @@ public final class JWEHeader extends CommonJWTHeader {
             } else if ("tag".equals(name)) {
                 header = header.authTag(Base64URLValue.from(jsonObject.getString(name)));
             } else {
-                header = header.customParam(name, JSONObjectUtils.getJsonValueAsObject(jsonObject.get(name)));
+                try {
+                    header = header.customParam(name, JSONObjectUtils.getJsonValueAsObject(jsonObject.get(name)));
+                } catch (CustomParameterNameException e) {
+                    throw new AtbashUnexpectedException(e);
+                }
             }
         }
 
-        return header.build();
+        try {
+            return header.build();
+        } catch (CustomParameterNameException e) {
+            throw new AtbashUnexpectedException(e);
+        }
     }
 
 

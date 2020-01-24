@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package be.atbash.ee.security.octopus.nimbus.jose;
 
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.ee.security.octopus.nimbus.util.JSONObjectUtils;
+import be.atbash.util.exception.AtbashUnexpectedException;
 
 import javax.json.JsonObject;
 import java.text.ParseException;
@@ -55,27 +56,6 @@ public final class PlainHeader extends Header {
 
 
     private static final long serialVersionUID = 1L;
-
-
-    /**
-     * The registered parameter names.
-     */
-    private static final Set<String> REGISTERED_PARAMETER_NAMES;
-
-
-    /*
-     * Initialises the registered parameter name set.
-     */
-    static {
-        Set<String> claims = new HashSet<>();
-
-        claims.add("alg");
-        claims.add("typ");
-        claims.add("cty");
-        claims.add("crit");
-
-        REGISTERED_PARAMETER_NAMES = Collections.unmodifiableSet(claims);
-    }
 
 
     /**
@@ -200,14 +180,14 @@ public final class PlainHeader extends Header {
          *              to a valid JSON entity, {@code null} if not
          *              specified.
          * @return This builder.
-         * @throws IllegalArgumentException If the specified parameter
+         * @throws CustomParameterNameException If the specified parameter
          *                                  name matches a registered
          *                                  parameter name.
          */
-        public Builder customParam(String name, Object value) {
+        public Builder customParam(String name, Object value) throws CustomParameterNameException {
 
             if (getRegisteredParameterNames().contains(name)) {
-                throw new IllegalArgumentException("The parameter name \"" + name + "\" matches a registered name");
+                throw new CustomParameterNameException(name);
             }
 
             if (customParams == null) {
@@ -254,7 +234,7 @@ public final class PlainHeader extends Header {
          *
          * @return The unsecured header.
          */
-        public PlainHeader build() {
+        public PlainHeader build() throws CustomParameterNameException {
 
             return new PlainHeader(typ, cty, crit, customParams, parsedBase64URL);
         }
@@ -265,7 +245,7 @@ public final class PlainHeader extends Header {
      * Creates a new minimal unsecured (plain) header with algorithm
      * {@link Algorithm#NONE none}.
      */
-    public PlainHeader() {
+    public PlainHeader() throws CustomParameterNameException {
 
         this(null, null, null, null, null);
     }
@@ -291,7 +271,7 @@ public final class PlainHeader extends Header {
                        String cty,
                        Set<String> crit,
                        Map<String, Object> customParams,
-                       Base64URLValue parsedBase64URL) {
+                       Base64URLValue parsedBase64URL) throws CustomParameterNameException {
 
         super(Algorithm.NONE, typ, cty, crit, customParams, parsedBase64URL);
     }
@@ -303,7 +283,7 @@ public final class PlainHeader extends Header {
      * @param plainHeader The unsecured header to copy. Must not be
      *                    {@code null}.
      */
-    public PlainHeader(PlainHeader plainHeader) {
+    public PlainHeader(PlainHeader plainHeader) throws CustomParameterNameException {
 
         this(
                 plainHeader.getType(),
@@ -321,8 +301,8 @@ public final class PlainHeader extends Header {
      * @return The registered parameter names, as an unmodifiable set.
      */
     public static Set<String> getRegisteredParameterNames() {
-
-        return REGISTERED_PARAMETER_NAMES;
+        // NO additional parameters
+        return Header.getRegisteredParameterNames();
     }
 
 
@@ -397,11 +377,19 @@ public final class PlainHeader extends Header {
                     header = header.criticalParams(new HashSet<>(critValues));
                 }
             } else {
-                header = header.customParam(name, JSONObjectUtils.getJsonValueAsObject(jsonObject.get(name)));
+                try {
+                    header = header.customParam(name, JSONObjectUtils.getJsonValueAsObject(jsonObject.get(name)));
+                } catch (CustomParameterNameException e) {
+                    throw new AtbashUnexpectedException(e);
+                }
             }
         }
 
-        return header.build();
+        try {
+            return header.build();
+        } catch (CustomParameterNameException e) {
+            throw new AtbashUnexpectedException(e);
+        }
     }
 
 

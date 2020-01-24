@@ -78,18 +78,30 @@ public abstract class Header implements Serializable {
 
 
     /**
-     * Empty custom parameters constant.
-     */
-    private static final Map<String, Object> EMPTY_CUSTOM_PARAMS =
-            Collections.unmodifiableMap(new HashMap<>());
-
-
-    /**
      * The original parsed Base64URL, {@code null} if the header was
      * created from scratch.
      */
     private final Base64URLValue parsedBase64URL;
 
+    /**
+     * The registered parameter names.
+     */
+    private static final Set<String> REGISTERED_PARAMETER_NAMES;
+
+
+    /*
+     * Initialises the registered parameter name set.
+     */
+    static {
+        Set<String> claims = new HashSet<>();
+
+        claims.add("alg");
+        claims.add("typ");
+        claims.add("cty");
+        claims.add("crit");
+
+        REGISTERED_PARAMETER_NAMES = Collections.unmodifiableSet(claims);
+    }
 
     /**
      * Creates a new abstract header.
@@ -112,7 +124,7 @@ public abstract class Header implements Serializable {
                      JOSEObjectType typ,
                      String cty, Set<String> crit,
                      Map<String, Object> customParams,
-                     Base64URLValue parsedBase64URL) {
+                     Base64URLValue parsedBase64URL) throws CustomParameterNameException {
 
         if (alg == null) {
             throw new IllegalArgumentException("The algorithm \"alg\" header parameter must not be null");
@@ -131,13 +143,22 @@ public abstract class Header implements Serializable {
         }
 
         if (customParams != null) {
+            checkCustomParameterNames(customParams);
             // Copy and make unmodifiable
             this.customParams = Collections.unmodifiableMap(new HashMap<>(customParams));
         } else {
-            this.customParams = EMPTY_CUSTOM_PARAMS;
+            this.customParams = Collections.unmodifiableMap(new HashMap<>());
         }
 
         this.parsedBase64URL = parsedBase64URL;
+    }
+
+    protected void checkCustomParameterNames(Map<String, Object> customParams) throws CustomParameterNameException {
+        for (String name : customParams.keySet()) {
+            if (REGISTERED_PARAMETER_NAMES.contains(name)) {
+                throw new CustomParameterNameException(name);
+            }
+        }
     }
 
 
@@ -146,7 +167,7 @@ public abstract class Header implements Serializable {
      *
      * @param header The header to copy. Must not be {@code null}.
      */
-    protected Header(Header header) {
+    protected Header(Header header) throws CustomParameterNameException {
 
         this(
                 header.getAlgorithm(),
@@ -338,6 +359,9 @@ public abstract class Header implements Serializable {
         }
     }
 
+    public static Set<String> getRegisteredParameterNames() {
+        return REGISTERED_PARAMETER_NAMES;
+    }
 
     /**
      * Parses a {@link PlainHeader}, {@link JWSHeader} or {@link JWEHeader}

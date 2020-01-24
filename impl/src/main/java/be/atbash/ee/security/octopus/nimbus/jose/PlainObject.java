@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package be.atbash.ee.security.octopus.nimbus.jose;
 
 
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
+import be.atbash.util.exception.AtbashUnexpectedException;
 
 import java.text.ParseException;
 
@@ -53,7 +54,12 @@ public class PlainObject extends JOSEObject {
 
         setPayload(payload);
 
-        header = new PlainHeader();
+        try {
+            header = new PlainHeader();
+        } catch (CustomParameterNameException e) {
+            // Since we create a PlainHeader with custom parameters, they can't contain something reserved names.
+            throw new AtbashUnexpectedException(e);
+        }
     }
 
 
