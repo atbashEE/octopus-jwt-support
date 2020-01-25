@@ -67,34 +67,18 @@ public class PasswordBasedEncrypter extends PasswordBasedCryptoProvider implemen
 	 */
 	public static final int MIN_SALT_LENGTH = 8;
 
-
-	/**
-	 * The cryptographic salt length, in bytes.
-	 */
-	//private final int saltLength;
-
-
 	/**
 	 * The minimum recommended iteration count (1000).
 	 */
 	public static final int MIN_RECOMMENDED_ITERATION_COUNT = 1000;
 
 
-	/**
-	 * The iteration count.
-	 */
-	//private final int iterationCount;
-
 
 	/**
 	 * Creates a new password-based encrypter.
 	 *
-	 * @param password       The password bytes. Must not be empty or
+	 * @param secretKey      The ke for the decryption. Must not be empty or
 	 *                       {@code null}.
-	 * @param saltLength     The length of the generated cryptographic
-	 *                       salts, in bytes. Must be at least 8 bytes.
-	 * @param iterationCount The pseudo-random function (PRF) iteration
-	 *                       count. Must be at least 1000.
 	 */
 	public PasswordBasedEncrypter(SecretKey secretKey) {
 
@@ -108,22 +92,12 @@ public class PasswordBasedEncrypter extends PasswordBasedCryptoProvider implemen
 
 		EncryptionMethod enc = header.getEncryptionMethod();
 
-		// FIXME We need to work on the header
-		/*
-		JWEHeader updatedHeader = new JWEHeader.Builder(header).
-				pbes2Salt(Base64URLValue.encode(salt)).
-				pbes2Count(iterationCount).
-				build();
-
-		 */
-		JWEHeader updatedHeader = header;
-
-		SecretKey cek = ContentCryptoProvider.generateCEK(enc, getJCAContext().getSecureRandom());
+		SecretKey cek = ContentCryptoProvider.generateCEK(enc);
 
 		// The second JWE part
-		Base64URLValue encryptedKey = Base64URLValue.encode(AESKW.wrapCEK(cek, secretKey, getJCAContext().getKeyEncryptionProvider()));
+		Base64URLValue encryptedKey = Base64URLValue.encode(AESKW.wrapCEK(cek, secretKey));
 
-		return ContentCryptoProvider.encrypt(updatedHeader, clearText, cek, encryptedKey, getJCAContext());
+		return ContentCryptoProvider.encrypt(header, clearText, cek, encryptedKey);
 	}
 
 }

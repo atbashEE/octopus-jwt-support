@@ -137,7 +137,6 @@ public class RSAKeyUtilsTest {
 
     private RSAKey generateKey() {
         KeyGenerator keyGenerator = new KeyGenerator();
-        keyGenerator.init();
         RSAGenerationParameters generationParameters = new RSAGenerationParameters.RSAGenerationParametersBuilder()
                 .withKeySize(2048)
                 .withKeyId("kid")

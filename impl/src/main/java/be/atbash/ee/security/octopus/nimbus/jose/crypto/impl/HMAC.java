@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,13 @@ package be.atbash.ee.security.octopus.nimbus.jose.crypto.impl;
 
 
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
+import be.atbash.ee.security.octopus.nimbus.jose.crypto.bc.BouncyCastleProviderSingleton;
 
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.security.Provider;
 
 
 /**
@@ -39,18 +39,14 @@ public final class HMAC {
     private HMAC() {
     }
 
-    public static Mac getInitMac(SecretKey secretKey,
-                                 Provider provider)
+    public static Mac getInitMac(SecretKey secretKey)
             throws JOSEException {
 
         Mac mac;
 
         try {
-            if (provider != null) {
-                mac = Mac.getInstance(secretKey.getAlgorithm(), provider);
-            } else {
-                mac = Mac.getInstance(secretKey.getAlgorithm());
-            }
+
+            mac = Mac.getInstance(secretKey.getAlgorithm(), BouncyCastleProviderSingleton.getInstance());
 
             mac.init(secretKey);
 
@@ -75,19 +71,16 @@ public final class HMAC {
      *                 algorithm name. Must not be {@code null}.
      * @param secret   The secret. Must not be {@code null}.
      * @param message  The message. Must not be {@code null}.
-     * @param provider The JCA provider, or {@code null} to use the default
-     *                 one.
      * @return A MAC service instance.
      * @throws JOSEException If the algorithm is not supported or the
      *                       MAC secret key is invalid.
      */
     public static byte[] compute(String alg,
                                  byte[] secret,
-                                 byte[] message,
-                                 Provider provider)
+                                 byte[] message)
             throws JOSEException {
 
-        return compute(new SecretKeySpec(secret, alg), message, provider);
+        return compute(new SecretKeySpec(secret, alg), message);
     }
 
 
@@ -98,18 +91,15 @@ public final class HMAC {
      * @param secretKey The secret key, with the appropriate HMAC
      *                  algorithm. Must not be {@code null}.
      * @param message   The message. Must not be {@code null}.
-     * @param provider  The JCA provider, or {@code null} to use the
-     *                  default one.
      * @return A MAC service instance.
      * @throws JOSEException If the algorithm is not supported or the MAC
      *                       secret key is invalid.
      */
     public static byte[] compute(SecretKey secretKey,
-                                 byte[] message,
-                                 Provider provider)
+                                 byte[] message)
             throws JOSEException {
 
-        Mac mac = getInitMac(secretKey, provider);
+        Mac mac = getInitMac(secretKey);
         mac.update(message);
         return mac.doFinal();
     }

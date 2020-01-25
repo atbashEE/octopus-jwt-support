@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto.impl;
 
 
+import be.atbash.ee.security.octopus.config.JCASupportConfiguration;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.KeyLengthException;
-import be.atbash.ee.security.octopus.nimbus.jose.jca.JWEJCAContext;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWECryptoParts;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEHeader;
@@ -29,7 +29,6 @@ import be.atbash.ee.security.octopus.nimbus.util.IntegerOverflowException;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import java.security.SecureRandom;
 import java.util.*;
 
 
@@ -89,13 +88,11 @@ public class ContentCryptoProvider {
      * Generates a Content Encryption Key (CEK) for the specified JOSE
      * encryption method.
      *
-     * @param enc       The encryption method. Must not be {@code null}.
-     * @param randomGen The secure random generator to use. Must not be
-     *                  {@code null}.
+     * @param enc The encryption method. Must not be {@code null}.
      * @return The generated CEK (with algorithm "AES").
      * @throws JOSEException If the encryption method is not supported.
      */
-    public static SecretKey generateCEK(EncryptionMethod enc, SecureRandom randomGen)
+    public static SecretKey generateCEK(EncryptionMethod enc)
             throws JOSEException {
 
         if (!SUPPORTED_ENCRYPTION_METHODS.contains(enc)) {
@@ -104,7 +101,7 @@ public class ContentCryptoProvider {
 
         byte[] cekMaterial = new byte[ByteUtils.byteLength(enc.cekBitLength())];
 
-        randomGen.nextBytes(cekMaterial);
+        JCASupportConfiguration.getInstance().getSecureRandom().nextBytes(cekMaterial);
 
         return new SecretKeySpec(cekMaterial, "AES");
     }
@@ -141,17 +138,14 @@ public class ContentCryptoProvider {
      * @param cek          The Content Encryption Key (CEK). Must not be
      *                     {@code null}.
      * @param encryptedKey The encrypted CEK, {@code null} if not required.
-     * @param jcaProvider  The JWE JCA provider specification. Must not be
-     *                     {@code null}.
      * @return The JWE crypto parts.
      * @throws JOSEException If encryption failed.
      */
     public static JWECryptoParts encrypt(JWEHeader header,
                                          byte[] clearText,
                                          SecretKey cek,
-                                         Base64URLValue encryptedKey,
-                                         JWEJCAContext jcaProvider)
-            throws JOSEException {
+                                         Base64URLValue encryptedKey)
+    throws JOSEException {
 
         checkCEKLength(cek, header.getEncryptionMethod());
 
@@ -169,22 +163,19 @@ public class ContentCryptoProvider {
                 header.getEncryptionMethod().equals(EncryptionMethod.A192CBC_HS384) ||
                 header.getEncryptionMethod().equals(EncryptionMethod.A256CBC_HS512)) {
 
-            iv = AESCBC.generateIV(jcaProvider.getSecureRandom());
+            iv = AESCBC.generateIV();
 
             authCipherText = AESCBC.encryptAuthenticated(
-                    cek, iv, plainText, aad,
-                    jcaProvider.getContentEncryptionProvider(),
-                    jcaProvider.getMACProvider());
+                    cek, iv, plainText, aad);
 
         } else if (header.getEncryptionMethod().equals(EncryptionMethod.A128GCM) ||
                 header.getEncryptionMethod().equals(EncryptionMethod.A192GCM) ||
                 header.getEncryptionMethod().equals(EncryptionMethod.A256GCM)) {
 
-            Container<byte[]> ivContainer = new Container<>(AESGCM.generateIV(jcaProvider.getSecureRandom()));
+            Container<byte[]> ivContainer = new Container<>(AESGCM.generateIV());
 
             authCipherText = AESGCM.encrypt(
-                    cek, ivContainer, plainText, aad,
-                    jcaProvider.getContentEncryptionProvider());
+                    cek, ivContainer, plainText, aad);
 
             iv = ivContainer.get();
 
@@ -215,8 +206,6 @@ public class ContentCryptoProvider {
      *                     {@code null}.
      * @param cek          The Content Encryption Key (CEK). Must not be
      *                     {@code null}.
-     * @param jcaProvider  The JWE JCA provider specification. Must not be
-     *                     {@code null}.
      * @return The clear text.
      * @throws JOSEException If decryption failed.
      */
@@ -224,9 +213,8 @@ public class ContentCryptoProvider {
                                  Base64URLValue iv,
                                  Base64URLValue cipherText,
                                  Base64URLValue authTag,
-                                 SecretKey cek,
-                                 JWEJCAContext jcaProvider)
-            throws JOSEException {
+                                 SecretKey cek)
+    throws JOSEException {
 
         checkCEKLength(cek, header.getEncryptionMethod());
 
@@ -246,9 +234,7 @@ public class ContentCryptoProvider {
                     iv.decode(),
                     cipherText.decode(),
                     aad,
-                    authTag.decode(),
-                    jcaProvider.getContentEncryptionProvider(),
-                    jcaProvider.getMACProvider());
+                    authTag.decode());
 
         } else if (header.getEncryptionMethod().equals(EncryptionMethod.A128GCM) ||
                 header.getEncryptionMethod().equals(EncryptionMethod.A192GCM) ||
@@ -259,8 +245,7 @@ public class ContentCryptoProvider {
                     iv.decode(),
                     cipherText.decode(),
                     aad,
-                    authTag.decode(),
-                    jcaProvider.getContentEncryptionProvider());
+                    authTag.decode());
 
         } else {
             throw new JOSEException(AlgorithmSupportMessage.unsupportedEncryptionMethod(

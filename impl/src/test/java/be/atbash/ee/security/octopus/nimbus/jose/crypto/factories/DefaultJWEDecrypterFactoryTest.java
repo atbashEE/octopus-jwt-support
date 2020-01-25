@@ -16,16 +16,11 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto.factories;
 
 
-import be.atbash.ee.security.octopus.nimbus.jose.crypto.bc.BouncyCastleProviderSingleton;
-import be.atbash.ee.security.octopus.nimbus.jose.jca.JCAAware;
 import be.atbash.ee.security.octopus.nimbus.jose.proc.JWEDecrypterFactory;
-import be.atbash.ee.security.octopus.nimbus.jwt.jwe.*;
-import be.atbash.ee.security.octopus.nimbus.util.ByteUtils;
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod;
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEProvider;
 import org.junit.jupiter.api.Test;
-
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
-import java.security.SecureRandom;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -42,7 +37,6 @@ public class DefaultJWEDecrypterFactoryTest {
         DefaultJWEDecrypterFactory factory = new DefaultJWEDecrypterFactory();
 
         assertThat(factory).isInstanceOf(JWEDecrypterFactory.class);
-        assertThat(factory).isInstanceOf(JCAAware.class);
         assertThat(factory).isInstanceOf(JWEProvider.class);
     }
 
@@ -73,62 +67,4 @@ public class DefaultJWEDecrypterFactoryTest {
         assertThat(factory.supportedEncryptionMethods()).hasSize(6);
     }
 
-    @Test
-    public void testDefaultJCAContext() {
-
-        DefaultJWEDecrypterFactory factory = new DefaultJWEDecrypterFactory();
-
-        assertThat(factory.getJCAContext().getSecureRandom()).isNotNull();
-        assertThat(factory.getJCAContext().getProvider()).isNull();
-        assertThat(factory.getJCAContext().getKeyEncryptionProvider()).isNull();
-        assertThat(factory.getJCAContext().getMACProvider()).isNull();
-        assertThat(factory.getJCAContext().getContentEncryptionProvider()).isNull();
-    }
-
-    @Test
-    public void testSetSecureRandom()
-            throws Exception {
-
-        SecureRandom secureRandom = new SecureRandom() {
-            @Override
-            public String getAlgorithm() {
-                return "test";
-            }
-        };
-
-        DefaultJWEDecrypterFactory factory = new DefaultJWEDecrypterFactory();
-        factory.getJCAContext().setSecureRandom(secureRandom);
-
-        KeyGenerator keyGen = KeyGenerator.getInstance("AES");
-        keyGen.init(128); // for example
-        SecretKey key = keyGen.generateKey();
-        assertThat(ByteUtils.bitLength(key.getEncoded())).isEqualTo(128);
-
-        JWEDecrypter decrypter = factory.createJWEDecrypter(new JWEHeader(JWEAlgorithm.DIR, EncryptionMethod.A128GCM), key);
-
-        assertThat(decrypter.getJCAContext().getSecureRandom().getAlgorithm()).isEqualTo("test");
-    }
-
-    @Test
-    public void testSetProvider()
-            throws Exception {
-
-        DefaultJWEDecrypterFactory factory = new DefaultJWEDecrypterFactory();
-        factory.getJCAContext().setProvider(BouncyCastleProviderSingleton.getInstance());
-        factory.getJCAContext().setKeyEncryptionProvider(BouncyCastleProviderSingleton.getInstance());
-        factory.getJCAContext().setMACProvider(BouncyCastleProviderSingleton.getInstance());
-        factory.getJCAContext().setContentEncryptionProvider(BouncyCastleProviderSingleton.getInstance());
-
-        KeyGenerator keyGen = KeyGenerator.getInstance("AES");
-        keyGen.init(128); // for example
-        SecretKey key = keyGen.generateKey();
-        assertThat(ByteUtils.bitLength(key.getEncoded())).isEqualTo(128);
-
-        JWEDecrypter decrypter = factory.createJWEDecrypter(new JWEHeader(JWEAlgorithm.DIR, EncryptionMethod.A128GCM), key);
-
-        assertThat(decrypter.getJCAContext().getProvider().getName()).isEqualTo("BC");
-        assertThat(decrypter.getJCAContext().getKeyEncryptionProvider().getName()).isEqualTo("BC");
-        assertThat(decrypter.getJCAContext().getMACProvider().getName()).isEqualTo("BC");
-        assertThat(decrypter.getJCAContext().getContentEncryptionProvider().getName()).isEqualTo("BC");
-    }
 }

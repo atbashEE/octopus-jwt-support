@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ import be.atbash.ee.security.octopus.nimbus.util.Container;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import java.security.Provider;
 
 /**
  * AES GCM methods for Content Encryption Key (CEK) encryption and
@@ -46,18 +45,15 @@ public final class AESGCMKW {
      *                 {@code null} either.
      * @param kek      The AES Key Encryption Key (KEK). Must not be
      *                 {@code null}.
-     * @param provider The specific JCA provider to use, {@code null}
-     *                 implies the default system one.
      * @return The encrypted Content Encryption Key (CEK).
      * @throws JOSEException If encryption failed.
      */
     public static AuthenticatedCipherText encryptCEK(SecretKey cek,
                                                      Container<byte[]> iv,
-                                                     SecretKey kek,
-                                                     Provider provider)
+                                                     SecretKey kek)
             throws JOSEException {
 
-        return AESGCM.encrypt(kek, iv, cek.getEncoded(), new byte[0], provider);
+        return AESGCM.encrypt(kek, iv, cek.getEncoded(), new byte[0]);
     }
 
 
@@ -71,19 +67,16 @@ public final class AESGCMKW {
      * @param authEncrCEK The encrypted Content Encryption Key (CEK) to
      *                    decrypt and authentication tag. Must not be
      *                    {@code null}.
-     * @param provider    The JCA provider, or {@code null} to use the
-     *                    default one.
      * @return The decrypted Content Encryption Key (CEK).
      * @throws JOSEException If decryption failed.
      */
     public static SecretKey decryptCEK(SecretKey kek,
                                        byte[] iv,
                                        AuthenticatedCipherText authEncrCEK,
-                                       int keyLength,
-                                       Provider provider)
+                                       int keyLength)
             throws JOSEException {
 
-        byte[] keyBytes = AESGCM.decrypt(kek, iv, authEncrCEK.getCipherText(), new byte[0], authEncrCEK.getAuthenticationTag(), provider);
+        byte[] keyBytes = AESGCM.decrypt(kek, iv, authEncrCEK.getCipherText(), new byte[0], authEncrCEK.getAuthenticationTag());
 
         if (ByteUtils.safeBitLength(keyBytes) != keyLength) {
 

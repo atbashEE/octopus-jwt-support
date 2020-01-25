@@ -33,7 +33,6 @@ public class KeyGeneratorTest {
     @BeforeEach
     public void setup() {
         keyGenerator = new KeyGenerator();
-        keyGenerator.init();
     }
 
     @Test

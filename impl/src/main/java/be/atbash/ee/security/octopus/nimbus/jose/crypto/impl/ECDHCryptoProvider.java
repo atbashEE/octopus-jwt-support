@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -186,7 +186,6 @@ public abstract class ECDHCryptoProvider extends BaseJWEProvider {
         EncryptionMethod enc = header.getEncryptionMethod();
 
         // Derive shared key via concat KDF
-        getConcatKDF().getJCAContext().setProvider(getJCAContext().getMACProvider()); // update before concat
         SecretKey sharedKey = ECDH.deriveSharedKey(header, Z, getConcatKDF());
 
         SecretKey cek;
@@ -199,14 +198,14 @@ public abstract class ECDHCryptoProvider extends BaseJWEProvider {
             if (contentEncryptionKey != null) { // Use externally supplied CEK
                 cek = contentEncryptionKey;
             } else { // Generate the CEK according to the enc method
-                cek = ContentCryptoProvider.generateCEK(enc, getJCAContext().getSecureRandom());
+                cek = ContentCryptoProvider.generateCEK(enc);
             }
-            encryptedKey = Base64URLValue.encode(AESKW.wrapCEK(cek, sharedKey, getJCAContext().getKeyEncryptionProvider()));
+            encryptedKey = Base64URLValue.encode(AESKW.wrapCEK(cek, sharedKey));
         } else {
             throw new JOSEException("Unexpected JWE ECDH algorithm mode: " + algMode);
         }
 
-        return ContentCryptoProvider.encrypt(header, clearText, cek, encryptedKey, getJCAContext());
+        return ContentCryptoProvider.encrypt(header, clearText, cek, encryptedKey);
     }
 
 
@@ -225,7 +224,6 @@ public abstract class ECDHCryptoProvider extends BaseJWEProvider {
         ECDH.AlgorithmMode algMode = ECDH.resolveAlgorithmMode(alg);
 
         // Derive shared key via concat KDF
-        getConcatKDF().getJCAContext().setProvider(getJCAContext().getMACProvider()); // update before concat
         SecretKey sharedKey = ECDH.deriveSharedKey(header, Z, getConcatKDF());
 
         SecretKey cek;
@@ -236,12 +234,12 @@ public abstract class ECDHCryptoProvider extends BaseJWEProvider {
             if (encryptedKey == null) {
                 throw new JOSEException("Missing JWE encrypted key");
             }
-            cek = AESKW.unwrapCEK(sharedKey, encryptedKey.decode(), getJCAContext().getKeyEncryptionProvider());
+            cek = AESKW.unwrapCEK(sharedKey, encryptedKey.decode());
         } else {
             throw new JOSEException("Unexpected JWE ECDH algorithm mode: " + algMode);
         }
 
-        return ContentCryptoProvider.decrypt(header, iv, cipherText, authTag, cek, getJCAContext());
+        return ContentCryptoProvider.decrypt(header, iv, cipherText, authTag, cek);
     }
 
 

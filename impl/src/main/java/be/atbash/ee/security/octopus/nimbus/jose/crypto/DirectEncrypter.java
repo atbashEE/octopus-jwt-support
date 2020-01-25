@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -133,6 +133,6 @@ public class DirectEncrypter extends DirectCryptoProvider implements JWEEncrypte
 
         Base64URLValue encryptedKey = null; // The second JWE part
 
-        return ContentCryptoProvider.encrypt(header, clearText, getKey(), encryptedKey, getJCAContext());
+        return ContentCryptoProvider.encrypt(header, clearText, getKey(), encryptedKey);
     }
 }

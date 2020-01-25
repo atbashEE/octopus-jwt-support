@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,11 @@ package be.atbash.ee.security.octopus.nimbus.jose.crypto.impl;
 
 
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
+import be.atbash.ee.security.octopus.nimbus.jose.crypto.bc.BouncyCastleProviderSingleton;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
-import java.security.Provider;
 import java.security.Signature;
 import java.security.spec.MGF1ParameterSpec;
 import java.security.spec.PSSParameterSpec;
@@ -45,8 +45,7 @@ public final class RSASSA {
      * @return A signer and verifier instance.
      * @throws JOSEException If the algorithm is not supported.
      */
-    public static Signature getSignerAndVerifier(JWSAlgorithm alg,
-                                                 Provider provider)
+    public static Signature getSignerAndVerifier(JWSAlgorithm alg)
             throws JOSEException {
 
         // The JCE crypto provider uses different alg names
@@ -79,11 +78,9 @@ public final class RSASSA {
 
         Signature signature;
         try {
-            if (provider != null) {
-                signature = Signature.getInstance(jcaAlg, provider);
-            } else {
-                signature = Signature.getInstance(jcaAlg);
-            }
+
+            signature = Signature.getInstance(jcaAlg, BouncyCastleProviderSingleton.getInstance());
+
         } catch (NoSuchAlgorithmException e) {
             throw new JOSEException("Unsupported RSASSA algorithm: " + e.getMessage(), e);
         }

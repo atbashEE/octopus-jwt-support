@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,15 @@
 package be.atbash.ee.security.octopus.keys.generator;
 
 import be.atbash.ee.security.octopus.UnsupportedKeyType;
+import be.atbash.ee.security.octopus.config.JCASupportConfiguration;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.bc.BouncyCastleProviderSingleton;
 import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import be.atbash.util.PublicAPI;
 import be.atbash.util.exception.AtbashUnexpectedException;
 import org.bouncycastle.jce.ECNamedCurveTable;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.spec.ECParameterSpec;
 
-import javax.annotation.PostConstruct;
 import javax.crypto.interfaces.DHPrivateKey;
 import javax.crypto.interfaces.DHPublicKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -42,22 +41,7 @@ import java.util.List;
 @ApplicationScoped
 public class KeyGenerator {
 
-    private boolean initialized = false;
-
-    @PostConstruct
-    public void init() {
-        Security.addProvider(new BouncyCastleProvider());
-        initialized = true;
-    }
-
-    private void doInitialize() {
-        if (!initialized) {
-            init();
-        }
-    }
-
     public List<AtbashKey> generateKeys(GenerationParameters parameters) {
-        doInitialize();
         List<AtbashKey> result = null;
         if (KeyType.RSA.equals(parameters.getKeyType())) {
             result = generateRSAKeys((RSAGenerationParameters) parameters);
@@ -82,8 +66,10 @@ public class KeyGenerator {
 
     private List<AtbashKey> generateRSAKeys(RSAGenerationParameters generationParameters) {
         try {
-            KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA", "BC");  // Do we need BC?
-            generator.initialize(generationParameters.getKeySize(), new SecureRandom());
+
+            KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA", BouncyCastleProviderSingleton.getInstance());
+
+            generator.initialize(generationParameters.getKeySize(), JCASupportConfiguration.getInstance().getSecureRandom());
             KeyPair kp = generator.generateKeyPair();
 
             RSAPublicKey pub = (RSAPublicKey) kp.getPublic();
@@ -93,7 +79,7 @@ public class KeyGenerator {
             result.add(new AtbashKey(generationParameters.getKid(), pub));
             result.add(new AtbashKey(generationParameters.getKid(), priv));
             return result;
-        } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
+        } catch (NoSuchAlgorithmException e) {
             throw new AtbashUnexpectedException(e);
         }
     }
@@ -104,7 +90,7 @@ public class KeyGenerator {
             if (generationParameters.getParameterSpec() != null) {
                 generator.initialize(generationParameters.getParameterSpec());
             } else {
-                generator.initialize(generationParameters.getKeySize(), new SecureRandom());
+                generator.initialize(generationParameters.getKeySize(), JCASupportConfiguration.getInstance().getSecureRandom());
 
             }
             KeyPair kp = generator.generateKeyPair();
@@ -124,9 +110,11 @@ public class KeyGenerator {
     private List<AtbashKey> generateECKeys(ECGenerationParameters generationParameters) {
         try {
             ECParameterSpec ecSpec = ECNamedCurveTable.getParameterSpec(generationParameters.getCurveName());
-            KeyPairGenerator g = KeyPairGenerator.getInstance("ECDSA", "BC");
-            g.initialize(ecSpec, new SecureRandom());
-            KeyPair kp = g.generateKeyPair();
+
+            KeyPairGenerator generator = KeyPairGenerator.getInstance("ECDSA", BouncyCastleProviderSingleton.getInstance());
+
+            generator.initialize(ecSpec, JCASupportConfiguration.getInstance().getSecureRandom());
+            KeyPair kp = generator.generateKeyPair();
 
             ECPublicKey pub = (ECPublicKey) kp.getPublic();
             ECPrivateKey priv = (ECPrivateKey) kp.getPrivate();
@@ -135,7 +123,7 @@ public class KeyGenerator {
             result.add(new AtbashKey(generationParameters.getKid(), pub));
             result.add(new AtbashKey(generationParameters.getKid(), priv));
             return result;
-        } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException | NoSuchProviderException e) {
+        } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException e) {
             throw new AtbashUnexpectedException(e);
         }
     }
@@ -144,7 +132,7 @@ public class KeyGenerator {
         try {
             // FIXME support for other algorithms
             KeyPairGenerator g = KeyPairGenerator.getInstance("Ed25519", BouncyCastleProviderSingleton.getInstance());
-            //g.initialize(256, new SecureRandom()); Not needed as 256 is the only allowed keySize and new SecureRandom() is taken by default.
+            g.initialize(256, JCASupportConfiguration.getInstance().getSecureRandom());
             KeyPair kp = g.generateKeyPair();
 
 
@@ -159,7 +147,7 @@ public class KeyGenerator {
 
     private List<AtbashKey> generateOctKey(OCTGenerationParameters generationParameters) {
         byte[] bytes = new byte[generationParameters.getKeySize() / 8];
-        new SecureRandom().nextBytes(bytes);
+        JCASupportConfiguration.getInstance().getSecureRandom().nextBytes(bytes);
 
         SecretKeySpec secretKey = new SecretKeySpec(bytes, "AES");
 

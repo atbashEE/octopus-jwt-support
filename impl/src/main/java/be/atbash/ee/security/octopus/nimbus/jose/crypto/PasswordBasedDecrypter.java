@@ -72,7 +72,7 @@ public class PasswordBasedDecrypter extends PasswordBasedCryptoProvider implemen
     /**
      * Creates a new password-based decrypter.
      *
-     * @param password The password bytes. Must not be empty or
+     * @param secretKey The Key to use for the encryption
      *                 {@code null}.
      */
     public PasswordBasedDecrypter(SecretKey secretKey) {
@@ -117,27 +117,14 @@ public class PasswordBasedDecrypter extends PasswordBasedCryptoProvider implemen
             throw new JOSEException("Missing JWE \"p2s\" header parameter");
         }
 
-        byte[] salt = header.getPBES2Salt().decode();
-
         if (header.getPBES2Count() < 1) {
             throw new JOSEException("Missing JWE \"p2c\" header parameter");
         }
 
-        int iterationCount = header.getPBES2Count();
-
         critPolicy.ensureHeaderPasses(header);
 
-        // FIXME Define this a helper otherwise SecretKey can't be recreated.
-		/*
-		JWEAlgorithm alg = header.getAlgorithm();
-		byte[] formattedSalt = PBKDF2.formatSalt(alg, salt);
-		PRFParams prfParams = PRFParams.resolve(alg, getJCAContext().getMACProvider());
-		SecretKey psKey = PBKDF2.deriveKey(getPassword(), formattedSalt, iterationCount, prfParams);
+        SecretKey cek = AESKW.unwrapCEK(secretKey, encryptedKey.decode());
 
-		 */
-
-        SecretKey cek = AESKW.unwrapCEK(secretKey, encryptedKey.decode(), getJCAContext().getKeyEncryptionProvider());
-
-        return ContentCryptoProvider.decrypt(header, iv, cipherText, authTag, cek, getJCAContext());
+        return ContentCryptoProvider.decrypt(header, iv, cipherText, authTag, cek);
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto;
 
 
+import be.atbash.ee.security.octopus.config.JCASupportConfiguration;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.AlgorithmSupportMessage;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.ECDSA;
@@ -165,8 +166,8 @@ public class ECDSASigner extends ECDSAProvider implements JWSSigner {
         byte[] jcaSignature;
 
         try {
-            Signature dsa = ECDSA.getSignerAndVerifier(alg, getJCAContext().getProvider());
-            dsa.initSign(privateKey, getJCAContext().getSecureRandom());
+            Signature dsa = ECDSA.getSignerAndVerifier(alg);
+            dsa.initSign(privateKey, JCASupportConfiguration.getInstance().getSecureRandom());
             dsa.update(signingInput);
             jcaSignature = dsa.sign();
 

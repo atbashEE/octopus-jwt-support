@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,11 @@
  */
 package be.atbash.ee.security.octopus.keys.writer.encoder;
 
+import be.atbash.ee.security.octopus.config.JCASupportConfiguration;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.writer.KeyEncoderParameters;
+import be.atbash.ee.security.octopus.nimbus.jose.crypto.bc.BouncyCastleProviderSingleton;
 import be.atbash.util.StringUtils;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMEncryptor;
 import org.bouncycastle.openssl.jcajce.JcaMiscPEMGenerator;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
@@ -27,7 +28,6 @@ import org.bouncycastle.openssl.jcajce.JcePEMEncryptorBuilder;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
-import java.security.SecureRandom;
 
 /**
  *
@@ -58,8 +58,8 @@ public class PemKeyEncoderPrivatePartPKCS1 implements KeyEncoder {
             generator = new JcaMiscPEMGenerator(atbashKey.getKey());
         } else {
             JcePEMEncryptorBuilder builder = new JcePEMEncryptorBuilder(encryptionAlg);
-            builder.setProvider(BouncyCastleProvider.PROVIDER_NAME);
-            builder.setSecureRandom(new SecureRandom());
+            builder.setProvider(BouncyCastleProviderSingleton.getInstance());
+            builder.setSecureRandom(JCASupportConfiguration.getInstance().getSecureRandom());
             PEMEncryptor encryptor = builder.build(parameters.getKeyPassword());
             generator = new JcaMiscPEMGenerator(atbashKey.getKey(), encryptor);
         }

@@ -19,20 +19,23 @@ import be.atbash.ee.security.octopus.UnsupportedKeyType;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.ECCurveHelper;
 import be.atbash.ee.security.octopus.keys.writer.KeyEncoderParameters;
+import be.atbash.ee.security.octopus.nimbus.jose.crypto.bc.BouncyCastleProviderSingleton;
 import be.atbash.ee.security.octopus.nimbus.jwk.*;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.util.exception.AtbashUnexpectedException;
 import org.bouncycastle.asn1.*;
 import org.bouncycastle.jcajce.provider.asymmetric.edec.BCEdDSAPrivateKey;
 import org.bouncycastle.jce.ECNamedCurveTable;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.spec.ECPublicKeySpec;
 import org.bouncycastle.math.ec.ECPoint;
 import org.bouncycastle.math.ec.rfc8032.Ed25519;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.security.*;
+import java.security.Key;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPrivateKey;
@@ -46,7 +49,7 @@ import java.security.spec.InvalidKeySpecException;
 public class JwkKeyEncoderPrivatePart extends AbstractEncoder implements KeyEncoder {
 
     public JwkKeyEncoderPrivatePart() {
-        Security.addProvider(new BouncyCastleProvider());
+        //Security.addProvider(new BouncyCastleProvider());  // FIXME This is JVM Wide
     }
 
     @Override
@@ -137,14 +140,15 @@ public class JwkKeyEncoderPrivatePart extends AbstractEncoder implements KeyEnco
             // TODO Optimize
             if (key instanceof org.bouncycastle.jce.interfaces.ECPrivateKey) {
                 try {
-                    KeyFactory keyFactory = KeyFactory.getInstance("ECDSA", "BC");
+
+                    KeyFactory keyFactory = KeyFactory.getInstance("ECDSA", BouncyCastleProviderSingleton.getInstance());
                     org.bouncycastle.jce.spec.ECParameterSpec ecSpec = ECNamedCurveTable.getParameterSpec(curve.getStdName());
 
                     ECPoint q = ecSpec.getG().multiply(((org.bouncycastle.jce.interfaces.ECPrivateKey) key).getD());
 
                     ECPublicKeySpec pubSpec = new ECPublicKeySpec(q, ecSpec);
                     return keyFactory.generatePublic(pubSpec);
-                } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeySpecException e) {
+                } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
                     throw new AtbashUnexpectedException(e);
                 }
             }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,11 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto.impl;
 
 
+import be.atbash.ee.security.octopus.nimbus.jose.crypto.bc.BouncyCastleProviderSingleton;
+
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 import java.security.NoSuchAlgorithmException;
-import java.security.Provider;
 
 
 /**
@@ -34,19 +35,14 @@ public final class CipherHelper {
     }
 
     /**
-     * Instantiates a cipher with an (optional) JCA provider.
+     * Instantiates a cipher.
      *
-     * @param name     The name of the cipher. Must not be {@code null}.
-     * @param provider The JCA provider, or {@code null} to use the default
-     *                 one.
+     * @param name The name of the cipher. Must not be {@code null}.
      */
-    public static Cipher getInstance(String name, Provider provider)
+    public static Cipher getInstance(String name)
             throws NoSuchAlgorithmException, NoSuchPaddingException {
 
-        if (provider == null) {
-            return Cipher.getInstance(name);
-        } else {
-            return Cipher.getInstance(name, provider);
-        }
+        return Cipher.getInstance(name, BouncyCastleProviderSingleton.getInstance());
+
     }
 }

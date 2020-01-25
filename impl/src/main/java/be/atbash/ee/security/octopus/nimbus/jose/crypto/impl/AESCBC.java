@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto.impl;
 
 
+import be.atbash.ee.security.octopus.config.JCASupportConfiguration;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.utils.ConstantTimeUtils;
 import be.atbash.ee.security.octopus.nimbus.util.ByteUtils;
@@ -25,8 +26,6 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.ByteBuffer;
-import java.security.Provider;
-import java.security.SecureRandom;
 import java.util.Arrays;
 
 
@@ -54,14 +53,12 @@ public final class AESCBC {
      * Generates a random 128 bit (16 byte) Initialisation Vector(IV) for
      * use in AES-CBC encryption.
      *
-     * @param randomGen The secure random generator to use. Must be
-     *                  correctly initialised and not {@code null}.
      * @return The random 128 bit IV, as 16 byte array.
      */
-    public static byte[] generateIV(SecureRandom randomGen) {
+    public static byte[] generateIV() {
 
         byte[] bytes = new byte[ByteUtils.byteLength(IV_BIT_LENGTH)];
-        randomGen.nextBytes(bytes);
+        JCASupportConfiguration.getInstance().getSecureRandom().nextBytes(bytes);
         return bytes;
     }
 
@@ -74,20 +71,17 @@ public final class AESCBC {
      *                      else creates a decryption cipher.
      * @param iv            The initialisation vector (IV). Must not be
      *                      {@code null}.
-     * @param provider      The JCA provider, or {@code null} to use the
-     *                      default one.
      * @return The AES/CBC/PKCS5Padding cipher.
      */
     private static Cipher createAESCBCCipher(SecretKey secretKey,
                                              boolean forEncryption,
-                                             byte[] iv,
-                                             Provider provider)
+                                             byte[] iv)
             throws JOSEException {
 
         Cipher cipher;
 
         try {
-            cipher = CipherHelper.getInstance("AES/CBC/PKCS5Padding", provider);
+            cipher = CipherHelper.getInstance("AES/CBC/PKCS5Padding");
 
             SecretKeySpec keyspec = new SecretKeySpec(secretKey.getEncoded(), "AES");
 
@@ -118,18 +112,15 @@ public final class AESCBC {
      * @param iv        The initialisation vector (IV). Must not be
      *                  {@code null}.
      * @param plainText The plain text. Must not be {@code null}.
-     * @param provider  The JCA provider, or {@code null} to use the
-     *                  default one.
      * @return The cipher text.
      * @throws JOSEException If encryption failed.
      */
     public static byte[] encrypt(SecretKey secretKey,
                                  byte[] iv,
-                                 byte[] plainText,
-                                 Provider provider)
+                                 byte[] plainText)
             throws JOSEException {
 
-        Cipher cipher = createAESCBCCipher(secretKey, true, iv, provider);
+        Cipher cipher = createAESCBCCipher(secretKey, true, iv);
 
         try {
             return cipher.doFinal(plainText);
@@ -156,26 +147,20 @@ public final class AESCBC {
      * @param plainText   The plain text. Must not be {@code null}.
      * @param aad         The additional authenticated data. Must not be
      *                    {@code null}.
-     * @param ceProvider  The JCA provider for the content encryption, or
-     *                    {@code null} to use the default one.
-     * @param macProvider The JCA provider for the MAC computation, or
-     *                    {@code null} to use the default one.
      * @return The authenticated cipher text.
      * @throws JOSEException If encryption failed.
      */
     public static AuthenticatedCipherText encryptAuthenticated(SecretKey secretKey,
                                                                byte[] iv,
                                                                byte[] plainText,
-                                                               byte[] aad,
-                                                               Provider ceProvider,
-                                                               Provider macProvider)
+                                                               byte[] aad)
             throws JOSEException {
 
         // Extract MAC + AES/CBC keys from input secret key
         CompositeKey compositeKey = new CompositeKey(secretKey);
 
         // Encrypt plain text
-        byte[] cipherText = encrypt(compositeKey.getAESKey(), iv, plainText, ceProvider);
+        byte[] cipherText = encrypt(compositeKey.getAESKey(), iv, plainText);
 
         // AAD length to 8 byte array
         byte[] al = AAD.computeLength(aad);
@@ -183,7 +168,8 @@ public final class AESCBC {
         // Do MAC
         int hmacInputLength = aad.length + iv.length + cipherText.length + al.length;
         byte[] hmacInput = ByteBuffer.allocate(hmacInputLength).put(aad).put(iv).put(cipherText).put(al).array();
-        byte[] hmac = HMAC.compute(compositeKey.getMACKey(), hmacInput, macProvider);
+
+        byte[] hmac = HMAC.compute(compositeKey.getMACKey(), hmacInput);
         byte[] authTag = Arrays.copyOf(hmac, compositeKey.getTruncatedMACByteLength());
 
         return new AuthenticatedCipherText(cipherText, authTag);
@@ -196,18 +182,15 @@ public final class AESCBC {
      * @param iv         The initialisation vector (IV). Must not be
      *                   {@code null}.
      * @param cipherText The cipher text. Must not be {@code null}.
-     * @param provider   The JCA provider, or {@code null} to use the
-     *                   default one.
      * @return The decrypted plain text.
      * @throws JOSEException If decryption failed.
      */
     public static byte[] decrypt(SecretKey secretKey,
                                  byte[] iv,
-                                 byte[] cipherText,
-                                 Provider provider)
+                                 byte[] cipherText)
             throws JOSEException {
 
-        Cipher cipher = createAESCBCCipher(secretKey, false, iv, provider);
+        Cipher cipher = createAESCBCCipher(secretKey, false, iv);
 
         try {
             return cipher.doFinal(cipherText);
@@ -235,10 +218,6 @@ public final class AESCBC {
      * @param aad         The additional authenticated data. Must not be
      *                    {@code null}.
      * @param authTag     The authentication tag. Must not be {@code null}.
-     * @param ceProvider  The JCA provider for the content encryption, or
-     *                    {@code null} to use the default one.
-     * @param macProvider The JCA provider for the MAC computation, or
-     *                    {@code null} to use the default one.
      * @return The decrypted plain text.
      * @throws JOSEException If decryption failed.
      */
@@ -246,9 +225,7 @@ public final class AESCBC {
                                               byte[] iv,
                                               byte[] cipherText,
                                               byte[] aad,
-                                              byte[] authTag,
-                                              Provider ceProvider,
-                                              Provider macProvider)
+                                              byte[] authTag)
             throws JOSEException {
 
 
@@ -266,7 +243,7 @@ public final class AESCBC {
                 put(cipherText).
                 put(al).
                 array();
-        byte[] hmac = HMAC.compute(compositeKey.getMACKey(), hmacInput, macProvider);
+        byte[] hmac = HMAC.compute(compositeKey.getMACKey(), hmacInput);
 
         byte[] expectedAuthTag = Arrays.copyOf(hmac, compositeKey.getTruncatedMACByteLength());
 
@@ -274,7 +251,7 @@ public final class AESCBC {
             throw new JOSEException("MAC check failed");
         }
 
-        return decrypt(compositeKey.getAESKey(), iv, cipherText, ceProvider);
+        return decrypt(compositeKey.getAESKey(), iv, cipherText);
     }
 
 

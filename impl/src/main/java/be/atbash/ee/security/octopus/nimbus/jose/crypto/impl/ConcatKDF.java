@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,7 @@ package be.atbash.ee.security.octopus.nimbus.jose.crypto.impl;
 
 
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
-import be.atbash.ee.security.octopus.nimbus.jose.jca.JCAAware;
-import be.atbash.ee.security.octopus.nimbus.jose.jca.JCAContext;
+import be.atbash.ee.security.octopus.nimbus.jose.crypto.bc.BouncyCastleProviderSingleton;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.ee.security.octopus.nimbus.util.ByteUtils;
 import be.atbash.ee.security.octopus.nimbus.util.IntegerUtils;
@@ -29,7 +28,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.Provider;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -42,19 +40,13 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * @author Vladimir Dzhuvinov
  * @version 2017-06-01
  */
-public class ConcatKDF implements JCAAware<JCAContext> {
+public class ConcatKDF {
 
 
     /**
      * The JCA name of the hash algorithm.
      */
     private final String jcaHashAlg;
-
-
-    /**
-     * The JCA context..
-     */
-    private final JCAContext jcaContext = new JCAContext();
 
 
     /**
@@ -83,14 +75,6 @@ public class ConcatKDF implements JCAAware<JCAContext> {
 
         return jcaHashAlg;
     }
-
-
-    @Override
-    public JCAContext getJCAContext() {
-
-        return jcaContext;
-    }
-
 
     /**
      * Derives a key from the specified inputs.
@@ -203,13 +187,8 @@ public class ConcatKDF implements JCAAware<JCAContext> {
     private MessageDigest getMessageDigest()
             throws JOSEException {
 
-        Provider provider = getJCAContext().getProvider();
-
         try {
-            if (provider == null)
-                return MessageDigest.getInstance(jcaHashAlg);
-            else
-                return MessageDigest.getInstance(jcaHashAlg, provider);
+            return MessageDigest.getInstance(jcaHashAlg, BouncyCastleProviderSingleton.getInstance());
         } catch (NoSuchAlgorithmException e) {
             throw new JOSEException("Couldn't get message digest for KDF: " + e.getMessage(), e);
         }

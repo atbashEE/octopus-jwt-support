@@ -15,6 +15,7 @@
  */
 package be.atbash.ee.security.octopus.util;
 
+import be.atbash.ee.security.octopus.config.JCASupportConfiguration;
 import be.atbash.ee.security.octopus.exception.DecryptionFailedException;
 import be.atbash.ee.security.octopus.exception.MissingPasswordException;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
@@ -42,8 +43,6 @@ public final class EncryptionHelper {
 
     private static final int ITERATION_COUNT = 65556;
 
-    private static final SecureRandom random = new SecureRandom();
-
     private EncryptionHelper() {
     }
 
@@ -58,7 +57,7 @@ public final class EncryptionHelper {
 
         // generate correct cipher key for AES, based on the supplied PW.
         byte[] saltBytes = new byte[20];
-        random.nextBytes(saltBytes);
+        JCASupportConfiguration.getInstance().getSecureRandom().nextBytes(saltBytes);
 
         try {
             // Derive the key
@@ -123,7 +122,7 @@ public final class EncryptionHelper {
     public static String encode(byte[] value, SecretKey secretKey) {
 
         byte[] saltBytes = new byte[20];
-        random.nextBytes(saltBytes);
+        JCASupportConfiguration.getInstance().getSecureRandom().nextBytes(saltBytes);
 
         try {
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -184,7 +184,7 @@ public class MACVerifier extends MACProvider implements JWSVerifier {
         }
 
         String jcaAlg = getJCAAlgorithmName(header.getAlgorithm());
-        byte[] expectedHMAC = HMAC.compute(jcaAlg, getSecret(), signedContent, getJCAContext().getProvider());
+        byte[] expectedHMAC = HMAC.compute(jcaAlg, getSecret(), signedContent);
         return ConstantTimeUtils.areEqual(expectedHMAC, signature.decode());
     }
 }

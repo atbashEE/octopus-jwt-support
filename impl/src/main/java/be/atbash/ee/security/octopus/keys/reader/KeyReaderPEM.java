@@ -19,12 +19,12 @@ import be.atbash.ee.security.octopus.exception.MissingPasswordException;
 import be.atbash.ee.security.octopus.exception.ResourceNotFoundException;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup;
+import be.atbash.ee.security.octopus.nimbus.jose.crypto.bc.BouncyCastleProviderSingleton;
 import be.atbash.util.StringUtils;
 import be.atbash.util.exception.AtbashUnexpectedException;
 import be.atbash.util.resource.ResourceUtil;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMDecryptorProvider;
 import org.bouncycastle.openssl.PEMEncryptedKeyPair;
 import org.bouncycastle.openssl.PEMKeyPair;
@@ -43,8 +43,8 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.security.KeyPair;
 import java.security.PrivateKey;
+import java.security.Provider;
 import java.security.PublicKey;
-import java.security.Security;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,8 +53,6 @@ public class KeyReaderPEM {
         List<AtbashKey> result = new ArrayList<>();
 
         try {
-            Security.addProvider(new BouncyCastleProvider());
-
             ResourceUtil resourceUtil = ResourceUtil.getInstance();
             if (!resourceUtil.resourceExists(path)) {
                 throw new ResourceNotFoundException(path);
@@ -70,7 +68,8 @@ public class KeyReaderPEM {
             Object pemData = pemParser.readObject();
             reader.close();
 
-            JcaPEMKeyConverter converter = new JcaPEMKeyConverter().setProvider("BC");
+            Provider provider = BouncyCastleProviderSingleton.getInstance();
+            JcaPEMKeyConverter converter = new JcaPEMKeyConverter().setProvider(provider);
             if (pemData instanceof PEMEncryptedKeyPair) {
                 // Encrypted key - we will use provided password
                 PEMEncryptedKeyPair ckp = (PEMEncryptedKeyPair) pemData;
@@ -80,7 +79,7 @@ public class KeyReaderPEM {
                     throw new MissingPasswordException(MissingPasswordException.ObjectType.STORE, path);
                 }
 
-                PEMDecryptorProvider decProv = new JcePEMDecryptorProviderBuilder().build(passphrase);
+                PEMDecryptorProvider decProv = new JcePEMDecryptorProviderBuilder().setProvider(provider).build(passphrase);
 
                 // Untested for EC key due to https://github.com/kaikramer/keystore-explorer/issues/119
                 PEMKeyPair keyPair = ckp.decryptKeyPair(decProv);
@@ -92,14 +91,15 @@ public class KeyReaderPEM {
                 PKCS8EncryptedPrivateKeyInfo privateKeyInfo = (PKCS8EncryptedPrivateKeyInfo) pemData;
 
                 JceOpenSSLPKCS8DecryptorProviderBuilder providerBuilder = new JceOpenSSLPKCS8DecryptorProviderBuilder();
+                providerBuilder.setProvider(provider);
                 char[] passphrase = passwordLookup.getResourcePassword(path);
 
                 if (StringUtils.isEmpty(passphrase)) {
                     throw new MissingPasswordException(MissingPasswordException.ObjectType.STORE, path);
                 }
 
-                InputDecryptorProvider provider = providerBuilder.build(passphrase);
-                PrivateKeyInfo info = privateKeyInfo.decryptPrivateKeyInfo(provider);
+                InputDecryptorProvider inputDecryptorProvider = providerBuilder.build(passphrase);
+                PrivateKeyInfo info = privateKeyInfo.decryptPrivateKeyInfo(inputDecryptorProvider);
                 PrivateKey privateKey = converter.getPrivateKey(info);
                 result.add(new AtbashKey(path, privateKey));
 

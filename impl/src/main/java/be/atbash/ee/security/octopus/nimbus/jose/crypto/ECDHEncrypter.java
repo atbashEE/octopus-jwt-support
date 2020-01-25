@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package be.atbash.ee.security.octopus.nimbus.jose.crypto;
 
 
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
+import be.atbash.ee.security.octopus.nimbus.jose.crypto.bc.BouncyCastleProviderSingleton;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.ECDH;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.ECDHCryptoProvider;
 import be.atbash.ee.security.octopus.nimbus.jwk.Curve;
@@ -24,7 +25,10 @@ import be.atbash.ee.security.octopus.nimbus.jwk.ECKey;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.*;
 
 import javax.crypto.SecretKey;
-import java.security.*;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.spec.ECParameterSpec;
@@ -204,8 +208,7 @@ public class ECDHEncrypter extends ECDHCryptoProvider implements JWEEncrypter {
         // Derive 'Z'
         SecretKey Z = ECDH.deriveSharedSecret(
                 publicKey,
-                ephemeralPrivateKey,
-                getJCAContext().getKeyEncryptionProvider());
+                ephemeralPrivateKey);
 
         return encryptWithZ(updatedHeader, Z, clearText, contentEncryptionKey);
     }
@@ -221,16 +224,8 @@ public class ECDHEncrypter extends ECDHCryptoProvider implements JWEEncrypter {
     private KeyPair generateEphemeralKeyPair(ECParameterSpec ecParameterSpec)
             throws JOSEException {
 
-        Provider keProvider = getJCAContext().getKeyEncryptionProvider();
-
         try {
-            KeyPairGenerator generator;
-
-            if (keProvider != null) {
-                generator = KeyPairGenerator.getInstance("EC", keProvider);
-            } else {
-                generator = KeyPairGenerator.getInstance("EC");
-            }
+            KeyPairGenerator generator = KeyPairGenerator.getInstance("EC", BouncyCastleProviderSingleton.getInstance());
 
             generator.initialize(ecParameterSpec);
             return generator.generateKeyPair();

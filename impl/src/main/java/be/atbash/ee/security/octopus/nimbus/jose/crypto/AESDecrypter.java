@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -187,7 +187,7 @@ public class AESDecrypter extends AESCryptoProvider implements JWEDecrypter {
                 alg.equals(JWEAlgorithm.A192KW) ||
                 alg.equals(JWEAlgorithm.A256KW)) {
 
-            cek = AESKW.unwrapCEK(getKey(), encryptedKey.decode(), getJCAContext().getKeyEncryptionProvider());
+            cek = AESKW.unwrapCEK(getKey(), encryptedKey.decode());
 
         } else if (alg.equals(JWEAlgorithm.A128GCMKW) ||
                 alg.equals(JWEAlgorithm.A192GCMKW) ||
@@ -206,13 +206,13 @@ public class AESDecrypter extends AESCryptoProvider implements JWEDecrypter {
             byte[] keyTag = header.getAuthTag().decode();
 
             AuthenticatedCipherText authEncrCEK = new AuthenticatedCipherText(encryptedKey.decode(), keyTag);
-            cek = AESGCMKW.decryptCEK(getKey(), keyIV, authEncrCEK, keyLength, getJCAContext().getKeyEncryptionProvider());
+            cek = AESGCMKW.decryptCEK(getKey(), keyIV, authEncrCEK, keyLength);
 
         } else {
 
             throw new JOSEException(AlgorithmSupportMessage.unsupportedJWEAlgorithm(alg, SUPPORTED_ALGORITHMS));
         }
 
-        return ContentCryptoProvider.decrypt(header, iv, cipherText, authTag, cek, getJCAContext());
+        return ContentCryptoProvider.decrypt(header, iv, cipherText, authTag, cek);
     }
 }

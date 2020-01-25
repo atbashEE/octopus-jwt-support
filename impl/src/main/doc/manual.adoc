@@ -18,12 +18,14 @@ User manual for Atbash configuration.
 
 . Updated BouncyCastle to the latest version.
 . Various small fixes and updates.
+. Configuration of SecureRandom (JVM default or BouncyCastle defined one)
 
 Breaking changes
 
 - Custom parameter for the headers can't contain any registered names anymore and a `CustomParameterNameException` is thrown.
 The exceptions are p2c and p2s for a JWEHeader which is properly handled (as regular claim value)
 - be.atbash.ee.security.octopus.jwt.decoder.JWTDecoder.decode(java.lang.String, java.lang.Class<T>) has a changed return type.
+- A subset of Nimbus JOSE is integrated in this JWT support module.
 
 === 0.9.1
 
@@ -468,3 +470,11 @@ The value has following format
 
 * v : A positive integral number
 * unit : s (seconds), m (minutes) or h (hours)
+
+=== jwt.jca.securerandom.algo
+
+default : **none**
+
+Algorithm name for the SecureRandom implementation.
+
+When no value is set, JVM configured one will be taken.

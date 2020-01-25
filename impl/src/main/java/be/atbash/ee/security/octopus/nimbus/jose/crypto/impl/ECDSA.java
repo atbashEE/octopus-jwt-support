@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,11 @@ package be.atbash.ee.security.octopus.nimbus.jose.crypto.impl;
 
 
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
+import be.atbash.ee.security.octopus.nimbus.jose.crypto.bc.BouncyCastleProviderSingleton;
 import be.atbash.ee.security.octopus.nimbus.jwk.Curve;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 
 import java.security.NoSuchAlgorithmException;
-import java.security.Provider;
 import java.security.Signature;
 import java.security.interfaces.ECKey;
 import java.security.spec.ECParameterSpec;
@@ -83,15 +83,13 @@ public final class ECDSA {
     /**
      * Creates a new JCA signer / verifier for ECDSA.
      *
-     * @param alg         The ECDSA JWS algorithm. Must not be
-     *                    {@code null}.
-     * @param jcaProvider The JCA provider, {@code null} if not specified.
+     * @param alg The ECDSA JWS algorithm. Must not be
+     *            {@code null}.
      * @return The JCA signer / verifier instance.
      * @throws JOSEException If a JCA signer / verifier couldn't be
      *                       created.
      */
-    public static Signature getSignerAndVerifier(JWSAlgorithm alg,
-                                                 Provider jcaProvider)
+    public static Signature getSignerAndVerifier(JWSAlgorithm alg)
             throws JOSEException {
 
         String jcaAlg;
@@ -112,11 +110,8 @@ public final class ECDSA {
         }
 
         try {
-            if (jcaProvider != null) {
-                return Signature.getInstance(jcaAlg, jcaProvider);
-            } else {
-                return Signature.getInstance(jcaAlg);
-            }
+            return Signature.getInstance(jcaAlg, BouncyCastleProviderSingleton.getInstance());
+
         } catch (NoSuchAlgorithmException e) {
             throw new JOSEException("Unsupported ECDSA algorithm: " + e.getMessage(), e);
         }

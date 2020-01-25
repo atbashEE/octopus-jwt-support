@@ -17,6 +17,7 @@ package be.atbash.ee.security.octopus.nimbus.jose.crypto.impl;
 
 
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
+import be.atbash.ee.security.octopus.nimbus.jose.crypto.bc.BouncyCastleProviderSingleton;
 import be.atbash.ee.security.octopus.nimbus.jwk.Curve;
 import be.atbash.ee.security.octopus.nimbus.jwk.OctetKeyPair;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod;
@@ -30,7 +31,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.Provider;
 import java.security.interfaces.ECPublicKey;
 
 
@@ -139,25 +139,19 @@ public final class ECDH {
      * @param privateKey The private EC Key, i.e. the ephemeral private EC
      *                   key on encryption, or the consumer's private EC
      *                   key on decryption. Must not be {@code null}.
-     * @param provider   The specific JCA provider for the ECDH key
-     *                   agreement, {@code null} to use the default one.
      * @return The derived shared secret ('Z'), with algorithm "AES".
      * @throws JOSEException If derivation of the shared secret failed.
      */
     public static SecretKey deriveSharedSecret(ECPublicKey publicKey,
-                                               PrivateKey privateKey,
-                                               Provider provider)
+                                               PrivateKey privateKey)
             throws JOSEException {
 
         // Get an ECDH key agreement instance from the JCA provider
         KeyAgreement keyAgreement;
 
         try {
-            if (provider != null) {
-                keyAgreement = KeyAgreement.getInstance("ECDH", provider);
-            } else {
-                keyAgreement = KeyAgreement.getInstance("ECDH");
-            }
+
+            keyAgreement = KeyAgreement.getInstance("ECDH", BouncyCastleProviderSingleton.getInstance());
 
         } catch (NoSuchAlgorithmException e) {
             throw new JOSEException("Couldn't get an ECDH key agreement instance: " + e.getMessage(), e);

@@ -20,7 +20,6 @@ import be.atbash.ee.security.octopus.nimbus.jose.crypto.DirectDecrypter;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.DirectEncrypter;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.RSADecrypter;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.RSAEncrypter;
-import be.atbash.ee.security.octopus.nimbus.jose.crypto.bc.BouncyCastleProviderSingleton;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEHeader;
@@ -194,7 +193,7 @@ public class EncryptedJWTTest {
 
         // Create an encrypter with the specified public RSA key
         RSAEncrypter encrypter = new RSAEncrypter(publicKey);
-        encrypter.getJCAContext().setProvider(BouncyCastleProviderSingleton.getInstance());
+        //encrypter.getJCAContext().setProvider(BouncyCastleProviderSingleton.getInstance());
 
         // Do the actual encryption
         jwt.encrypt(encrypter);
@@ -209,7 +208,7 @@ public class EncryptedJWTTest {
 
         // Create an decrypter with the specified private RSA key
         RSADecrypter decrypter = new RSADecrypter(privateKey);
-        decrypter.getJCAContext().setProvider(BouncyCastleProviderSingleton.getInstance());
+        //decrypter.getJCAContext().setProvider(BouncyCastleProviderSingleton.getInstance());
 
         // Decrypt
         jwt.decrypt(decrypter);

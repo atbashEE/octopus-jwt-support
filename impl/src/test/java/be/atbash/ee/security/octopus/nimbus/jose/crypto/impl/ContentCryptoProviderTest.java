@@ -17,8 +17,6 @@ package be.atbash.ee.security.octopus.nimbus.jose.crypto.impl;
 
 
 import be.atbash.ee.security.octopus.nimbus.jose.KeyLengthException;
-import be.atbash.ee.security.octopus.nimbus.jose.crypto.bc.BouncyCastleProviderSingleton;
-import be.atbash.ee.security.octopus.nimbus.jose.jca.JWEJCAContext;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWECryptoParts;
@@ -76,29 +74,25 @@ public class ContentCryptoProviderTest {
 	@Test
     public void test_A256CBC_HS512() throws Exception {
 
-        JWEHeader header = new JWEHeader(JWEAlgorithm.DIR, EncryptionMethod.A256CBC_HS512);
-        byte[] clearText = "Hello world!".getBytes(StandardCharsets.UTF_8);
+		JWEHeader header = new JWEHeader(JWEAlgorithm.DIR, EncryptionMethod.A256CBC_HS512);
+		byte[] clearText = "Hello world!".getBytes(StandardCharsets.UTF_8);
 		byte[] cekBytes = new byte[64];
 		new SecureRandom().nextBytes(cekBytes);
 		SecretKey cek = new SecretKeySpec(cekBytes, "AES");
-        Base64URLValue encryptedKey = null;
-        JWEJCAContext jcaProvider = new JWEJCAContext();
-		jcaProvider.setProvider(BouncyCastleProviderSingleton.getInstance());
+		Base64URLValue encryptedKey = null;
 
 		JWECryptoParts jweParts = ContentCryptoProvider.encrypt(
-                header,
-                clearText,
-                cek,
-                encryptedKey,
-                jcaProvider);
+				header,
+				clearText,
+				cek,
+				encryptedKey);
 
 		assertThat(Arrays.equals(clearText, ContentCryptoProvider.decrypt(
-                header,
-                jweParts.getInitializationVector(),
-                jweParts.getCipherText(),
-                jweParts.getAuthenticationTag(),
-                cek,
-                jcaProvider))).isTrue();
+				header,
+				jweParts.getInitializationVector(),
+				jweParts.getCipherText(),
+				jweParts.getAuthenticationTag(),
+				cek))).isTrue();
 	}
 
 	@Test
@@ -111,16 +105,13 @@ public class ContentCryptoProviderTest {
 		new SecureRandom().nextBytes(cekBytes);
 		SecretKey cek = new SecretKeySpec(cekBytes, "AES");
 		Base64URLValue encryptedKey = null;
-		JWEJCAContext jcaProvider = new JWEJCAContext();
-		jcaProvider.setProvider(BouncyCastleProviderSingleton.getInstance());
 
 		KeyLengthException e = Assertions.assertThrows(KeyLengthException.class,
 				() -> ContentCryptoProvider.encrypt(
 						header,
 						clearText,
 						cek,
-						encryptedKey,
-						jcaProvider));
+						encryptedKey));
 
 		assertThat(e.getMessage()).isEqualTo("The Content Encryption Key (CEK) length for A256CBC-HS512 must be 512 bits");
 	}
@@ -135,16 +126,14 @@ public class ContentCryptoProviderTest {
 		new SecureRandom().nextBytes(cekBytes);
 		SecretKey cek = new SecretKeySpec(cekBytes, "AES");
 		Base64URLValue encryptedKey = null;
-		JWEJCAContext jcaProvider = new JWEJCAContext();
-		jcaProvider.setProvider(BouncyCastleProviderSingleton.getInstance());
 
 		KeyLengthException e = Assertions.assertThrows(KeyLengthException.class,
 				() -> ContentCryptoProvider.encrypt(
 						header,
 						clearText,
 						cek,
-						encryptedKey,
-						jcaProvider));
+						encryptedKey
+				));
 
 
 		assertThat(e.getMessage()).isEqualTo("The Content Encryption Key (CEK) length for A256GCM must be 256 bits");
@@ -155,14 +144,12 @@ public class ContentCryptoProviderTest {
 	public void testKeyGen()
             throws Exception {
 
-		SecureRandom randomGen = new SecureRandom();
-
-		assertThat(ContentCryptoProvider.generateCEK(EncryptionMethod.A128GCM, randomGen).getEncoded().length).isEqualTo(ByteUtils.byteLength(128));
-		assertThat(ContentCryptoProvider.generateCEK(EncryptionMethod.A192GCM, randomGen).getEncoded().length).isEqualTo(ByteUtils.byteLength(192));
-		assertThat(ContentCryptoProvider.generateCEK(EncryptionMethod.A256GCM, randomGen).getEncoded().length).isEqualTo(ByteUtils.byteLength(256));
-		assertThat(ContentCryptoProvider.generateCEK(EncryptionMethod.A128CBC_HS256, randomGen).getEncoded().length).isEqualTo(ByteUtils.byteLength(256));
-		assertThat(ContentCryptoProvider.generateCEK(EncryptionMethod.A192CBC_HS384, randomGen).getEncoded().length).isEqualTo(ByteUtils.byteLength(384));
-		assertThat(ContentCryptoProvider.generateCEK(EncryptionMethod.A256CBC_HS512, randomGen).getEncoded().length).isEqualTo(ByteUtils.byteLength(512));
+		assertThat(ContentCryptoProvider.generateCEK(EncryptionMethod.A128GCM).getEncoded().length).isEqualTo(ByteUtils.byteLength(128));
+		assertThat(ContentCryptoProvider.generateCEK(EncryptionMethod.A192GCM).getEncoded().length).isEqualTo(ByteUtils.byteLength(192));
+		assertThat(ContentCryptoProvider.generateCEK(EncryptionMethod.A256GCM).getEncoded().length).isEqualTo(ByteUtils.byteLength(256));
+		assertThat(ContentCryptoProvider.generateCEK(EncryptionMethod.A128CBC_HS256).getEncoded().length).isEqualTo(ByteUtils.byteLength(256));
+		assertThat(ContentCryptoProvider.generateCEK(EncryptionMethod.A192CBC_HS384).getEncoded().length).isEqualTo(ByteUtils.byteLength(384));
+		assertThat(ContentCryptoProvider.generateCEK(EncryptionMethod.A256CBC_HS512).getEncoded().length).isEqualTo(ByteUtils.byteLength(512));
 
 	}
 }

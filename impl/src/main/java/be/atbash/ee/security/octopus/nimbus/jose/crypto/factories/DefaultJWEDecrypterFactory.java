@@ -20,7 +20,6 @@ import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.KeyLengthException;
 import be.atbash.ee.security.octopus.nimbus.jose.KeyTypeException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.*;
-import be.atbash.ee.security.octopus.nimbus.jose.jca.JWEJCAContext;
 import be.atbash.ee.security.octopus.nimbus.jose.proc.JWEDecrypterFactory;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
@@ -77,12 +76,6 @@ public class DefaultJWEDecrypterFactory implements JWEDecrypterFactory {
     }
 
 
-    /**
-     * The JWE JCA context.
-     */
-    private final JWEJCAContext jcaContext = new JWEJCAContext();
-
-
     @Override
     public Set<JWEAlgorithm> supportedJWEAlgorithms() {
 
@@ -94,13 +87,6 @@ public class DefaultJWEDecrypterFactory implements JWEDecrypterFactory {
     public Set<EncryptionMethod> supportedEncryptionMethods() {
 
         return SUPPORTED_ENCRYPTION_METHODS;
-    }
-
-
-    @Override
-    public JWEJCAContext getJCAContext() {
-
-        return jcaContext;
     }
 
 
@@ -177,13 +163,6 @@ public class DefaultJWEDecrypterFactory implements JWEDecrypterFactory {
 
             throw new JOSEException("Unsupported JWE algorithm or encryption method");
         }
-
-        // Apply JCA context
-        decrypter.getJCAContext().setSecureRandom(jcaContext.getSecureRandom());
-        decrypter.getJCAContext().setProvider(jcaContext.getProvider());
-        decrypter.getJCAContext().setKeyEncryptionProvider(jcaContext.getKeyEncryptionProvider());
-        decrypter.getJCAContext().setMACProvider(jcaContext.getMACProvider());
-        decrypter.getJCAContext().setContentEncryptionProvider(jcaContext.getContentEncryptionProvider());
 
         return decrypter;
     }

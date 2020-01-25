@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,19 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto.impl;
 
 
+import be.atbash.ee.security.octopus.config.JCASupportConfiguration;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
+import be.atbash.ee.security.octopus.nimbus.jose.crypto.bc.BouncyCastleProviderSingleton;
 import be.atbash.ee.security.octopus.nimbus.util.ByteUtils;
 import be.atbash.ee.security.octopus.nimbus.util.Container;
 import be.atbash.ee.security.octopus.nimbus.util.KeyUtils;
 
 import javax.crypto.*;
 import javax.crypto.spec.GCMParameterSpec;
-import java.security.*;
+import java.security.AlgorithmParameters;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidParameterSpecException;
 
 
@@ -58,14 +63,12 @@ public final class AESGCM {
      *
      * <p>See RFC 7518 (JWA), section 5.3.
      *
-     * @param randomGen The secure random generator to use. Must be
-     *                  correctly initialised and not {@code null}.
      * @return The random 96 bit IV, as 12 byte array.
      */
-    public static byte[] generateIV(SecureRandom randomGen) {
+    public static byte[] generateIV() {
 
         byte[] bytes = new byte[ByteUtils.byteLength(IV_BIT_LENGTH)];
-        randomGen.nextBytes(bytes);
+        JCASupportConfiguration.getInstance().getSecureRandom().nextBytes(bytes);
         return bytes;
     }
 
@@ -91,8 +94,7 @@ public final class AESGCM {
     public static AuthenticatedCipherText encrypt(SecretKey secretKey,
                                                   Container<byte[]> ivContainer,
                                                   byte[] plainText,
-                                                  byte[] authData,
-                                                  Provider provider)
+                                                  byte[] authData)
             throws JOSEException {
 
         // Key alg must be "AES"
@@ -103,11 +105,8 @@ public final class AESGCM {
         byte[] iv = ivContainer.get();
 
         try {
-            if (provider != null) {
-                cipher = Cipher.getInstance("AES/GCM/NoPadding", provider);
-            } else {
-                cipher = Cipher.getInstance("AES/GCM/NoPadding");
-            }
+
+            cipher = Cipher.getInstance("AES/GCM/NoPadding", BouncyCastleProviderSingleton.getInstance());
 
             GCMParameterSpec gcmSpec = new GCMParameterSpec(AUTH_TAG_BIT_LENGTH, iv);
             cipher.init(Cipher.ENCRYPT_MODE, aesKey, gcmSpec);
@@ -241,8 +240,7 @@ public final class AESGCM {
                                  byte[] iv,
                                  byte[] cipherText,
                                  byte[] authData,
-                                 byte[] authTag,
-                                 Provider provider)
+                                 byte[] authTag)
             throws JOSEException {
 
         // Key alg must be "AES"
@@ -251,11 +249,8 @@ public final class AESGCM {
         Cipher cipher;
 
         try {
-            if (provider != null) {
-                cipher = Cipher.getInstance("AES/GCM/NoPadding", provider);
-            } else {
-                cipher = Cipher.getInstance("AES/GCM/NoPadding");
-            }
+
+            cipher = Cipher.getInstance("AES/GCM/NoPadding", BouncyCastleProviderSingleton.getInstance());
 
             GCMParameterSpec gcmSpec = new GCMParameterSpec(AUTH_TAG_BIT_LENGTH, iv);
             cipher.init(Cipher.DECRYPT_MODE, aesKey, gcmSpec);

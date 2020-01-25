@@ -457,7 +457,7 @@ public class JWETest {
 
         assertThat(e).isInstanceOf(AtbashUnexpectedException.class);
         assertThat(e.getCause()).isInstanceOf(JOSEException.class);
-        assertThat(e.getCause().getCause().getMessage()).isEqualTo("AES/GCM/NoPadding decryption failed: Tag mismatch!");
+        assertThat(e.getCause().getCause().getMessage()).isEqualTo("AES/GCM/NoPadding decryption failed: mac check in GCM failed");
 
     }
 
@@ -492,7 +492,7 @@ public class JWETest {
 
         assertThat(e).isInstanceOf(AtbashUnexpectedException.class);
         assertThat(e.getCause()).isInstanceOf(JOSEException.class);
-        assertThat(e.getCause().getCause().getMessage()).isEqualTo("AES/GCM/NoPadding decryption failed: Tag mismatch!");
+        assertThat(e.getCause().getCause().getMessage()).isEqualTo("AES/GCM/NoPadding decryption failed: mac check in GCM failed");
 
     }
 

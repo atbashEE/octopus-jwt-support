@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -96,10 +96,9 @@ public class RSAEncrypter extends RSACryptoProvider implements JWEEncrypter {
      * Creates a new RSA encrypter.
      *
      * @param rsaJWK The RSA JSON Web Key (JWK). Must not be {@code null}.
-     * @throws JOSEException If the RSA JWK extraction failed.
+     *
      */
-    public RSAEncrypter(RSAKey rsaJWK)
-            throws JOSEException {
+    public RSAEncrypter(RSAKey rsaJWK) {
 
         this(rsaJWK.toRSAPublicKey());
     }
@@ -162,7 +161,7 @@ public class RSAEncrypter extends RSACryptoProvider implements JWEEncrypter {
             cek = contentEncryptionKey;
         } else {
             // Generate and encrypt the CEK according to the enc method
-            cek = ContentCryptoProvider.generateCEK(enc, getJCAContext().getSecureRandom());
+            cek = ContentCryptoProvider.generateCEK(enc);
         }
 
         Base64URLValue encryptedKey; // The second JWE part
@@ -170,7 +169,7 @@ public class RSAEncrypter extends RSACryptoProvider implements JWEEncrypter {
         if (alg.equals(JWEAlgorithm.RSA_OAEP_256)) {
 
             // Encrypt the cek (used to encrypt the clearText) with the RSA public key.
-            encryptedKey = Base64URLValue.encode(RSA_OAEP_256.encryptCEK(publicKey, cek, getJCAContext().getKeyEncryptionProvider()));
+            encryptedKey = Base64URLValue.encode(RSA_OAEP_256.encryptCEK(publicKey, cek));
 
         } else {
 
@@ -178,6 +177,6 @@ public class RSAEncrypter extends RSACryptoProvider implements JWEEncrypter {
         }
 
         // Define All JWE Parts
-        return ContentCryptoProvider.encrypt(header, clearText, cek, encryptedKey, getJCAContext());
+        return ContentCryptoProvider.encrypt(header, clearText, cek, encryptedKey);
     }
 }

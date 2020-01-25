@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,8 @@ import java.util.Map;
 public class JWTParametersSigning extends JWTParametersHeader {
 
     private AtbashKey secretKeySigning;
+
+    // FIXME Store link to custom Provider (or JCAContext and thus also SecureRandom)
 
     public JWTParametersSigning(Map<String, Object> headerValues, AtbashKey secretKeySigning) {
         super(headerValues);

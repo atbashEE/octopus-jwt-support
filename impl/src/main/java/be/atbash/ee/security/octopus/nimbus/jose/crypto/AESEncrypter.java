@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -189,17 +189,17 @@ public class AESEncrypter extends AESCryptoProvider implements JWEEncrypter {
 
         // Generate and encrypt the CEK according to the enc method
         EncryptionMethod enc = header.getEncryptionMethod();
-        SecretKey cek = ContentCryptoProvider.generateCEK(enc, getJCAContext().getSecureRandom());
+        SecretKey cek = ContentCryptoProvider.generateCEK(enc);
 
         if (AlgFamily.AESKW.equals(algFamily)) {
 
-            encryptedKey = Base64URLValue.encode(AESKW.wrapCEK(cek, getKey(), getJCAContext().getKeyEncryptionProvider()));
+            encryptedKey = Base64URLValue.encode(AESKW.wrapCEK(cek, getKey()));
             updatedHeader = header; // simply copy ref
 
         } else if (AlgFamily.AESGCMKW.equals(algFamily)) {
 
-            Container<byte[]> keyIV = new Container<>(AESGCM.generateIV(getJCAContext().getSecureRandom()));
-            AuthenticatedCipherText authCiphCEK = AESGCMKW.encryptCEK(cek, keyIV, getKey(), getJCAContext().getKeyEncryptionProvider());
+            Container<byte[]> keyIV = new Container<>(AESGCM.generateIV());
+            AuthenticatedCipherText authCiphCEK = AESGCMKW.encryptCEK(cek, keyIV, getKey());
             encryptedKey = Base64URLValue.encode(authCiphCEK.getCipherText());
 
             // Add iv and tag to the header
@@ -212,6 +212,6 @@ public class AESEncrypter extends AESCryptoProvider implements JWEEncrypter {
             throw new JOSEException("Unexpected JWE algorithm: " + alg);
         }
 
-        return ContentCryptoProvider.encrypt(updatedHeader, clearText, cek, encryptedKey, getJCAContext());
+        return ContentCryptoProvider.encrypt(updatedHeader, clearText, cek, encryptedKey);
     }
 }

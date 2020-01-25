@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ import javax.crypto.spec.PSource;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.AlgorithmParameters;
 import java.security.PrivateKey;
-import java.security.Provider;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.MGF1ParameterSpec;
@@ -52,22 +51,20 @@ public final class RSA_OAEP_256 {
     /**
      * Encrypts the specified Content Encryption Key (CEK).
      *
-     * @param pub      The public RSA key. Must not be {@code null}.
-     * @param cek      The Content Encryption Key (CEK) to encrypt. Must
-     *                 not be {@code null}.
-     * @param provider The JCA provider, or {@code null} to use the default
-     *                 one.
+     * @param pub The public RSA key. Must not be {@code null}.
+     * @param cek The Content Encryption Key (CEK) to encrypt. Must
+     *            not be {@code null}.
      * @return The encrypted Content Encryption Key (CEK).
      * @throws JOSEException If encryption failed.
      */
-    public static byte[] encryptCEK(RSAPublicKey pub, SecretKey cek, Provider provider)
+    public static byte[] encryptCEK(RSAPublicKey pub, SecretKey cek)
             throws JOSEException {
 
         try {
-            AlgorithmParameters algp = AlgorithmParametersHelper.getInstance("OAEP", provider);
+            AlgorithmParameters algp = AlgorithmParametersHelper.getInstance("OAEP");
             AlgorithmParameterSpec paramSpec = new OAEPParameterSpec("SHA-256", "MGF1", MGF1ParameterSpec.SHA256, PSource.PSpecified.DEFAULT);
             algp.init(paramSpec);
-            Cipher cipher = CipherHelper.getInstance(RSA_OEAP_256_JCA_ALG, provider);
+            Cipher cipher = CipherHelper.getInstance(RSA_OEAP_256_JCA_ALG);
             cipher.init(Cipher.ENCRYPT_MODE, pub, algp);
             return cipher.doFinal(cek.getEncoded());
 
@@ -89,20 +86,18 @@ public final class RSA_OAEP_256 {
      * @param priv         The private RSA key. Must not be {@code null}.
      * @param encryptedCEK The encrypted Content Encryption Key (CEK) to
      *                     decrypt. Must not be {@code null}.
-     * @param provider     The JCA provider, or {@code null} to use the
-     *                     default one.
      * @return The decrypted Content Encryption Key (CEK).
      * @throws JOSEException If decryption failed.
      */
     public static SecretKey decryptCEK(PrivateKey priv,
-                                       byte[] encryptedCEK, Provider provider)
+                                       byte[] encryptedCEK)
             throws JOSEException {
 
         try {
-            AlgorithmParameters algp = AlgorithmParametersHelper.getInstance("OAEP", provider);
+            AlgorithmParameters algp = AlgorithmParametersHelper.getInstance("OAEP");
             AlgorithmParameterSpec paramSpec = new OAEPParameterSpec("SHA-256", "MGF1", MGF1ParameterSpec.SHA256, PSource.PSpecified.DEFAULT);
             algp.init(paramSpec);
-            Cipher cipher = CipherHelper.getInstance(RSA_OEAP_256_JCA_ALG, provider);
+            Cipher cipher = CipherHelper.getInstance(RSA_OEAP_256_JCA_ALG);
             cipher.init(Cipher.DECRYPT_MODE, priv, algp);
             return new SecretKeySpec(cipher.doFinal(encryptedCEK), "AES");
 

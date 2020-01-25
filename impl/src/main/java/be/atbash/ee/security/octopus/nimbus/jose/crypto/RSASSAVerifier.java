@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,10 +89,9 @@ public class RSASSAVerifier extends RSASSAProvider implements JWSVerifier {
      * Creates a new RSA Signature-Scheme-with-Appendix (RSASSA) verifier.
      *
      * @param rsaJWK The RSA JSON Web Key (JWK). Must not be {@code null}.
-     * @throws JOSEException If the RSA JWK extraction failed.
+     *
      */
-    public RSASSAVerifier(RSAKey rsaJWK)
-            throws JOSEException {
+    public RSASSAVerifier(RSAKey rsaJWK) {
 
         this(rsaJWK.toRSAPublicKey(), null);
     }
@@ -152,7 +151,7 @@ public class RSASSAVerifier extends RSASSAProvider implements JWSVerifier {
             return false;
         }
 
-        Signature verifier = RSASSA.getSignerAndVerifier(header.getAlgorithm(), getJCAContext().getProvider());
+        Signature verifier = RSASSA.getSignerAndVerifier(header.getAlgorithm());
 
         try {
             verifier.initVerify(publicKey);

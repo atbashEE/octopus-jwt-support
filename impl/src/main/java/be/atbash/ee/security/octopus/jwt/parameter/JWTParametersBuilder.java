@@ -15,6 +15,7 @@
  */
 package be.atbash.ee.security.octopus.jwt.parameter;
 
+import be.atbash.ee.security.octopus.config.JCASupportConfiguration;
 import be.atbash.ee.security.octopus.jwt.JWTEncoding;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
@@ -31,7 +32,6 @@ import be.atbash.util.exception.AtbashUnexpectedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -155,7 +155,7 @@ public final class JWTParametersBuilder {
 
     private void defineKeyBasedOnPassword() throws JOSEException {
         byte[] salt = new byte[PasswordBasedEncrypter.MIN_SALT_LENGTH];  // FIXME Config
-        new SecureRandom().nextBytes(salt);  // FIXME Make this configurable from a central point.
+        JCASupportConfiguration.getInstance().getSecureRandom().nextBytes(salt);
 
         PRFParams prfParams = PRFParams.resolve(jweAlgorithm);
         secretKeyEncryption = new AtbashKey(kid, PBKDF.deriveKey(password, salt, iterationCount, prfParams));

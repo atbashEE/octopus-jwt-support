@@ -161,7 +161,7 @@ public class AESCBCTest {
 
         assertThat(inputKey.getEncoded()).withFailMessage("Input key").isEqualTo(INPUT_KEY_256);
 
-        AuthenticatedCipherText act = AESCBC.encryptAuthenticated(inputKey, IV, PLAIN_TEXT, AAD_VALUE, null, null);
+        AuthenticatedCipherText act = AESCBC.encryptAuthenticated(inputKey, IV, PLAIN_TEXT, AAD_VALUE);
 
         assertThat(act.getCipherText()).withFailMessage("Cipher text").isEqualTo(CIPHER_TEXT_256);
         assertThat(act.getAuthenticationTag()).withFailMessage("Auth tag").isEqualTo(AUTH_TAG_256);
@@ -175,7 +175,7 @@ public class AESCBCTest {
 
         assertThat(inputKey.getEncoded()).withFailMessage("Input key").isEqualTo(INPUT_KEY_512);
 
-        AuthenticatedCipherText act = AESCBC.encryptAuthenticated(inputKey, IV, PLAIN_TEXT, AAD_VALUE, null, null);
+        AuthenticatedCipherText act = AESCBC.encryptAuthenticated(inputKey, IV, PLAIN_TEXT, AAD_VALUE);
 
         assertThat(act.getCipherText()).withFailMessage("Cipher text").isEqualTo(CIPHER_TEXT_512);
         assertThat(act.getAuthenticationTag()).withFailMessage("Auth tag").isEqualTo(AUTH_TAG_512);
@@ -189,7 +189,7 @@ public class AESCBCTest {
 
         assertThat(inputKey.getEncoded()).withFailMessage("Input key").isEqualTo(INPUT_KEY_256);
 
-        AuthenticatedCipherText act = AESCBC.encryptAuthenticated(inputKey, IV, PLAIN_TEXT, AAD_VALUE, null, null);
+        AuthenticatedCipherText act = AESCBC.encryptAuthenticated(inputKey, IV, PLAIN_TEXT, AAD_VALUE);
 
         byte[] cipherText = act.getCipherText();
 
@@ -197,7 +197,7 @@ public class AESCBCTest {
         cipherText[cipherText.length - 1] ^= 0x01;
 
         try {
-            AESCBC.decryptAuthenticated(inputKey, IV, cipherText, AAD_VALUE, act.getAuthenticationTag(), null, null);
+            AESCBC.decryptAuthenticated(inputKey, IV, cipherText, AAD_VALUE, act.getAuthenticationTag());
         } catch (JOSEException e) {
 			assertThat(e.getMessage()).isEqualTo("MAC check failed");
         }
@@ -222,7 +222,7 @@ public class AESCBCTest {
         AuthenticatedCipherText act;
 
         try {
-            act = AESCBC.encryptAuthenticated(inputKey, iv, plaintext, aad, null, null);
+            act = AESCBC.encryptAuthenticated(inputKey, iv, plaintext, aad);
         } catch (OutOfMemoryError e) {
             System.out.println("Test not run due to " + e);
             return;
@@ -251,8 +251,8 @@ public class AESCBCTest {
                 () -> {
                     AESCBC.decryptAuthenticated(inputKey, newIv,
                             newCiphertext, newAad,
-                            authTag, // Note that the authTag does NOT change.
-                            null, null);
+                            authTag // Note that the authTag does NOT change.
+                            );
                     // Reaching this point means that the HMac check is
                     // bypassed although the decrypted data is different
                     // from plaintext.
