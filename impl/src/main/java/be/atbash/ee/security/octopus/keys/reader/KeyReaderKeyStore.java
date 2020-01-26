@@ -15,6 +15,7 @@
  */
 package be.atbash.ee.security.octopus.keys.reader;
 
+import be.atbash.ee.security.octopus.exception.MissingPasswordLookupException;
 import be.atbash.ee.security.octopus.exception.ResourceNotFoundException;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup;
@@ -37,6 +38,9 @@ public class KeyReaderKeyStore {
     //https://github.com/jfsulliv/JWK_Extractor/blob/master/src/jwk_extractor/JWK_Handler.java
 
     public List<AtbashKey> readResource(String path, KeyResourcePasswordLookup passwordLookup) {
+        if (passwordLookup == null) {
+            throw new MissingPasswordLookupException();
+        }
         List<AtbashKey> result = new ArrayList<>();
 
         KeyStore keyStore;

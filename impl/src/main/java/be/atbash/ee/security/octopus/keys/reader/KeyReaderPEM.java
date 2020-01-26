@@ -16,6 +16,7 @@
 package be.atbash.ee.security.octopus.keys.reader;
 
 import be.atbash.ee.security.octopus.exception.MissingPasswordException;
+import be.atbash.ee.security.octopus.exception.MissingPasswordLookupException;
 import be.atbash.ee.security.octopus.exception.ResourceNotFoundException;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup;
@@ -71,6 +72,10 @@ public class KeyReaderPEM {
             Provider provider = BouncyCastleProviderSingleton.getInstance();
             JcaPEMKeyConverter converter = new JcaPEMKeyConverter().setProvider(provider);
             if (pemData instanceof PEMEncryptedKeyPair) {
+                if (passwordLookup == null) {
+                    throw new MissingPasswordLookupException();
+                }
+
                 // Encrypted key - we will use provided password
                 PEMEncryptedKeyPair ckp = (PEMEncryptedKeyPair) pemData;
 
@@ -88,6 +93,10 @@ public class KeyReaderPEM {
                 result.add(new AtbashKey(path, pair.getPublic()));
             }
             if (pemData instanceof PKCS8EncryptedPrivateKeyInfo) {
+                if (passwordLookup == null) {
+                    throw new MissingPasswordLookupException();
+                }
+
                 PKCS8EncryptedPrivateKeyInfo privateKeyInfo = (PKCS8EncryptedPrivateKeyInfo) pemData;
 
                 JceOpenSSLPKCS8DecryptorProviderBuilder providerBuilder = new JceOpenSSLPKCS8DecryptorProviderBuilder();

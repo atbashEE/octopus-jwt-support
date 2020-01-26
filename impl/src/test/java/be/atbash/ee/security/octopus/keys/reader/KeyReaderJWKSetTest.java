@@ -85,6 +85,6 @@ public class KeyReaderJWKSetTest {
 
     @Test
     public void readResource() {
-        Assertions.assertThrows(ResourceNotFoundException.class, () -> reader.readResource("./not-existent", null));
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> reader.readResource("./not-existent", new TestPasswordLookup()));
     }
 }

@@ -15,7 +15,9 @@
  */
 package be.atbash.ee.security.octopus.keys.reader;
 
+import be.atbash.ee.security.octopus.exception.MissingPasswordLookupException;
 import be.atbash.ee.security.octopus.exception.ResourceNotFoundException;
+import be.atbash.ee.security.octopus.keys.TestPasswordLookup;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -26,7 +28,14 @@ class KeyReaderKeyStoreTest {
     @Test
     void readResource() {
         KeyReaderKeyStore keyStore = new KeyReaderKeyStore();
-        ResourceNotFoundException notFoundException = assertThrows(ResourceNotFoundException.class, () -> keyStore.readResource("./non-existing.path", null));
+        ResourceNotFoundException notFoundException = assertThrows(ResourceNotFoundException.class, () -> keyStore.readResource("./non-existing.path", new TestPasswordLookup()));
         assertThat(notFoundException.getMessage()).isEqualTo("Path not found : ./non-existing.path");
+    }
+
+    @Test
+    void readResource_nolookup() {
+        KeyReaderKeyStore keyStore = new KeyReaderKeyStore();
+        MissingPasswordLookupException missingException = assertThrows(MissingPasswordLookupException.class, () -> keyStore.readResource("./some.path", null));
+        assertThat(missingException.getMessage()).isEqualTo("KeyResourcePasswordLookup instance required");
     }
 }

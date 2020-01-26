@@ -15,6 +15,7 @@
  */
 package be.atbash.ee.security.octopus.keys.reader;
 
+import be.atbash.ee.security.octopus.exception.MissingPasswordLookupException;
 import be.atbash.ee.security.octopus.exception.ResourceNotFoundException;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup;
@@ -86,6 +87,9 @@ public class KeyReaderJWK {
             jwk = JWK.parse(json);
 
         } else {
+            if (passwordLookup == null) {
+                throw new MissingPasswordLookupException();
+            }
             char[] password = passwordLookup.getKeyPassword(path, jwkJsonObject.getString("kid"));
             String decoded = EncryptionHelper.decode(jwkJsonObject.getString("enc"), password);
 

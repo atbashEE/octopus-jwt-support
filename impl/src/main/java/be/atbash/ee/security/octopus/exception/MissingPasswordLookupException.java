@@ -13,19 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.ee.security.octopus.keys.reader;
+package be.atbash.ee.security.octopus.exception;
 
-import be.atbash.ee.security.octopus.exception.ResourceNotFoundException;
-import be.atbash.ee.security.octopus.keys.TestPasswordLookup;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import be.atbash.util.PublicAPI;
+import be.atbash.util.exception.AtbashException;
 
-class KeyReaderPEMTest {
+/**
+ *
+ */
+@PublicAPI
+public class MissingPasswordLookupException extends AtbashException {
 
-    private KeyReaderPEM reader = new KeyReaderPEM();
-
-    @Test
-    public void readResource() {
-        Assertions.assertThrows(ResourceNotFoundException.class, () -> reader.readResource("./not-existent", new TestPasswordLookup()));
+    public MissingPasswordLookupException() {
+        super("KeyResourcePasswordLookup instance required");
     }
+
+
 }
