@@ -35,6 +35,7 @@ The exceptions are p2c and p2s for a JWEHeader which is properly handled (as reg
 . Support for AtbashKey by JWTEncoder and JWTDecoder.
 . Support for jku header (JSON Key URL)
 . _discriminator_ object for SelectorCriteria
+. Reading public key from certificate from KeyStore format.
 
 Breaking changes
 

@@ -340,4 +340,32 @@ public class KeyReaderTest {
         assertThat(keys.get(0).getSecretKeyType().getAsymmetricPart()).isEqualTo(AsymmetricPart.PUBLIC);
 
     }
+
+    @Test
+    public void readKeyResource_scenario17() {
+        // JKS with cert and rsa
+
+        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa_cert.jks", new TestPasswordLookup("password".toCharArray(), null));
+        assertThat(keys).hasSize(1);
+
+        boolean privateKey = false;
+        boolean publicKey = false;
+
+        AtbashKey atbashKey = keys.get(0);
+        assertThat(atbashKey.getKeyId()).isEqualTo("selfsigned");  // alias from keystore
+        assertThat(atbashKey.getSecretKeyType().isAsymmetric()).isTrue();
+        if (atbashKey.getSecretKeyType().getAsymmetricPart() == AsymmetricPart.PRIVATE) {
+            assertThat(atbashKey.getKey()).isInstanceOf(RSAPrivateKey.class);
+            privateKey = true;
+        }
+        if (atbashKey.getSecretKeyType().getAsymmetricPart() == AsymmetricPart.PUBLIC) {
+            assertThat(atbashKey.getKey()).isInstanceOf(RSAPublicKey.class);
+            publicKey = true;
+        }
+
+        assertThat(privateKey).isFalse();
+        assertThat(publicKey).isTrue();
+
+    }
+
 }

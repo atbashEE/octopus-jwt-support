@@ -60,6 +60,10 @@ public class KeyReaderKeyStore {
                     char[] password = passwordLookup.getKeyPassword(path, alias);
                     result.addAll(readKeysFromKeyEntry(keyStore, alias, password));
                 }
+                if (keyStore.isCertificateEntry(alias)) {
+                    Certificate certificate = keyStore.getCertificate(alias);
+                    result.add(new AtbashKey(alias, certificate.getPublicKey()));
+                }
 
             }
         } catch (FileNotFoundException e) {
