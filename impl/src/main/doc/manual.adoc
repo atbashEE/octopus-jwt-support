@@ -15,6 +15,8 @@ User manual for Atbash configuration.
 . Support for Reading and Writing OCT JWK.
 . Support OCT keys in various places
 . PlainJWT support by JWTEncode and JWTDecoder.
+. Support for storing EC Key in KeyStore format
+. Support for reading public key from certificate of KeyStore format.
 
 . Updated BouncyCastle to the latest version.
 . Various small fixes and updates.
@@ -419,12 +421,19 @@ default : **CN=localhost**
 
 Defines the x500 name for the generated certificate when storing a public key into a Key store file.
 
-=== key.store.signature.algo
+=== key.store.signature.algo.RSA
 
 default : **SHA1WithRSA**
 
-Defines the algorithm used for singing the certificate which is generated when storing a public key into a Key store file.
-Please note that there will be always an RSA key generated for this, so one is only able to change ther hashing part of the signature.
+Defines the algorithm used for singing the certificate which is generated when storing a RSA public key into a Key store file.
+Please note that there will be always an RSA key generated for this, so one is only able to change the hashing part of the signature.
+
+=== key.store.signature.algo.EC
+
+default : **SHA384withECDSA**
+
+Defines the algorithm used for singing the certificate which is generated when storing a EC public key into a Key store file.
+Please note that there will be always an EC key generated for this, so one is only able to change the hashing part of the signature.
 
 === key.store.type
 

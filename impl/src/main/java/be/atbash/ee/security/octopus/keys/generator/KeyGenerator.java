@@ -111,7 +111,7 @@ public class KeyGenerator {
         try {
             ECParameterSpec ecSpec = ECNamedCurveTable.getParameterSpec(generationParameters.getCurveName());
 
-            KeyPairGenerator generator = KeyPairGenerator.getInstance("ECDSA", BouncyCastleProviderSingleton.getInstance());
+            KeyPairGenerator generator = KeyPairGenerator.getInstance("EC", BouncyCastleProviderSingleton.getInstance());
 
             generator.initialize(ecSpec, JCASupportConfiguration.getInstance().getSecureRandom());
             KeyPair kp = generator.generateKeyPair();

@@ -17,11 +17,13 @@ package be.atbash.ee.security.octopus.keys.writer.encoder;
 
 import be.atbash.ee.security.octopus.config.JwtSupportConfiguration;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
+import be.atbash.ee.security.octopus.keys.generator.ECGenerationParameters;
 import be.atbash.ee.security.octopus.keys.generator.KeyGenerator;
 import be.atbash.ee.security.octopus.keys.generator.RSAGenerationParameters;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.keys.selector.filter.AsymmetricPartKeyFilter;
 import be.atbash.ee.security.octopus.keys.writer.KeyEncoderParameters;
+import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import be.atbash.util.exception.AtbashUnexpectedException;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
@@ -64,13 +66,13 @@ public class KeyStoreEncoder extends AbstractEncoder implements KeyEncoder {
             if (atbashKey.getSecretKeyType().getAsymmetricPart() == AsymmetricPart.PRIVATE) {
 
                 PrivateKey key = (PrivateKey) atbashKey.getKey();
-                X509Certificate certificate = generateCertificate(getPublicKey(key), key);
+                X509Certificate certificate = generateCertificate(getPublicKey(key), key, atbashKey.getSecretKeyType().getKeyType());
                 KeyStore.Entry entry = new KeyStore.PrivateKeyEntry(key, new X509Certificate[]{certificate});
                 keyStore.setEntry(atbashKey.getKeyId(), entry, new KeyStore.PasswordProtection(parameters.getKeyPassword()));
             }
             if (atbashKey.getSecretKeyType().getAsymmetricPart() == AsymmetricPart.PUBLIC) {
                 PublicKey key = (PublicKey) atbashKey.getKey();
-                X509Certificate certificate = generateCertificate(key, null);
+                X509Certificate certificate = generateCertificate(key, null, atbashKey.getSecretKeyType().getKeyType());
                 KeyStore.Entry entry = new KeyStore.TrustedCertificateEntry(certificate);
                 keyStore.setEntry(atbashKey.getKeyId(), entry, null);
 
@@ -93,7 +95,7 @@ public class KeyStoreEncoder extends AbstractEncoder implements KeyEncoder {
         return stream.toByteArray();
     }
 
-    private X509Certificate generateCertificate(PublicKey publicKey, PrivateKey privateKey) {
+    private X509Certificate generateCertificate(PublicKey publicKey, PrivateKey privateKey, KeyType keyType) {
 
         try {
 
@@ -105,10 +107,10 @@ public class KeyStoreEncoder extends AbstractEncoder implements KeyEncoder {
                     start.getTime(), expiry.getTime(), name, SubjectPublicKeyInfo.getInstance(publicKey.getEncoded()));
             if (privateKey == null) {
 
-                privateKey = createSigningKey(); // this is the private key to sign the certificate. Has nothing to do with the Certificate and the public key.
+                privateKey = createSigningKey(keyType); // this is the private key to sign the certificate. Has nothing to do with the Certificate and the public key.
             }
 
-            ContentSigner signer = new JcaContentSignerBuilder(configuration.getCertificateSignatureAlgorithm()).setProvider(new BouncyCastleProvider()).build(privateKey);
+            ContentSigner signer = new JcaContentSignerBuilder(getCertificateSignatureAlgorithm(keyType)).setProvider(new BouncyCastleProvider()).build(privateKey);
             X509CertificateHolder holder = certificateBuilder.build(signer);
             return new JcaX509CertificateConverter().setProvider(new BouncyCastleProvider()).getCertificate(holder);
 
@@ -117,9 +119,55 @@ public class KeyStoreEncoder extends AbstractEncoder implements KeyEncoder {
         }
     }
 
-    private PrivateKey createSigningKey() {
+    private String getCertificateSignatureAlgorithm(KeyType keyType) {
+        String result;
+        switch (keyType.getValue()) {
+            case "RSA":
+                result = configuration.getCertificateSignatureAlgorithmRSA();
+                break;
+            case "EC":
+                result = configuration.getCertificateSignatureAlgorithmEC();
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + keyType.getValue());
+        }
+        return result;
+    }
+
+    private PrivateKey createSigningKey(KeyType keyType) {
+        PrivateKey result;
+        switch (keyType.getValue()) {
+            case "RSA":
+                result = createSigningKeyRSA();
+                break;
+            case "EC":
+                result = createSigningKeyEC();
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + keyType.getValue());
+        }
+        return result;
+
+    }
+
+    private PrivateKey createSigningKeyRSA() {
         RSAGenerationParameters generationParameters = new RSAGenerationParameters.RSAGenerationParametersBuilder()
                 .withKeyId("cert-signing")
+                .build();
+        KeyGenerator generator = new KeyGenerator();
+        List<AtbashKey> atbashKeys = generator.generateKeys(generationParameters);
+        AsymmetricPartKeyFilter keyFilter = new AsymmetricPartKeyFilter(AsymmetricPart.PRIVATE);
+
+        List<AtbashKey> privateKeys = keyFilter.filter(atbashKeys);
+        // TODO should we be on the safe side and check we have just 1 private key.
+        return (PrivateKey) privateKeys.get(0).getKey();
+
+    }
+
+    private PrivateKey createSigningKeyEC() {
+        ECGenerationParameters generationParameters = new ECGenerationParameters.ECGenerationParametersBuilder()
+                .withKeyId("cert-signing")
+                .withCurveName("P-256")
                 .build();
         KeyGenerator generator = new KeyGenerator();
         List<AtbashKey> atbashKeys = generator.generateKeys(generationParameters);

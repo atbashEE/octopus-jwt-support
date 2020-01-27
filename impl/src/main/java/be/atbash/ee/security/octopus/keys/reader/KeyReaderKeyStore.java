@@ -15,10 +15,12 @@
  */
 package be.atbash.ee.security.octopus.keys.reader;
 
+import be.atbash.ee.security.octopus.config.JwtSupportConfiguration;
 import be.atbash.ee.security.octopus.exception.MissingPasswordLookupException;
 import be.atbash.ee.security.octopus.exception.ResourceNotFoundException;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup;
+import be.atbash.ee.security.octopus.nimbus.jose.crypto.bc.BouncyCastleProviderSingleton;
 import be.atbash.util.exception.AtbashUnexpectedException;
 import be.atbash.util.resource.ResourceUtil;
 
@@ -45,7 +47,13 @@ public class KeyReaderKeyStore {
 
         KeyStore keyStore;
         try {
-            keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            String keyStoreType = JwtSupportConfiguration.getInstance().getKeyStoreType();
+            if ("JKS".equals(keyStoreType)) {
+                keyStore = KeyStore.getInstance(keyStoreType);
+            } else {
+                keyStore = KeyStore.getInstance(keyStoreType, BouncyCastleProviderSingleton.getInstance());
+
+            }
         } catch (KeyStoreException e) {
             throw new AtbashUnexpectedException(e);
         }

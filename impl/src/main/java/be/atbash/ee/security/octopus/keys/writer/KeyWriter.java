@@ -21,6 +21,7 @@ import be.atbash.ee.security.octopus.exception.MissingPasswordException;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.reader.KeyResourceType;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
+import be.atbash.ee.security.octopus.nimbus.jose.crypto.bc.BouncyCastleProviderSingleton;
 import be.atbash.ee.security.octopus.nimbus.jwk.JWKSet;
 import be.atbash.util.PublicAPI;
 import be.atbash.util.StringUtils;
@@ -145,7 +146,7 @@ public class KeyWriter {
     }
 
     private KeyStore loadExistingKeyStore(String target, char[] filePassword) throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
-        KeyStore keyStore = KeyStore.getInstance(jwtSupportConfiguration.getKeyStoreType());
+        KeyStore keyStore = KeyStore.getInstance(jwtSupportConfiguration.getKeyStoreType(), BouncyCastleProviderSingleton.getInstance());
 
         if (resourceUtil.resourceExists(target)) {
 

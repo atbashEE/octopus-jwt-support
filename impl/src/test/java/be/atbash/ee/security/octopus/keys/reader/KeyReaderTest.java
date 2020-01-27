@@ -15,10 +15,12 @@
  */
 package be.atbash.ee.security.octopus.keys.reader;
 
+import be.atbash.config.test.TestConfig;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.TestPasswordLookup;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.util.resource.ResourceUtil;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -40,6 +42,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class KeyReaderTest {
 
     private KeyReader keyReader = new KeyReader();
+
+    @AfterEach
+    public void tearDown() {
+        TestConfig.resetConfig();
+    }
 
     @Test
     public void readKeyResource_scenario1() {
@@ -284,6 +291,7 @@ public class KeyReaderTest {
     @Test
     public void readKeyResource_scenario12() {
         // JKS
+        TestConfig.addConfigValue("key.store.type", "JKS");
 
         List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "keystore.jks", new TestPasswordLookup("atbash".toCharArray(), "atbash_key".toCharArray()));
         assertThat(keys).hasSize(2);
@@ -343,6 +351,7 @@ public class KeyReaderTest {
 
     @Test
     public void readKeyResource_scenario17() {
+        TestConfig.addConfigValue("key.store.type", "JKS");
         // JKS with cert and rsa
 
         List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa_cert.jks", new TestPasswordLookup("password".toCharArray(), null));

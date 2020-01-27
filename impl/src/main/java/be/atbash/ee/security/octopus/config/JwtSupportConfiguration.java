@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -150,13 +150,18 @@ public class JwtSupportConfiguration extends AbstractConfiguration implements Mo
     }
 
     @ConfigProperty
-    public String getCertificateSignatureAlgorithm() {
-        return getOptionalValue("key.store.signature.algo", "SHA1WithRSA", String.class);
+    public String getCertificateSignatureAlgorithmRSA() {
+        return getOptionalValue("key.store.signature.algo.RSA", "SHA1WithRSA", String.class);
+    }
+
+    @ConfigProperty
+    public String getCertificateSignatureAlgorithmEC() {
+        return getOptionalValue("key.store.signature.algo.EC", "SHA384withECDSA", String.class);
     }
 
     @ConfigProperty
     public String getKeyStoreType() {
-        return getOptionalValue("key.store.type", "pkcs12", String.class);
+        return getOptionalValue("key.store.type", "PKCS12", String.class);
     }
 
     @ConfigProperty
