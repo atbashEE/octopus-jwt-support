@@ -21,7 +21,6 @@ import be.atbash.ee.security.octopus.jwt.parameter.JWTParameters;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersEncryption;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersPlain;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersSigning;
-import be.atbash.ee.security.octopus.jwt.serializer.spi.SerializerProvider;
 import be.atbash.ee.security.octopus.nimbus.jose.*;
 import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import be.atbash.ee.security.octopus.nimbus.jwt.JWTClaimsSet;
@@ -34,6 +33,7 @@ import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSObject;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSSigner;
 import be.atbash.ee.security.octopus.nimbus.util.JSONObjectUtils;
+import be.atbash.ee.security.octopus.util.JsonbUtil;
 import be.atbash.util.PublicAPI;
 import be.atbash.util.exception.AtbashUnexpectedException;
 
@@ -41,8 +41,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.json.JsonObject;
 import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
-import javax.json.bind.JsonbConfig;
 import java.text.ParseException;
 
 /**
@@ -185,10 +183,8 @@ public class JWTEncoder {
     }
 
     private String createJSONString(Object data) {
-        JsonbConfig config = new JsonbConfig();
 
-        config.withSerializers(SerializerProvider.getInstance().getSerializers());
-        Jsonb jsonb = JsonbBuilder.create(config);
+        Jsonb jsonb = JsonbUtil.getJsonb();
         return jsonb.toJson(data);
     }
 

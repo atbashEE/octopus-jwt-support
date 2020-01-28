@@ -16,12 +16,10 @@
 package be.atbash.ee.security.octopus.nimbus.util;
 
 
-import be.atbash.ee.security.octopus.jwt.serializer.spi.SerializerProvider;
+import be.atbash.ee.security.octopus.util.JsonbUtil;
 
 import javax.json.*;
 import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
-import javax.json.bind.JsonbConfig;
 import javax.json.bind.JsonbException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -56,11 +54,8 @@ public final class JSONObjectUtils {
         JsonObject result;
 
         try {
-            // FIXME Centralize this as used on several places.
-            JsonbConfig config = new JsonbConfig();
-            config.withDeserializers(SerializerProvider.getInstance().getDeserializers());
-            Jsonb jsonb = JsonbBuilder.create(config);
 
+            Jsonb jsonb = JsonbUtil.getJsonb();
             result = jsonb.fromJson(value, JsonObject.class);
 
 

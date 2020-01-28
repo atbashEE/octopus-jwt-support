@@ -23,6 +23,7 @@ import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.bc.BouncyCastleProviderSingleton;
 import be.atbash.ee.security.octopus.nimbus.jwk.*;
 import be.atbash.ee.security.octopus.util.EncryptionHelper;
+import be.atbash.ee.security.octopus.util.JsonbUtil;
 import be.atbash.util.exception.AtbashUnexpectedException;
 import be.atbash.util.resource.ResourceUtil;
 
@@ -30,7 +31,6 @@ import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.PrivateKey;
@@ -78,7 +78,7 @@ public class KeyReaderJWK {
 
     protected List<AtbashKey> parse(String json, String path, KeyResourcePasswordLookup passwordLookup) throws ParseException, JOSEException {
 
-        Jsonb jsonb = JsonbBuilder.create();
+        Jsonb jsonb = JsonbUtil.getJsonb();
         JsonObject jwkJsonObject = jsonb.fromJson(json, JsonObject.class);
 
         JWK jwk;

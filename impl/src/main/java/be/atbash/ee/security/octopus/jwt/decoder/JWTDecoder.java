@@ -17,7 +17,6 @@ package be.atbash.ee.security.octopus.jwt.decoder;
 
 import be.atbash.ee.security.octopus.jwt.InvalidJWTException;
 import be.atbash.ee.security.octopus.jwt.JWTEncoding;
-import be.atbash.ee.security.octopus.jwt.serializer.spi.SerializerProvider;
 import be.atbash.ee.security.octopus.keys.selector.KeySelector;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jwt.EncryptedJWT;
@@ -25,6 +24,7 @@ import be.atbash.ee.security.octopus.nimbus.jwt.JWTClaimsSet;
 import be.atbash.ee.security.octopus.nimbus.jwt.PlainJWT;
 import be.atbash.ee.security.octopus.nimbus.jwt.SignedJWT;
 import be.atbash.ee.security.octopus.nimbus.jwt.proc.DefaultJWTProcessor;
+import be.atbash.ee.security.octopus.util.JsonbUtil;
 import be.atbash.util.PublicAPI;
 import be.atbash.util.StringUtils;
 import be.atbash.util.exception.AtbashIllegalActionException;
@@ -32,8 +32,6 @@ import be.atbash.util.exception.AtbashUnexpectedException;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
-import javax.json.bind.JsonbConfig;
 import java.text.ParseException;
 
 /**
@@ -160,11 +158,7 @@ public class JWTDecoder {
     }
 
     private <T> JWTData<T> readJSONString(String data, Class<T> classType, MetaJWTData metaJWTData) {
-        JsonbConfig config = new JsonbConfig();
-
-        config.withDeserializers(SerializerProvider.getInstance().getDeserializers());
-
-        Jsonb jsonb = JsonbBuilder.create(config);
+        Jsonb jsonb = JsonbUtil.getJsonb();
 
         return new JWTData<>(jsonb.fromJson(data, classType), metaJWTData);
 

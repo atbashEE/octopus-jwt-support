@@ -19,13 +19,13 @@ import be.atbash.ee.security.octopus.exception.ResourceNotFoundException;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
+import be.atbash.ee.security.octopus.util.JsonbUtil;
 import be.atbash.util.exception.AtbashUnexpectedException;
 import be.atbash.util.resource.ResourceUtil;
 
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
@@ -65,7 +65,7 @@ public class KeyReaderJWKSet extends KeyReaderJWK {
     public List<AtbashKey> parseContent(String path, KeyResourcePasswordLookup passwordLookup, String fileContent) {
         List<AtbashKey> result = new ArrayList<>();
 
-        Jsonb jsonb = JsonbBuilder.create();
+        Jsonb jsonb = JsonbUtil.getJsonb();
         JsonObject jsonObject = jsonb.fromJson(fileContent, JsonObject.class);
 
         JsonArray keys = jsonObject.getJsonArray("keys");
