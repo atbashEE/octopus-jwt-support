@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,9 +61,6 @@ import java.io.IOException;
 public class Ed25519Signer extends EdDSAProvider implements JWSSigner {
 
 
-	private final BCEdDSAPrivateKey privateKey;
-
-
 	private final org.bouncycastle.crypto.signers.Ed25519Signer signer;
 
 
@@ -81,10 +78,6 @@ public class Ed25519Signer extends EdDSAProvider implements JWSSigner {
 		if (!Curve.Ed25519.getName().equals(privateKey.getAlgorithm())) {
 			throw new JOSEException("Ed25519Signer only supports OctetKeyPairs with crv=Ed25519");
 		}
-
-
-		this.privateKey = privateKey;
-
 
 		signer = new org.bouncycastle.crypto.signers.Ed25519Signer();
 		CipherParameters parameters = new Ed25519PrivateKeyParameters(getD(privateKey), 0);

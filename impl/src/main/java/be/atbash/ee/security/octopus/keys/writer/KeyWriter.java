@@ -107,7 +107,7 @@ public class KeyWriter {
         }
     }
 
-    private byte[] writeKeyAsJWKSet(AtbashKey atbashKey, JWKSet jwkSet) throws IOException {
+    private byte[] writeKeyAsJWKSet(AtbashKey atbashKey, JWKSet jwkSet) {
         KeyEncoderParameters parameters = new KeyEncoderParameters(jwkSet);
 
         return keyWriterFactory.writeKeyAsJWKSet(atbashKey, parameters);
@@ -238,7 +238,7 @@ public class KeyWriter {
         return keyWriterFactory.writeKeyAsKeyStore(atbashKey, parameters);
     }
 
-    private byte[] writeKeyAsJWK(AtbashKey atbashKey, char[] keyPassword) throws IOException {
+    private byte[] writeKeyAsJWK(AtbashKey atbashKey, char[] keyPassword) {
         //checkKeyPassword(atbashKey, keyPassword);
 
         KeyEncoderParameters parameters = new KeyEncoderParameters(keyPassword);

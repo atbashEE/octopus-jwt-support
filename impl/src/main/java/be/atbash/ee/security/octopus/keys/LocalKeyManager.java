@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,17 +25,10 @@ import be.atbash.ee.security.octopus.keys.selector.SelectorCriteria;
 import be.atbash.ee.security.octopus.keys.selector.filter.KeyFilter;
 import be.atbash.util.StringUtils;
 import be.atbash.util.exception.AtbashIllegalActionException;
-import be.atbash.util.exception.AtbashUnexpectedException;
 
 import javax.enterprise.inject.Vetoed;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 /**
  *
@@ -52,8 +45,6 @@ public class LocalKeyManager extends AbstractKeyManager implements KeyManager {
     private KeyFilesHelper keyFilesHelper;
 
     private KeyResourcePasswordLookup passwordLookup;
-
-    private KeyReaderJWKSet keyReaderJWKSet;
 
     private List<AtbashKey> keys = new ArrayList<>();
 
@@ -102,7 +93,6 @@ public class LocalKeyManager extends AbstractKeyManager implements KeyManager {
             configuration = new JwtSupportConfiguration();
             keyReader = new KeyReader();
             keyFilesHelper = new KeyFilesHelper();
-            keyReaderJWKSet = new KeyReaderJWKSet();
 
             passwordLookup = configuration.getPasswordLookup();
         }

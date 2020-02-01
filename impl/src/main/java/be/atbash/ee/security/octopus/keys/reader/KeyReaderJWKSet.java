@@ -84,7 +84,7 @@ public class KeyReaderJWKSet extends KeyReaderJWK {
                 kids.add(kid);
                 result.addAll(parse(jwkJson.toString(), path, passwordLookup));
             }
-        } catch (ParseException | JOSEException e) {
+        } catch (ParseException e) {
             // TODO We need another exception, indicating that loading failed
             throw new AtbashUnexpectedException(e);
         }

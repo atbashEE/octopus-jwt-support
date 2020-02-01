@@ -59,7 +59,7 @@ public class KeyReaderJWK {
             String fileContent = new Scanner(inputStream).useDelimiter("\\Z").next();
 
             result = parse(fileContent, path, passwordLookup);
-        } catch (ParseException | JOSEException | IOException e) {
+        } catch (ParseException | IOException e) {
             throw new AtbashUnexpectedException(e);
         } finally {
             if (inputStream != null) {
@@ -76,7 +76,7 @@ public class KeyReaderJWK {
     }
 
 
-    protected List<AtbashKey> parse(String json, String path, KeyResourcePasswordLookup passwordLookup) throws ParseException, JOSEException {
+    protected List<AtbashKey> parse(String json, String path, KeyResourcePasswordLookup passwordLookup) throws ParseException {
 
         Jsonb jsonb = JsonbUtil.getJsonb();
         JsonObject jwkJsonObject = jsonb.fromJson(json, JsonObject.class);

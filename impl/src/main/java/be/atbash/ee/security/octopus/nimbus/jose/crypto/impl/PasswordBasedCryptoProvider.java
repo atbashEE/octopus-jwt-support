@@ -87,7 +87,7 @@ public abstract class PasswordBasedCryptoProvider extends BaseJWEProvider {
     /**
      * Creates a new password-based encryption / decryption provider.
      *
-     * @param password The password bytes. Must not be empty or
+     * @param secretKey The secretKey for encryption. Must not be empty or
      *                 {@code null}.
      */
     protected PasswordBasedCryptoProvider(SecretKey secretKey) {

@@ -31,8 +31,6 @@ public class JWTParametersSigning extends JWTParametersHeader {
 
     private AtbashKey secretKeySigning;
 
-    // FIXME Store link to custom Provider (or JCAContext and thus also SecureRandom)
-
     public JWTParametersSigning(Map<String, Object> headerValues, AtbashKey secretKeySigning) {
         super(headerValues);
         this.secretKeySigning = secretKeySigning;

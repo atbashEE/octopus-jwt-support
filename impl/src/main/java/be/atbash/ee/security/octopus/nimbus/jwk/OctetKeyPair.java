@@ -634,7 +634,7 @@ public class OctetKeyPair extends JWK implements AsymmetricJWK, CurveBasedJWK {
         BCEdDSAPublicKey publicKey = null;
         // BCEdDSAPublicKey constructors are package scope !!!
         Constructor<?>[] constructors = BCEdDSAPublicKey.class.getDeclaredConstructors();
-        for (Constructor constructor : constructors) {
+        for (Constructor<?> constructor : constructors) {
             if (AsymmetricKeyParameter.class.isAssignableFrom(constructor.getParameterTypes()[0])) {
                 constructor.setAccessible(true);
                 try {
@@ -662,7 +662,7 @@ public class OctetKeyPair extends JWK implements AsymmetricJWK, CurveBasedJWK {
 
         // BCEdDSAPrivateKey constructors are package scope !!!
         Constructor<?>[] constructors = BCEdDSAPrivateKey.class.getDeclaredConstructors();
-        for (Constructor constructor : constructors) {
+        for (Constructor<?> constructor : constructors) {
             if (AsymmetricKeyParameter.class.isAssignableFrom(constructor.getParameterTypes()[0])) {
                 constructor.setAccessible(true);
                 try {

@@ -48,10 +48,6 @@ import java.security.spec.InvalidKeySpecException;
 
 public class JwkKeyEncoderPrivatePart extends AbstractEncoder implements KeyEncoder {
 
-    public JwkKeyEncoderPrivatePart() {
-        //Security.addProvider(new BouncyCastleProvider());  // FIXME This is JVM Wide
-    }
-
     @Override
     public byte[] encodeKey(AtbashKey atbashKey, KeyEncoderParameters parameters) {
 
@@ -77,7 +73,7 @@ public class JwkKeyEncoderPrivatePart extends AbstractEncoder implements KeyEnco
     }
 
     private byte[] encodeECKey(AtbashKey atbashKey) {
-        Curve curve = deriveCurve(atbashKey);
+        Curve curve = deriveCurve(atbashKey);  // FIXME Move to be.atbash.ee.security.octopus.keys.writer.encoder.AbstractEncoder.getPublicKey
 
         ECKey jwk = new ECKey.Builder(curve, (ECPublicKey) getPublicKey(atbashKey.getKey(), curve)).keyID(atbashKey.getKeyId())
                 .privateKey((ECPrivateKey) atbashKey.getKey())
@@ -88,7 +84,7 @@ public class JwkKeyEncoderPrivatePart extends AbstractEncoder implements KeyEnco
 
     private byte[] encodeOKPKey(AtbashKey atbashKey) {
 
-        // TODO Check if type from BouncyCastle especially when JKD has support for it.
+        // TODO Check if type from BouncyCastle especially when JDK has support for it.
         BCEdDSAPrivateKey key = (BCEdDSAPrivateKey) atbashKey.getKey();
 
         // The next code statements are required to get access to the x and d values of the private Key.
@@ -135,7 +131,7 @@ public class JwkKeyEncoderPrivatePart extends AbstractEncoder implements KeyEnco
     }
 
     private PublicKey getPublicKey(Key key, Curve curve) {
-
+        // FIXME Move to be.atbash.ee.security.octopus.keys.writer.encoder.AbstractEncoder.getPublicKey
         if (key instanceof ECPrivateKey) {
             // TODO Optimize
             if (key instanceof org.bouncycastle.jce.interfaces.ECPrivateKey) {
