@@ -24,6 +24,8 @@ import net.jadler.Jadler;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import uk.org.lidalia.slf4jtest.TestLogger;
+import uk.org.lidalia.slf4jtest.TestLoggerFactory;
 
 import java.net.URI;
 import java.security.interfaces.RSAPublicKey;
@@ -33,17 +35,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class RemoteKeyManagerTest {
 
-    private RemoteKeyManager remoteKeyManager = new RemoteKeyManager();
+    private RemoteKeyManager remoteKeyManager;
+
+    private TestLogger testLogger;
 
     @BeforeEach
     public void setUp() {
-        Jadler.initJadler();
-    }
+        testLogger = TestLoggerFactory.getTestLogger(ValidateRemoteJWKSetURI.class);
 
+        Jadler.initJadler();
+        System.setProperty("atbash.utils.cdi.check", "false");
+        remoteKeyManager = new RemoteKeyManager();
+
+    }
 
     @AfterEach
     public void tearDown() {
         Jadler.closeJadler();
+        System.setProperty("atbash.utils.cdi.check", "");
+        TestLoggerFactory.clear();
     }
 
     @Test
@@ -63,6 +73,18 @@ public class RemoteKeyManagerTest {
 
         List<AtbashKey> keys = remoteKeyManager.retrieveKeys(criteria);
         assertThat(keys).hasSize(1);
+        assertThat(testLogger.getLoggingEvents()).isEmpty();
+    }
+
+    @Test
+    public void retrieveKeys_remoteSet_notValidJKU() {
+
+        SelectorCriteria criteria = SelectorCriteria.newBuilder().withId("remoteKid").withJKU(URI.create("http://localhost:/endpint/notAllowed")).build();
+
+        List<AtbashKey> keys = remoteKeyManager.retrieveKeys(criteria);
+        assertThat(keys).hasSize(0);
+        assertThat(testLogger.getLoggingEvents()).hasSize(1);
+        assertThat(testLogger.getLoggingEvents().get(0).getMessage()).isEqualTo("Following JKU 'http://localhost:/endpint/notAllowed' is not declared as valid. Ignoring value");
     }
 
     private RSAPublicKey generateRSAKeys() {

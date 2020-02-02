@@ -159,7 +159,8 @@ TODO : Describe the default verifications.
 
 == Additional verification
 
-As indicated in the above example, an optional verifier, of type `be.atbash.ee.security.octopus.jwt.decoder.JWTVerifier` can be passed to the decode() method.  The interface has the following verification method:
+As indicated in the above example, an optional verifier, of type `be.atbash.ee.security.octopus.jwt.decoder.JWTVerifier` can be passed to the decode() method.
+The interface has the following verification method:
 
 ----
      boolean verify(CommonJWTHeader header, JWTClaimsSet jwtClaimsSet);
@@ -168,13 +169,25 @@ As indicated in the above example, an optional verifier, of type `be.atbash.ee.s
 The header parameter has the header, either the header for the JWS (signed JWT) or the JWE (encrypted JWT).
 The jwtClaimsSet parameter contains the payload of the JWT. The claims value are still in basic format, so if there is an converter defined, it is not yet applied.
 
+== Validate jku
+
+The `RemoteKeyManager` retrieves the JWKSet from the JKU values defined in the header of a signed/encrypted JWT. However, allowing any URI in this header is a serious security issue as anyone can create a JWT and point to an endpoint he controls.
+There, these URIs needs to be approved.
+
+Create an instance of `RemoteJWKSetURIValidator` and implement the is valid method.
+The instance can be defined through the ServiceLoader mechanism or as CDI bean (when used in a CDI environment) Only those URIs which are denoted as valid will be used.
+
+When no instances of `RemoteJWKSetURIValidator` are found, no URI will be valid.
+
 == Creating JWE
 
-Creating a JWE, the JWT variant which uses encryption, is very similar in creating a signed version. This is done on purpose so that creating a signed JWT or an encrypted JWT is similar and developers don't need to learn different patterns.
+Creating a JWE, the JWT variant which uses encryption, is very similar in creating a signed version.
+This is done on purpose so that creating a signed JWT or an encrypted JWT is similar and developers don't need to learn different patterns.
 
     String encoded = new JWTEncoder().encode(payload, parameters);
 
-The `JWTEncoder` class can also be used for creating a JWE. The difference is the parameter we supply, when encoding. The following example shows the minimal required parameters.
+The `JWTEncoder` class can also be used for creating a JWE. The difference is the parameter we supply, when encoding.
+The following example shows the minimal required parameters.
 
     JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWE)
             .withSecretKeyForSigning(signKey)

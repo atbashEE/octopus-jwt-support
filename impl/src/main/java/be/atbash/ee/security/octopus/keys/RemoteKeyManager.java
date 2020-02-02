@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,17 +19,16 @@ import be.atbash.ee.security.octopus.keys.retriever.JWKSetRetriever;
 import be.atbash.ee.security.octopus.keys.selector.SelectorCriteria;
 import be.atbash.ee.security.octopus.keys.selector.filter.KeyFilter;
 import be.atbash.ee.security.octopus.nimbus.jwk.JWKSet;
+import be.atbash.util.CDIUtils;
 import be.atbash.util.exception.AtbashIllegalActionException;
+import be.atbash.util.reflection.CDICheck;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.enterprise.inject.Vetoed;
 import java.io.IOException;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Vetoed
 public class RemoteKeyManager extends AbstractKeyManager implements KeyManager {
@@ -40,6 +39,8 @@ public class RemoteKeyManager extends AbstractKeyManager implements KeyManager {
 
     private JWKSetRetriever jwkSetRetriever = new JWKSetRetriever();
 
+    private ValidateRemoteJWKSetURI validator = retrieveJWKSetURIValidator();
+
     @Override
     public List<AtbashKey> retrieveKeys(SelectorCriteria selectorCriteria) {
         if (selectorCriteria == null) {
@@ -49,11 +50,15 @@ public class RemoteKeyManager extends AbstractKeyManager implements KeyManager {
         List<AtbashKey> result = new ArrayList<>();
 
         if (selectorCriteria.getJku() != null) {
-            List<KeyFilter> filters = selectorCriteria.asKeyFilters();
-            JWKSet jwkSet = getJWKSet(selectorCriteria.getJku());
 
-            if (jwkSet != null) {
-                result = filterKeys(jwkSet.getAtbashKeys(), filters);
+            if (validator.validate(selectorCriteria.getJku())) {
+
+                List<KeyFilter> filters = selectorCriteria.asKeyFilters();
+                JWKSet jwkSet = getJWKSet(selectorCriteria.getJku());
+
+                if (jwkSet != null) {
+                    result = filterKeys(jwkSet.getAtbashKeys(), filters);
+                }
             }
         }
 
@@ -82,4 +87,18 @@ public class RemoteKeyManager extends AbstractKeyManager implements KeyManager {
         // For the startup logging.
         return "class " + RemoteKeyManager.class.getName();
     }
+
+    private static ValidateRemoteJWKSetURI retrieveJWKSetURIValidator() {
+
+        List<RemoteJWKSetURIValidator> validators = new ArrayList<>();
+
+        ServiceLoader<RemoteJWKSetURIValidator> loader = ServiceLoader.load(RemoteJWKSetURIValidator.class);
+        loader.forEach(validators::add);
+
+        if (CDICheck.withinContainer()) {
+            validators.addAll(CDIUtils.retrieveInstances(RemoteJWKSetURIValidator.class));
+        }
+        return new ValidateRemoteJWKSetURI(validators);
+    }
+
 }
