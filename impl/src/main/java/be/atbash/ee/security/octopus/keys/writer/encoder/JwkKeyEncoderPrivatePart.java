@@ -16,6 +16,7 @@
 package be.atbash.ee.security.octopus.keys.writer.encoder;
 
 import be.atbash.ee.security.octopus.UnsupportedKeyType;
+import be.atbash.ee.security.octopus.jwk.EncryptedJSONJWK;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.ECCurveHelper;
 import be.atbash.ee.security.octopus.keys.writer.KeyEncoderParameters;
@@ -52,37 +53,49 @@ public class JwkKeyEncoderPrivatePart extends AbstractEncoder implements KeyEnco
     public byte[] encodeKey(AtbashKey atbashKey, KeyEncoderParameters parameters) {
 
         if (KeyType.RSA.equals(atbashKey.getSecretKeyType().getKeyType())) {
-            return encodeRSAKey(atbashKey);
+            return encodeRSAKey(atbashKey, parameters);
         }
         if (KeyType.EC.equals(atbashKey.getSecretKeyType().getKeyType())) {
-            return encodeECKey(atbashKey);
+            return encodeECKey(atbashKey, parameters);
         }
         if (KeyType.OKP.equals(atbashKey.getSecretKeyType().getKeyType())) {
-            return encodeOKPKey(atbashKey);
+            return encodeOKPKey(atbashKey, parameters);
         }
 
         throw new UnsupportedKeyType(atbashKey.getSecretKeyType().getKeyType(), "writing JWK");
     }
 
-    private byte[] encodeRSAKey(AtbashKey atbashKey) {
+    private byte[] encodeRSAKey(AtbashKey atbashKey, KeyEncoderParameters parameters) {
         RSAKey rsaKey = new RSAKey.Builder((RSAPublicKey) getPublicKey(atbashKey.getKey())).keyID(atbashKey.getKeyId())
                 .privateKey((RSAPrivateKey) atbashKey.getKey())
                 .build();
 
-        return rsaKey.toJSONObject().build().toString().getBytes(StandardCharsets.UTF_8);
+        String result;
+        if (parameters.getKeyPassword() != null) {
+            result = EncryptedJSONJWK.encryptedOutput(rsaKey, parameters.getKeyPassword());
+        } else {
+            result = rsaKey.toJSONObject().build().toString();
+        }
+        return result.getBytes(StandardCharsets.UTF_8);
     }
 
-    private byte[] encodeECKey(AtbashKey atbashKey) {
+    private byte[] encodeECKey(AtbashKey atbashKey, KeyEncoderParameters parameters) {
         Curve curve = deriveCurve(atbashKey);  // FIXME Move to be.atbash.ee.security.octopus.keys.writer.encoder.AbstractEncoder.getPublicKey
 
-        ECKey jwk = new ECKey.Builder(curve, (ECPublicKey) getPublicKey(atbashKey.getKey(), curve)).keyID(atbashKey.getKeyId())
+        ECKey ecKey = new ECKey.Builder(curve, (ECPublicKey) getPublicKey(atbashKey.getKey(), curve)).keyID(atbashKey.getKeyId())
                 .privateKey((ECPrivateKey) atbashKey.getKey())
                 .build();
 
-        return jwk.toJSONObject().build().toString().getBytes(StandardCharsets.UTF_8);
+        String result;
+        if (parameters.getKeyPassword() != null) {
+            result = EncryptedJSONJWK.encryptedOutput(ecKey, parameters.getKeyPassword());
+        } else {
+            result = ecKey.toJSONObject().build().toString();
+        }
+        return result.getBytes(StandardCharsets.UTF_8);
     }
 
-    private byte[] encodeOKPKey(AtbashKey atbashKey) {
+    private byte[] encodeOKPKey(AtbashKey atbashKey, KeyEncoderParameters parameters) {
 
         // TODO Check if type from BouncyCastle especially when JDK has support for it.
         BCEdDSAPrivateKey key = (BCEdDSAPrivateKey) atbashKey.getKey();
@@ -117,7 +130,13 @@ public class JwkKeyEncoderPrivatePart extends AbstractEncoder implements KeyEnco
                 .d(Base64URLValue.encode(dBytes))
                 .build();
 
-        return jwk.toJSONObject().build().toString().getBytes(StandardCharsets.UTF_8);
+        String result;
+        if (parameters.getKeyPassword() != null) {
+            result = EncryptedJSONJWK.encryptedOutput(jwk, parameters.getKeyPassword());
+        } else {
+            result = jwk.toJSONObject().build().toString();
+        }
+        return result.getBytes(StandardCharsets.UTF_8);
     }
 
     private Curve deriveCurve(AtbashKey atbashKey) {

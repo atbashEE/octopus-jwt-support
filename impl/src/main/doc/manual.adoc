@@ -357,6 +357,13 @@ The 2 last parameters are used depending on the type of the format.
 * keyPassword: Used for encryption of the key, when this is used in the format or requested through a config parameter (for PEM format for example)
 * filePassword: Used for the encryption of the file when file is encrypted as a whole (like with Java Key store). This password is also used for reading it first if the file already exists.
 
+When you write out a private Key in the JWK format, a key password is required. All sensitive JSON values are encrypted and written as 'enc' to the JWK.  Reading such a format requires the same password to retrieve the keys from it.
+This is an alternative for the signing and encryption of the JWK, but ony supported by Atbash.
+
+If you do not want to create this encrypted format of Atbash, set the parameter `jwt.jwk.encrypted` to false.
+
+When you convert a JWK with the `JWTEncoder`to JSON, the conversion is not performed as there is no possibility to supply a password.
+
 == Define Serializer
 
 When a custom JSON serializer is required
@@ -501,3 +508,9 @@ default : **none**
 Algorithm name for the SecureRandom implementation.
 
 When no value is set, JVM configured one will be taken.
+
+=== jwt.jwk.encrypted
+
+default : **true**
+
+Are private Keys written by the `KeyWriter` 'encrypted' using the Custom Atbash format?

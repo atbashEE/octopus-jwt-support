@@ -225,6 +225,11 @@ public class JwtSupportConfiguration extends AbstractConfiguration implements Mo
         return configValue;
     }
 
+    @ConfigEntry
+    public boolean isJWKEncrypted() {
+        return getOptionalValue("jwt.jwk.encrypted", Boolean.TRUE, Boolean.class);
+    }
+
     // Java SE Support
     private static JwtSupportConfiguration INSTANCE;
 

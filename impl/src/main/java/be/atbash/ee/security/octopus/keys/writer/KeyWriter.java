@@ -180,7 +180,6 @@ public class KeyWriter {
             switch (keyResourceType) {
 
                 case JWK:
-                    // FIXME support for encrypted JWK of Atbash (see JWKEncryptedCreator)
                     result = writeKeyAsJWK(atbashKey, keyPassword);
                     break;
                 case JWKSET:
@@ -239,7 +238,9 @@ public class KeyWriter {
     }
 
     private byte[] writeKeyAsJWK(AtbashKey atbashKey, char[] keyPassword) {
-        //checkKeyPassword(atbashKey, keyPassword);
+        if (jwtSupportConfiguration.isJWKEncrypted()) {
+            checkKeyPassword(atbashKey, keyPassword);
+        }
 
         KeyEncoderParameters parameters = new KeyEncoderParameters(keyPassword);
 

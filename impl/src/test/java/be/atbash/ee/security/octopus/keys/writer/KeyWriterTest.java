@@ -23,6 +23,8 @@ import be.atbash.ee.security.octopus.keys.TestPasswordLookup;
 import be.atbash.ee.security.octopus.keys.reader.KeyReader;
 import be.atbash.ee.security.octopus.keys.reader.KeyResourceType;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
+import be.atbash.ee.security.octopus.keys.selector.filter.AsymmetricPartKeyFilter;
+import be.atbash.ee.security.octopus.keys.selector.filter.KeyFilter;
 import be.atbash.ee.security.octopus.nimbus.jwk.JWKSet;
 import be.atbash.util.TestReflectionUtils;
 import be.atbash.util.resource.ResourceUtil;
@@ -144,6 +146,8 @@ public class KeyWriterTest {
     @Test
     public void writeKeyResource_scenario5() throws IOException {
         // scenario 5 RSA private key as JWK
+        when(jwtSupportConfigurationMock.isJWKEncrypted()).thenReturn(false);
+
         List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.jwk");
 
         AtbashKey privateKey = filterKeys(keys, AsymmetricPart.PRIVATE);
@@ -161,6 +165,25 @@ public class KeyWriterTest {
         for (String key : expected.keySet()) {
             assertThat(expected.getString(key)).isEqualTo(data.getString(key));
         }
+    }
+
+    @Test
+    public void writeKeyResource_RSA_encrypted() throws IOException {
+        // RSA Private key is 'encrypted'
+        when(jwtSupportConfigurationMock.isJWKEncrypted()).thenReturn(true);
+
+        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.jwk");
+        // FIXME use this technique everywhere to filter keys instead of KeySelector.
+        KeyFilter filter = new AsymmetricPartKeyFilter(AsymmetricPart.PRIVATE);
+        AtbashKey privateKey = filter.filter(keys).get(0);
+
+        byte[] bytes = keyWriter.writeKeyResource(privateKey, KeyResourceType.JWK, "atbash".toCharArray());
+        Jsonb jsonb = JsonbBuilder.create();
+
+        JsonObject data = jsonb.fromJson(new String(bytes), JsonObject.class);
+        assertThat(data.keySet()).containsOnly("kty", "kid", "enc");
+
+        // test to get the AtbashKey back, see KeyReaderJWKTest
     }
 
     @Test
@@ -209,6 +232,8 @@ public class KeyWriterTest {
     @Test
     public void writeKeyResource_scenario9() throws IOException, ParseException {
         // scenario 9 RSA private key as JWKSet
+        when(jwtSupportConfigurationMock.isJWKEncrypted()).thenReturn(false);
+
         List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.jwk");
 
         AtbashKey privateKey = filterKeys(keys, AsymmetricPart.PRIVATE);
