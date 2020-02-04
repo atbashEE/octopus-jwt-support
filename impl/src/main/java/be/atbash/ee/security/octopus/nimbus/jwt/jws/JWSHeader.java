@@ -345,6 +345,13 @@ public final class JWSHeader extends CommonJWTHeader {
          */
         public Builder customParam(String name, Object value) throws CustomParameterNameException {
 
+            if ("jku".equals(name)) {
+                if (!(value instanceof URI)) {
+                    throw new IllegalArgumentException("The type of the parameter \"jku\" must be URI.");
+                }
+                jku = (URI) value;
+                return this;
+            }
             if (getRegisteredParameterNames().contains(name)) {
                 throw new CustomParameterNameException(name);
             }

@@ -485,6 +485,7 @@ public class JWSHeaderTest {
     @Test
     public void customParam_denyRegisteredNames() {
         Set<String> registeredParameterNames = JWSHeader.getRegisteredParameterNames();
+        registeredParameterNames.remove("jku");
 
         for (String name : registeredParameterNames) {
 
@@ -498,6 +499,8 @@ public class JWSHeaderTest {
     @Test
     public void customParam_denyRegisteredNames_asMap() {
         Set<String> registeredParameterNames = JWSHeader.getRegisteredParameterNames();
+        registeredParameterNames.remove("jku");
+
         for (String name : registeredParameterNames) {
 
             CustomParameterNameException exception = Assertions.assertThrows(CustomParameterNameException.class, () -> {
@@ -514,6 +517,19 @@ public class JWSHeaderTest {
     @Test
     public void getRegisteredParameterNames() {
         assertThat(JWSHeader.getRegisteredParameterNames()).hasSize(10);
+    }
+
+    @Test
+    public void testParameterJKU()
+            throws Exception {
+
+        String uriStr = "http://localhost/something";
+        URI jku = URI.create(uriStr);
+        JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.HS256)
+                .customParam("jku", jku)
+                .build();
+
+        assertThat(header.getJWKURL().toASCIIString()).isEqualTo(uriStr);
     }
 }
 

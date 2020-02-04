@@ -586,9 +586,9 @@ public final class JWEHeader extends CommonJWTHeader {
 
         /**
          * Due to JWTParametersBuilder#defineKeyBasedOnPassword() where p2s and p2c are defined as custom.
-         * TODO search for a better alternative.
+         * FIXME search for a better alternative. see also JWSHeader.Builder#customParam(java.lang.String, java.lang.Object)
          *
-         * @param name The parameter name
+         * @param name  The parameter name
          * @param value The parameter value
          * @return Is the parameter name one of the special names and handled by this method.
          */
