@@ -58,11 +58,28 @@ public class RemoteKeyManager extends AbstractKeyManager implements KeyManager {
 
                 if (jwkSet != null) {
                     result = filterKeys(jwkSet.getAtbashKeys(), filters);
+
+                    if (result.isEmpty()) {
+                        // Not found in the jwkSet, maybe cache needs to be expired and reread
+
+                        dropCache(selectorCriteria.getJku());
+                        jwkSet = getJWKSet(selectorCriteria.getJku());
+
+                        if (jwkSet != null) {
+                            result = filterKeys(jwkSet.getAtbashKeys(), filters);
+                        }
+
+                    }
                 }
+
             }
         }
 
         return result;
+    }
+
+    private void dropCache(URI jku) {
+        remoteJWKSetCache.remove(jku);
     }
 
     private JWKSet getJWKSet(URI jku) {
