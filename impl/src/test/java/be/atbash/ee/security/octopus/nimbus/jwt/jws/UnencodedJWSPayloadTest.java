@@ -81,7 +81,7 @@ public class UnencodedJWSPayloadTest {
         Base64URLValue headerB64 = new Base64URLValue("eyJhbGciOiJIUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19");
         JWSHeader header = JWSHeader.parse(headerB64);
         assertThat(header.getAlgorithm()).isEqualTo(JWSAlgorithm.HS256);
-        assertThat((Boolean) header.getCustomParam("b64")).isFalse();
+        assertThat((Boolean) header.getCustomParameter("b64")).isFalse();
         Set<String> crit = header.getCriticalParams();
         assertThat(crit.contains("b64")).isTrue();
         assertThat(crit).hasSize(1);
@@ -111,7 +111,7 @@ public class UnencodedJWSPayloadTest {
         //Create JWT
 
         JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.HS256)
-                .customParam("b64", false)
+                .parameter("b64", false)
                 .build();
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                 .claim("foo", "bar")
@@ -125,7 +125,7 @@ public class UnencodedJWSPayloadTest {
         signedJWT = SignedJWT.parse(serializedJWT);
 
         //Then
-        assertThat((Boolean) header.getCustomParam("b64")).isFalse();
+        assertThat((Boolean) header.getCustomParameter("b64")).isFalse();
 
         JWSVerifier verifier = new MACVerifier(JWK, new HashSet<>(Collections.singletonList("b64")));
         byte[] payloadBytes = claimsSet.toString().getBytes(StandardCharsets.UTF_8);

@@ -95,7 +95,7 @@ public class JWTDecoder {
     private <T> JWTData<T> readPlainJWT(String data, Class<T> classType) throws ParseException {
         PlainJWT plainJWT = PlainJWT.parse(data);
 
-        MetaJWTData metaJWTData = new MetaJWTData(null, plainJWT.getHeader().getCustomParams());
+        MetaJWTData metaJWTData = new MetaJWTData(null, plainJWT.getHeader().getCustomParameters());
 
 
         JWTClaimsSet jwtClaimsSet = plainJWT.getJWTClaimsSet();
@@ -122,7 +122,7 @@ public class JWTDecoder {
             }
         }
 
-        MetaJWTData metaJWTData = new MetaJWTData(keyID, encryptedJWT.getHeader().getCustomParams());
+        MetaJWTData metaJWTData = new MetaJWTData(keyID, encryptedJWT.getHeader().getCustomParameters());
 
         if (classType.equals(JWTClaimsSet.class)) {
             return new JWTData<>((T) jwtClaimsSet, metaJWTData);
@@ -145,7 +145,7 @@ public class JWTDecoder {
         }
 
         String keyID = signedJWT.getHeader().getKeyID();
-        MetaJWTData metaJWTData = new MetaJWTData(keyID, signedJWT.getHeader().getCustomParams());
+        MetaJWTData metaJWTData = new MetaJWTData(keyID, signedJWT.getHeader().getCustomParameters());
 
         if (classType.equals(JWTClaimsSet.class)) {
             return new JWTData<>((T) jwtClaimsSet, metaJWTData);

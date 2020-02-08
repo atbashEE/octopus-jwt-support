@@ -16,7 +16,6 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto.impl;
 
 
-import be.atbash.ee.security.octopus.nimbus.jose.CustomParameterNameException;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
 import org.junit.jupiter.api.Test;
@@ -58,7 +57,7 @@ public class CriticalHeaderParamsDeferralTest {
     }
 
     @Test
-    public void testPassMissingCritHeader() throws CustomParameterNameException {
+    public void testPassMissingCritHeader() {
 
         CriticalHeaderParamsDeferral checker = new CriticalHeaderParamsDeferral();
 
@@ -68,14 +67,14 @@ public class CriticalHeaderParamsDeferralTest {
     }
 
     @Test
-    public void testPassIgnoredCritParams() throws CustomParameterNameException {
+    public void testPassIgnoredCritParams() {
 
         CriticalHeaderParamsDeferral checker = new CriticalHeaderParamsDeferral();
         checker.setDeferredCriticalHeaderParams(new HashSet<>(Collections.singletonList("exp")));
 
         JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.RS256).
                 keyID("1").
-                customParam("exp", "2014-04-24").
+                parameter("exp", "2014-04-24").
                 criticalParams(new HashSet<>(Collections.singletonList("exp"))).
                 build();
 
@@ -83,13 +82,13 @@ public class CriticalHeaderParamsDeferralTest {
     }
 
     @Test
-    public void testReject() throws CustomParameterNameException {
+    public void testReject() {
 
         CriticalHeaderParamsDeferral checker = new CriticalHeaderParamsDeferral();
 
         JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.RS256).
                 keyID("1").
-                customParam("exp", "2014-04-24").
+                parameter("exp", "2014-04-24").
                 criticalParams(new HashSet<>(Collections.singletonList("exp"))).
                 build();
 

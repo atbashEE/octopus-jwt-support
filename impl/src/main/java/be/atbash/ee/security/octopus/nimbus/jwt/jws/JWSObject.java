@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -117,7 +117,7 @@ public class JWSObject extends JOSEObject {
 
         setPayload(payload);
 
-        if (header.getCustomParam("b64") == null || (Boolean) header.getCustomParam("b64")) {
+        if (header.getCustomParameter("b64") == null || (Boolean) header.getCustomParameter("b64")) {
             signingInputString = composeSigningInput(header.toBase64URL(), payload.toBase64URL());
         } else {
             signingInputString = header.toBase64URL().toString() + '.' + payload.toString();

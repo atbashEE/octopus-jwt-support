@@ -49,7 +49,7 @@ public class PlainJWTTest {
     public void testHeaderAndClaimsSetConstructor()
             throws Exception {
 
-        PlainHeader header = new PlainHeader.Builder().customParam("exp", 1000L).build();
+        PlainHeader header = new PlainHeader.Builder().parameter("exp", 1000L).build();
 
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                 .subject("alice")

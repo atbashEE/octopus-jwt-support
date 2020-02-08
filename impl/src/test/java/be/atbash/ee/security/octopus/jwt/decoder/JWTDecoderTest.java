@@ -124,7 +124,7 @@ public class JWTDecoderTest {
 
         JWTVerifier verifier = (header, jwtClaimsSet) -> {
             boolean result = true;
-            if (!"value1".equals(header.getCustomParam("head1"))) {
+            if (!"value1".equals(header.getCustomParameter("head1"))) {
                 result = false;
             }
             if (!"123".equals(jwtClaimsSet.getClaim("value"))) {
@@ -156,7 +156,7 @@ public class JWTDecoderTest {
 
         JWTVerifier verifier = (header, jwtClaimsSet) -> {
             boolean result = true;
-            if (!"value1".equals(header.getCustomParam("head1"))) {
+            if (!"value1".equals(header.getCustomParameter("head1"))) {
                 result = false;
             }
             if (!"123".equals(jwtClaimsSet.getClaim("value"))) {
@@ -187,7 +187,7 @@ public class JWTDecoderTest {
 
         JWTVerifier verifier = (header, jwtClaimsSet) -> {
             boolean result = true;
-            if (!"value1".equals(header.getCustomParam("head1"))) {
+            if (!"value1".equals(header.getCustomParameter("head1"))) {
                 result = false;
             }
             if (!"321".equals(jwtClaimsSet.getClaim("value"))) {

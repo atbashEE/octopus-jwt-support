@@ -16,6 +16,7 @@
 package be.atbash.ee.security.octopus.nimbus.jose;
 
 
+import be.atbash.ee.security.octopus.nimbus.HeaderParameterType;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEHeader;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
@@ -28,14 +29,17 @@ import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 import java.io.Serializable;
 import java.text.ParseException;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 
 /**
  * The base abstract class for unsecured ({@code alg=none}), JSON Web Signature
  * (JWS) and JSON Web Encryption (JWE) headers.
  *
- * <p>The header may also include {@link #getCustomParams custom
+ * <p>The header may also include {@link #getCustomParameters custom
  * parameters}; these will be serialised and parsed along the registered ones.
  *
  * @author Vladimir Dzhuvinov
@@ -74,7 +78,7 @@ public abstract class Header implements Serializable {
     /**
      * Custom header parameters.
      */
-    private final Map<String, Object> customParams;
+    private final Map<String, Object> customParameters;
 
 
     /**
@@ -86,22 +90,7 @@ public abstract class Header implements Serializable {
     /**
      * The registered parameter names.
      */
-    private static final Set<String> REGISTERED_PARAMETER_NAMES;
-
-
-    /*
-     * Initialises the registered parameter name set.
-     */
-    static {
-        Set<String> claims = new HashSet<>();
-
-        claims.add("alg");
-        claims.add("typ");
-        claims.add("cty");
-        claims.add("crit");
-
-        REGISTERED_PARAMETER_NAMES = Collections.unmodifiableSet(claims);
-    }
+    private static final Set<String> REGISTERED_PARAMETER_NAMES = HeaderParameterType.getHeaderParameters();
 
     /**
      * Creates a new abstract header.
@@ -115,66 +104,52 @@ public abstract class Header implements Serializable {
      * @param crit            The names of the critical header
      *                        ({@code crit}) parameters, empty set or
      *                        {@code null} if none.
-     * @param customParams    The custom parameters, empty map or
+     * @param parameters      The custom parameters, empty map or
      *                        {@code null} if none.
      * @param parsedBase64URL The parsed Base64URL, {@code null} if the
      *                        header is created from scratch.
      */
     protected Header(Algorithm alg,
                      JOSEObjectType typ,
-                     String cty, Set<String> crit,
-                     Map<String, Object> customParams,
-                     Base64URLValue parsedBase64URL) throws CustomParameterNameException {
+                     String cty,
+                     Set<String> crit,
+                     Map<String, Object> parameters,
+                     Base64URLValue parsedBase64URL) {
 
-        if (alg == null) {
+        this.alg = HeaderParameterType.getParameterValue("alg", alg, parameters);
+        if (this.alg == null) {
             throw new IllegalArgumentException("The algorithm \"alg\" header parameter must not be null");
         }
 
-        this.alg = alg;
+        this.typ = HeaderParameterType.getParameterValue("typ", typ, parameters);
+        this.cty = HeaderParameterType.getParameterValue("cty", cty, parameters);
 
-        this.typ = typ;
-        this.cty = cty;
-
-        if (crit != null) {
+        Set<String> temp = HeaderParameterType.getParameterValue("crit", crit, parameters);
+        if (temp != null) {
             // Copy and make unmodifiable
-            this.crit = Collections.unmodifiableSet(new HashSet<>(crit));
+            this.crit = Collections.unmodifiableSet(new HashSet<>(temp));
         } else {
             this.crit = null;
         }
 
-        if (customParams != null) {
-            checkCustomParameterNames(customParams);
-            // Copy and make unmodifiable
-            this.customParams = Collections.unmodifiableMap(new HashMap<>(customParams));
-        } else {
-            this.customParams = Collections.unmodifiableMap(new HashMap<>());
-        }
+        this.customParameters = HeaderParameterType.filterOutRegisteredNames(parameters, REGISTERED_PARAMETER_NAMES);
 
         this.parsedBase64URL = parsedBase64URL;
     }
-
-    protected void checkCustomParameterNames(Map<String, Object> customParams) throws CustomParameterNameException {
-        for (String name : customParams.keySet()) {
-            if (REGISTERED_PARAMETER_NAMES.contains(name)) {
-                throw new CustomParameterNameException(name);
-            }
-        }
-    }
-
 
     /**
      * Deep copy constructor.
      *
      * @param header The header to copy. Must not be {@code null}.
      */
-    protected Header(Header header) throws CustomParameterNameException {
+    protected Header(Header header) {
 
         this(
                 header.getAlgorithm(),
                 header.getType(),
                 header.getContentType(),
                 header.getCriticalParams(),
-                header.getCustomParams(),
+                header.getCustomParameters(),
                 header.getParsedBase64URL());
     }
 
@@ -231,9 +206,9 @@ public abstract class Header implements Serializable {
      *             {@code null}.
      * @return The custom parameter, {@code null} if not specified.
      */
-    public Object getCustomParam(final String name) {
+    public Object getCustomParameter(String name) {
 
-        return customParams.get(name);
+        return customParameters.get(name);
     }
 
 
@@ -243,9 +218,9 @@ public abstract class Header implements Serializable {
      * @return The custom parameters, as a unmodifiable map, empty map if
      * none.
      */
-    public Map<String, Object> getCustomParams() {
+    public Map<String, Object> getCustomParameters() {
 
-        return customParams;
+        return customParameters;
     }
 
 
@@ -267,10 +242,10 @@ public abstract class Header implements Serializable {
      *
      * @return The included parameters.
      */
-    public Set<String> getIncludedParams() {
+    public Set<String> getIncludedParameters() {
 
         Set<String> includedParameters =
-                new HashSet<>(getCustomParams().keySet());
+                new HashSet<>(getCustomParameters().keySet());
 
         includedParameters.add("alg");
 
@@ -302,7 +277,7 @@ public abstract class Header implements Serializable {
         // Include custom parameters, they will be overwritten if their
         // names match specified registered ones
         JsonObjectBuilder result = Json.createObjectBuilder();
-        customParams.forEach((key, value) -> JSONObjectUtils.addValue(result, key, value));
+        customParameters.forEach((key, value) -> JSONObjectUtils.addValue(result, key, value));
 
         // Alg is always defined
         result.add("alg", alg.toString());

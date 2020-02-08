@@ -83,15 +83,15 @@ public class PlainHeaderTest {
                 customParams,
                 null);
 
-        assertThat(header.getIncludedParams()).containsOnly("alg", "typ", "cty", "crit", "xCustom");
+        assertThat(header.getIncludedParameters()).containsOnly("alg", "typ", "cty", "crit", "xCustom");
 
 
         assertThat(header.getAlgorithm()).isEqualTo(Algorithm.NONE);
         assertThat(header.getType()).isEqualTo(new JOSEObjectType("JWT"));
         assertThat(header.getContentType()).isEqualTo("application/jwt");
         assertThat(header.getCriticalParams().size()).isEqualTo(3);
-        assertThat(header.getCustomParam("xCustom")).isEqualTo("abc");
-        assertThat(header.getCustomParams().size()).isEqualTo(1);
+        assertThat(header.getCustomParameter("xCustom")).isEqualTo("abc");
+        assertThat(header.getCustomParameters().size()).isEqualTo(1);
         assertThat(header.getParsedBase64URL()).isNull();
 
         Base64URLValue b64url = header.toBase64URL();
@@ -105,8 +105,8 @@ public class PlainHeaderTest {
         assertThat(header.getType()).isEqualTo(new JOSEObjectType("JWT"));
         assertThat(header.getContentType()).isEqualTo("application/jwt");
         assertThat(header.getCriticalParams().size()).isEqualTo(3);
-        assertThat(header.getCustomParam("xCustom")).isEqualTo("abc");
-        assertThat(header.getCustomParams().size()).isEqualTo(1);
+        assertThat(header.getCustomParameter("xCustom")).isEqualTo("abc");
+        assertThat(header.getCustomParameters().size()).isEqualTo(1);
         assertThat(header.getParsedBase64URL()).isEqualTo(b64url);
 
         // Copy
@@ -116,8 +116,8 @@ public class PlainHeaderTest {
         assertThat(header.getType()).isEqualTo(new JOSEObjectType("JWT"));
         assertThat(header.getContentType()).isEqualTo("application/jwt");
         assertThat(header.getCriticalParams().size()).isEqualTo(3);
-        assertThat(header.getCustomParam("xCustom")).isEqualTo("abc");
-        assertThat(header.getCustomParams().size()).isEqualTo(1);
+        assertThat(header.getCustomParameter("xCustom")).isEqualTo("abc");
+        assertThat(header.getCustomParameters().size()).isEqualTo(1);
         assertThat(header.getParsedBase64URL()).isEqualTo(b64url);
     }
 
@@ -134,10 +134,10 @@ public class PlainHeaderTest {
                 type(new JOSEObjectType("JWT")).
                 contentType("application/jwt").
                 criticalParams(crit).
-                customParam("xCustom", "abc").
+                parameter("xCustom", "abc").
                 build();
 
-        assertThat(header.getIncludedParams()).containsOnly("alg", "typ", "cty", "crit", "xCustom");
+        assertThat(header.getIncludedParameters()).containsOnly("alg", "typ", "cty", "crit", "xCustom");
 
         Base64URLValue b64url = header.toBase64URL();
 
@@ -150,8 +150,8 @@ public class PlainHeaderTest {
         assertThat(header.getType()).isEqualTo(new JOSEObjectType("JWT"));
         assertThat(header.getContentType()).isEqualTo("application/jwt");
         assertThat(header.getCriticalParams().size()).isEqualTo(3);
-        assertThat(header.getCustomParam("xCustom")).isEqualTo("abc");
-        assertThat(header.getCustomParams().size()).isEqualTo(1);
+        assertThat(header.getCustomParameter("xCustom")).isEqualTo("abc");
+        assertThat(header.getCustomParameters().size()).isEqualTo(1);
     }
 
     @Test
@@ -169,19 +169,19 @@ public class PlainHeaderTest {
     }
 
     @Test
-    public void testBuilderWithCustomParams() throws CustomParameterNameException {
+    public void testBuilderWithCustomParams() {
 
         Map<String, Object> customParams = new HashMap<>();
         customParams.put("x", "1");
         customParams.put("y", "2");
 
         PlainHeader header = new PlainHeader.Builder().
-                customParams(customParams).
+                parameters(customParams).
                 build();
 
-        assertThat(header.getCustomParam("x")).isEqualTo("1");
-        assertThat(header.getCustomParam("y")).isEqualTo("2");
-        assertThat(header.getCustomParams().size()).isEqualTo(2);
+        assertThat(header.getCustomParameter("x")).isEqualTo("1");
+        assertThat(header.getCustomParameter("y")).isEqualTo("2");
+        assertThat(header.getCustomParameters().size()).isEqualTo(2);
     }
 
     @Test

@@ -16,14 +16,16 @@
 package be.atbash.ee.security.octopus.nimbus.jwt.jws;
 
 
-import be.atbash.ee.security.octopus.nimbus.jose.*;
+import be.atbash.ee.security.octopus.nimbus.jose.Algorithm;
+import be.atbash.ee.security.octopus.nimbus.jose.Header;
+import be.atbash.ee.security.octopus.nimbus.jose.JOSEObjectType;
+import be.atbash.ee.security.octopus.nimbus.jose.PlainHeader;
 import be.atbash.ee.security.octopus.nimbus.jwk.JWK;
 import be.atbash.ee.security.octopus.nimbus.jwt.CommonJWTHeader;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.ee.security.octopus.nimbus.util.Base64Value;
 import be.atbash.ee.security.octopus.nimbus.util.JSONObjectUtils;
 import be.atbash.ee.security.octopus.nimbus.util.X509CertChainUtils;
-import be.atbash.util.exception.AtbashUnexpectedException;
 
 import javax.json.JsonObject;
 import java.net.URI;
@@ -51,7 +53,7 @@ import java.util.*;
  *     <li>crit
  * </ul>
  *
- * <p>The header may also include {@link #getCustomParams custom
+ * <p>The header may also include {@link #getCustomParameters custom
  * parameters}; these will be serialised and parsed along the registered ones.
  *
  * <p>Example header of a JSON Web Signature (JWS) object using the
@@ -80,7 +82,7 @@ public final class JWSHeader extends CommonJWTHeader {
      * <pre>
      * JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.HS256).
      *                    contentType("text/plain").
-     *                    customParam("exp", new Date().getTime()).
+     *                    parameter("exp", new Date().getTime()).
      *                    build();
      * </pre>
      */
@@ -150,7 +152,7 @@ public final class JWSHeader extends CommonJWTHeader {
         /**
          * Custom header parameters.
          */
-        private Map<String, Object> customParams;
+        private Map<String, Object> parameters;
 
 
         /**
@@ -196,7 +198,7 @@ public final class JWSHeader extends CommonJWTHeader {
             x5t256 = jwsHeader.getX509CertSHA256Thumbprint();
             x5c = jwsHeader.getX509CertChain();
             kid = jwsHeader.getKeyID();
-            customParams = jwsHeader.getCustomParams();
+            parameters = jwsHeader.getCustomParameters();
         }
 
 
@@ -339,28 +341,14 @@ public final class JWSHeader extends CommonJWTHeader {
          *              to a valid JSON entity, {@code null} if not
          *              specified.
          * @return This builder.
-         * @throws CustomParameterNameException If the specified parameter
-         *                                      name matches a registered
-         *                                      parameter name.
          */
-        public Builder customParam(String name, Object value) throws CustomParameterNameException {
+        public Builder parameter(String name, Object value) {
 
-            if ("jku".equals(name)) {
-                if (!(value instanceof URI)) {
-                    throw new IllegalArgumentException("The type of the parameter \"jku\" must be URI.");
-                }
-                jku = (URI) value;
-                return this;
-            }
-            if (getRegisteredParameterNames().contains(name)) {
-                throw new CustomParameterNameException(name);
+            if (parameters == null) {
+                parameters = new HashMap<>();
             }
 
-            if (customParams == null) {
-                customParams = new HashMap<>();
-            }
-
-            customParams.put(name, value);
+            parameters.put(name, value);
 
             return this;
         }
@@ -370,14 +358,14 @@ public final class JWSHeader extends CommonJWTHeader {
          * Sets the custom (non-registered) parameters. The values must
          * be serialisable to a JSON entity, otherwise will be ignored.
          *
-         * @param customParameters The custom parameters, empty map or
-         *                         {@code null} if none.
+         * @param parameters The custom parameters, empty map or
+         *                   {@code null} if none.
          * @return This builder.
          */
-        public Builder customParams(Map<String, Object> customParameters) throws CustomParameterNameException {
+        public Builder parameters(Map<String, Object> parameters) {
 
-            for (Map.Entry<String, Object> entry : customParameters.entrySet()) {
-                customParam(entry.getKey(), entry.getValue());
+            for (Map.Entry<String, Object> entry : parameters.entrySet()) {
+                parameter(entry.getKey(), entry.getValue());
             }
 
             return this;
@@ -403,12 +391,12 @@ public final class JWSHeader extends CommonJWTHeader {
          *
          * @return The JWS header.
          */
-        public JWSHeader build() throws CustomParameterNameException {
+        public JWSHeader build() {
 
             return new JWSHeader(
                     alg, typ, cty, crit,
                     jku, jwk, x5u, x5t256, x5c, kid,
-                    customParams, parsedBase64URL);
+                    parameters, parsedBase64URL);
         }
     }
 
@@ -422,7 +410,7 @@ public final class JWSHeader extends CommonJWTHeader {
      * @param alg The JWS algorithm ({@code alg}) parameter. Must not be
      *            "none" or {@code null}.
      */
-    public JWSHeader(JWSAlgorithm alg) throws CustomParameterNameException {
+    public JWSHeader(JWSAlgorithm alg) {
 
         this(alg, null, null, null, null, null, null, null, null, null, null, null);
     }
@@ -456,7 +444,7 @@ public final class JWSHeader extends CommonJWTHeader {
      *                        parameter, {@code null} if not specified.
      * @param kid             The key ID ({@code kid}) parameter,
      *                        {@code null} if not specified.
-     * @param customParams    The custom parameters, empty map or
+     * @param parameters      The custom parameters, empty map or
      *                        {@code null} if none.
      * @param parsedBase64URL The parsed Base64URL, {@code null} if the
      *                        header is created from scratch.
@@ -471,10 +459,10 @@ public final class JWSHeader extends CommonJWTHeader {
                      Base64URLValue x5t256,
                      List<Base64Value> x5c,
                      String kid,
-                     Map<String, Object> customParams,
-                     Base64URLValue parsedBase64URL) throws CustomParameterNameException {
+                     Map<String, Object> parameters,
+                     Base64URLValue parsedBase64URL) {
 
-        super(alg, typ, cty, crit, jku, jwk, x5u, x5t256, x5c, kid, customParams, parsedBase64URL);
+        super(alg, typ, cty, crit, jku, jwk, x5u, x5t256, x5c, kid, parameters, parsedBase64URL);
 
         if (alg.getName().equals(Algorithm.NONE.getName())) {
             throw new IllegalArgumentException("The JWS algorithm \"alg\" cannot be \"none\"");
@@ -487,7 +475,7 @@ public final class JWSHeader extends CommonJWTHeader {
      *
      * @param jwsHeader The JWS header to copy. Must not be {@code null}.
      */
-    public JWSHeader(JWSHeader jwsHeader) throws CustomParameterNameException {
+    public JWSHeader(JWSHeader jwsHeader) {
 
         this(
                 jwsHeader.getAlgorithm(),
@@ -500,7 +488,7 @@ public final class JWSHeader extends CommonJWTHeader {
                 jwsHeader.getX509CertSHA256Thumbprint(),
                 jwsHeader.getX509CertChain(),
                 jwsHeader.getKeyID(),
-                jwsHeader.getCustomParams(),
+                jwsHeader.getCustomParameters(),
                 jwsHeader.getParsedBase64URL()
         );
     }
@@ -611,19 +599,11 @@ public final class JWSHeader extends CommonJWTHeader {
             } else if ("kid".equals(name)) {
                 header = header.keyID(jsonObject.getString(name));
             } else {
-                try {
-                    header = header.customParam(name, JSONObjectUtils.getJsonValueAsObject(jsonObject.get(name)));
-                } catch (CustomParameterNameException e) {
-                    throw new AtbashUnexpectedException(e);
-                }
+                header = header.parameter(name, JSONObjectUtils.getJsonValueAsObject(jsonObject.get(name)));
             }
         }
 
-        try {
-            return header.build();
-        } catch (CustomParameterNameException e) {
-            throw new AtbashUnexpectedException(e);
-        }
+        return header.build();
     }
 
 

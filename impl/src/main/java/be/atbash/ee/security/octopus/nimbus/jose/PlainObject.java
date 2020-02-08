@@ -17,7 +17,6 @@ package be.atbash.ee.security.octopus.nimbus.jose;
 
 
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
-import be.atbash.util.exception.AtbashUnexpectedException;
 
 import java.text.ParseException;
 
@@ -54,12 +53,7 @@ public class PlainObject extends JOSEObject {
 
         setPayload(payload);
 
-        try {
-            header = new PlainHeader();
-        } catch (CustomParameterNameException e) {
-            // Since we create a PlainHeader with custom parameters, they can't contain something reserved names.
-            throw new AtbashUnexpectedException(e);
-        }
+        header = new PlainHeader();
     }
 
 

@@ -24,8 +24,6 @@ User manual for Atbash configuration.
 
 Breaking changes
 
-- Custom parameter for the headers can't contain any registered names anymore and a `CustomParameterNameException` is thrown.
-The exceptions are p2c and p2s for a JWEHeader which is properly handled (as regular claim value)
 - be.atbash.ee.security.octopus.jwt.decoder.JWTDecoder.decode(java.lang.String, java.lang.Class<T>) has a changed return type.
 - A subset of Nimbus JOSE is integrated in this JWT support module.
 

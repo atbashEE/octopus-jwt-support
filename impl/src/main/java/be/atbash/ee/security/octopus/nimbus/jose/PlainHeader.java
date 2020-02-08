@@ -18,7 +18,6 @@ package be.atbash.ee.security.octopus.nimbus.jose;
 
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.ee.security.octopus.nimbus.util.JSONObjectUtils;
-import be.atbash.util.exception.AtbashUnexpectedException;
 
 import javax.json.JsonObject;
 import java.text.ParseException;
@@ -38,7 +37,7 @@ import java.util.*;
  *     <li>crit
  * </ul>
  *
- * <p>The header may also carry {@link #getCustomParams custom parameters};
+ * <p>The header may also carry {@link #getCustomParameters custom parameters};
  * these will be serialised and parsed along the registered ones.
  *
  * <p>Example:
@@ -92,9 +91,9 @@ public final class PlainHeader extends Header {
 
 
         /**
-         * Custom header parameters.
+         * header parameters.
          */
-        private Map<String, Object> customParams;
+        private Map<String, Object> parameters;
 
 
         /**
@@ -123,7 +122,7 @@ public final class PlainHeader extends Header {
             typ = plainHeader.getType();
             cty = plainHeader.getContentType();
             crit = plainHeader.getCriticalParams();
-            customParams = plainHeader.getCustomParams();
+            parameters = plainHeader.getCustomParameters();
         }
 
 
@@ -180,21 +179,14 @@ public final class PlainHeader extends Header {
          *              to a valid JSON entity, {@code null} if not
          *              specified.
          * @return This builder.
-         * @throws CustomParameterNameException If the specified parameter
-         *                                  name matches a registered
-         *                                  parameter name.
          */
-        public Builder customParam(String name, Object value) throws CustomParameterNameException {
+        public Builder parameter(String name, Object value) {
 
-            if (getRegisteredParameterNames().contains(name)) {
-                throw new CustomParameterNameException(name);
+            if (parameters == null) {
+                parameters = new HashMap<>();
             }
 
-            if (customParams == null) {
-                customParams = new HashMap<>();
-            }
-
-            customParams.put(name, value);
+            parameters.put(name, value);
 
             return this;
         }
@@ -204,13 +196,13 @@ public final class PlainHeader extends Header {
          * Sets the custom (non-registered) parameters. The values must
          * be serialisable to a JSON entity, otherwise will be ignored.
          *
-         * @param customParameters The custom parameters, empty map or
-         *                         {@code null} if none.
+         * @param parameters The custom parameters, empty map or
+         *                   {@code null} if none.
          * @return This builder.
          */
-        public Builder customParams(Map<String, Object> customParameters) {
+        public Builder parameters(Map<String, Object> parameters) {
 
-            this.customParams = customParameters;
+            this.parameters = parameters;
             return this;
         }
 
@@ -234,9 +226,9 @@ public final class PlainHeader extends Header {
          *
          * @return The unsecured header.
          */
-        public PlainHeader build() throws CustomParameterNameException {
+        public PlainHeader build() {
 
-            return new PlainHeader(typ, cty, crit, customParams, parsedBase64URL);
+            return new PlainHeader(typ, cty, crit, parameters, parsedBase64URL);
         }
     }
 
@@ -245,7 +237,7 @@ public final class PlainHeader extends Header {
      * Creates a new minimal unsecured (plain) header with algorithm
      * {@link Algorithm#NONE none}.
      */
-    public PlainHeader() throws CustomParameterNameException {
+    public PlainHeader() {
 
         this(null, null, null, null, null);
     }
@@ -262,7 +254,7 @@ public final class PlainHeader extends Header {
      * @param crit            The names of the critical header
      *                        ({@code crit}) parameters, empty set or
      *                        {@code null} if none.
-     * @param customParams    The custom parameters, empty map or
+     * @param parameters    The custom parameters, empty map or
      *                        {@code null} if none.
      * @param parsedBase64URL The parsed Base64URL, {@code null} if the
      *                        header is created from scratch.
@@ -270,10 +262,10 @@ public final class PlainHeader extends Header {
     public PlainHeader(JOSEObjectType typ,
                        String cty,
                        Set<String> crit,
-                       Map<String, Object> customParams,
-                       Base64URLValue parsedBase64URL) throws CustomParameterNameException {
+                       Map<String, Object> parameters,
+                       Base64URLValue parsedBase64URL) {
 
-        super(Algorithm.NONE, typ, cty, crit, customParams, parsedBase64URL);
+        super(Algorithm.NONE, typ, cty, crit, parameters, parsedBase64URL);
     }
 
 
@@ -283,13 +275,13 @@ public final class PlainHeader extends Header {
      * @param plainHeader The unsecured header to copy. Must not be
      *                    {@code null}.
      */
-    public PlainHeader(PlainHeader plainHeader) throws CustomParameterNameException {
+    public PlainHeader(PlainHeader plainHeader) {
 
         this(
                 plainHeader.getType(),
                 plainHeader.getContentType(),
                 plainHeader.getCriticalParams(),
-                plainHeader.getCustomParams(),
+                plainHeader.getCustomParameters(),
                 plainHeader.getParsedBase64URL()
         );
     }
@@ -377,19 +369,11 @@ public final class PlainHeader extends Header {
                     header = header.criticalParams(new HashSet<>(critValues));
                 }
             } else {
-                try {
-                    header = header.customParam(name, JSONObjectUtils.getJsonValueAsObject(jsonObject.get(name)));
-                } catch (CustomParameterNameException e) {
-                    throw new AtbashUnexpectedException(e);
-                }
+                header = header.parameter(name, JSONObjectUtils.getJsonValueAsObject(jsonObject.get(name)));
             }
         }
 
-        try {
-            return header.build();
-        } catch (CustomParameterNameException e) {
-            throw new AtbashUnexpectedException(e);
-        }
+        return header.build();
     }
 
 

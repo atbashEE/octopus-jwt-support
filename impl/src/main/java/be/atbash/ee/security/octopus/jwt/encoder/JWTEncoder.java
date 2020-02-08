@@ -21,7 +21,10 @@ import be.atbash.ee.security.octopus.jwt.parameter.JWTParameters;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersEncryption;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersPlain;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersSigning;
-import be.atbash.ee.security.octopus.nimbus.jose.*;
+import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
+import be.atbash.ee.security.octopus.nimbus.jose.JOSEObjectType;
+import be.atbash.ee.security.octopus.nimbus.jose.Payload;
+import be.atbash.ee.security.octopus.nimbus.jose.PlainHeader;
 import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import be.atbash.ee.security.octopus.nimbus.jwt.JWTClaimsSet;
 import be.atbash.ee.security.octopus.nimbus.jwt.PlainJWT;
@@ -89,12 +92,7 @@ public class JWTEncoder {
     }
 
     private String createPlainJWT(Object data, JWTParametersPlain parameters) {
-        PlainHeader header;
-        try {
-            header = new PlainHeader.Builder().customParams(parameters.getHeaderValues()).build();
-        } catch (CustomParameterNameException e) {
-            throw new AtbashUnexpectedException(e);
-        }
+        PlainHeader header = new PlainHeader.Builder().parameters(parameters.getHeaderValues()).build();
 
         PlainJWT plainJWT;
         if (data instanceof JWTClaimsSet) {
@@ -124,7 +122,7 @@ public class JWTEncoder {
         JWEObject jweObject = new JWEObject(
                 new JWEHeader.Builder(jweAlgorithm, EncryptionMethod.A256GCM)
                         .keyID(parameters.getKeyID())
-                        .customParams(parameters.getHeaderValues())
+                        .parameters(parameters.getHeaderValues())
                         .contentType("JWT") // required to signal nested JWT
                         .build(),
                 new Payload(createSignedJWT(data, parameters.getParametersSigning())));
@@ -162,7 +160,7 @@ public class JWTEncoder {
         JWSHeader header = new JWSHeader.Builder(signerFactory.defineJWSAlgorithm(parameters))
                 .type(JOSEObjectType.JWT)
                 .keyID(parameters.getKeyID())
-                .customParams(parameters.getHeaderValues())
+                .parameters(parameters.getHeaderValues())
                 .build();
 
         if (data instanceof JWTClaimsSet) {

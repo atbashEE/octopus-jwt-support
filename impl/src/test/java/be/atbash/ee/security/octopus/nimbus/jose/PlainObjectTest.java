@@ -44,7 +44,7 @@ public class PlainObjectTest {
         assertThat(header.getAlgorithm()).isEqualTo(Algorithm.NONE);
         assertThat(header.getType()).isNull();
         assertThat(header.getContentType()).isNull();
-        assertThat(header.getCustomParams()).isEmpty();
+        assertThat(header.getCustomParameters()).isEmpty();
 
         String serializedJOSEObject = plain.serialize();
 
@@ -54,7 +54,7 @@ public class PlainObjectTest {
         assertThat(header.getAlgorithm()).isEqualTo(Algorithm.NONE);
         assertThat(header.getType()).isNull();
         assertThat(header.getContentType()).isNull();
-        assertThat(header.getCustomParams()).isEmpty();
+        assertThat(header.getCustomParameters()).isEmpty();
 
         assertThat(plain.getPayload().toString()).isEqualTo("Hello world!");
 

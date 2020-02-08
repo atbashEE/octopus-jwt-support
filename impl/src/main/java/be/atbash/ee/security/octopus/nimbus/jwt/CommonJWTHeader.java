@@ -16,8 +16,8 @@
 package be.atbash.ee.security.octopus.nimbus.jwt;
 
 
+import be.atbash.ee.security.octopus.nimbus.HeaderParameterType;
 import be.atbash.ee.security.octopus.nimbus.jose.Algorithm;
-import be.atbash.ee.security.octopus.nimbus.jose.CustomParameterNameException;
 import be.atbash.ee.security.octopus.nimbus.jose.Header;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEObjectType;
 import be.atbash.ee.security.octopus.nimbus.jwk.JWK;
@@ -99,24 +99,7 @@ abstract public class CommonJWTHeader extends Header {
     /**
      * The registered parameter names.
      */
-    static final Set<String> REGISTERED_PARAMETER_NAMES;
-
-
-    /*
-     * Initialises the registered parameter name set.
-     */
-    static {
-        Set<String> claims = new HashSet<>();
-
-        claims.add("kid");
-        claims.add("x5c");
-        claims.add("x5t256");
-        claims.add("x5u");
-        claims.add("jwk");
-        claims.add("jku");
-
-        REGISTERED_PARAMETER_NAMES = Collections.unmodifiableSet(claims);
-    }
+    static final Set<String> REGISTERED_PARAMETER_NAMES = HeaderParameterType.getCommonJwtHeaderParameters();
 
     /**
      * Creates a new common JWS and JWE header.
@@ -143,7 +126,7 @@ abstract public class CommonJWTHeader extends Header {
      *                        parameter, {@code null} if not specified.
      * @param kid             The key ID ({@code kid}) parameter,
      *                        {@code null} if not specified.
-     * @param customParams    The custom parameters, empty map or
+     * @param parameters      The parameters, empty map or
      *                        {@code null} if none.
      * @param parsedBase64URL The parsed Base64URL, {@code null} if the
      *                        header is created from scratch.
@@ -158,24 +141,25 @@ abstract public class CommonJWTHeader extends Header {
                               Base64URLValue x5t256,
                               List<Base64Value> x5c,
                               String kid,
-                              Map<String, Object> customParams,
-                              Base64URLValue parsedBase64URL) throws CustomParameterNameException {
+                              Map<String, Object> parameters,
+                              Base64URLValue parsedBase64URL) {
 
-        super(alg, typ, cty, crit, customParams, parsedBase64URL);
+        super(alg, typ, cty, crit, HeaderParameterType.filterOutRegisteredNames(parameters, REGISTERED_PARAMETER_NAMES), parsedBase64URL);
 
-        this.jku = jku;
-        this.jwk = jwk;
-        this.x5u = x5u;
-        this.x5t256 = x5t256;
+        this.jku = HeaderParameterType.getParameterValue("jku", jku, parameters);
+        this.jwk = HeaderParameterType.getParameterValue("jwk", jwk, parameters);
+        this.x5u = HeaderParameterType.getParameterValue("x5u", x5u, parameters);
+        this.x5t256 = HeaderParameterType.getParameterValue("x5t256", x5t256, parameters);
 
-        if (x5c != null) {
+        List<Base64Value> temp = HeaderParameterType.getParameterValue("x5c", x5c, parameters);
+        if (temp != null) {
             // Copy and make unmodifiable
-            this.x5c = Collections.unmodifiableList(new ArrayList<>(x5c));
+            this.x5c = Collections.unmodifiableList(new ArrayList<>(temp));
         } else {
             this.x5c = null;
         }
 
-        this.kid = kid;
+        this.kid = HeaderParameterType.getParameterValue("kid", kid, parameters);
     }
 
 
@@ -253,9 +237,9 @@ abstract public class CommonJWTHeader extends Header {
 
 
     @Override
-    public Set<String> getIncludedParams() {
+    public Set<String> getIncludedParameters() {
 
-        Set<String> includedParameters = super.getIncludedParams();
+        Set<String> includedParameters = super.getIncludedParameters();
 
         if (jku != null) {
             includedParameters.add("jku");
@@ -322,6 +306,9 @@ abstract public class CommonJWTHeader extends Header {
     }
 
     public static Set<String> getRegisteredParameterNames() {
-        return REGISTERED_PARAMETER_NAMES;
+        HashSet<String> result = new HashSet<>();
+        result.addAll(HeaderParameterType.getHeaderParameters());
+        result.addAll(HeaderParameterType.getCommonJwtHeaderParameters());
+        return result;
     }
 }
