@@ -15,7 +15,10 @@
  */
 package be.atbash.ee.security.octopus.keys.writer.encoder;
 
+import be.atbash.ee.security.octopus.keys.AtbashKey;
+import be.atbash.ee.security.octopus.keys.ECCurveHelper;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.bc.BouncyCastleProviderSingleton;
+import be.atbash.ee.security.octopus.nimbus.jwk.Curve;
 import be.atbash.util.exception.AtbashUnexpectedException;
 import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey;
 import org.bouncycastle.jce.ECNamedCurveTable;
@@ -26,13 +29,18 @@ import org.bouncycastle.math.ec.ECPoint;
 
 import java.security.Key;
 import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
+import java.security.interfaces.ECKey;
+import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.RSAPrivateCrtKey;
+import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
 
 public abstract class AbstractEncoder {
 
-    protected PublicKey getPublicKey(Key key) {
+    protected PublicKey getPublicKey(AtbashKey atbashKey) {
+        Key key = atbashKey.getKey();
         // FIXME Move this to a general helper utility class?
         if (key instanceof RSAPrivateCrtKey) {
             RSAPrivateCrtKey rsaPrivateCrtKey = (RSAPrivateCrtKey) key;

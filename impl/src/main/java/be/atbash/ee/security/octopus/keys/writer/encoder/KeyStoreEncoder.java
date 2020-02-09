@@ -66,7 +66,7 @@ public class KeyStoreEncoder extends AbstractEncoder implements KeyEncoder {
             if (atbashKey.getSecretKeyType().getAsymmetricPart() == AsymmetricPart.PRIVATE) {
 
                 PrivateKey key = (PrivateKey) atbashKey.getKey();
-                X509Certificate certificate = generateCertificate(getPublicKey(key), key, atbashKey.getSecretKeyType().getKeyType());
+                X509Certificate certificate = generateCertificate(getPublicKey(atbashKey), key, atbashKey.getSecretKeyType().getKeyType());
                 KeyStore.Entry entry = new KeyStore.PrivateKeyEntry(key, new X509Certificate[]{certificate});
                 keyStore.setEntry(atbashKey.getKeyId(), entry, new KeyStore.PasswordProtection(parameters.getKeyPassword()));
             }

@@ -20,28 +20,19 @@ import be.atbash.ee.security.octopus.jwk.EncryptedJSONJWK;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.ECCurveHelper;
 import be.atbash.ee.security.octopus.keys.writer.KeyEncoderParameters;
-import be.atbash.ee.security.octopus.nimbus.jose.crypto.bc.BouncyCastleProviderSingleton;
 import be.atbash.ee.security.octopus.nimbus.jwk.*;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.util.exception.AtbashUnexpectedException;
 import org.bouncycastle.asn1.*;
 import org.bouncycastle.jcajce.provider.asymmetric.edec.BCEdDSAPrivateKey;
-import org.bouncycastle.jce.ECNamedCurveTable;
-import org.bouncycastle.jce.spec.ECPublicKeySpec;
-import org.bouncycastle.math.ec.ECPoint;
 import org.bouncycastle.math.ec.rfc8032.Ed25519;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.security.Key;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
-import java.security.spec.InvalidKeySpecException;
 
 /**
  *
@@ -66,7 +57,7 @@ public class JwkKeyEncoderPrivatePart extends AbstractEncoder implements KeyEnco
     }
 
     private byte[] encodeRSAKey(AtbashKey atbashKey, KeyEncoderParameters parameters) {
-        RSAKey rsaKey = new RSAKey.Builder((RSAPublicKey) getPublicKey(atbashKey.getKey())).keyID(atbashKey.getKeyId())
+        RSAKey rsaKey = new RSAKey.Builder((RSAPublicKey) getPublicKey(atbashKey)).keyID(atbashKey.getKeyId())
                 .privateKey((RSAPrivateKey) atbashKey.getKey())
                 .build();
 
@@ -80,9 +71,9 @@ public class JwkKeyEncoderPrivatePart extends AbstractEncoder implements KeyEnco
     }
 
     private byte[] encodeECKey(AtbashKey atbashKey, KeyEncoderParameters parameters) {
-        Curve curve = deriveCurve(atbashKey);  // FIXME Move to be.atbash.ee.security.octopus.keys.writer.encoder.AbstractEncoder.getPublicKey
+        Curve curve = ECCurveHelper.getCurve((java.security.interfaces.ECKey) atbashKey.getKey());
 
-        ECKey ecKey = new ECKey.Builder(curve, (ECPublicKey) getPublicKey(atbashKey.getKey(), curve)).keyID(atbashKey.getKeyId())
+        ECKey ecKey = new ECKey.Builder(curve, (ECPublicKey) getPublicKey(atbashKey)).keyID(atbashKey.getKeyId())
                 .privateKey((ECPrivateKey) atbashKey.getKey())
                 .build();
 
@@ -139,36 +130,5 @@ public class JwkKeyEncoderPrivatePart extends AbstractEncoder implements KeyEnco
         return result.getBytes(StandardCharsets.UTF_8);
     }
 
-    private Curve deriveCurve(AtbashKey atbashKey) {
 
-        Curve curve = ECCurveHelper.getCurve((java.security.interfaces.ECKey) atbashKey.getKey());
-        if (curve == null) {
-            throw new AtbashUnexpectedException(String.format("Unable to determine EC Curve of %s", atbashKey.getKeyId()));
-        }
-        return curve;
-
-    }
-
-    private PublicKey getPublicKey(Key key, Curve curve) {
-        // FIXME Move to be.atbash.ee.security.octopus.keys.writer.encoder.AbstractEncoder.getPublicKey
-        if (key instanceof ECPrivateKey) {
-            // TODO Optimize
-            if (key instanceof org.bouncycastle.jce.interfaces.ECPrivateKey) {
-                try {
-
-                    KeyFactory keyFactory = KeyFactory.getInstance("ECDSA", BouncyCastleProviderSingleton.getInstance());
-                    org.bouncycastle.jce.spec.ECParameterSpec ecSpec = ECNamedCurveTable.getParameterSpec(curve.getStdName());
-
-                    ECPoint q = ecSpec.getG().multiply(((org.bouncycastle.jce.interfaces.ECPrivateKey) key).getD());
-
-                    ECPublicKeySpec pubSpec = new ECPublicKeySpec(q, ecSpec);
-                    return keyFactory.generatePublic(pubSpec);
-                } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-                    throw new AtbashUnexpectedException(e);
-                }
-            }
-        }
-        throw new UnsupportedOperationException("TODO");
-
-    }
 }
