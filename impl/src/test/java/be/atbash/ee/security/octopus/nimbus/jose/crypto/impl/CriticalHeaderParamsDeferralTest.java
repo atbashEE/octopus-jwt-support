@@ -30,8 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests the critical parameters checker.
  *
- * @author Vladimir Dzhuvinov
- * @version 2015-04-21
+ * Based on code by Vladimir Dzhuvinov
  */
 public class CriticalHeaderParamsDeferralTest {
 

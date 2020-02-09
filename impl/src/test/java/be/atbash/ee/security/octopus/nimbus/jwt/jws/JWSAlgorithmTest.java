@@ -24,8 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests the JWS Algorithm class.
  *
- * @author Vladimir Dzhuvinov
- * @version 2018-03-28
+ * Based on code by Vladimir Dzhuvinov
  */
 public class JWSAlgorithmTest {
 

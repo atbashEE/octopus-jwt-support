@@ -27,8 +27,7 @@ import java.util.Set;
 /**
  * Critical ({@code crit}) header parameters deferral policy.
  *
- * @author Vladimir Dzhuvinov
- * @version 2015-05-20
+ * Based on code by Vladimir Dzhuvinov
  */
 public class CriticalHeaderParamsDeferral {
 // FIXME verify usage nad usefullness

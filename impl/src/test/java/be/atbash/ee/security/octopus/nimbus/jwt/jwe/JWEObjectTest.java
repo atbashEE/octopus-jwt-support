@@ -25,8 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests JWE object methods.
  *
- * @author Vladimir Dzhuvinov
- * @version 2014-08-20
+ * Based on code by Vladimir Dzhuvinov
  */
 public class JWEObjectTest {
 

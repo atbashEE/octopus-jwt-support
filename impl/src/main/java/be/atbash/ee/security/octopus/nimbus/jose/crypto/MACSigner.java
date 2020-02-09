@@ -55,8 +55,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  *     <li>{@link JWSAlgorithm#HS512}
  * </ul>
  *
- * @author Vladimir Dzhuvinov
- * @version 2016-07-27
+ * Based on code by Vladimir Dzhuvinov
  */
 public class MACSigner extends MACProvider implements JWSSigner {
 

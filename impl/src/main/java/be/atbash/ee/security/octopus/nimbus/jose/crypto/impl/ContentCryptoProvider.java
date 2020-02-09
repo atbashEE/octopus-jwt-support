@@ -35,8 +35,7 @@ import java.util.*;
 /**
  * JWE content encryption / decryption provider.
  *
- * @author Vladimir Dzhuvinov
- * @version 2017-06-01
+ * Based on code by Vladimir Dzhuvinov
  */
 public class ContentCryptoProvider {
 

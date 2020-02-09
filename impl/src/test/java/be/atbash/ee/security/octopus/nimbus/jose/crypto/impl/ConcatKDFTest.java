@@ -33,8 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests the Concatenation KDF.
  *
- * @author Vladimir Dzhuvinov
- * @version 2017-05-05
+ * Based on code by Vladimir Dzhuvinov
  */
 public class ConcatKDFTest {
 	

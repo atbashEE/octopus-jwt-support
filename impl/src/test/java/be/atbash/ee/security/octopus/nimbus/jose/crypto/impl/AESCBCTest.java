@@ -31,8 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Tests the authenticated AES/CBC encryption and decryption methods. Uses test
  * vectors from draft-ietf-jose-json-web-algorithms-10, appendix C.
  *
- * @author Vladimir Dzhuvinov
- * @version 2017-06-01
+ * Based on code by Vladimir Dzhuvinov
  */
 public class AESCBCTest {
 

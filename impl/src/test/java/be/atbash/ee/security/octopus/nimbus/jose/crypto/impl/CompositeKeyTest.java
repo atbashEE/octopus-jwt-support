@@ -30,8 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Tests composite MAC + AES key extraction. Test cases from 
  * http://tools.ietf.org/html/rfc7518#appendix-B
  *
- * @author Vladimir Dzhuvinov
- * @version 2013-06-29
+ * Based on code by  Vladimir Dzhuvinov
  */
 public class CompositeKeyTest  {
 

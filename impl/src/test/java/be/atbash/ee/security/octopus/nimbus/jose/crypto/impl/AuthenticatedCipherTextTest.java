@@ -24,8 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests the authenticated cipher text wrapper.
  *
- * @author Vladimir Dzhuvinov
- * @version 2013-05-07
+ * Based on code by Vladimir Dzhuvinov
  */
 public class AuthenticatedCipherTextTest {
 

@@ -26,7 +26,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests DEFLATE compression.
  *
- * @version 2013-03-26
  */
 public class DeflateUtilsTest {
 

@@ -45,8 +45,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests an encrypted JWT object. Uses test RSA keys from the JWE spec.
  *
- * @author Vladimir Dzhuvinov
- * @version 2017-07-11
+ * Based on code by Vladimir Dzhuvinov
  */
 public class EncryptedJWTTest {
 

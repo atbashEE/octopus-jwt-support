@@ -43,8 +43,7 @@ import java.util.Set;
  * <p>Supports all standard JWS algorithms implemented in the
  * {@link be.atbash.ee.security.octopus.nimbus.jose.crypto} package.
  *
- * @author Vladimir Dzhuvinov
- * @version 2015-11-16
+ * Based on code by Vladimir Dzhuvinov
  */
 public class DefaultJWSVerifierFactory implements JWSVerifierFactory {
 

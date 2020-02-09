@@ -32,8 +32,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests the Additional Authenticated Data (AAD) functions.
  *
- * @author Vladimir Dzhuvinov
- * @version 2017-06-01
+ * Based on code by Vladimir Dzhuvinov
  */
 public class AADTest {
 

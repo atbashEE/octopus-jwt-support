@@ -57,8 +57,7 @@ import javax.crypto.spec.SecretKeySpec;
  *     <li>{@link be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod#A256GCM} (requires 256 bit key)
  * </ul>
  *
- * @author Vladimir Dzhuvinov
- * @version 2017-06-01
+ * Based on code by Vladimir Dzhuvinov
  */
 public class DirectEncrypter extends DirectCryptoProvider implements JWEEncrypter {
 

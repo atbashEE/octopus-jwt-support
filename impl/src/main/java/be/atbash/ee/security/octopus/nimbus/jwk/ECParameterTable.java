@@ -35,9 +35,7 @@ import java.security.spec.ECParameterSpec;
  *     <li>{@link Curve#P_521}
  * </ul>
  *
- * @author Vladimir Dzhuvinov
- * @author Aleksei Doroganov
- * @version 2018-03-28
+ * Based on code by Vladimir Dzhuvinov and Aleksei Doroganov
  */
 final class ECParameterTable {
 

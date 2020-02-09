@@ -27,8 +27,7 @@ import java.security.cert.X509Certificate;
 /**
  * Asymmetric (pair) JSON Web Key (JWK).
  *
- * @author Vladimir Dzhuvinov
- * @version 2018-02-27
+ * Based on code by Vladimir Dzhuvinov
  */
 public interface AsymmetricJWK {
 

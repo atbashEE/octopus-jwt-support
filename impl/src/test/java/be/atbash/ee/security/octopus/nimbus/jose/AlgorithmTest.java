@@ -32,8 +32,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests the base Algorithm class.
  *
- * @author Vladimir Dzhuvinov
- * @version 2012-09-26
+ * Based on code by Vladimir Dzhuvinov
  */
 public class AlgorithmTest {
 

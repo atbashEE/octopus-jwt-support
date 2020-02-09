@@ -26,8 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 
 /**
- * @author Vladimir Dzhuvinov
- * @version 2017-06-30
+ * Based on code by Vladimir Dzhuvinov
  */
 public class KeyUseAndOpsConsistencyTest {
 

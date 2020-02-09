@@ -76,8 +76,7 @@ import java.util.Set;
  *     <li>{@link EncryptionMethod#A256GCM}
  * </ul>
  *
- * @author Vladimir Dzhuvinov
- * @version 2018-12-12
+ * Based on code by Vladimir Dzhuvinov
  */
 public class ECDHDecrypter extends ECDHCryptoProvider implements JWEDecrypter {
 

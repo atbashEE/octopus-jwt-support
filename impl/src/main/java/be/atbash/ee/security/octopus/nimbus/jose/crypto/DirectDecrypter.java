@@ -65,8 +65,7 @@ import java.util.Set;
  * checks for ("alg":"dir") and encrypted key not being present will be
  * skipped.
  *
- * @author Vladimir Dzhuvinov
- * @version 2018-07-16
+ * Based on code by Vladimir Dzhuvinov
  */
 public class DirectDecrypter extends DirectCryptoProvider implements JWEDecrypter {
 

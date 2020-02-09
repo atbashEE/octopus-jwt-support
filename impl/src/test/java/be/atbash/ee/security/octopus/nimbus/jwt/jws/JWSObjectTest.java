@@ -27,8 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests JWS object methods.
  *
- * @author Vladimir Dzhuvinov
- * @version 2015-01-15
+ * Based on code by Vladimir Dzhuvinov
  */
 public class JWSObjectTest {
 

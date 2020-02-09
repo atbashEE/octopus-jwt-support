@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,7 @@ import java.util.LinkedHashSet;
 /**
  * Algorithm family.
  *
- * @author Vladimir Dzhuvinov
- * @version 2016-08-24
+ * Based on code by Vladimir Dzhuvinov
  */
 public class AlgorithmFamily<T extends Algorithm> extends LinkedHashSet<T> {
 

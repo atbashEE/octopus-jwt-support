@@ -56,9 +56,7 @@ import java.util.*;
  * }
  * </pre>
  *
- * @author Vladimir Dzhuvinov
- * @author Vedran Pavic
- * @version 2019-10-03
+ * Based on code by Vladimir Dzhuvinov and Vedran Pavic
  */
 public class JWKSet implements Serializable {
 

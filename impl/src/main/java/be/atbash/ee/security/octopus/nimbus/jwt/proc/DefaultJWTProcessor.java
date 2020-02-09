@@ -79,8 +79,7 @@ import java.text.ParseException;
  * verifier may be extended to perform additional checks, such as issuer and
  * subject acceptance.
  *
- * @author Vladimir Dzhuvinov
- * @version 2019-10-15
+ * Based on code by Vladimir Dzhuvinov
  */
 public class DefaultJWTProcessor {
 

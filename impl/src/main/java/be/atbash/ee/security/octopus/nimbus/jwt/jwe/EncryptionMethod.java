@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,8 +36,7 @@ import be.atbash.ee.security.octopus.nimbus.jose.AlgorithmFamily;
  *
  * <p>Additional encryption method names can be defined using the constructors.
  *
- * @author Vladimir Dzhuvinov
- * @version 2015-10-14
+ * Based on code by Vladimir Dzhuvinov
  */
 public final class EncryptionMethod extends Algorithm {
 

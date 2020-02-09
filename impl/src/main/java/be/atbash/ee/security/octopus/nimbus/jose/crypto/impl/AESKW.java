@@ -32,9 +32,7 @@ import java.security.NoSuchAlgorithmException;
  *
  * <p>See RFC 7518 (JWA), section 4.4.
  *
- * @author Melisa Halsband
- * @author Vladimir Dzhuvinov
- * @version 2018-03-09
+ * Based on code by Melisa Halsband and Vladimir Dzhuvinov
  */
 public final class AESKW {
 

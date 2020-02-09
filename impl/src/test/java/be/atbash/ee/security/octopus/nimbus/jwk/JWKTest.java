@@ -48,8 +48,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  * Tests the base JWK class.
  *
- * @author Vladimir Dzhuvinov
- * @version 2019-10-15
+ * Based on code by Vladimir Dzhuvinov
  */
 public class JWKTest {
 

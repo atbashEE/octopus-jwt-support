@@ -36,9 +36,7 @@ import java.util.Arrays;
  *
  * <p>See RFC 7518 (JWA), section 5.2.
  *
- * @author Vladimir Dzhuvinov
- * @author Axel Nennker
- * @version 2018-01-04
+ * Based on code by Vladimir Dzhuvinov and Axel Nennker
  */
 public final class AESCBC {
 

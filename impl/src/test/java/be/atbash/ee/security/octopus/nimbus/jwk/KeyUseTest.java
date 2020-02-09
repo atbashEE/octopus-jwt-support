@@ -39,8 +39,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests the key use enumeration.
  *
- * @author Vladimir Dzhuvinov
- * @version 2019-02-06
+ * Based on code by Vladimir Dzhuvinov
  */
 public class KeyUseTest {
 

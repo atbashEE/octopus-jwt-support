@@ -35,8 +35,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests the JSON object utilities.
  *
- * @author Vladimir Dzhuvinov
- * @version 2019-10-05
+ * Based on code by Vladimir Dzhuvinov
  */
 public class JSONObjectUtilsTest {
 

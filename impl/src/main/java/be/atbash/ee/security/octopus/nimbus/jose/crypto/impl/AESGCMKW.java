@@ -29,9 +29,7 @@ import javax.crypto.spec.SecretKeySpec;
  *
  * <p>See RFC 7518 (JWA), section 4.7.
  *
- * @author Melisa Halsband
- * @author Vladimir Dzhuvinov
- * @version 2017-06-01
+ * Based on code by Melisa Halsband and Vladimir Dzhuvinov
  */
 public final class AESGCMKW {
 

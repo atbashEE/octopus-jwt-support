@@ -42,8 +42,7 @@ import java.util.Set;
  * <p>The header may also include {@link #getCustomParameters custom
  * parameters}; these will be serialised and parsed along the registered ones.
  *
- * @author Vladimir Dzhuvinov
- * @version 2019-10-04
+ * Based on code by Vladimir Dzhuvinov
  */
 public abstract class Header implements Serializable {
 

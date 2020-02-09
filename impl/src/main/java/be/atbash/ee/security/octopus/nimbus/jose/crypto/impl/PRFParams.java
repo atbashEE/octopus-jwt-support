@@ -24,8 +24,7 @@ import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
  * Pseudo-Random Function (PRF) parameters, intended for use in the Password-
  * Based Key Derivation Function 2 (PBKDF2).
  *
- * @author Vladimir Dzhuvinov
- * @version 2015-05-26
+ * Based on code by Vladimir Dzhuvinov
  */
 public final class PRFParams {
 

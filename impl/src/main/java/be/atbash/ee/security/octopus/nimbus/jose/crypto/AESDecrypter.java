@@ -65,9 +65,7 @@ import java.util.Set;
  *     <li>{@link be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod#A256GCM}
  * </ul>
  *
- * @author Melisa Halsband
- * @author Vladimir Dzhuvinov
- * @version 2015-06-29
+ * Based on code by Melisa Halsband and Vladimir Dzhuvinov
  */
 public class AESDecrypter extends AESCryptoProvider implements JWEDecrypter {
 

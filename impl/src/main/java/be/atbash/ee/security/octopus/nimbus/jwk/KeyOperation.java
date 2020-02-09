@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,8 +39,7 @@ import java.util.Set;
  *     <li>{@link #DERIVE_BITS deriveBits}
  * </ul>
  *
- * @author Vladimir Dzhuvinov
- * @version 2014-04-02
+ * Based on code by Vladimir Dzhuvinov
  */
 public enum KeyOperation {
 

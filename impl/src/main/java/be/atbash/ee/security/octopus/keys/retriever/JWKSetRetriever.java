@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,9 +35,7 @@ import java.util.Scanner;
  * HTTP proxy, HTTP connect and read timeouts as well as a size limit of the
  * retrieved entity. Caching header directives are not honoured.
  *
- * @author Vladimir Dzhuvinov
- * @author Artun Subasi
- * @version 2019-08-23
+ * Based on code by Vladimir Dzhuvinov and Artun Subasi
  */
 public class JWKSetRetriever {
 

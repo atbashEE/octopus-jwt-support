@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,8 +26,7 @@ package be.atbash.ee.security.octopus.nimbus.util;
  * from a man called Boris Karadjov.
  *
  * @param <T> the type of the item in this container.
- * @author Dimitar A. Stoikov
- * @version 2016-10-13
+ * Based on code by Dimitar A. Stoikov
  */
 public class Container<T> {
 

@@ -29,8 +29,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 /**
  * JSON Web Signature (JWS) secured object. This class is thread-safe.
  *
- * @author Vladimir Dzhuvinov
- * @version 2019-08-01
+ * Based on code by Vladimir Dzhuvinov
  */
 public class JWSObject extends JOSEObject {
 

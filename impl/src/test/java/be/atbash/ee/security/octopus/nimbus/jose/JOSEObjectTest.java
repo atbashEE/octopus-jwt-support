@@ -26,8 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests JOSE object methods.
  *
- * @author Vladimir Dzhuvinov
- * @version 2019-10-14
+ * Based on code by Vladimir Dzhuvinov
  */
 public class JOSEObjectTest {
 

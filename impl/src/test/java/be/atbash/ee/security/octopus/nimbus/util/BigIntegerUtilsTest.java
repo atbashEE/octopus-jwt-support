@@ -26,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests the big integer utility.
  *
- * @author Vladimir Dzhuvinov
+ * Based on code by Vladimir Dzhuvinov
  */
 public class BigIntegerUtilsTest {
 

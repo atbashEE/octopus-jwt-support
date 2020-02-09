@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,9 +69,7 @@ import java.util.*;
  *     .build();
  * </pre>
  *
- * @author Vladimir Dzhuvinov
- * @author Justin Richer
- * @version 2019-04-15
+ * Based on code by Vladimir Dzhuvinov and Justin Richer
  */
 public final class JWTClaimsSet implements Serializable {
 

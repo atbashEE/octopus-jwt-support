@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,7 @@ import be.atbash.ee.security.octopus.nimbus.util.DeflateUtils;
  * Deflate (RFC 1951) helper methods, intended for use by JWE encrypters and
  * decrypters. This class is thread-safe.
  *
- * @author Vladimir Dzhuvinov
- * @version 2014-07-08
+ * Based on code by Vladimir Dzhuvinov
  */
 final class DeflateHelper {
 

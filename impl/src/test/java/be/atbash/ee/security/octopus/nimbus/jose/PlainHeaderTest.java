@@ -34,8 +34,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests plain header parsing and serialisation.
  *
- * @author Vladimir Dzhuvinov
- * @version 2019-10-04
+ * Based on code by Vladimir Dzhuvinov
  */
 public class PlainHeaderTest {
 

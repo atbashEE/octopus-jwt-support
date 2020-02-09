@@ -55,9 +55,7 @@ import java.security.SignatureException;
  *     <li>{@link JWSAlgorithm#PS512}
  * </ul>
  *
- * @author Vladimir Dzhuvinov
- * @author Omer Levi Hevroni
- * @version 2018-10-11
+ * Based on code by Vladimir Dzhuvinov and Omer Levi Hevroni
  */
 public class RSASSASigner extends RSASSAProvider implements JWSSigner {
 

@@ -42,8 +42,7 @@ import be.atbash.ee.security.octopus.nimbus.jose.AlgorithmFamily;
  *
  * <p>Additional JWE algorithm names can be defined using the constructors.
  *
- * @author Vladimir Dzhuvinov
- * @version 2017-04-09
+ * Based on code by Vladimir Dzhuvinov
  */
 public final class JWEAlgorithm extends Algorithm {
 

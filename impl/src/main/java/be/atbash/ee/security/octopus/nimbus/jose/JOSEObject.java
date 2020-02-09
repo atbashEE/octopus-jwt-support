@@ -32,8 +32,7 @@ import java.text.ParseException;
  * The base abstract class for unsecured (plain / {@code alg=none}), JSON Web
  * Signature (JWS) secured and JSON Web Encryption (JWE) secured objects.
  *
- * @author Vladimir Dzhuvinov
- * @version 2017-07-11
+ * Based on code by Vladimir Dzhuvinov
  */
 public abstract class JOSEObject implements Serializable {
 

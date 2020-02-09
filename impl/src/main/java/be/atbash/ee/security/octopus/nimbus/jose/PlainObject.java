@@ -24,8 +24,7 @@ import java.text.ParseException;
 /**
  * Unsecured (plain / {@code alg=none}) JOSE object. This class is thread-safe.
  *
- * @author Vladimir Dzhuvinov
- * @version 2014-04-08
+ * Based on code by Vladimir Dzhuvinov
  */
 public class PlainObject extends JOSEObject {
 

@@ -29,8 +29,7 @@ import java.text.ParseException;
 /**
  * Unsecured (plain) JSON Web Token (JWT).
  *
- * @author Vladimir Dzhuvinov
- * @version 2015-08-19
+ * Based on code by  Vladimir Dzhuvinov
  */
 public class PlainJWT extends PlainObject implements JWT {
 

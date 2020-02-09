@@ -55,9 +55,7 @@ import java.security.interfaces.ECPrivateKey;
  *     <li>{@link JWSAlgorithm#ES512}
  * </ul>
  *
- * @author Axel Nennker
- * @author Vladimir Dzhuvinov
- * @version 2016-11-30
+ * Based on code by Axel Nennker and Vladimir Dzhuvinov
  */
 public class ECDSASigner extends ECDSAProvider implements JWSSigner {
 

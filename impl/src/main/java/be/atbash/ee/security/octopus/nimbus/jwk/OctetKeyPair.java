@@ -90,8 +90,7 @@ import java.util.*;
  * 	.build();
  * </pre>
  *
- * @author Vladimir Dzhuvinov
- * @version 2019-04-15
+ * Based on code by Vladimir Dzhuvinov
  */
 public class OctetKeyPair extends JWK implements AsymmetricJWK, CurveBasedJWK {
 

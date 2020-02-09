@@ -41,8 +41,7 @@ import java.util.Set;
  * <p>Supports all standard JWE algorithms implemented in the
  * {@link be.atbash.ee.security.octopus.nimbus.jose.crypto} package.
  *
- * @author Vladimir Dzhuvinov
- * @version 2015-11-16
+ * Based on code by Vladimir Dzhuvinov
  */
 public class DefaultJWEDecrypterFactory implements JWEDecrypterFactory {
 

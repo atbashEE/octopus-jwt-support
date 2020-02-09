@@ -37,8 +37,7 @@ import java.security.interfaces.ECPublicKey;
 /**
  * Elliptic Curve Diffie-Hellman key agreement functions and utilities.
  *
- * @author Vladimir Dzhuvinov
- * @version 2018-12-12
+ * Based on code by Vladimir Dzhuvinov
  */
 public final class ECDH {
 

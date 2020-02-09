@@ -56,9 +56,7 @@ import java.util.Set;
  *     <li>{@link JWSAlgorithm#ES512}
  * </ul>
  *
- * @author Axel Nennker
- * @author Vladimir Dzhuvinov
- * @version 2017-04-13
+ * Based on code by Axel Nennker and Vladimir Dzhuvinov
  */
 public class ECDSAVerifier extends ECDSAProvider implements JWSVerifier {
 

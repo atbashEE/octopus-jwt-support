@@ -56,8 +56,7 @@ import java.util.Set;
  *     <li>{@link JWSAlgorithm#PS512}
  * </ul>
  *
- * @author Vladimir Dzhuvinov
- * @version 2015-06-02
+ * Based on code by Vladimir Dzhuvinov
  */
 public class RSASSAVerifier extends RSASSAProvider implements JWSVerifier {
 

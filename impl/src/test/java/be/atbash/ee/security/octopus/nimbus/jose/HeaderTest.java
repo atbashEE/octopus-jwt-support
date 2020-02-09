@@ -30,8 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests the base JOSE header class.
  *
- * @author Vladimir Dzhuvinov
- * @version 2019-10-04
+ * Based on code by Vladimir Dzhuvinov
  */
 public class HeaderTest {
 

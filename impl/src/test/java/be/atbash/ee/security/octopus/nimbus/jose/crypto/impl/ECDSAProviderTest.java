@@ -23,8 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 
 /**
- * @author Vladimir Dzhuvinov
- * @version 2018-03-28
+ * Based on code by Vladimir Dzhuvinov
  */
 public class ECDSAProviderTest {
 

@@ -30,8 +30,7 @@ import java.security.spec.PSSParameterSpec;
 /**
  * RSA-SSA functions and utilities.
  *
- * @author Vladimir Dzhuvinov
- * @version 2015-05-31
+ * Based on code by Vladimir Dzhuvinov
  */
 public final class RSASSA {
 

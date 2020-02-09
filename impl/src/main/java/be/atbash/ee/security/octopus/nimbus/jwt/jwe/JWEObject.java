@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,7 @@ import java.text.ParseException;
 /**
  * JSON Web Encryption (JWE) secured object. This class is thread-safe.
  *
- * @author Vladimir Dzhuvinov
- * @version 2016-04-13
+ * Based on code by Vladimir Dzhuvinov
  */
 public class JWEObject extends JOSEObject {
 

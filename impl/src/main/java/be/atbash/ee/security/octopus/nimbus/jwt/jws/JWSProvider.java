@@ -26,8 +26,7 @@ import java.util.Set;
  *
  * <p>The JWS provider can be queried to determine its algorithm capabilities.
  *
- * @author Vladimir Dzhuvinov
- * @version 2015-11-16
+ * Based on code by Vladimir Dzhuvinov
  */
 public interface JWSProvider extends JOSEProvider {
 

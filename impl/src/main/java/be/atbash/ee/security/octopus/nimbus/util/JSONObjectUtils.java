@@ -32,8 +32,7 @@ import java.util.List;
 /**
  * JSON object helper methods for parsing and typed retrieval of member values.
  *
- * @author Vladimir Dzhuvinov
- * @version 2018-11-06
+ * Based on code by Vladimir Dzhuvinov
  */
 public final class JSONObjectUtils {
 

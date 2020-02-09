@@ -26,8 +26,7 @@ import java.util.Set;
  *
  * <p>The JWE provider can be queried to determine its algorithm capabilities.
  *
- * @author Vladimir Dzhuvinov
- * @version 2015-05-26
+ * Based on code by Vladimir Dzhuvinov
  */
 public interface JWEProvider extends JOSEProvider {
 

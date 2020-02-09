@@ -51,8 +51,7 @@ import java.util.*;
  *     <li>crit
  * </ul>
  *
- * @author Vladimir Dzhuvinov
- * @version 2017-04-09
+ * Based on code by Vladimir Dzhuvinov
  */
 abstract public class CommonJWTHeader extends Header {
 

@@ -26,7 +26,7 @@ import java.security.NoSuchAlgorithmException;
  * Utility for creating {@link AlgorithmParameters} objects with
  * an optional JCA provider.
  *
- * @author Justin Richer
+ * Based on code by Justin Richer
  */
 public class AlgorithmParametersHelper {
 

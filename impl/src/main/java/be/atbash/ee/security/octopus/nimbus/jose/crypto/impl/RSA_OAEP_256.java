@@ -35,9 +35,7 @@ import java.security.spec.MGF1ParameterSpec;
  * RSAES OAEP (SHA-256) methods for Content Encryption Key (CEK) encryption and
  * decryption. Uses the BouncyCastle.org provider. This class is thread-safe
  *
- * @author Vladimir Dzhuvinov
- * @author Justin Richer
- * @version 2017-11-27
+ * Based on code by Vladimir Dzhuvinov and Justin Richer
  */
 public final class RSA_OAEP_256 {
 

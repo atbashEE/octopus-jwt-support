@@ -26,8 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests static AES crypto provider constants and methods.
  *
- * @author Vladimir Dzhuvinov
- * @version 2015-05-27
+ * Based on code by Vladimir Dzhuvinov
  */
 public class AESCryptoTest  {
 

@@ -42,9 +42,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests JSON Web Key (JWK) set parsing and serialisation.
  *
- * @author Vladimir Dzhuvinov
- * @author Vedran Pavic
- * @version 2019-02-24
+ * Based on code by Vladimir Dzhuvinov and Vedran Pavic
  */
 public class JWKSetTest {
     // FIXME, move over some of these test to KeyReader. Possibly add new methods.

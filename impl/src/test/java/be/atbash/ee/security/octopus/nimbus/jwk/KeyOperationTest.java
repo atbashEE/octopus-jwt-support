@@ -30,8 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests the key operation enumeration.
  *
- * @author Vladimir Dzhuvinov
- * @version 2014-04-03
+ * Based on code by Vladimir Dzhuvinov
  */
 public class KeyOperationTest {
 

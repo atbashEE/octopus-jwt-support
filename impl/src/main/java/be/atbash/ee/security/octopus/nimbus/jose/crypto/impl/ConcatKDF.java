@@ -37,8 +37,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  *
  * <p>See NIST.800-56A.
  *
- * @author Vladimir Dzhuvinov
- * @version 2017-06-01
+ * Based on code by Vladimir Dzhuvinov
  */
 public class ConcatKDF {
 

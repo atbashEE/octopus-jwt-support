@@ -28,8 +28,7 @@ import java.util.Set;
  * The base abstract class for JSON Web Encryption (JWE) encrypters and
  * decrypters.
  *
- * @author Vladimir Dzhuvinov
- * @version 2015-11-16
+ * Based on code by Vladimir Dzhuvinov
  */
 abstract class BaseJWEProvider implements JWEProvider {
 

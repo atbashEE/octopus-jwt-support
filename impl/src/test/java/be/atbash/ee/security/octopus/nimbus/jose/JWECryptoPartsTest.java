@@ -29,8 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests the JWE crypto parts class.
  *
- * @author Vladimir Dzhuvinov
- * @version 2014-07-11
+ * Based on code by Vladimir Dzhuvinov
  */
 public class JWECryptoPartsTest {
 

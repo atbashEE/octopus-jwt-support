@@ -65,8 +65,7 @@ import java.util.*;
  * }
  * </pre>
  *
- * @author Vladimir Dzhuvinov
- * @version 2019-10-04
+ * Based on code by Vladimir Dzhuvinov
  */
 public final class JWSHeader extends CommonJWTHeader {
 

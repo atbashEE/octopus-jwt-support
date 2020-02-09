@@ -30,9 +30,7 @@ import java.security.NoSuchAlgorithmException;
  * Static methods for Hash-based Message Authentication Codes (HMAC). This
  * class is thread-safe.
  *
- * @author Axel Nennker
- * @author Vladimir Dzhuvinov
- * @version 2015-04-23
+ * Based on code by Axel Nennker and Vladimir Dzhuvinov
  */
 public final class HMAC {
 

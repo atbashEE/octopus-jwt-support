@@ -27,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests the Base64URL class.
  *
- * @author Vladimir Dzhuvinov
+ * Based on code by Vladimir Dzhuvinov
  */
 public class Base64URLValueTest {
 

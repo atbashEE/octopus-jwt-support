@@ -33,8 +33,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  *
  * <p>See RFC 7638.
  *
- * @author Vladimir Dzhuvinov
- * @version 2016-07-26
+ * Based on code by Vladimir Dzhuvinov
  */
 public final class ThumbprintUtils {
 

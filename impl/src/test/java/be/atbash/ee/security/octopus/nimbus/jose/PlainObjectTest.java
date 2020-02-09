@@ -24,8 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests plaintext JOSE object parsing and serialisation.
  *
- * @author Vladimir Dzhuvinov
- * @version 2014-07-08
+ * Based on code by Vladimir Dzhuvinov
  */
 public class PlainObjectTest {
 

@@ -59,10 +59,7 @@ import java.util.Set;
  *     <li>{@link be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod#A256GCM}
  * </ul>
  *
- * @author David Ortiz
- * @author Vladimir Dzhuvinov
- * @author Dimitar A. Stoikov
- * @version 2018-10-11
+ * Based on code by David Ortiz, Vladimir Dzhuvinov and Dimitar A. Stoikov
  */
 public class RSADecrypter extends RSACryptoProvider implements JWEDecrypter {
 

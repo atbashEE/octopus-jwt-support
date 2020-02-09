@@ -26,8 +26,7 @@ import java.security.NoSuchAlgorithmException;
 /**
  * Helper utilities for instantiating ciphers.
  *
- * @author Cedric Staub
- * @version 2014-01-22
+ * Based on code by Cedric Staub
  */
 public final class CipherHelper {
 

@@ -65,10 +65,7 @@ import javax.crypto.spec.SecretKeySpec;
  *     <li>{@link EncryptionMethod#A256GCM}
  * </ul>
  *
- * @author Melisa Halsband
- * @author Vladimir Dzhuvinov
- * @author Dimitar A. Stoikov
- * @version 2017-06-01
+ * Based on code by Melisa Halsband, Vladimir Dzhuvinov and Dimitar A. Stoikov
  */
 public class AESEncrypter extends AESCryptoProvider implements JWEEncrypter {
 

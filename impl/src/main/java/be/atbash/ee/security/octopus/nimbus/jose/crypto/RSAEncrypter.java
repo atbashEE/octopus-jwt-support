@@ -60,10 +60,7 @@ import java.security.interfaces.RSAPublicKey;
  *     <li>{@link EncryptionMethod#A256GCM}
  * </ul>
  *
- * @author David Ortiz
- * @author Vladimir Dzhuvinov
- * @author Jun Yu
- * @version 2018-07-17
+ * Based on code by David Ortiz, Vladimir Dzhuvinov and Jun Yu
  */
 public class RSAEncrypter extends RSACryptoProvider implements JWEEncrypter {
 

@@ -37,10 +37,7 @@ import java.security.spec.InvalidParameterSpecException;
  *
  * <p>See RFC 7518 (JWA), section 5.1 and appendix 3.
  *
- * @author Vladimir Dzhuvinov
- * @author Axel Nennker
- * @author Dimitar A. Stoikov
- * @version 2018-01-11
+ * Based on code by Vladimir Dzhuvinov, Axel Nennker and Dimitar A. Stoikov
  */
 public final class AESGCM {
 

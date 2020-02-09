@@ -24,8 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests the EncryptionMethod class.
  *
- * @author Vladimir Dzhuvinov
- * @version 2014-10-14
+ * Based on code by Vladimir Dzhuvinov
  */
 public class EncryptionMethodTest {
 

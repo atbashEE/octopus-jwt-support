@@ -30,9 +30,7 @@ import java.security.spec.ECParameterSpec;
 /**
  * Elliptic Curve Digital Signature Algorithm (ECDSA) functions and utilities.
  *
- * @author Vladimir Dzhuvinov
- * @author Aleksei Doroganov
- * @version 2019-10-03
+ * Based on code by Vladimir Dzhuvinov and Aleksei Doroganov
  */
 public final class ECDSA {
 

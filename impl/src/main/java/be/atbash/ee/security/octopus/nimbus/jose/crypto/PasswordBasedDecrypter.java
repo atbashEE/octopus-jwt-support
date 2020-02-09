@@ -57,8 +57,7 @@ import java.util.Set;
  *     <li>{@link EncryptionMethod#A256GCM}
  * </ul>
  *
- * @author Vladimir Dzhuvinov
- * @version 2016-07-26
+ * Based on code by Vladimir Dzhuvinov
  */
 public class PasswordBasedDecrypter extends PasswordBasedCryptoProvider implements JWEDecrypter {
 

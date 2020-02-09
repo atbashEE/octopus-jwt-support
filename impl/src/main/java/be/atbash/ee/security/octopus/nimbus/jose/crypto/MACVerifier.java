@@ -52,8 +52,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  *     <li>{@link JWSAlgorithm#HS512}
  * </ul>
  *
- * @author Vladimir Dzhuvinov
- * @version 2016-06-26
+ * Based on code by Vladimir Dzhuvinov
  */
 public class MACVerifier extends MACProvider implements JWSVerifier {
 

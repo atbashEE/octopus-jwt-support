@@ -30,8 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests the JWT parser. Uses test vectors from JWT spec.
  *
- * @author Vladimir Dzhuvinov
- * @version 2015-08-19
+ * Based on code by Vladimir Dzhuvinov
  */
 public class JWTParserTest {
 

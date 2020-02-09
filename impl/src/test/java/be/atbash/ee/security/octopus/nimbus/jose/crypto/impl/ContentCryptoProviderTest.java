@@ -38,8 +38,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests the content encryption / decryption provider.
  *
- * @author Vladimir Dzhuvinov
- * @version 2015-06-29
+ * Based on code by Vladimir Dzhuvinov
  */
 public class ContentCryptoProviderTest {
 
