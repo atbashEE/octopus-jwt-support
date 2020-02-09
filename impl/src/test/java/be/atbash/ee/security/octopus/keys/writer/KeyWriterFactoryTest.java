@@ -20,6 +20,8 @@ import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.generator.KeyGenerator;
 import be.atbash.ee.security.octopus.keys.generator.RSAGenerationParameters;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
+import be.atbash.ee.security.octopus.keys.selector.filter.AsymmetricPartKeyFilter;
+import be.atbash.ee.security.octopus.keys.selector.filter.KeyFilter;
 import be.atbash.ee.security.octopus.nimbus.jwk.JWKSet;
 import be.atbash.ee.security.octopus.nimbus.jwk.RSAKey;
 import org.junit.jupiter.api.Assertions;
@@ -78,16 +80,15 @@ public class KeyWriterFactoryTest {
 
     private AtbashKey findPublicKey(List<AtbashKey> atbashKeys) {
 
-        // We can use the KeySelector also :)
-        return atbashKeys.stream().filter(k -> k.getSecretKeyType().getAsymmetricPart() == AsymmetricPart.PUBLIC).findAny().get();
-        // We use immediately .get() since we know there is a public key
+        KeyFilter filter = new AsymmetricPartKeyFilter(AsymmetricPart.PUBLIC);
+        return filter.filter(atbashKeys).get(0);
+
     }
 
     private AtbashKey findPrivateKey(List<AtbashKey> atbashKeys) {
 
-        // We can use the KeySelector also :)
-        return atbashKeys.stream().filter(k -> k.getSecretKeyType().getAsymmetricPart() == AsymmetricPart.PRIVATE).findAny().get();
-        // We use immediately .get() since we know there is a public key
+        KeyFilter filter = new AsymmetricPartKeyFilter(AsymmetricPart.PRIVATE);
+        return filter.filter(atbashKeys).get(0);
     }
 
     private List<AtbashKey> generateRSAKeys(String kid) {

@@ -168,12 +168,12 @@ public class KeyWriterTest {
     }
 
     @Test
-    public void writeKeyResource_RSA_encrypted() throws IOException {
+    public void writeKeyResource_RSA_encrypted() {
         // RSA Private key is 'encrypted'
         when(jwtSupportConfigurationMock.isJWKEncrypted()).thenReturn(true);
 
         List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.jwk");
-        // FIXME use this technique everywhere to filter keys instead of KeySelector.
+
         KeyFilter filter = new AsymmetricPartKeyFilter(AsymmetricPart.PRIVATE);
         AtbashKey privateKey = filter.filter(keys).get(0);
 
