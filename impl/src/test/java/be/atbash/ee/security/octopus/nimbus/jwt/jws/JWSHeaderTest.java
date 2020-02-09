@@ -148,7 +148,43 @@ public class JWSHeaderTest {
         assertThat(header.getIncludedParameters()).contains("xCustom");
         assertThat(header.getIncludedParameters()).hasSize(11);
 
-        // Test copy constructor  // FIXME This is a second test so need another test method.
+    }
+
+    @Test
+    public void testCopyConstructor()
+            throws Exception {
+
+        Set<String> crit = new HashSet<>();
+        crit.add("iat");
+        crit.add("exp");
+        crit.add("nbf");
+
+        Base64URLValue mod = new Base64URLValue("abc123");
+        Base64URLValue exp = new Base64URLValue("def456");
+        KeyUse use = KeyUse.ENCRYPTION;
+        String kid = "1234";
+
+        RSAKey jwk = new RSAKey.Builder(mod, exp).keyUse(use).algorithm(JWEAlgorithm.RSA_OAEP_256).keyID(kid).build();
+
+        List<Base64Value> certChain = new LinkedList<>();
+        certChain.add(new Base64Value("asd"));
+        certChain.add(new Base64Value("fgh"));
+        certChain.add(new Base64Value("jkl"));
+
+        JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.RS256).
+                type(new JOSEObjectType("JWT")).
+                contentType("application/json").
+                criticalParams(crit).
+                jwkURL(new URI("https://example.com/jku.json")).
+                jwk(jwk).
+                x509CertURL(new URI("https://example/cert.b64")).
+                x509CertSHA256Thumbprint(new Base64URLValue("789asd")).
+                x509CertChain(certChain).
+                keyID("1234").
+                parameter("xCustom", "+++").
+                build();
+
+
         header = new JWSHeader(header);
 
         assertThat(header.getAlgorithm()).isEqualTo(JWSAlgorithm.RS256);
@@ -181,7 +217,6 @@ public class JWSHeaderTest {
         assertThat(header.getCustomParameter("xCustom")).isEqualTo("+++");
         assertThat(header.getCustomParameters().size()).isEqualTo(1);
 
-        assertThat(header.getParsedBase64URL()).isEqualTo(base64URL);
     }
 
     @Test
