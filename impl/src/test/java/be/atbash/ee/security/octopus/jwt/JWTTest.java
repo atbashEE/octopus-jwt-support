@@ -26,10 +26,7 @@ import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersBuilder;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.KeyManager;
 import be.atbash.ee.security.octopus.keys.ListKeyManager;
-import be.atbash.ee.security.octopus.keys.generator.ECGenerationParameters;
-import be.atbash.ee.security.octopus.keys.generator.KeyGenerator;
-import be.atbash.ee.security.octopus.keys.generator.OKPGenerationParameters;
-import be.atbash.ee.security.octopus.keys.generator.RSAGenerationParameters;
+import be.atbash.ee.security.octopus.keys.TestKeys;
 import be.atbash.ee.security.octopus.keys.selector.*;
 import be.atbash.ee.security.octopus.util.HmacSecretUtil;
 import org.junit.jupiter.api.AfterEach;
@@ -90,7 +87,7 @@ public class JWTTest {
     @Test
     public void encodingJWT_HMAC() {
 
-        AtbashKey key = generateOCTKey();
+        AtbashKey key = TestKeys.generateOCTKeys("hmacID").get(0);
 
         JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS)
                 .withSecretKeyForSigning(key)
@@ -131,7 +128,7 @@ public class JWTTest {
     @Test
     public void encodingJWT__hmac_TamperedPayload() {
 
-        AtbashKey key = generateOCTKey();
+        AtbashKey key = TestKeys.generateOCTKeys("hmacID").get(0);
 
         JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS)
                 .withSecretKeyForSigning(key)
@@ -156,7 +153,7 @@ public class JWTTest {
     @Test
     public void encodingJWT_RSA() {
 
-        List<AtbashKey> keys = generateRSAKeys(KID_SIGN);
+        List<AtbashKey> keys = TestKeys.generateRSAKeys(KID_SIGN);
 
         ListKeyManager keyManager = new ListKeyManager(keys);
 
@@ -188,7 +185,7 @@ public class JWTTest {
     public void encodingJWT_RSA_otherAlgo() {
         TestConfig.addConfigValue("jwt.sign.rsa.algo", "PS512");
 
-        List<AtbashKey> keys = generateRSAKeys(KID_SIGN);
+        List<AtbashKey> keys = TestKeys.generateRSAKeys(KID_SIGN);
 
         ListKeyManager keyManager = new ListKeyManager(keys);
 
@@ -219,7 +216,7 @@ public class JWTTest {
     @Test
     public void encodingJWT_RSA_WrongKeyForVerification() {
 
-        List<AtbashKey> keys = generateRSAKeys(KID_SIGN);
+        List<AtbashKey> keys = TestKeys.generateRSAKeys(KID_SIGN);
 
         ListKeyManager keyManager = new ListKeyManager(keys);
 
@@ -235,7 +232,7 @@ public class JWTTest {
         String encoded = new JWTEncoder().encode(payload, parameters);
 
 
-        List<AtbashKey> keysOther = generateRSAKeys(KID_SIGN);
+        List<AtbashKey> keysOther = TestKeys.generateRSAKeys(KID_SIGN);
         keyManager = new ListKeyManager(keysOther);
 
         criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PUBLIC).build();
@@ -248,7 +245,7 @@ public class JWTTest {
     @Test
     public void encodingJWT_RSA_tamperedPayload() {
 
-        List<AtbashKey> keys = generateRSAKeys(KID_SIGN);
+        List<AtbashKey> keys = TestKeys.generateRSAKeys(KID_SIGN);
 
         ListKeyManager keyManager = new ListKeyManager(keys);
 
@@ -276,7 +273,7 @@ public class JWTTest {
     @Test
     public void encodingJWT_RSA_WrongKeyType() {
 
-        List<AtbashKey> keys = generateRSAKeys(KID_SIGN);
+        List<AtbashKey> keys = TestKeys.generateRSAKeys(KID_SIGN);
 
         ListKeyManager keyManager = new ListKeyManager(keys);
 
@@ -294,7 +291,7 @@ public class JWTTest {
     @Test
     public void encodingJWT_EC() {
 
-        List<AtbashKey> keys = generateECKeys(KID_SIGN, "P-256");
+        List<AtbashKey> keys = TestKeys.generateECKeys(KID_SIGN, "P-256");
 
         ListKeyManager keyManager = new ListKeyManager(keys);
 
@@ -325,7 +322,7 @@ public class JWTTest {
     @Test
     public void encodingJWT_EC_customAlgo() {
 
-        List<AtbashKey> keys = generateECKeys(KID_SIGN, "P-521");
+        List<AtbashKey> keys = TestKeys.generateECKeys(KID_SIGN, "P-521");
 
         ListKeyManager keyManager = new ListKeyManager(keys);
 
@@ -356,7 +353,7 @@ public class JWTTest {
     @Test
     public void encodingJWT_EC_WrongKeyForVerification() {
 
-        List<AtbashKey> keys = generateECKeys(KID_SIGN, "P-256");
+        List<AtbashKey> keys = TestKeys.generateECKeys(KID_SIGN, "P-256");
 
         ListKeyManager keyManager = new ListKeyManager(keys);
 
@@ -371,7 +368,7 @@ public class JWTTest {
 
         String encoded = new JWTEncoder().encode(payload, parameters);
 
-        List<AtbashKey> keysOther = generateECKeys(KID_SIGN, "P-256");
+        List<AtbashKey> keysOther = TestKeys.generateECKeys(KID_SIGN, "P-256");
         keyManager = new ListKeyManager(keysOther);
 
         criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PUBLIC).build();
@@ -384,7 +381,7 @@ public class JWTTest {
     @Test
     public void encodingJWT_EC_tamperedPayload() {
 
-        List<AtbashKey> keys = generateECKeys(KID_SIGN, "P-256");
+        List<AtbashKey> keys = TestKeys.generateECKeys(KID_SIGN, "P-256");
 
         ListKeyManager keyManager = new ListKeyManager(keys);
 
@@ -412,7 +409,7 @@ public class JWTTest {
     @Test
     public void encodingJWT_EC_WrongKeyType() {
 
-        List<AtbashKey> keys = generateECKeys(KID_SIGN, "P-256");
+        List<AtbashKey> keys = TestKeys.generateECKeys(KID_SIGN, "P-256");
 
         ListKeyManager keyManager = new ListKeyManager(keys);
 
@@ -430,7 +427,7 @@ public class JWTTest {
     @Test
     public void encodingJWT_EC_unsupportedCurve() {
 
-        List<AtbashKey> keys = generateECKeys(KID_SIGN, "prime192v1");
+        List<AtbashKey> keys = TestKeys.generateECKeys(KID_SIGN, "prime192v1");
 
         ListKeyManager keyManager = new ListKeyManager(keys);
 
@@ -449,7 +446,7 @@ public class JWTTest {
     @Test
     public void encodingJWT_noKeyMatch() {
 
-        List<AtbashKey> keys = generateRSAKeys(KID_SIGN);
+        List<AtbashKey> keys = TestKeys.generateRSAKeys(KID_SIGN);
 
         ListKeyManager keyManager = new ListKeyManager(keys);
 
@@ -479,7 +476,7 @@ public class JWTTest {
 
     @Test
     public void encodingJWT_OKP() {
-        List<AtbashKey> keys = generateOKPKeys(KID_SIGN);
+        List<AtbashKey> keys = TestKeys.generateOKPKeys(KID_SIGN);
 
         ListKeyManager keyManager = new ListKeyManager(keys);
 
@@ -509,7 +506,7 @@ public class JWTTest {
 
     @Test
     public void encodingJWT_OKP_tamperedPayload() {
-        List<AtbashKey> keys = generateOKPKeys(KID_SIGN);
+        List<AtbashKey> keys = TestKeys.generateOKPKeys(KID_SIGN);
 
         ListKeyManager keyManager = new ListKeyManager(keys);
 
@@ -538,7 +535,7 @@ public class JWTTest {
 
     @Test
     public void encodingJWT_OKP_wrongKey() {
-        List<AtbashKey> keys = generateOKPKeys(KID_SIGN);
+        List<AtbashKey> keys = TestKeys.generateOKPKeys(KID_SIGN);
 
         ListKeyManager keyManager = new ListKeyManager(keys);
 
@@ -554,7 +551,7 @@ public class JWTTest {
         String encoded = new JWTEncoder().encode(payload, parameters);
         String updatedEncoded = tamperWithPayload(encoded);
 
-        List<AtbashKey> keysOther = generateOKPKeys(KID_SIGN);
+        List<AtbashKey> keysOther = TestKeys.generateOKPKeys(KID_SIGN);
         keyManager = new ListKeyManager(keysOther);
 
         criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PUBLIC).build();
@@ -563,38 +560,4 @@ public class JWTTest {
         KeySelector keySelector = new SingleKeySelector(publicList.get(0));
         Assertions.assertThrows(InvalidJWTException.class, () -> new JWTDecoder().decode(updatedEncoded, Payload.class, keySelector, null));
     }
-
-    private AtbashKey generateOCTKey() {
-        byte[] secret = new byte[32];
-        new SecureRandom().nextBytes(secret);
-
-        return HmacSecretUtil.generateSecretKey("hmacID", secret);
-    }
-
-    private List<AtbashKey> generateRSAKeys(String kid) {
-        RSAGenerationParameters generationParameters = new RSAGenerationParameters.RSAGenerationParametersBuilder()
-                .withKeyId(kid)
-                .build();
-        KeyGenerator generator = new KeyGenerator();
-        return generator.generateKeys(generationParameters);
-    }
-
-    private List<AtbashKey> generateECKeys(String kid, String curveName) {
-        ECGenerationParameters generationParameters = new ECGenerationParameters.ECGenerationParametersBuilder()
-                .withKeyId(kid)
-                .withCurveName(curveName)
-                .build();
-        KeyGenerator generator = new KeyGenerator();
-        return generator.generateKeys(generationParameters);
-    }
-
-    private List<AtbashKey> generateOKPKeys(String kid) {
-        OKPGenerationParameters generationParameters = new OKPGenerationParameters.OKPGenerationParametersBuilder()
-                .withKeyId(kid)
-                .build();
-
-        KeyGenerator generator = new KeyGenerator();
-        return generator.generateKeys(generationParameters);
-    }
-
 }

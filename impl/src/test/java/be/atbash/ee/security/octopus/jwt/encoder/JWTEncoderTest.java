@@ -25,8 +25,7 @@ import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersNone;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersPlain;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.ListKeyManager;
-import be.atbash.ee.security.octopus.keys.generator.KeyGenerator;
-import be.atbash.ee.security.octopus.keys.generator.RSAGenerationParameters;
+import be.atbash.ee.security.octopus.keys.TestKeys;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.keys.selector.SelectorCriteria;
 import be.atbash.ee.security.octopus.nimbus.jwt.JWT;
@@ -159,7 +158,7 @@ public class JWTEncoderTest {
     }
 
     private JWTParameters getJwtParameters() {
-        List<AtbashKey> keys = generateRSAKeys("kid");
+        List<AtbashKey> keys = TestKeys.generateRSAKeys("kid");
 
         ListKeyManager keyManager = new ListKeyManager(keys);
         SelectorCriteria criteria = SelectorCriteria.newBuilder().withAsymmetricPart(AsymmetricPart.PRIVATE).build();
@@ -202,7 +201,7 @@ public class JWTEncoderTest {
     }
 
     private AtbashKey createKeyForSigning() {
-        List<AtbashKey> keys = generateRSAKeys("sign");
+        List<AtbashKey> keys = TestKeys.generateRSAKeys("sign");
 
         ListKeyManager keyManager = new ListKeyManager(keys);
         SelectorCriteria criteria = SelectorCriteria.newBuilder().withAsymmetricPart(AsymmetricPart.PRIVATE).build();
@@ -214,7 +213,7 @@ public class JWTEncoderTest {
     }
 
     private AtbashKey createKeyForEncryption() {
-        List<AtbashKey> keys = generateRSAKeys("encrypt");
+        List<AtbashKey> keys = TestKeys.generateRSAKeys("encrypt");
 
         ListKeyManager keyManager = new ListKeyManager(keys);
         SelectorCriteria criteria = SelectorCriteria.newBuilder().withAsymmetricPart(AsymmetricPart.PUBLIC).build();
@@ -228,14 +227,6 @@ public class JWTEncoderTest {
     private Map<String, Object> getJson(String jwtPart) {
         String decoded = new String(Base64.getDecoder().decode(jwtPart));
         return new JWTDecoder().decode(decoded, HashMap.class).getData();
-    }
-
-    private List<AtbashKey> generateRSAKeys(String kid) {
-        RSAGenerationParameters generationParameters = new RSAGenerationParameters.RSAGenerationParametersBuilder()
-                .withKeyId(kid)
-                .build();
-        KeyGenerator generator = new KeyGenerator();
-        return generator.generateKeys(generationParameters);
     }
 
     @Test

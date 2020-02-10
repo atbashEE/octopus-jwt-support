@@ -16,14 +16,9 @@
 package be.atbash.ee.security.octopus.keys.reader;
 
 import be.atbash.ee.security.octopus.keys.AtbashKey;
-import be.atbash.ee.security.octopus.keys.generator.ECGenerationParameters;
-import be.atbash.ee.security.octopus.keys.generator.KeyGenerator;
-import be.atbash.ee.security.octopus.keys.generator.OKPGenerationParameters;
-import be.atbash.ee.security.octopus.keys.generator.RSAGenerationParameters;
+import be.atbash.ee.security.octopus.keys.Filters;
+import be.atbash.ee.security.octopus.keys.TestKeys;
 import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup;
-import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
-import be.atbash.ee.security.octopus.keys.selector.filter.AsymmetricPartKeyFilter;
-import be.atbash.ee.security.octopus.keys.selector.filter.KeyFilter;
 import be.atbash.ee.security.octopus.keys.writer.KeyWriter;
 import be.atbash.ee.security.octopus.nimbus.jwk.Curve;
 import org.junit.jupiter.api.Test;
@@ -41,8 +36,8 @@ class KeyReaderJWKTest {
 
     @Test
     void parse_RSA_enc() throws ParseException {
-        List<AtbashKey> keys = generateRSAKeys("kid");
-        AtbashKey privateKey = getPrivateKey(keys);
+        List<AtbashKey> keys = TestKeys.generateRSAKeys("kid");
+        AtbashKey privateKey = Filters.findPrivateKey(keys);
 
         byte[] bytes = keyWriter.writeKeyResource(privateKey, KeyResourceType.JWK, "atbash".toCharArray());
         String json = new String(bytes);
@@ -50,7 +45,7 @@ class KeyReaderJWKTest {
         assertThat(json).contains("\"enc\":");
         assertThat(json).contains("\"kty\":\"RSA\"");
         List<AtbashKey> parsedKeys = keyReader.parse(json, "somePath", new TestLookup());
-        AtbashKey parsedKey = getPrivateKey(parsedKeys);
+        AtbashKey parsedKey = Filters.findPrivateKey(parsedKeys);
 
         // Both keys are the same when their encoded format is the same.
         assertThat(parsedKey.getKey().getEncoded()).isEqualTo(privateKey.getKey().getEncoded());
@@ -59,8 +54,8 @@ class KeyReaderJWKTest {
 
     @Test
     void parse_EC_enc() throws ParseException {
-        List<AtbashKey> keys = generateECKeys("kid", Curve.P_256.getName());
-        AtbashKey privateKey = getPrivateKey(keys);
+        List<AtbashKey> keys = TestKeys.generateECKeys("kid", Curve.P_256.getName());
+        AtbashKey privateKey = Filters.findPrivateKey(keys);
 
         byte[] bytes = keyWriter.writeKeyResource(privateKey, KeyResourceType.JWK, "atbash".toCharArray());
         String json = new String(bytes);
@@ -68,7 +63,7 @@ class KeyReaderJWKTest {
         assertThat(json).contains("\"enc\":");
         assertThat(json).contains("\"kty\":\"EC\"");
         List<AtbashKey> parsedKeys = keyReader.parse(json, "somePath", new TestLookup());
-        AtbashKey parsedKey = getPrivateKey(parsedKeys);
+        AtbashKey parsedKey = Filters.findPrivateKey(parsedKeys);
 
         //TODO Both keys are the same but encrypted is not the same hmmmm
         assertThat(parsedKey.getKey()).isEqualTo(privateKey.getKey());
@@ -77,8 +72,8 @@ class KeyReaderJWKTest {
 
     @Test
     void parse_OKP_enc() throws ParseException {
-        List<AtbashKey> keys = generateOKPKeys("kid");
-        AtbashKey privateKey = getPrivateKey(keys);
+        List<AtbashKey> keys = TestKeys.generateOKPKeys("kid");
+        AtbashKey privateKey = Filters.findPrivateKey(keys);
 
         byte[] bytes = keyWriter.writeKeyResource(privateKey, KeyResourceType.JWK, "atbash".toCharArray());
         String json = new String(bytes);
@@ -86,42 +81,11 @@ class KeyReaderJWKTest {
         assertThat(json).contains("\"enc\":");
         assertThat(json).contains("\"kty\":\"OKP\"");
         List<AtbashKey> parsedKeys = keyReader.parse(json, "somePath", new TestLookup());
-        AtbashKey parsedKey = getPrivateKey(parsedKeys);
+        AtbashKey parsedKey = Filters.findPrivateKey(parsedKeys);
 
         // Both keys are the same when their encoded format is the same.
         assertThat(parsedKey.getKey().getEncoded()).isEqualTo(privateKey.getKey().getEncoded());
 
-    }
-
-    private AtbashKey getPrivateKey(List<AtbashKey> keys) {
-        KeyFilter filter = new AsymmetricPartKeyFilter(AsymmetricPart.PRIVATE);
-        return filter.filter(keys).get(0);
-    }
-
-    private List<AtbashKey> generateRSAKeys(String kid) {
-        RSAGenerationParameters generationParameters = new RSAGenerationParameters.RSAGenerationParametersBuilder()
-                .withKeyId(kid)
-                .build();
-        KeyGenerator generator = new KeyGenerator();
-        return generator.generateKeys(generationParameters);
-    }
-
-    private List<AtbashKey> generateECKeys(String kid, String curveName) {
-        ECGenerationParameters generationParameters = new ECGenerationParameters.ECGenerationParametersBuilder()
-                .withKeyId(kid)
-                .withCurveName(curveName)
-                .build();
-        KeyGenerator generator = new KeyGenerator();
-        return generator.generateKeys(generationParameters);
-    }
-
-    private List<AtbashKey> generateOKPKeys(String kid) {
-        OKPGenerationParameters generationParameters = new OKPGenerationParameters.OKPGenerationParametersBuilder()
-                .withKeyId(kid)
-                .build();
-
-        KeyGenerator generator = new KeyGenerator();
-        return generator.generateKeys(generationParameters);
     }
 
     private static class TestLookup implements KeyResourcePasswordLookup {

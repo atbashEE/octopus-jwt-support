@@ -21,7 +21,6 @@ import be.atbash.ee.security.octopus.jwt.encoder.JWTEncoder;
 import be.atbash.ee.security.octopus.jwt.encoder.testclasses.Payload;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParameters;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersBuilder;
-import be.atbash.ee.security.octopus.keys.generator.*;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.keys.selector.KeySelector;
 import be.atbash.ee.security.octopus.keys.selector.SelectorCriteria;
@@ -38,7 +37,7 @@ public class AtbashKeyJSONTest {
 
     @Test
     public void testJSONSupport_RSAPrivate() {
-        ListKeyManager keyManager = new ListKeyManager(generateRSAKeys());
+        ListKeyManager keyManager = new ListKeyManager(TestKeys.generateRSAKeys(KID));
 
         SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID).withAsymmetricPart(AsymmetricPart.PRIVATE).build();
         List<AtbashKey> keyList = keyManager.retrieveKeys(criteria);
@@ -58,7 +57,7 @@ public class AtbashKeyJSONTest {
 
     @Test
     public void testJSONSupport_RSAPublic() {
-        ListKeyManager keyManager = new ListKeyManager(generateRSAKeys());
+        ListKeyManager keyManager = new ListKeyManager(TestKeys.generateRSAKeys(KID));
 
         SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID).withAsymmetricPart(AsymmetricPart.PUBLIC).build();
         List<AtbashKey> keyList = keyManager.retrieveKeys(criteria);
@@ -78,7 +77,7 @@ public class AtbashKeyJSONTest {
 
     @Test
     public void testJSONSupport_ECPrivate() {
-        ListKeyManager keyManager = new ListKeyManager(generateECKeys());
+        ListKeyManager keyManager = new ListKeyManager(TestKeys.generateECKeys(KID));
 
         SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID).withAsymmetricPart(AsymmetricPart.PRIVATE).build();
         List<AtbashKey> keyList = keyManager.retrieveKeys(criteria);
@@ -100,7 +99,7 @@ public class AtbashKeyJSONTest {
 
     @Test
     public void testJSONSupport_ECPublic() {
-        ListKeyManager keyManager = new ListKeyManager(generateECKeys());
+        ListKeyManager keyManager = new ListKeyManager(TestKeys.generateECKeys(KID));
 
         SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID).withAsymmetricPart(AsymmetricPart.PUBLIC).build();
         List<AtbashKey> keyList = keyManager.retrieveKeys(criteria);
@@ -123,7 +122,7 @@ public class AtbashKeyJSONTest {
 
     @Test
     public void testJsonSupport_OCT() {
-        List<AtbashKey> keys = generateOCTKeys();
+        List<AtbashKey> keys = TestKeys.generateOCTKeys(KID);
         JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.NONE).build();
         String json = new JWTEncoder().encode(keys.get(0), parameters);
 
@@ -132,43 +131,9 @@ public class AtbashKeyJSONTest {
         assertThat(key.getKey().getEncoded()).isEqualTo(keys.get(0).getKey().getEncoded());
     }
 
-    private List<AtbashKey> generateRSAKeys() {
-        RSAGenerationParameters generationParameters = new RSAGenerationParameters.RSAGenerationParametersBuilder()
-                .withKeyId(KID)
-                .build();
-        KeyGenerator generator = new KeyGenerator();
-        return generator.generateKeys(generationParameters);
-    }
-
-    private List<AtbashKey> generateECKeys() {
-        ECGenerationParameters parameters = new ECGenerationParameters.ECGenerationParametersBuilder()
-                .withKeyId(KID)
-                .withCurveName("secp256r1")
-                .build();
-        KeyGenerator generator = new KeyGenerator();
-        return generator.generateKeys(parameters);
-    }
-
-    private List<AtbashKey> generateOCTKeys() {
-        OCTGenerationParameters generationParameters = new OCTGenerationParameters.OCTGenerationParametersBuilder()
-                .withKeyId(KID)
-                .build();
-        KeyGenerator generator = new KeyGenerator();
-        return generator.generateKeys(generationParameters);
-    }
-
-    private List<AtbashKey> generateOKPKeys() {
-        OKPGenerationParameters generationParameters = new OKPGenerationParameters.OKPGenerationParametersBuilder()
-                .withKeyId(KID)
-                .build();
-
-        KeyGenerator generator = new KeyGenerator();
-        return generator.generateKeys(generationParameters);
-    }
-
     @Test
     public void testJSONSupport_OKPPrivate() {
-        ListKeyManager keyManager = new ListKeyManager(generateOKPKeys());
+        ListKeyManager keyManager = new ListKeyManager(TestKeys.generateOKPKeys(KID));
 
         SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID).withAsymmetricPart(AsymmetricPart.PRIVATE).build();
         List<AtbashKey> keyList = keyManager.retrieveKeys(criteria);
@@ -189,7 +154,7 @@ public class AtbashKeyJSONTest {
 
     @Test
     public void testJSONSupport_OKPPublic() {
-        ListKeyManager keyManager = new ListKeyManager(generateOKPKeys());
+        ListKeyManager keyManager = new ListKeyManager(TestKeys.generateOKPKeys(KID));
 
         SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID).withAsymmetricPart(AsymmetricPart.PUBLIC).build();
         List<AtbashKey> keyList = keyManager.retrieveKeys(criteria);
@@ -214,7 +179,7 @@ public class AtbashKeyJSONTest {
         // If we can sign and verify some data, I guess we are safe
 
         // Get the keys
-        List<AtbashKey> atbashKeys = generateECKeys();
+        List<AtbashKey> atbashKeys = TestKeys.generateECKeys(KID);
         ListKeyManager keyManager = new ListKeyManager(atbashKeys);
 
         SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID).withAsymmetricPart(AsymmetricPart.PRIVATE).build();

@@ -23,8 +23,7 @@ import be.atbash.ee.security.octopus.jwt.parameter.JWTParameters;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersBuilder;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.ListKeyManager;
-import be.atbash.ee.security.octopus.keys.generator.KeyGenerator;
-import be.atbash.ee.security.octopus.keys.generator.RSAGenerationParameters;
+import be.atbash.ee.security.octopus.keys.TestKeys;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.keys.selector.SelectorCriteria;
 import be.atbash.ee.security.octopus.keys.selector.TestKeySelector;
@@ -55,7 +54,7 @@ public class JWTDecoderTest {
 
     @Test
     public void decode_customSerializer() {
-        List<AtbashKey> keys = generateRSAKeys("kid");
+        List<AtbashKey> keys = TestKeys.generateRSAKeys("kid");
         JWTParameters parameters = getJwtParameters(keys, null);
         JWTEncoder encoder = new JWTEncoder();
         JWTClaimsSet claims = new JWTClaimsSet.Builder().claim("value", "200,150,100").build();
@@ -112,7 +111,7 @@ public class JWTDecoderTest {
     @Test
     public void decode_withVerifier_valid() {
 
-        List<AtbashKey> keys = generateRSAKeys("kid");
+        List<AtbashKey> keys = TestKeys.generateRSAKeys("kid");
         Map<String, String> headerValues = new HashMap<>();
         headerValues.put("head1", "value1");
         JWTParameters parameters = getJwtParameters(keys, headerValues);
@@ -144,7 +143,7 @@ public class JWTDecoderTest {
     @Test
     public void decode_withVerifier_invalidHeader() {
 
-        List<AtbashKey> keys = generateRSAKeys("kid");
+        List<AtbashKey> keys = TestKeys.generateRSAKeys("kid");
         Map<String, String> headerValues = new HashMap<>();
         headerValues.put("head1", "value2");
         JWTParameters parameters = getJwtParameters(keys, headerValues);
@@ -175,7 +174,7 @@ public class JWTDecoderTest {
     @Test
     public void decode_withVerifier_invalidClaim() {
 
-        List<AtbashKey> keys = generateRSAKeys("kid");
+        List<AtbashKey> keys = TestKeys.generateRSAKeys("kid");
         Map<String, String> headerValues = new HashMap<>();
         headerValues.put("head1", "value2");
         JWTParameters parameters = getJwtParameters(keys, headerValues);
@@ -204,7 +203,7 @@ public class JWTDecoderTest {
 
     @Test
     public void decode_customSerializer_withVerifier() {
-        List<AtbashKey> keys = generateRSAKeys("kid");
+        List<AtbashKey> keys = TestKeys.generateRSAKeys("kid");
         JWTParameters parameters = getJwtParameters(keys, null);
         JWTEncoder encoder = new JWTEncoder();
         JWTClaimsSet claims = new JWTClaimsSet.Builder().claim("value", "200,150,100").build();
@@ -231,15 +230,6 @@ public class JWTDecoderTest {
         assertThat(data.getG()).isEqualTo(150);
         assertThat(data.getB()).isEqualTo(100);
 
-    }
-
-
-    private List<AtbashKey> generateRSAKeys(String kid) {
-        RSAGenerationParameters generationParameters = new RSAGenerationParameters.RSAGenerationParametersBuilder()
-                .withKeyId(kid)
-                .build();
-        KeyGenerator generator = new KeyGenerator();
-        return generator.generateKeys(generationParameters);
     }
 
     private JWTParameters getJwtParameters(List<AtbashKey> keys, Map<String, String> headerValues) {

@@ -16,8 +16,8 @@
 package be.atbash.ee.security.octopus.keys.retriever;
 
 import be.atbash.ee.security.octopus.keys.AtbashKey;
-import be.atbash.ee.security.octopus.keys.generator.KeyGenerator;
-import be.atbash.ee.security.octopus.keys.generator.RSAGenerationParameters;
+import be.atbash.ee.security.octopus.keys.Filters;
+import be.atbash.ee.security.octopus.keys.TestKeys;
 import be.atbash.ee.security.octopus.nimbus.jwk.JWK;
 import be.atbash.ee.security.octopus.nimbus.jwk.JWKSet;
 import be.atbash.ee.security.octopus.nimbus.jwk.RSAKey;
@@ -34,7 +34,6 @@ import java.net.Proxy;
 import java.net.ServerSocket;
 import java.net.URL;
 import java.security.interfaces.RSAPublicKey;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -90,8 +89,8 @@ public class JWKSetRetrieverTest {
 
     @Test
     public void testRetrieveOK() throws Exception {
-
-        RSAKey rsaKey = new RSAKey.Builder(generateRSAKeys()).keyID("kid").build();
+        AtbashKey publicKey = Filters.findPublicKey(TestKeys.generateRSAKeys("kid"));
+        RSAKey rsaKey = new RSAKey.Builder((RSAPublicKey) publicKey.getKey()).keyID("kid").build();
         JWKSet set = new JWKSet(rsaKey);
 
         Jadler.onRequest()
@@ -112,8 +111,8 @@ public class JWKSetRetrieverTest {
 
     @Test
     public void testRetrieveOK_loop() throws Exception {
-
-        RSAKey rsaKey = new RSAKey.Builder(generateRSAKeys()).keyID("kid").build();
+        AtbashKey publicKey = Filters.findPublicKey(TestKeys.generateRSAKeys("kid"));
+        RSAKey rsaKey = new RSAKey.Builder((RSAPublicKey) publicKey.getKey()).keyID("kid").build();
         JWKSet set = new JWKSet(rsaKey);
 
         Jadler.onRequest()
@@ -136,8 +135,8 @@ public class JWKSetRetrieverTest {
 
     @Test
     public void testRetrieveOKWithoutContentType() throws Exception {
-
-        RSAKey rsaKey = new RSAKey.Builder(generateRSAKeys()).keyID("kid").build();
+        AtbashKey publicKey = Filters.findPublicKey(TestKeys.generateRSAKeys("kid"));
+        RSAKey rsaKey = new RSAKey.Builder((RSAPublicKey) publicKey.getKey()).keyID("kid").build();
         JWKSet set = new JWKSet(rsaKey);
 
         Jadler.onRequest()
@@ -156,8 +155,8 @@ public class JWKSetRetrieverTest {
 
     @Test
     public void testIgnoreInvalidContentType() throws Exception {
-
-        RSAKey rsaKey = new RSAKey.Builder(generateRSAKeys()).keyID("kid").build();
+        AtbashKey publicKey = Filters.findPublicKey(TestKeys.generateRSAKeys("kid"));
+        RSAKey rsaKey = new RSAKey.Builder((RSAPublicKey) publicKey.getKey()).keyID("kid").build();
         JWKSet set = new JWKSet(rsaKey);
 
         String invalidContentType = "moo/boo/foo";
@@ -179,8 +178,8 @@ public class JWKSetRetrieverTest {
 
     @Test
     public void testRetrieve2xxWithProxy() throws Exception {
-
-        RSAKey rsaKey = new RSAKey.Builder(generateRSAKeys()).keyID("kid").build();
+        AtbashKey publicKey = Filters.findPublicKey(TestKeys.generateRSAKeys("kid"));
+        RSAKey rsaKey = new RSAKey.Builder((RSAPublicKey) publicKey.getKey()).keyID("kid").build();
         JWKSet set = new JWKSet(rsaKey);
 
         Jadler.onRequest()
@@ -201,8 +200,8 @@ public class JWKSetRetrieverTest {
 
     @Test
     public void testRetrieve2xx() throws Exception {
-
-        RSAKey rsaKey = new RSAKey.Builder(generateRSAKeys()).keyID("kid").build();
+        AtbashKey publicKey = Filters.findPublicKey(TestKeys.generateRSAKeys("kid"));
+        RSAKey rsaKey = new RSAKey.Builder((RSAPublicKey) publicKey.getKey()).keyID("kid").build();
         JWKSet set = new JWKSet(rsaKey);
 
         Jadler.onRequest()
@@ -251,8 +250,8 @@ public class JWKSetRetrieverTest {
 
     @Test
     public void testReadTimeout() {
-
-        RSAKey rsaKey = new RSAKey.Builder(generateRSAKeys()).keyID("kid").build();
+        AtbashKey publicKey = Filters.findPublicKey(TestKeys.generateRSAKeys("kid"));
+        RSAKey rsaKey = new RSAKey.Builder((RSAPublicKey) publicKey.getKey()).keyID("kid").build();
         JWKSet set = new JWKSet(rsaKey);
 
         Jadler.onRequest()
@@ -273,8 +272,8 @@ public class JWKSetRetrieverTest {
 
     @Test
     public void testSizeLimit() throws Exception {
-
-        RSAKey rsaKey = new RSAKey.Builder(generateRSAKeys()).keyID("kid").build();
+        AtbashKey publicKey = Filters.findPublicKey(TestKeys.generateRSAKeys("kid"));
+        RSAKey rsaKey = new RSAKey.Builder((RSAPublicKey) publicKey.getKey()).keyID("kid").build();
         JWKSet set = new JWKSet(rsaKey);
 
         Jadler.onRequest()
@@ -295,20 +294,5 @@ public class JWKSetRetrieverTest {
         // FIXME Can we bring this message back?
         assertThat(e.getMessage()).startsWith("Parsing of content of 'http://localhost:");
 
-    }
-
-    private RSAPublicKey generateRSAKeys() {
-        RSAGenerationParameters generationParameters = new RSAGenerationParameters.RSAGenerationParametersBuilder()
-                .withKeyId("something")
-                .build();
-        KeyGenerator generator = new KeyGenerator();
-        List<AtbashKey> atbashKeys = generator.generateKeys(generationParameters);
-        RSAPublicKey result = null;
-        for (AtbashKey atbashKey : atbashKeys) {
-            if (atbashKey.getKey() instanceof RSAPublicKey) {
-                result = (RSAPublicKey) atbashKey.getKey();
-            }
-        }
-        return result;
     }
 }

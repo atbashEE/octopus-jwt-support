@@ -17,8 +17,7 @@ package be.atbash.ee.security.octopus.nimbus.jwk;
 
 
 import be.atbash.ee.security.octopus.keys.AtbashKey;
-import be.atbash.ee.security.octopus.keys.generator.KeyGenerator;
-import be.atbash.ee.security.octopus.keys.generator.RSAGenerationParameters;
+import be.atbash.ee.security.octopus.keys.TestKeys;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
@@ -976,7 +975,7 @@ public class JWKSetTest {
 
     @Test
     public void getAtbashKeys() {
-        List<AtbashKey> atbashKeys = generateRSAKeys("kid");
+        List<AtbashKey> atbashKeys = TestKeys.generateRSAKeys("kid");
         RSAPrivateKey privateKey = null;
         RSAPublicKey publicKey = null;
         for (AtbashKey atbashKey : atbashKeys) {
@@ -994,13 +993,5 @@ public class JWKSetTest {
         List<AtbashKey> keys = jwkSet.getAtbashKeys();
 
         assertThat(keys).hasSize(2);
-    }
-
-    private List<AtbashKey> generateRSAKeys(String kid) {
-        RSAGenerationParameters generationParameters = new RSAGenerationParameters.RSAGenerationParametersBuilder()
-                .withKeyId(kid)
-                .build();
-        KeyGenerator generator = new KeyGenerator();
-        return generator.generateKeys(generationParameters);
     }
 }

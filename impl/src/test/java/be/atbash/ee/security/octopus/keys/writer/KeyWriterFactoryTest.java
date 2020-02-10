@@ -17,11 +17,8 @@ package be.atbash.ee.security.octopus.keys.writer;
 
 import be.atbash.ee.security.octopus.exception.DuplicateKeyIdException;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
-import be.atbash.ee.security.octopus.keys.generator.KeyGenerator;
-import be.atbash.ee.security.octopus.keys.generator.RSAGenerationParameters;
-import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
-import be.atbash.ee.security.octopus.keys.selector.filter.AsymmetricPartKeyFilter;
-import be.atbash.ee.security.octopus.keys.selector.filter.KeyFilter;
+import be.atbash.ee.security.octopus.keys.Filters;
+import be.atbash.ee.security.octopus.keys.TestKeys;
 import be.atbash.ee.security.octopus.nimbus.jwk.JWKSet;
 import be.atbash.ee.security.octopus.nimbus.jwk.RSAKey;
 import org.junit.jupiter.api.Assertions;
@@ -45,10 +42,10 @@ public class KeyWriterFactoryTest {
     @Test
     public void writeKeyAsJWKSet_duplicateKeyId() {
 
-        List<AtbashKey> atbashKeys = generateRSAKeys("kid");
+        List<AtbashKey> atbashKeys = TestKeys.generateRSAKeys("kid");
 
-        AtbashKey publicKey = findPublicKey(atbashKeys);
-        AtbashKey privateKey = findPrivateKey(atbashKeys);
+        AtbashKey publicKey = Filters.findPublicKey(atbashKeys);
+        AtbashKey privateKey = Filters.findPrivateKey(atbashKeys);
         RSAKey rsaKey = new RSAKey.Builder((RSAPublicKey) publicKey.getKey()).keyID(publicKey.getKeyId())
                 .privateKey((RSAPrivateKey) privateKey.getKey())
                 .build();
@@ -62,10 +59,10 @@ public class KeyWriterFactoryTest {
     @Test
     public void writeKeyAsJWKSet() {
 
-        List<AtbashKey> atbashKeys = generateRSAKeys("kid");
+        List<AtbashKey> atbashKeys = TestKeys.generateRSAKeys("kid");
 
-        AtbashKey publicKey = findPublicKey(atbashKeys);
-        AtbashKey privateKey = findPrivateKey(atbashKeys);
+        AtbashKey publicKey = Filters.findPublicKey(atbashKeys);
+        AtbashKey privateKey = Filters.findPrivateKey(atbashKeys);
         RSAKey rsaKey = new RSAKey.Builder((RSAPublicKey) publicKey.getKey()).keyID(publicKey.getKeyId())
                 .privateKey((RSAPrivateKey) privateKey.getKey())
                 .build();
@@ -74,29 +71,8 @@ public class KeyWriterFactoryTest {
         KeyEncoderParameters parameters = new KeyEncoderParameters(jwkSet);
 
 
-        List<AtbashKey> atbashKeys2 = generateRSAKeys("kid2");
+        List<AtbashKey> atbashKeys2 = TestKeys.generateRSAKeys("kid2");
         factory.writeKeyAsJWKSet(atbashKeys2.get(0), parameters);
-    }
-
-    private AtbashKey findPublicKey(List<AtbashKey> atbashKeys) {
-
-        KeyFilter filter = new AsymmetricPartKeyFilter(AsymmetricPart.PUBLIC);
-        return filter.filter(atbashKeys).get(0);
-
-    }
-
-    private AtbashKey findPrivateKey(List<AtbashKey> atbashKeys) {
-
-        KeyFilter filter = new AsymmetricPartKeyFilter(AsymmetricPart.PRIVATE);
-        return filter.filter(atbashKeys).get(0);
-    }
-
-    private List<AtbashKey> generateRSAKeys(String kid) {
-        RSAGenerationParameters generationParameters = new RSAGenerationParameters.RSAGenerationParametersBuilder()
-                .withKeyId(kid)
-                .build();
-        KeyGenerator generator = new KeyGenerator();
-        return generator.generateKeys(generationParameters);
     }
 
 }

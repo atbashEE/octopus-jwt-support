@@ -15,8 +15,6 @@
  */
 package be.atbash.ee.security.octopus.keys;
 
-import be.atbash.ee.security.octopus.keys.generator.KeyGenerator;
-import be.atbash.ee.security.octopus.keys.generator.RSAGenerationParameters;
 import be.atbash.ee.security.octopus.keys.selector.SelectorCriteria;
 import be.atbash.ee.security.octopus.nimbus.jwk.JWK;
 import be.atbash.ee.security.octopus.nimbus.jwk.JWKSet;
@@ -62,7 +60,8 @@ public class RemoteKeyManagerTest {
 
     @Test
     public void retrieveKeys_remoteSet() {
-        RSAKey rsaKey = new RSAKey.Builder(generateRSAKeys()).keyID("remoteKid").build();
+        AtbashKey publicKey = Filters.findPublicKey(TestKeys.generateRSAKeys("remoteKid"));
+        RSAKey rsaKey = new RSAKey.Builder((RSAPublicKey) publicKey.getKey()).keyID("remoteKid").build();
         JWKSet set = new JWKSet(rsaKey);
 
         Jadler.onRequest()
@@ -93,8 +92,10 @@ public class RemoteKeyManagerTest {
 
     @Test
     public void retrieveKeys_cache_invalidation() {
-        RSAKey rsaKey1 = new RSAKey.Builder(generateRSAKeys()).keyID("remoteKid1").build();
-        RSAKey rsaKey2 = new RSAKey.Builder(generateRSAKeys()).keyID("remoteKid2").build();
+        AtbashKey publicKey = Filters.findPublicKey(TestKeys.generateRSAKeys("remoteKid1"));
+        RSAKey rsaKey1 = new RSAKey.Builder((RSAPublicKey) publicKey.getKey()).keyID("remoteKid1").build();
+        publicKey = Filters.findPublicKey(TestKeys.generateRSAKeys("remoteKid2"));
+        RSAKey rsaKey2 = new RSAKey.Builder((RSAPublicKey) publicKey.getKey()).keyID("remoteKid2").build();
         JWKSet set1 = new JWKSet(rsaKey1);
 
         List<JWK> keySet = new ArrayList<>();
@@ -139,18 +140,4 @@ public class RemoteKeyManagerTest {
         assertThat(keys).hasSize(1);
     }
 
-    private RSAPublicKey generateRSAKeys() {
-        RSAGenerationParameters generationParameters = new RSAGenerationParameters.RSAGenerationParametersBuilder()
-                .withKeyId("something")
-                .build();
-        KeyGenerator generator = new KeyGenerator();
-        List<AtbashKey> atbashKeys = generator.generateKeys(generationParameters);
-        RSAPublicKey result = null;
-        for (AtbashKey atbashKey : atbashKeys) {
-            if (atbashKey.getKey() instanceof RSAPublicKey) {
-                result = (RSAPublicKey) atbashKey.getKey();
-            }
-        }
-        return result;
-    }
 }

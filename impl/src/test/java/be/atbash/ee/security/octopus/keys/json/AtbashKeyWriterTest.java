@@ -21,8 +21,7 @@ import be.atbash.ee.security.octopus.jwt.parameter.JWTParameters;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersBuilder;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.ListKeyManager;
-import be.atbash.ee.security.octopus.keys.generator.KeyGenerator;
-import be.atbash.ee.security.octopus.keys.generator.RSAGenerationParameters;
+import be.atbash.ee.security.octopus.keys.TestKeys;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.keys.selector.SelectorCriteria;
 import org.junit.jupiter.api.Test;
@@ -41,7 +40,7 @@ public class AtbashKeyWriterTest {
 
     @Test
     public void testWriteJSONString() {
-        ListKeyManager keyManager = new ListKeyManager(generateRSAKeys(KID));
+        ListKeyManager keyManager = new ListKeyManager(TestKeys.generateRSAKeys(KID));
 
         SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID).withAsymmetricPart(AsymmetricPart.PRIVATE).build();
         List<AtbashKey> keyList = keyManager.retrieveKeys(criteria);
@@ -65,14 +64,6 @@ public class AtbashKeyWriterTest {
         assertThat(data.keySet()).containsOnly("p", "kty", "q", "d", "e", "kid", "qi", "dp", "dq", "n");
 
 
-    }
-
-    private List<AtbashKey> generateRSAKeys(String kid) {
-        RSAGenerationParameters generationParameters = new RSAGenerationParameters.RSAGenerationParametersBuilder()
-                .withKeyId(kid)
-                .build();
-        KeyGenerator generator = new KeyGenerator();
-        return generator.generateKeys(generationParameters);
     }
 
 }

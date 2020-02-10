@@ -17,11 +17,8 @@ package be.atbash.ee.security.octopus.nimbus.jose.crypto.impl;
 
 
 import be.atbash.ee.security.octopus.keys.AtbashKey;
-import be.atbash.ee.security.octopus.keys.ListKeyManager;
-import be.atbash.ee.security.octopus.keys.generator.KeyGenerator;
-import be.atbash.ee.security.octopus.keys.generator.RSAGenerationParameters;
-import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
-import be.atbash.ee.security.octopus.keys.selector.SelectorCriteria;
+import be.atbash.ee.security.octopus.keys.Filters;
+import be.atbash.ee.security.octopus.keys.TestKeys;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jwk.RSAKey;
 import org.junit.jupiter.api.Assertions;
@@ -136,24 +133,10 @@ public class RSAKeyUtilsTest {
     }
 
     private RSAKey generateKey() {
-        KeyGenerator keyGenerator = new KeyGenerator();
-        RSAGenerationParameters generationParameters = new RSAGenerationParameters.RSAGenerationParametersBuilder()
-                .withKeySize(2048)
-                .withKeyId("kid")
-                .build();
-        List<AtbashKey> atbashKeys = keyGenerator.generateKeys(generationParameters);
+        List<AtbashKey> atbashKeys = TestKeys.generateRSAKeys("kid");
 
-        ListKeyManager keyManager = new ListKeyManager(atbashKeys);
-
-        SelectorCriteria criteria = SelectorCriteria.newBuilder().withAsymmetricPart(AsymmetricPart.PRIVATE).build();
-        List<AtbashKey> privateList = keyManager.retrieveKeys(criteria);
-
-        AtbashKey privateKey = privateList.get(0);
-        criteria = SelectorCriteria.newBuilder().withAsymmetricPart(AsymmetricPart.PUBLIC).build();
-
-        List<AtbashKey> publicList = keyManager.retrieveKeys(criteria);
-        AtbashKey publicKey = publicList.get(0);
-
+        AtbashKey privateKey = Filters.findPrivateKey(atbashKeys);
+        AtbashKey publicKey = Filters.findPublicKey(atbashKeys);
 
         return new RSAKey.Builder((RSAPublicKey) publicKey.getKey()).keyID("kid")
                 .privateKey((RSAPrivateKey) privateKey.getKey())

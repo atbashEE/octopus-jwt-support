@@ -21,8 +21,7 @@ import be.atbash.ee.security.octopus.jwt.parameter.JWTParameters;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersBuilder;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.ListKeyManager;
-import be.atbash.ee.security.octopus.keys.generator.KeyGenerator;
-import be.atbash.ee.security.octopus.keys.generator.RSAGenerationParameters;
+import be.atbash.ee.security.octopus.keys.TestKeys;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.keys.selector.KeySelector;
 import be.atbash.ee.security.octopus.keys.selector.SelectorCriteria;
@@ -60,7 +59,7 @@ public class JWTDecoderJWTClaimSetTest {
     @Test
     public void encodeObject_jwt() {
         // Encode to JWT
-        List<AtbashKey> keys = generateRSAKeys(KID_SIGN);
+        List<AtbashKey> keys = TestKeys.generateRSAKeys(KID_SIGN);
 
         String encoded = encoder.encode(jwtClaimsSet, getJwtParameters(keys));
 
@@ -85,14 +84,6 @@ public class JWTDecoderJWTClaimSetTest {
             }
         }
 
-    }
-
-    private List<AtbashKey> generateRSAKeys(String kid) {
-        RSAGenerationParameters generationParameters = new RSAGenerationParameters.RSAGenerationParametersBuilder()
-                .withKeyId(kid)
-                .build();
-        KeyGenerator generator = new KeyGenerator();
-        return generator.generateKeys(generationParameters);
     }
 
     private JWTParameters getJwtParameters(List<AtbashKey> keys) {

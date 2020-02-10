@@ -17,7 +17,6 @@ package be.atbash.ee.security.octopus.keys;
 
 import be.atbash.ee.security.octopus.keys.fake.FakeRSAPrivate;
 import be.atbash.ee.security.octopus.keys.fake.FakeRSAPublic;
-import be.atbash.ee.security.octopus.keys.generator.*;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.util.resource.ResourceUtil;
 import org.junit.jupiter.api.Assertions;
@@ -84,7 +83,7 @@ public class AtbashKeyTest {
 
     @Test
     public void RSA_specification_2048() {
-        List<AtbashKey> keys = generateRSAKeys("test", 2048);
+        List<AtbashKey> keys = TestKeys.generateRSAKeys("test", 2048);
         for (AtbashKey key : keys) {
             assertThat(key.getSpecification()).isEqualTo("key length : 2048");
         }
@@ -92,7 +91,7 @@ public class AtbashKeyTest {
 
     @Test
     public void RSA_specification_3072() {
-        List<AtbashKey> keys = generateRSAKeys("test", 3072);
+        List<AtbashKey> keys = TestKeys.generateRSAKeys("test", 3072);
         for (AtbashKey key : keys) {
             assertThat(key.getSpecification()).isEqualTo("key length : 3072");
         }
@@ -100,7 +99,7 @@ public class AtbashKeyTest {
 
     @Test
     public void RSA_specification_4096() {
-        List<AtbashKey> keys = generateRSAKeys("test", 4096);
+        List<AtbashKey> keys = TestKeys.generateRSAKeys("test", 4096);
         for (AtbashKey key : keys) {
             assertThat(key.getSpecification()).isEqualTo("key length : 4096");
         }
@@ -108,7 +107,7 @@ public class AtbashKeyTest {
 
     @Test
     public void OCT_specification_256() {
-        List<AtbashKey> keys = generateOCTKeys("test", 256);
+        List<AtbashKey> keys = TestKeys.generateOCTKeys("test", 256);
         for (AtbashKey key : keys) {
             assertThat(key.getSpecification()).isEqualTo("key length : 256");
         }
@@ -116,7 +115,7 @@ public class AtbashKeyTest {
 
     @Test
     public void OCT_specification_512() {
-        List<AtbashKey> keys = generateOCTKeys("test", 512);
+        List<AtbashKey> keys = TestKeys.generateOCTKeys("test", 512);
         for (AtbashKey key : keys) {
             assertThat(key.getSpecification()).isEqualTo("key length : 512");
         }
@@ -124,7 +123,7 @@ public class AtbashKeyTest {
 
     @Test
     public void EC_specification_P256() {
-        List<AtbashKey> keys = generateECKeys("test", "P-256");
+        List<AtbashKey> keys = TestKeys.generateECKeys("test", "P-256");
         for (AtbashKey key : keys) {
             assertThat(key.getSpecification()).isEqualTo("Curve name : P-256");
         }
@@ -132,7 +131,7 @@ public class AtbashKeyTest {
 
     @Test
     public void EC_specification_P521() {
-        List<AtbashKey> keys = generateECKeys("test", "P-521");
+        List<AtbashKey> keys = TestKeys.generateECKeys("test", "P-521");
         for (AtbashKey key : keys) {
             assertThat(key.getSpecification()).isEqualTo("Curve name : P-521");
         }
@@ -140,7 +139,7 @@ public class AtbashKeyTest {
 
     @Test
     public void EC_specification_P256K() {
-        List<AtbashKey> keys = generateECKeys("test", "P-256K");
+        List<AtbashKey> keys = TestKeys.generateECKeys("test", "P-256K");
         for (AtbashKey key : keys) {
             assertThat(key.getSpecification()).isEqualTo("Curve name : P-256K");
         }
@@ -148,7 +147,7 @@ public class AtbashKeyTest {
 
     @Test
     public void EC_specification_P384() {
-        List<AtbashKey> keys = generateECKeys("test", "P-384");
+        List<AtbashKey> keys = TestKeys.generateECKeys("test", "P-384");
         for (AtbashKey key : keys) {
             assertThat(key.getSpecification()).isEqualTo("Curve name : P-384");
         }
@@ -156,7 +155,7 @@ public class AtbashKeyTest {
 
     @Test
     public void EC_specification_prime256v1() {
-        List<AtbashKey> keys = generateECKeys("test", "prime256v1");
+        List<AtbashKey> keys = TestKeys.generateECKeys("test", "prime256v1");
         for (AtbashKey key : keys) {
             assertThat(key.getSpecification()).isEqualTo("Curve name : P-256");
         }
@@ -164,44 +163,10 @@ public class AtbashKeyTest {
 
     @Test
     public void OKP_specification() {
-        List<AtbashKey> keys = generateOKPKeys("test");
+        List<AtbashKey> keys = TestKeys.generateRSAKeys("test");
         for (AtbashKey key : keys) {
             assertThat(key.getSpecification()).isEqualTo("Curve name : Ed25519");
         }
     }
 
-    private List<AtbashKey> generateRSAKeys(String kid, int keySize) {
-        RSAGenerationParameters generationParameters = new RSAGenerationParameters.RSAGenerationParametersBuilder()
-                .withKeyId(kid)
-                .withKeySize(keySize)
-                .build();
-        KeyGenerator generator = new KeyGenerator();
-        return generator.generateKeys(generationParameters);
-    }
-
-    private List<AtbashKey> generateECKeys(String kid, String curveName) {
-        ECGenerationParameters generationParameters = new ECGenerationParameters.ECGenerationParametersBuilder()
-                .withKeyId(kid)
-                .withCurveName(curveName)
-                .build();
-        KeyGenerator generator = new KeyGenerator();
-        return generator.generateKeys(generationParameters);
-    }
-
-    private List<AtbashKey> generateOCTKeys(String kid, int keySize) {
-        OCTGenerationParameters generationParameters = new OCTGenerationParameters.OCTGenerationParametersBuilder()
-                .withKeyId(kid)
-                .withKeySize(keySize)
-                .build();
-        KeyGenerator generator = new KeyGenerator();
-        return generator.generateKeys(generationParameters);
-    }
-
-    private List<AtbashKey> generateOKPKeys(String kid) {
-        OKPGenerationParameters generationParameters = new OKPGenerationParameters.OKPGenerationParametersBuilder()
-                .withKeyId(kid)
-                .build();
-        KeyGenerator generator = new KeyGenerator();
-        return generator.generateKeys(generationParameters);
-    }
 }

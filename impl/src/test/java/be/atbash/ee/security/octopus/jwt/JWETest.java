@@ -27,10 +27,7 @@ import be.atbash.ee.security.octopus.jwt.parameter.JWTParameters;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersBuilder;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.ListKeyManager;
-import be.atbash.ee.security.octopus.keys.generator.ECGenerationParameters;
-import be.atbash.ee.security.octopus.keys.generator.KeyGenerator;
-import be.atbash.ee.security.octopus.keys.generator.OCTGenerationParameters;
-import be.atbash.ee.security.octopus.keys.generator.RSAGenerationParameters;
+import be.atbash.ee.security.octopus.keys.TestKeys;
 import be.atbash.ee.security.octopus.keys.selector.*;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
@@ -91,8 +88,8 @@ public class JWETest {
     @Test
     public void encodingJWE_RSA() {
 
-        List<AtbashKey> keys = generateRSAKeys(KID_SIGN);
-        keys.addAll(generateRSAKeys(KID_ENCRYPT));
+        List<AtbashKey> keys = TestKeys.generateRSAKeys(KID_SIGN);
+        keys.addAll(TestKeys.generateRSAKeys(KID_ENCRYPT));
 
         ListKeyManager keyManager = new ListKeyManager(keys);
 
@@ -123,8 +120,8 @@ public class JWETest {
     public void encodingJWE_EC() throws ParseException {
         when(jwtSupportConfigurationMock.getDefaultJWEAlgorithmEC()).thenReturn(JWEAlgorithm.ECDH_ES_A256KW);
 
-        List<AtbashKey> keys = generateECKeys(KID_SIGN, "P-256");
-        keys.addAll(generateECKeys(KID_ENCRYPT, "P-256"));
+        List<AtbashKey> keys = TestKeys.generateECKeys(KID_SIGN, "P-256");
+        keys.addAll(TestKeys.generateECKeys(KID_ENCRYPT, "P-256"));
 
         ListKeyManager keyManager = new ListKeyManager(keys);
 
@@ -159,8 +156,8 @@ public class JWETest {
 
         when(jwtSupportConfigurationMock.getDefaultJWEAlgorithmEC()).thenReturn(JWEAlgorithm.ECDH_ES_A256KW);
 
-        List<AtbashKey> keys = generateECKeys(KID_SIGN, "prime192v1");
-        keys.addAll(generateECKeys(KID_ENCRYPT, "prime192v1"));
+        List<AtbashKey> keys = TestKeys.generateECKeys(KID_SIGN, "prime192v1");
+        keys.addAll(TestKeys.generateECKeys(KID_ENCRYPT, "prime192v1"));
 
         ListKeyManager keyManager = new ListKeyManager(keys);
 
@@ -186,8 +183,8 @@ public class JWETest {
 
         when(jwtSupportConfigurationMock.getDefaultJWEAlgorithmEC()).thenReturn(JWEAlgorithm.ECDH_ES_A256KW);
 
-        List<AtbashKey> keys = generateRSAKeys(KID_SIGN);
-        keys.addAll(generateECKeys(KID_ENCRYPT, "P-256"));
+        List<AtbashKey> keys = TestKeys.generateRSAKeys(KID_SIGN);
+        keys.addAll(TestKeys.generateECKeys(KID_ENCRYPT, "P-256"));
 
         ListKeyManager keyManager = new ListKeyManager(keys);
 
@@ -218,8 +215,8 @@ public class JWETest {
     public void encodingJWE_EC_RSA() {
         when(jwtSupportConfigurationMock.getDefaultJWEAlgorithmEC()).thenReturn(JWEAlgorithm.ECDH_ES_A256KW);
 
-        List<AtbashKey> keys = generateECKeys(KID_ENCRYPT, "P-256");
-        keys.addAll(generateRSAKeys(KID_SIGN));
+        List<AtbashKey> keys = TestKeys.generateECKeys(KID_ENCRYPT, "P-256");
+        keys.addAll(TestKeys.generateRSAKeys(KID_SIGN));
 
         ListKeyManager keyManager = new ListKeyManager(keys);
 
@@ -249,8 +246,8 @@ public class JWETest {
     @Test
     public void encodingJWE_RSA_WrongKeyType() {
 
-        List<AtbashKey> keys = generateRSAKeys(KID_SIGN);
-        keys.addAll(generateRSAKeys(KID_ENCRYPT));
+        List<AtbashKey> keys = TestKeys.generateRSAKeys(KID_SIGN);
+        keys.addAll(TestKeys.generateRSAKeys(KID_ENCRYPT));
 
         ListKeyManager keyManager = new ListKeyManager(keys);
 
@@ -276,11 +273,11 @@ public class JWETest {
     public void encodingJWE_OCT() {
         when(jwtSupportConfigurationMock.getDefaultJWEAlgorithmOCT()).thenReturn(JWEAlgorithm.A256KW);
 
-        List<AtbashKey> signKeyList = generateOCTKeys(KID_SIGN, 256);
+        List<AtbashKey> signKeyList = TestKeys.generateOCTKeys(KID_SIGN);
 
         assertThat(signKeyList).as("We should have 1 key for signing").hasSize(1);
 
-        List<AtbashKey> encryptKeyList = generateOCTKeys(KID_ENCRYPT, 256);
+        List<AtbashKey> encryptKeyList = TestKeys.generateOCTKeys(KID_ENCRYPT);
 
         assertThat(encryptKeyList).as("We should have 1 key for encryption").hasSize(1);
 
@@ -307,7 +304,7 @@ public class JWETest {
     public void encodingJWE_Password() {
 
         System.setProperty("atbash.utils.cdi.check", "false");
-        AtbashKey key = generateOCTKeys(KID_SIGN, 256).get(0);
+        AtbashKey key = TestKeys.generateOCTKeys(KID_SIGN).get(0);
 
         JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWE)
                 .withSecretKeyForSigning(key)
@@ -330,9 +327,9 @@ public class JWETest {
     @Test
     public void encodingJWE_NoKeyMatch() {
 
-        List<AtbashKey> signKeys = generateRSAKeys(KID_SIGN);
-        List<AtbashKey> keys = generateRSAKeys(KID_SIGN);
-        keys.addAll(generateRSAKeys(KID_ENCRYPT));
+        List<AtbashKey> signKeys = TestKeys.generateRSAKeys(KID_SIGN);
+        List<AtbashKey> keys = TestKeys.generateRSAKeys(KID_SIGN);
+        keys.addAll(TestKeys.generateRSAKeys(KID_ENCRYPT));
 
         ListKeyManager keyManager = new ListKeyManager(keys);
 
@@ -371,11 +368,11 @@ public class JWETest {
     public void encodingJWE_OCT_wrongKeyLength() {
         when(jwtSupportConfigurationMock.getDefaultJWEAlgorithmOCT()).thenReturn(JWEAlgorithm.A256KW);
 
-        List<AtbashKey> signKeyList = generateOCTKeys(KID_SIGN, 256);
+        List<AtbashKey> signKeyList = TestKeys.generateOCTKeys(KID_SIGN, 256);
 
         assertThat(signKeyList).as("We should have 1 key for signing").hasSize(1);
 
-        List<AtbashKey> encryptKeyList = generateOCTKeys(KID_ENCRYPT, 224);
+        List<AtbashKey> encryptKeyList = TestKeys.generateOCTKeys(KID_ENCRYPT, 224);
 
         assertThat(encryptKeyList).as("We should have 1 key for encryption").hasSize(1);
 
@@ -390,9 +387,9 @@ public class JWETest {
     @Test
     public void encodingJWE_RSA_wrongKey() {
 
-        List<AtbashKey> keys = generateRSAKeys(KID_SIGN);
+        List<AtbashKey> keys = TestKeys.generateRSAKeys(KID_SIGN);
         List<AtbashKey> signKeys = new ArrayList<>(keys);
-        keys.addAll(generateRSAKeys(KID_ENCRYPT));
+        keys.addAll(TestKeys.generateRSAKeys(KID_ENCRYPT));
 
         ListKeyManager keyManager = new ListKeyManager(keys);
 
@@ -414,7 +411,7 @@ public class JWETest {
         String encoded = jwtEncoder.encode(payload, parameters);
 
         // Generate another key for encryption
-        signKeys.addAll(generateRSAKeys(KID_ENCRYPT));
+        signKeys.addAll(TestKeys.generateRSAKeys(KID_ENCRYPT));
         keyManager = new ListKeyManager(signKeys);
 
         KeySelector keySelector = new TestKeySelector(keyManager);
@@ -429,8 +426,8 @@ public class JWETest {
     @Test
     public void encodingJWE_RSA_tamperedPayload() {
 
-        List<AtbashKey> keys = generateRSAKeys(KID_SIGN);
-        keys.addAll(generateRSAKeys(KID_ENCRYPT));
+        List<AtbashKey> keys = TestKeys.generateRSAKeys(KID_SIGN);
+        keys.addAll(TestKeys.generateRSAKeys(KID_ENCRYPT));
 
         ListKeyManager keyManager = new ListKeyManager(keys);
 
@@ -464,8 +461,8 @@ public class JWETest {
     @Test
     public void encodingJWE_RSA_tamperedIV() {
 
-        List<AtbashKey> keys = generateRSAKeys(KID_SIGN);
-        keys.addAll(generateRSAKeys(KID_ENCRYPT));
+        List<AtbashKey> keys = TestKeys.generateRSAKeys(KID_SIGN);
+        keys.addAll(TestKeys.generateRSAKeys(KID_ENCRYPT));
 
         ListKeyManager keyManager = new ListKeyManager(keys);
 
@@ -500,8 +497,8 @@ public class JWETest {
     public void encodingJWE_EC_customAlgo() throws ParseException {
         when(jwtSupportConfigurationMock.getDefaultJWEAlgorithmEC()).thenReturn(JWEAlgorithm.ECDH_ES);
 
-        List<AtbashKey> keys = generateECKeys(KID_SIGN, "P-256");
-        keys.addAll(generateECKeys(KID_ENCRYPT, "P-256"));
+        List<AtbashKey> keys = TestKeys.generateECKeys(KID_SIGN, "P-256");
+        keys.addAll(TestKeys.generateECKeys(KID_ENCRYPT, "P-256"));
 
         ListKeyManager keyManager = new ListKeyManager(keys);
 
@@ -533,8 +530,8 @@ public class JWETest {
     @Test
     public void encodingJWE_verifier() {
 
-        List<AtbashKey> keys = generateRSAKeys(KID_SIGN);
-        keys.addAll(generateRSAKeys(KID_ENCRYPT));
+        List<AtbashKey> keys = TestKeys.generateRSAKeys(KID_SIGN);
+        keys.addAll(TestKeys.generateRSAKeys(KID_ENCRYPT));
 
         ListKeyManager keyManager = new ListKeyManager(keys);
 
@@ -577,8 +574,8 @@ public class JWETest {
     @Test
     public void encodingJWE_verifier_false() {
 
-        List<AtbashKey> keys = generateRSAKeys(KID_SIGN);
-        keys.addAll(generateRSAKeys(KID_ENCRYPT));
+        List<AtbashKey> keys = TestKeys.generateRSAKeys(KID_SIGN);
+        keys.addAll(TestKeys.generateRSAKeys(KID_ENCRYPT));
 
         ListKeyManager keyManager = new ListKeyManager(keys);
 
@@ -613,31 +610,4 @@ public class JWETest {
 
         Assertions.assertThrows(InvalidJWTException.class, () -> new JWTDecoder().decode(encoded, Payload.class, keySelector, verifier));
     }
-
-    private List<AtbashKey> generateRSAKeys(String kid) {
-        RSAGenerationParameters generationParameters = new RSAGenerationParameters.RSAGenerationParametersBuilder()
-                .withKeyId(kid)
-                .build();
-        KeyGenerator generator = new KeyGenerator();
-        return generator.generateKeys(generationParameters);
-    }
-
-    private List<AtbashKey> generateECKeys(String kid, String curveName) {
-        ECGenerationParameters generationParameters = new ECGenerationParameters.ECGenerationParametersBuilder()
-                .withKeyId(kid)
-                .withCurveName(curveName)
-                .build();
-        KeyGenerator generator = new KeyGenerator();
-        return generator.generateKeys(generationParameters);
-    }
-
-    private List<AtbashKey> generateOCTKeys(String kid, int keySize) {
-        OCTGenerationParameters generationParameters = new OCTGenerationParameters.OCTGenerationParametersBuilder()
-                .withKeyId(kid)
-                .withKeySize(keySize)
-                .build();
-        KeyGenerator generator = new KeyGenerator();
-        return generator.generateKeys(generationParameters);
-    }
-
 }
