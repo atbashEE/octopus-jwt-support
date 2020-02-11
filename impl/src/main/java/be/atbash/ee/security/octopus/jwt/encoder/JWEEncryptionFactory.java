@@ -15,13 +15,13 @@
  */
 package be.atbash.ee.security.octopus.jwt.encoder;
 
-import be.atbash.ee.security.octopus.UnsupportedKeyType;
 import be.atbash.ee.security.octopus.exception.UnsupportedECCurveException;
 import be.atbash.ee.security.octopus.exception.UnsupportedKeyLengthException;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersEncryption;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.KeyLengthException;
+import be.atbash.ee.security.octopus.nimbus.jose.KeyTypeException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.AESEncrypter;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.ECDHEncrypter;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.PasswordBasedEncrypter;
@@ -47,7 +47,7 @@ public class JWEEncryptionFactory {
             if (parametersEncryption.getKey() instanceof RSAPublicKey) {
                 result = new RSAEncrypter((RSAPublicKey) parametersEncryption.getKey());
             } else {
-                throw new UnsupportedKeyType(AsymmetricPart.PUBLIC, JWE_CREATION);
+                throw new KeyTypeException(AsymmetricPart.PUBLIC, JWE_CREATION);
             }
         }
 
@@ -61,7 +61,7 @@ public class JWEEncryptionFactory {
                     throw new UnsupportedECCurveException(e.getMessage());
                 }
             } else {
-                throw new UnsupportedKeyType(AsymmetricPart.PUBLIC, JWE_CREATION);
+                throw new KeyTypeException(AsymmetricPart.PUBLIC, JWE_CREATION);
             }
         }
 
@@ -77,7 +77,7 @@ public class JWEEncryptionFactory {
             }
         }
         if (result == null) {
-            throw new UnsupportedKeyType(parametersEncryption.getKeyType(), JWE_CREATION);
+            throw new KeyTypeException(parametersEncryption.getKeyType(), JWE_CREATION);
         }
         return result;
 

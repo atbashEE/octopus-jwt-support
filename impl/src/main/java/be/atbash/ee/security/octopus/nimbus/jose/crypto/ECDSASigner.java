@@ -101,7 +101,7 @@ public class ECDSASigner extends ECDSAProvider implements JWSSigner {
         this(getPrivateKey(atbashKey));
     }
 
-    private static ECPrivateKey getPrivateKey(AtbashKey atbashKey) throws KeyTypeException {
+    private static ECPrivateKey getPrivateKey(AtbashKey atbashKey) {
         if (atbashKey.getSecretKeyType().getKeyType() != KeyType.EC) {
             throw new KeyTypeException(ECPrivateKey.class);
         }

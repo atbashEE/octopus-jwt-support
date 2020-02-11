@@ -92,12 +92,12 @@ public class RSASSAVerifier extends RSASSAProvider implements JWSVerifier {
      *
      * @param atbashKey The public RSA key. Must not be {@code null}.
      */
-    public RSASSAVerifier(AtbashKey atbashKey) throws KeyTypeException {
+    public RSASSAVerifier(AtbashKey atbashKey) {
 
         this(getPublicKey(atbashKey));
     }
 
-    private static RSAPublicKey getPublicKey(AtbashKey atbashKey) throws KeyTypeException {
+    private static RSAPublicKey getPublicKey(AtbashKey atbashKey) {
         if (atbashKey.getSecretKeyType().getKeyType() != KeyType.RSA) {
             throw new KeyTypeException(ECPrivateKey.class);
         }

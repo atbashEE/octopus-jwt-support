@@ -15,9 +15,9 @@
  */
 package be.atbash.ee.security.octopus.keys.generator;
 
-import be.atbash.ee.security.octopus.UnsupportedKeyType;
 import be.atbash.ee.security.octopus.config.JCASupportConfiguration;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
+import be.atbash.ee.security.octopus.nimbus.jose.KeyTypeException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.bc.BouncyCastleProviderSingleton;
 import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import be.atbash.util.PublicAPI;
@@ -29,7 +29,10 @@ import javax.crypto.interfaces.DHPrivateKey;
 import javax.crypto.interfaces.DHPublicKey;
 import javax.crypto.spec.SecretKeySpec;
 import javax.enterprise.context.ApplicationScoped;
-import java.security.*;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPrivateKey;
@@ -59,7 +62,7 @@ public class KeyGenerator {
             result = generateDHKeys((DHGenerationParameters) parameters);
         }
         if (result == null) {
-            throw new UnsupportedKeyType(parameters.getKeyType(), "Key generation");
+            throw new KeyTypeException(parameters.getKeyType(), "Key generation");
         }
         return result;
     }

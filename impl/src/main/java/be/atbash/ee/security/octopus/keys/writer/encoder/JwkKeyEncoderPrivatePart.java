@@ -15,11 +15,11 @@
  */
 package be.atbash.ee.security.octopus.keys.writer.encoder;
 
-import be.atbash.ee.security.octopus.UnsupportedKeyType;
 import be.atbash.ee.security.octopus.jwk.EncryptedJSONJWK;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.ECCurveHelper;
 import be.atbash.ee.security.octopus.keys.writer.KeyEncoderParameters;
+import be.atbash.ee.security.octopus.nimbus.jose.KeyTypeException;
 import be.atbash.ee.security.octopus.nimbus.jwk.*;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.util.exception.AtbashUnexpectedException;
@@ -53,7 +53,7 @@ public class JwkKeyEncoderPrivatePart extends AbstractEncoder implements KeyEnco
             return encodeOKPKey(atbashKey, parameters);
         }
 
-        throw new UnsupportedKeyType(atbashKey.getSecretKeyType().getKeyType(), "writing JWK");
+        throw new KeyTypeException(atbashKey.getSecretKeyType().getKeyType(), "writing JWK");
     }
 
     private byte[] encodeRSAKey(AtbashKey atbashKey, KeyEncoderParameters parameters) {

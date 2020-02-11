@@ -91,27 +91,27 @@ public class Ed25519Signer extends EdDSAProvider implements JWSSigner {
 	/**
 	 * Creates a new Ed25519 signer.
 	 *
-	 * @param atbashKey The private key. Must be non-{@code null}, and must
-	 *                   be of type Ed25519 ({@code "crv": "Ed25519"}).
-	 * @throws JOSEException If the key subtype is not supported or if the key is not a private key
-	 */
-	public Ed25519Signer(AtbashKey atbashKey) throws JOSEException {
+     * @param atbashKey The private key. Must be non-{@code null}, and must
+     *                   be of type Ed25519 ({@code "crv": "Ed25519"}).
+     * @throws JOSEException If the key subtype is not supported or if the key is not a private key
+     */
+    public Ed25519Signer(AtbashKey atbashKey) throws JOSEException {
 
-		this(getPrivateKey(atbashKey));
+        this(getPrivateKey(atbashKey));
 
-	}
+    }
 
-	private static BCEdDSAPrivateKey getPrivateKey(AtbashKey atbashKey) throws KeyTypeException {
-		if (atbashKey.getSecretKeyType().getKeyType() != KeyType.OKP) {
-			throw new KeyTypeException(ECPrivateKey.class);
-		}
-		if (atbashKey.getSecretKeyType().getAsymmetricPart() != AsymmetricPart.PRIVATE) {
-			throw new KeyTypeException(ECPrivateKey.class);
-		}
-		return (BCEdDSAPrivateKey) atbashKey.getKey();
-	}
+    private static BCEdDSAPrivateKey getPrivateKey(AtbashKey atbashKey) {
+        if (atbashKey.getSecretKeyType().getKeyType() != KeyType.OKP) {
+            throw new KeyTypeException(ECPrivateKey.class);
+        }
+        if (atbashKey.getSecretKeyType().getAsymmetricPart() != AsymmetricPart.PRIVATE) {
+            throw new KeyTypeException(ECPrivateKey.class);
+        }
+        return (BCEdDSAPrivateKey) atbashKey.getKey();
+    }
 
-	private byte[] getD(BCEdDSAPrivateKey privateKey) {
+    private byte[] getD(BCEdDSAPrivateKey privateKey) {
 		// The next code statements are required to get access to the x and d values of the private Key.
 		// BouncyCastle should have support for it!
 		ASN1InputStream stream = new ASN1InputStream(privateKey.getEncoded());

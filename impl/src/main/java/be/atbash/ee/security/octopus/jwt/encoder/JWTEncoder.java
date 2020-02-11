@@ -15,16 +15,12 @@
  */
 package be.atbash.ee.security.octopus.jwt.encoder;
 
-import be.atbash.ee.security.octopus.UnsupportedKeyType;
 import be.atbash.ee.security.octopus.config.JwtSupportConfiguration;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParameters;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersEncryption;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersPlain;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersSigning;
-import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
-import be.atbash.ee.security.octopus.nimbus.jose.JOSEObjectType;
-import be.atbash.ee.security.octopus.nimbus.jose.Payload;
-import be.atbash.ee.security.octopus.nimbus.jose.PlainHeader;
+import be.atbash.ee.security.octopus.nimbus.jose.*;
 import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import be.atbash.ee.security.octopus.nimbus.jwt.JWTClaimsSet;
 import be.atbash.ee.security.octopus.nimbus.jwt.PlainJWT;
@@ -117,7 +113,7 @@ public class JWTEncoder {
         }
 
         if (jweAlgorithm == null) {
-            throw new UnsupportedKeyType(parameters.getKeyType(), "JWE creation");
+            throw new KeyTypeException(parameters.getKeyType(), "JWE creation");
         }
         JWEObject jweObject = new JWEObject(
                 new JWEHeader.Builder(jweAlgorithm, EncryptionMethod.A256GCM)

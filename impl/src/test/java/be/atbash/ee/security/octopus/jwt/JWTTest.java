@@ -16,7 +16,6 @@
 package be.atbash.ee.security.octopus.jwt;
 
 import be.atbash.config.test.TestConfig;
-import be.atbash.ee.security.octopus.UnsupportedKeyType;
 import be.atbash.ee.security.octopus.exception.UnsupportedECCurveException;
 import be.atbash.ee.security.octopus.jwt.decoder.JWTDecoder;
 import be.atbash.ee.security.octopus.jwt.encoder.JWTEncoder;
@@ -28,6 +27,7 @@ import be.atbash.ee.security.octopus.keys.KeyManager;
 import be.atbash.ee.security.octopus.keys.ListKeyManager;
 import be.atbash.ee.security.octopus.keys.TestKeys;
 import be.atbash.ee.security.octopus.keys.selector.*;
+import be.atbash.ee.security.octopus.nimbus.jose.KeyTypeException;
 import be.atbash.ee.security.octopus.util.HmacSecretUtil;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -284,7 +284,7 @@ public class JWTTest {
                 .withSecretKeyForSigning(signKeyList.get(0))
                 .build();
 
-        Assertions.assertThrows(UnsupportedKeyType.class, () -> new JWTEncoder().encode(payload, parameters));
+        Assertions.assertThrows(KeyTypeException.class, () -> new JWTEncoder().encode(payload, parameters));
 
     }
 
@@ -420,7 +420,7 @@ public class JWTTest {
                 .withSecretKeyForSigning(signKeyList.get(0))
                 .build();
 
-        Assertions.assertThrows(UnsupportedKeyType.class, () -> new JWTEncoder().encode(payload, parameters));
+        Assertions.assertThrows(KeyTypeException.class, () -> new JWTEncoder().encode(payload, parameters));
 
     }
 

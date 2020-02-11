@@ -31,7 +31,6 @@ import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSSigner;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 
 import java.security.InvalidKeyException;
-import java.security.PrivateKey;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.interfaces.ECPrivateKey;
@@ -108,11 +107,11 @@ public class RSASSASigner extends RSASSAProvider implements JWSSigner {
      *                   length of an RSA key in a PKCS#11 store cannot be
      *                   checked. Must not be {@code null}.
      */
-    public RSASSASigner(AtbashKey atbashKey) throws KeyTypeException {
+    public RSASSASigner(AtbashKey atbashKey) {
         this(getPrivateKey(atbashKey));
     }
 
-    private static RSAPrivateKey getPrivateKey(AtbashKey atbashKey) throws KeyTypeException {
+    private static RSAPrivateKey getPrivateKey(AtbashKey atbashKey) {
         if (atbashKey.getSecretKeyType().getKeyType() != KeyType.RSA) {
             throw new KeyTypeException(ECPrivateKey.class);
         }

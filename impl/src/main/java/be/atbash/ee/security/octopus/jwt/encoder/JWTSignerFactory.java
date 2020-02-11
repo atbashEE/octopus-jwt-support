@@ -15,11 +15,9 @@
  */
 package be.atbash.ee.security.octopus.jwt.encoder;
 
-import be.atbash.ee.security.octopus.UnsupportedKeyType;
 import be.atbash.ee.security.octopus.config.JwtSupportConfiguration;
 import be.atbash.ee.security.octopus.exception.UnsupportedECCurveException;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersSigning;
-import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.KeyLengthException;
 import be.atbash.ee.security.octopus.nimbus.jose.KeyTypeException;
@@ -56,7 +54,7 @@ public class JWTSignerFactory {
         if (KeyType.OCT.equals(parametersSigning.getKeyType())) {
             try {
                 result = new MACSigner(parametersSigning.getAtbashKey());
-            } catch (KeyLengthException | KeyTypeException e) {
+            } catch (KeyLengthException e) {
                 // FIXME better exception here
                 throw new AtbashUnexpectedException(e);
                 // TODO
@@ -65,18 +63,14 @@ public class JWTSignerFactory {
             }
         }
         if (KeyType.RSA.equals(parametersSigning.getKeyType())) {
-            try {
                 result = new RSASSASigner(parametersSigning.getAtbashKey());
-            } catch (KeyTypeException e) {
-                throw new UnsupportedKeyType(AsymmetricPart.PRIVATE, "JWS Signing");
-            }
         }
         if (KeyType.EC.equals(parametersSigning.getKeyType())) {
 
             try {
                 result = new ECDSASigner(parametersSigning.getAtbashKey());
             } catch (JOSEException e) {
-                throw new UnsupportedECCurveException(e.getMessage());  // FIXME This is not the correct  message?
+                throw new UnsupportedECCurveException(e.getMessage());
             }
         }
 
@@ -90,7 +84,7 @@ public class JWTSignerFactory {
         }
 
         if (result == null) {
-            throw new UnsupportedKeyType(parametersSigning.getKeyType(), "JWT Signing");
+            throw new KeyTypeException(parametersSigning.getKeyType(), "JWT Signing");
         }
         return result;
     }
@@ -121,7 +115,7 @@ public class JWTSignerFactory {
             }
         }
         if (result == null) {
-            throw new UnsupportedKeyType(parametersSigning.getKeyType(), "JWT Signing");
+            throw new KeyTypeException(parametersSigning.getKeyType(), "JWT Signing");
         }
 
         return result;

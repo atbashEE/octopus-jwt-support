@@ -15,17 +15,34 @@
  */
 package be.atbash.ee.security.octopus.nimbus.jose;
 
+import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
+import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
+import be.atbash.util.exception.AtbashException;
 
 import java.security.Key;
 
+public class KeyTypeException extends AtbashException {
+    // FIXME We  change it back to extends KeyException when JoseException extends AtbashException
 
-/**
- * Key type exception.
- *
- * Based on code by  Vladimir Dzhuvinov
- */
-public class KeyTypeException extends KeyException {
+    /**
+     * Creates a new key type exception.
+     *
+     * @param keyType The expected key type
+     * @param action  The action which is performed
+     */
+    public KeyTypeException(KeyType keyType, String action) {
+        super(String.format("Unsupported KeyType %s for %s", keyType.getValue(), action));
+    }
 
+    /**
+     * Creates a new key type exception.
+     *
+     * @param asymmetricPart The expected type of key
+     * @param action         The action which is performed
+     */
+    public KeyTypeException(AsymmetricPart asymmetricPart, String action) {
+        super(String.format("%s key required for %s", asymmetricPart.name(), action));
+    }
 
     /**
      * Creates a new key type exception.
@@ -35,6 +52,7 @@ public class KeyTypeException extends KeyException {
      */
     public KeyTypeException(Class<? extends Key> expectedKeyClass) {
 
-        super("Invalid key: Must be an instance of " + expectedKeyClass);
+        super(String.format("Invalid key: Must be an instance of %s", expectedKeyClass));
     }
+
 }

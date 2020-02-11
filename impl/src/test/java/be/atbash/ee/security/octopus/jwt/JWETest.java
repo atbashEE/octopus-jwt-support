@@ -15,7 +15,6 @@
  */
 package be.atbash.ee.security.octopus.jwt;
 
-import be.atbash.ee.security.octopus.UnsupportedKeyType;
 import be.atbash.ee.security.octopus.config.JwtSupportConfiguration;
 import be.atbash.ee.security.octopus.exception.UnsupportedECCurveException;
 import be.atbash.ee.security.octopus.exception.UnsupportedKeyLengthException;
@@ -30,6 +29,7 @@ import be.atbash.ee.security.octopus.keys.ListKeyManager;
 import be.atbash.ee.security.octopus.keys.TestKeys;
 import be.atbash.ee.security.octopus.keys.selector.*;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
+import be.atbash.ee.security.octopus.nimbus.jose.KeyTypeException;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEObject;
 import be.atbash.util.TestReflectionUtils;
@@ -266,7 +266,7 @@ public class JWETest {
                 .withSecretKeyForEncryption(encryptKeyList.get(0))
                 .build();
 
-        Assertions.assertThrows(UnsupportedKeyType.class, () -> jwtEncoder.encode(payload, parameters));
+        Assertions.assertThrows(KeyTypeException.class, () -> jwtEncoder.encode(payload, parameters));
     }
 
     @Test

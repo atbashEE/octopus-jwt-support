@@ -168,12 +168,12 @@ public class MACSigner extends MACProvider implements JWSSigner {
      * @throws KeyLengthException If the secret length is shorter than the
      *                            minimum 256-bit requirement.
      */
-    public MACSigner(AtbashKey atbashKey) throws KeyTypeException, KeyLengthException {
+    public MACSigner(AtbashKey atbashKey) throws KeyLengthException {
 
         this(getKey(atbashKey));
     }
 
-    private static SecretKey getKey(AtbashKey atbashKey) throws KeyTypeException {
+    private static SecretKey getKey(AtbashKey atbashKey) {
         if (atbashKey.getSecretKeyType().getKeyType() != KeyType.OCT) {
             throw new KeyTypeException(ECPrivateKey.class);
         }

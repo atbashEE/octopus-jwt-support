@@ -37,7 +37,6 @@ import org.bouncycastle.jcajce.provider.asymmetric.edec.BCEdDSAPublicKey;
 
 import java.io.IOException;
 import java.security.interfaces.ECPrivateKey;
-import java.security.interfaces.RSAPublicKey;
 import java.util.Set;
 
 
@@ -101,7 +100,7 @@ public class Ed25519Verifier extends EdDSAProvider implements JWSVerifier {
 		this(getPublicKey(atbashKey));
 	}
 
-	private static BCEdDSAPublicKey getPublicKey(AtbashKey atbashKey) throws KeyTypeException {
+	private static BCEdDSAPublicKey getPublicKey(AtbashKey atbashKey) {
 		if (atbashKey.getSecretKeyType().getKeyType() != KeyType.OKP) {
 			throw new KeyTypeException(ECPrivateKey.class);
 		}

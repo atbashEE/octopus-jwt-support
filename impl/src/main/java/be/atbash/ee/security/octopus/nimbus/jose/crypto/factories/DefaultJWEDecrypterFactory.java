@@ -121,8 +121,8 @@ public class DefaultJWEDecrypterFactory implements JWEDecrypterFactory {
 			DirectDecrypter.SUPPORTED_ENCRYPTION_METHODS.contains(header.getEncryptionMethod())) {
 
 			if (!(key instanceof SecretKey)) {
-				throw new KeyTypeException(SecretKey.class);
-			}
+                throw new KeyTypeException(SecretKey.class);
+            }
 
 			SecretKey aesKey = (SecretKey)key;
 			DirectDecrypter directDecrypter =  new DirectDecrypter(aesKey);
