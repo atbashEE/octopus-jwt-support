@@ -16,11 +16,14 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto;
 
 
+import be.atbash.ee.security.octopus.keys.AtbashKey;
+import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
+import be.atbash.ee.security.octopus.nimbus.jose.KeyTypeException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.CriticalHeaderParamsDeferral;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.RSASSA;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.RSASSAProvider;
-import be.atbash.ee.security.octopus.nimbus.jwk.RSAKey;
+import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSObject;
@@ -30,6 +33,7 @@ import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import java.security.InvalidKeyException;
 import java.security.Signature;
 import java.security.SignatureException;
+import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Set;
 
@@ -83,18 +87,25 @@ public class RSASSAVerifier extends RSASSAProvider implements JWSVerifier {
         this(publicKey, null);
     }
 
-
     /**
      * Creates a new RSA Signature-Scheme-with-Appendix (RSASSA) verifier.
      *
-     * @param rsaJWK The RSA JSON Web Key (JWK). Must not be {@code null}.
-     *
+     * @param atbashKey The public RSA key. Must not be {@code null}.
      */
-    public RSASSAVerifier(RSAKey rsaJWK) {
+    public RSASSAVerifier(AtbashKey atbashKey) throws KeyTypeException {
 
-        this(rsaJWK.toRSAPublicKey(), null);
+        this(getPublicKey(atbashKey));
     }
 
+    private static RSAPublicKey getPublicKey(AtbashKey atbashKey) throws KeyTypeException {
+        if (atbashKey.getSecretKeyType().getKeyType() != KeyType.RSA) {
+            throw new KeyTypeException(ECPrivateKey.class);
+        }
+        if (atbashKey.getSecretKeyType().getAsymmetricPart() != AsymmetricPart.PUBLIC) {
+            throw new KeyTypeException(ECPrivateKey.class);
+        }
+        return (RSAPublicKey) atbashKey.getKey();
+    }
 
     /**
      * Creates a new RSA Signature-Scheme-with-Appendix (RSASSA) verifier.
@@ -115,18 +126,6 @@ public class RSASSAVerifier extends RSASSAProvider implements JWSVerifier {
 
         critPolicy.setDeferredCriticalHeaderParams(defCritHeaders);
     }
-
-
-    /**
-     * Gets the public RSA key.
-     *
-     * @return The public RSA key.
-     */
-    public RSAPublicKey getPublicKey() {
-
-        return publicKey;
-    }
-
 
     public Set<String> getProcessedCriticalHeaderParams() {
 

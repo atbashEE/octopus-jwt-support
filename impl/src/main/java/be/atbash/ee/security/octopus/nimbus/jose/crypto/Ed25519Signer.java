@@ -16,9 +16,13 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto;
 
 
+import be.atbash.ee.security.octopus.keys.AtbashKey;
+import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
+import be.atbash.ee.security.octopus.nimbus.jose.KeyTypeException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.EdDSAProvider;
 import be.atbash.ee.security.octopus.nimbus.jwk.Curve;
+import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import be.atbash.ee.security.octopus.nimbus.jwk.OctetKeyPair;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
@@ -32,6 +36,7 @@ import org.bouncycastle.jcajce.provider.asymmetric.edec.BCEdDSAPrivateKey;
 import org.bouncycastle.math.ec.rfc8032.Ed25519;
 
 import java.io.IOException;
+import java.security.interfaces.ECPrivateKey;
 
 
 /**
@@ -73,8 +78,6 @@ public class Ed25519Signer extends EdDSAProvider implements JWSSigner {
 	 */
 	public Ed25519Signer(BCEdDSAPrivateKey privateKey) throws JOSEException {
 
-		super();
-
 		if (!Curve.Ed25519.getName().equals(privateKey.getAlgorithm())) {
 			throw new JOSEException("Ed25519Signer only supports OctetKeyPairs with crv=Ed25519");
 		}
@@ -83,6 +86,29 @@ public class Ed25519Signer extends EdDSAProvider implements JWSSigner {
 		CipherParameters parameters = new Ed25519PrivateKeyParameters(getD(privateKey), 0);
 		signer.init(true, parameters);
 
+	}
+
+	/**
+	 * Creates a new Ed25519 signer.
+	 *
+	 * @param atbashKey The private key. Must be non-{@code null}, and must
+	 *                   be of type Ed25519 ({@code "crv": "Ed25519"}).
+	 * @throws JOSEException If the key subtype is not supported or if the key is not a private key
+	 */
+	public Ed25519Signer(AtbashKey atbashKey) throws JOSEException {
+
+		this(getPrivateKey(atbashKey));
+
+	}
+
+	private static BCEdDSAPrivateKey getPrivateKey(AtbashKey atbashKey) throws KeyTypeException {
+		if (atbashKey.getSecretKeyType().getKeyType() != KeyType.OKP) {
+			throw new KeyTypeException(ECPrivateKey.class);
+		}
+		if (atbashKey.getSecretKeyType().getAsymmetricPart() != AsymmetricPart.PRIVATE) {
+			throw new KeyTypeException(ECPrivateKey.class);
+		}
+		return (BCEdDSAPrivateKey) atbashKey.getKey();
 	}
 
 	private byte[] getD(BCEdDSAPrivateKey privateKey) {

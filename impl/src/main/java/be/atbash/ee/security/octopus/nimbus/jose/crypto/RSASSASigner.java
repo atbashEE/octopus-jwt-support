@@ -16,11 +16,14 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto;
 
 
+import be.atbash.ee.security.octopus.keys.AtbashKey;
+import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
+import be.atbash.ee.security.octopus.nimbus.jose.KeyTypeException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.RSAKeyUtils;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.RSASSA;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.RSASSAProvider;
-import be.atbash.ee.security.octopus.nimbus.jwk.RSAKey;
+import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSObject;
@@ -31,6 +34,8 @@ import java.security.InvalidKeyException;
 import java.security.PrivateKey;
 import java.security.Signature;
 import java.security.SignatureException;
+import java.security.interfaces.ECPrivateKey;
+import java.security.interfaces.RSAPrivateKey;
 
 
 /**
@@ -73,7 +78,7 @@ public class RSASSASigner extends RSASSAProvider implements JWSSigner {
      * <p>
      * See https://bitbucket.org/connect2id/nimbus-jose-jwt/issues/169
      */
-    private final PrivateKey privateKey;
+    private final RSAPrivateKey privateKey;
 
 
     /**
@@ -87,11 +92,35 @@ public class RSASSASigner extends RSASSAProvider implements JWSSigner {
      *                   length of an RSA key in a PKCS#11 store cannot be
      *                   checked. Must not be {@code null}.
      */
-    public RSASSASigner(PrivateKey privateKey) {
+    public RSASSASigner(RSAPrivateKey privateKey) {
 
         this(privateKey, false);
     }
 
+    /**
+     * Creates a new RSA Signature-Scheme-with-Appendix (RSASSA) signer.
+     * This constructor can also accept a private RSA key located in a
+     * PKCS#11 store that doesn't expose the private key parameters (such
+     * as a smart card or HSM).
+     *
+     * @param atbashKey The private RSA key. Its algorithm must be "RSA"
+     *                   and its length at least 2048 bits. Note that the
+     *                   length of an RSA key in a PKCS#11 store cannot be
+     *                   checked. Must not be {@code null}.
+     */
+    public RSASSASigner(AtbashKey atbashKey) throws KeyTypeException {
+        this(getPrivateKey(atbashKey));
+    }
+
+    private static RSAPrivateKey getPrivateKey(AtbashKey atbashKey) throws KeyTypeException {
+        if (atbashKey.getSecretKeyType().getKeyType() != KeyType.RSA) {
+            throw new KeyTypeException(ECPrivateKey.class);
+        }
+        if (atbashKey.getSecretKeyType().getAsymmetricPart() != AsymmetricPart.PRIVATE) {
+            throw new KeyTypeException(ECPrivateKey.class);
+        }
+        return (RSAPrivateKey) atbashKey.getKey();
+    }
 
     /**
      * Creates a new RSA Signature-Scheme-with-Appendix (RSASSA) signer.
@@ -106,7 +135,7 @@ public class RSASSASigner extends RSASSAProvider implements JWSSigner {
      * @param allowWeakKey {@code true} to allow an RSA key shorter than
      *                     2048 bits.
      */
-    public RSASSASigner(PrivateKey privateKey, boolean allowWeakKey) {
+    public RSASSASigner(RSAPrivateKey privateKey, boolean allowWeakKey) {
 
         if (!"RSA".equalsIgnoreCase(privateKey.getAlgorithm())) {
             throw new IllegalArgumentException("The private key algorithm must be RSA");
@@ -123,58 +152,6 @@ public class RSASSASigner extends RSASSAProvider implements JWSSigner {
 
         this.privateKey = privateKey;
     }
-
-
-    /**
-     * Creates a new RSA Signature-Scheme-with-Appendix (RSASSA) signer.
-     *
-     * @param rsaJWK The RSA JSON Web Key (JWK). Must contain or reference
-     *               a private part. Its length must be at least 2048 bits.
-     *               Note that the length of an RSA key in a PKCS#11 store
-     *               cannot be checked. Must not be {@code null}.
-     * @throws JOSEException If the RSA JWK doesn't contain a private part
-     *                       or its extraction failed.
-     */
-    public RSASSASigner(RSAKey rsaJWK)
-            throws JOSEException {
-
-        this(rsaJWK, false);
-    }
-
-
-    /**
-     * Creates a new RSA Signature-Scheme-with-Appendix (RSASSA) signer.
-     *
-     * @param rsaJWK       The RSA JSON Web Key (JWK). Must contain or
-     *                     reference a private part. Its length must be at
-     *                     least 2048 bits. Note that the length of an RSA
-     *                     key in a PKCS#11 store cannot be checked. Must
-     *                     not be {@code null}.
-     * @param allowWeakKey {@code true} to allow an RSA key shorter than
-     *                     2048 bits.
-     * @throws JOSEException If the RSA JWK doesn't contain a private part
-     *                       or its extraction failed.
-     */
-    public RSASSASigner(RSAKey rsaJWK, boolean allowWeakKey)
-            throws JOSEException {
-
-        this(RSAKeyUtils.toRSAPrivateKey(rsaJWK), allowWeakKey);
-    }
-
-
-    /**
-     * Gets the private RSA key.
-     *
-     * @return The private RSA key. Casting to
-     * {@link java.security.interfaces.RSAPrivateKey} may not be
-     * possible if the key is located in a PKCS#11 store that
-     * doesn't expose the private key parameters.
-     */
-    public PrivateKey getPrivateKey() {
-
-        return privateKey;
-    }
-
 
     @Override
     public Base64URLValue sign(JWSHeader header, byte[] signingInput)

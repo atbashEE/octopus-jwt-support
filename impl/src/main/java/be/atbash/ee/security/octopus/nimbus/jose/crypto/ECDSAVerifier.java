@@ -23,7 +23,6 @@ import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.ECDSA;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.ECDSAProvider;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.utils.ECChecks;
 import be.atbash.ee.security.octopus.nimbus.jwk.Curve;
-import be.atbash.ee.security.octopus.nimbus.jwk.ECKey;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSObject;
@@ -86,21 +85,6 @@ public class ECDSAVerifier extends ECDSAProvider implements JWSVerifier {
         this(publicKey, null);
     }
 
-
-    /**
-     * Creates a new Elliptic Curve Digital Signature Algorithm (ECDSA)
-     * verifier.
-     *
-     * @param ecJWK The EC JSON Web Key (JWK). Must not be {@code null}.
-     * @throws JOSEException If the elliptic curve of key is not supported.
-     */
-    public ECDSAVerifier(ECKey ecJWK)
-            throws JOSEException {
-
-        this(ecJWK.toECPublicKey());
-    }
-
-
     /**
      * Creates a new Elliptic Curve Digital Signature Algorithm (ECDSA)
      * verifier.
@@ -125,17 +109,6 @@ public class ECDSAVerifier extends ECDSAProvider implements JWSVerifier {
         }
 
         critPolicy.setDeferredCriticalHeaderParams(defCritHeaders);
-    }
-
-
-    /**
-     * Returns the public EC key.
-     *
-     * @return The public EC key.
-     */
-    public ECPublicKey getPublicKey() {
-
-        return publicKey;
     }
 
     public Set<String> getProcessedCriticalHeaderParams() {

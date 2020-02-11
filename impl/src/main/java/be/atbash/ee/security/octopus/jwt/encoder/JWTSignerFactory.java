@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersSigning;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.KeyLengthException;
+import be.atbash.ee.security.octopus.nimbus.jose.KeyTypeException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.ECDSASigner;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.Ed25519Signer;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.MACSigner;
@@ -31,13 +32,10 @@ import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSSigner;
 import be.atbash.util.exception.AtbashUnexpectedException;
-import org.bouncycastle.jcajce.provider.asymmetric.edec.BCEdDSAPrivateKey;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import java.security.PrivateKey;
 import java.security.interfaces.ECKey;
-import java.security.interfaces.ECPrivateKey;
 import java.security.spec.ECParameterSpec;
 
 /**
@@ -57,9 +55,9 @@ public class JWTSignerFactory {
 
         if (KeyType.OCT.equals(parametersSigning.getKeyType())) {
             try {
-                result = new MACSigner(parametersSigning.getKey().getEncoded());
-            } catch (KeyLengthException e) {
-
+                result = new MACSigner(parametersSigning.getAtbashKey());
+            } catch (KeyLengthException | KeyTypeException e) {
+                // FIXME better exception here
                 throw new AtbashUnexpectedException(e);
                 // TODO
                 //This should be already covered by HMACAlgorithmFactory.
@@ -67,34 +65,27 @@ public class JWTSignerFactory {
             }
         }
         if (KeyType.RSA.equals(parametersSigning.getKeyType())) {
-            if (parametersSigning.getKey() instanceof PrivateKey) {
-                result = new RSASSASigner((PrivateKey) parametersSigning.getKey());
-            } else {
+            try {
+                result = new RSASSASigner(parametersSigning.getAtbashKey());
+            } catch (KeyTypeException e) {
                 throw new UnsupportedKeyType(AsymmetricPart.PRIVATE, "JWS Signing");
             }
         }
         if (KeyType.EC.equals(parametersSigning.getKeyType())) {
 
-            if (parametersSigning.getKey() instanceof ECPrivateKey) {
-                try {
-                    result = new ECDSASigner((ECPrivateKey) parametersSigning.getKey());
-                } catch (JOSEException e) {
-                    throw new UnsupportedECCurveException(e.getMessage());
-                }
-            } else {
-                throw new UnsupportedKeyType(AsymmetricPart.PRIVATE, "JWS Signing");
+            try {
+                result = new ECDSASigner(parametersSigning.getAtbashKey());
+            } catch (JOSEException e) {
+                throw new UnsupportedECCurveException(e.getMessage());  // FIXME This is not the correct  message?
             }
         }
+
         if (KeyType.OKP.equals(parametersSigning.getKeyType())) {
 
-            if (parametersSigning.getKey() instanceof BCEdDSAPrivateKey) {
-                try {
-                    result = new Ed25519Signer((BCEdDSAPrivateKey) parametersSigning.getKey());
-                } catch (JOSEException e) {
-                    throw new UnsupportedECCurveException(e.getMessage());
-                }
-            } else {
-                throw new UnsupportedKeyType(AsymmetricPart.PRIVATE, "JWS Signing");
+            try {
+                result = new Ed25519Signer(parametersSigning.getAtbashKey());
+            } catch (JOSEException e) {
+                throw new UnsupportedECCurveException(e.getMessage());
             }
         }
 
@@ -136,7 +127,7 @@ public class JWTSignerFactory {
         return result;
     }
 
-    /* Copied from com.nimbusds.jose.crypto.ECDSA which has package scope */
+    /* FIXME Copied from com.nimbusds.jose.crypto.ECDSA which has package scope */
     private JWSAlgorithm resolveAlgorithm(ECKey ecKey)
             throws JOSEException {
 

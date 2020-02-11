@@ -16,11 +16,14 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto;
 
 
+import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.KeyLengthException;
+import be.atbash.ee.security.octopus.nimbus.jose.KeyTypeException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.AlgorithmSupportMessage;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.HMAC;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.MACProvider;
+import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import be.atbash.ee.security.octopus.nimbus.jwk.OctetSequenceKey;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
@@ -30,6 +33,7 @@ import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.ee.security.octopus.nimbus.util.ByteUtils;
 
 import javax.crypto.SecretKey;
+import java.security.interfaces.ECPrivateKey;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -156,6 +160,26 @@ public class MACSigner extends MACProvider implements JWSSigner {
         this(secretKey.getEncoded());
     }
 
+    /**
+     * Creates a new Message Authentication (MAC) signer.
+     *
+     * @param atbashKey The secret key. Must be at least 256 bits long and
+     *                  not {@code null}.
+     * @throws KeyLengthException If the secret length is shorter than the
+     *                            minimum 256-bit requirement.
+     */
+    public MACSigner(AtbashKey atbashKey) throws KeyTypeException, KeyLengthException {
+
+        this(getKey(atbashKey));
+    }
+
+    private static SecretKey getKey(AtbashKey atbashKey) throws KeyTypeException {
+        if (atbashKey.getSecretKeyType().getKeyType() != KeyType.OCT) {
+            throw new KeyTypeException(ECPrivateKey.class);
+        }
+
+        return (SecretKey) atbashKey.getKey();
+    }
 
     /**
      * Creates a new Message Authentication (MAC) signer.

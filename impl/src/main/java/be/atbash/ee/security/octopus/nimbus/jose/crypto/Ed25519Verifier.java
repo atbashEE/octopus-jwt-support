@@ -16,10 +16,14 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto;
 
 
+import be.atbash.ee.security.octopus.keys.AtbashKey;
+import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
+import be.atbash.ee.security.octopus.nimbus.jose.KeyTypeException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.CriticalHeaderParamsDeferral;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.EdDSAProvider;
 import be.atbash.ee.security.octopus.nimbus.jwk.Curve;
+import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import be.atbash.ee.security.octopus.nimbus.jwk.OctetKeyPair;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
@@ -32,6 +36,8 @@ import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters;
 import org.bouncycastle.jcajce.provider.asymmetric.edec.BCEdDSAPublicKey;
 
 import java.io.IOException;
+import java.security.interfaces.ECPrivateKey;
+import java.security.interfaces.RSAPublicKey;
 import java.util.Set;
 
 
@@ -81,6 +87,28 @@ public class Ed25519Verifier extends EdDSAProvider implements JWSVerifier {
 			throws JOSEException {
 
 		this(publicKey, null);
+	}
+
+	/**
+	 * Creates a new Ed25519 verifier.
+	 *
+	 * @param atbashKey The public Ed25519 key. Must not be {@code null}.
+	 * @throws JOSEException If the key subtype is not supported
+	 */
+	public Ed25519Verifier(AtbashKey atbashKey)
+			throws JOSEException {
+
+		this(getPublicKey(atbashKey));
+	}
+
+	private static BCEdDSAPublicKey getPublicKey(AtbashKey atbashKey) throws KeyTypeException {
+		if (atbashKey.getSecretKeyType().getKeyType() != KeyType.OKP) {
+			throw new KeyTypeException(ECPrivateKey.class);
+		}
+		if (atbashKey.getSecretKeyType().getAsymmetricPart() != AsymmetricPart.PUBLIC) {
+			throw new KeyTypeException(ECPrivateKey.class);
+		}
+		return (BCEdDSAPublicKey) atbashKey.getKey();
 	}
 
 

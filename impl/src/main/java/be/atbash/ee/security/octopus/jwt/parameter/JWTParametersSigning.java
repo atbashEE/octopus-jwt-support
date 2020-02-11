@@ -54,4 +54,8 @@ public class JWTParametersSigning extends JWTParametersHeader {
     public Key getKey() {
         return secretKeySigning.getKey();
     }
+
+    public AtbashKey getAtbashKey() {
+        return secretKeySigning;
+    }
 }

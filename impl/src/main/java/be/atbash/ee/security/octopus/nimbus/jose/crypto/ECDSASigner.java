@@ -17,12 +17,14 @@ package be.atbash.ee.security.octopus.nimbus.jose.crypto;
 
 
 import be.atbash.ee.security.octopus.config.JCASupportConfiguration;
+import be.atbash.ee.security.octopus.keys.AtbashKey;
+import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
+import be.atbash.ee.security.octopus.nimbus.jose.KeyTypeException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.AlgorithmSupportMessage;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.ECDSA;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.ECDSAProvider;
-import be.atbash.ee.security.octopus.nimbus.jwk.Curve;
-import be.atbash.ee.security.octopus.nimbus.jwk.ECKey;
+import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSObject;
@@ -86,68 +88,28 @@ public class ECDSASigner extends ECDSAProvider implements JWSSigner {
         this.privateKey = privateKey;
     }
 
-
-    /**
-     * Creates a new Elliptic Curve Digital Signature Algorithm (ECDSA)
-     * signer. This constructor is intended for a private EC key located
-     * in a PKCS#11 store that doesn't expose the private key parameters
-     * (such as a smart card or HSM).
-     *
-     * @param privateKey The private EC key. Its algorithm must be "EC".
-     *                   Must not be {@code null}.
-     * @param curve      The elliptic curve for the key. Must not be
-     *                   {@code null}.
-     * @throws JOSEException If the elliptic curve of key is not supported.
-     */
-    public ECDSASigner(PrivateKey privateKey, Curve curve)
-            throws JOSEException {
-
-        super(ECDSA.resolveAlgorithm(curve));
-
-        if (!"EC".equalsIgnoreCase(privateKey.getAlgorithm())) {
-            throw new IllegalArgumentException("The private key algorithm must be EC");
-        }
-
-        this.privateKey = privateKey;
-    }
-
-
     /**
      * Creates a new Elliptic Curve Digital Signature Algorithm (ECDSA)
      * signer.
      *
-     * @param ecJWK The EC JSON Web Key (JWK). Must contain a private part.
-     *              Must not be {@code null}.
-     * @throws JOSEException If the EC JWK doesn't contain a private part,
-     *                       its extraction failed, or the elliptic curve
-     *                       is not supported.
+     * @param atbashKey The private EC key. Must not be {@code null}.
+     * @throws JOSEException If the elliptic curve of key is not supported.
      */
-    public ECDSASigner(ECKey ecJWK)
+    public ECDSASigner(AtbashKey atbashKey)
             throws JOSEException {
 
-        super(ECDSA.resolveAlgorithm(ecJWK.getCurve()));
+        this(getPrivateKey(atbashKey));
+    }
 
-        if (!ecJWK.isPrivate()) {
-            throw new JOSEException("The EC JWK doesn't contain a private part");
+    private static ECPrivateKey getPrivateKey(AtbashKey atbashKey) throws KeyTypeException {
+        if (atbashKey.getSecretKeyType().getKeyType() != KeyType.EC) {
+            throw new KeyTypeException(ECPrivateKey.class);
         }
-
-        privateKey = ecJWK.toPrivateKey();
+        if (atbashKey.getSecretKeyType().getAsymmetricPart() != AsymmetricPart.PRIVATE) {
+            throw new KeyTypeException(ECPrivateKey.class);
+        }
+        return (ECPrivateKey) atbashKey.getKey();
     }
-
-
-    /**
-     * Gets the private EC key.
-     *
-     * @return The private EC key. Casting to
-     * {@link ECPrivateKey} may not be
-     * possible if the key is located in a PKCS#11 store that
-     * doesn't expose the private key parameters.
-     */
-    public PrivateKey getPrivateKey() {
-
-        return privateKey;
-    }
-
 
     @Override
     public Base64URLValue sign(JWSHeader header, byte[] signingInput)
