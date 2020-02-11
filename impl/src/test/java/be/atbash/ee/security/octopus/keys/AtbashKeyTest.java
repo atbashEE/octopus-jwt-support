@@ -163,7 +163,7 @@ public class AtbashKeyTest {
 
     @Test
     public void OKP_specification() {
-        List<AtbashKey> keys = TestKeys.generateRSAKeys("test");
+        List<AtbashKey> keys = TestKeys.generateOKPKeys("test");
         for (AtbashKey key : keys) {
             assertThat(key.getSpecification()).isEqualTo("Curve name : Ed25519");
         }
