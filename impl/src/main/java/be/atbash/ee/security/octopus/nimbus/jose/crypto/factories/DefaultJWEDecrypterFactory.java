@@ -40,7 +40,7 @@ import java.util.Set;
  *
  * <p>Supports all standard JWE algorithms implemented in the
  * {@link be.atbash.ee.security.octopus.nimbus.jose.crypto} package.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
 public class DefaultJWEDecrypterFactory implements JWEDecrypterFactory {
@@ -116,22 +116,21 @@ public class DefaultJWEDecrypterFactory implements JWEDecrypterFactory {
             ECPrivateKey ecPrivateKey = (ECPrivateKey) key;
             decrypter = new ECDHDecrypter(ecPrivateKey);
 
-        }
-		else if (DirectDecrypter.SUPPORTED_ALGORITHMS.contains(header.getAlgorithm()) &&
-			DirectDecrypter.SUPPORTED_ENCRYPTION_METHODS.contains(header.getEncryptionMethod())) {
+        } else if (DirectDecrypter.SUPPORTED_ALGORITHMS.contains(header.getAlgorithm()) &&
+                DirectDecrypter.SUPPORTED_ENCRYPTION_METHODS.contains(header.getEncryptionMethod())) {
 
-			if (!(key instanceof SecretKey)) {
+            if (!(key instanceof SecretKey)) {
                 throw new KeyTypeException(SecretKey.class);
             }
 
-			SecretKey aesKey = (SecretKey)key;
-			DirectDecrypter directDecrypter =  new DirectDecrypter(aesKey);
+            SecretKey aesKey = (SecretKey) key;
+            DirectDecrypter directDecrypter = new DirectDecrypter(aesKey);
 
-			if (! directDecrypter.supportedEncryptionMethods().contains(header.getEncryptionMethod())) {
-				throw new KeyLengthException(header.getEncryptionMethod().cekBitLength(), header.getEncryptionMethod());
-			}
+            if (!directDecrypter.supportedEncryptionMethods().contains(header.getEncryptionMethod())) {
+                throw new KeyLengthException(header.getEncryptionMethod().cekBitLength(), header.getEncryptionMethod());
+            }
 
-			decrypter = directDecrypter;
+            decrypter = directDecrypter;
 
         } else if (AESDecrypter.SUPPORTED_ALGORITHMS.contains(header.getAlgorithm()) &&
                 AESDecrypter.SUPPORTED_ENCRYPTION_METHODS.contains(header.getEncryptionMethod())) {
@@ -149,8 +148,7 @@ public class DefaultJWEDecrypterFactory implements JWEDecrypterFactory {
 
             decrypter = aesDecrypter;
 
-        }
-		else if (PasswordBasedDecrypter.SUPPORTED_ALGORITHMS.contains(header.getAlgorithm()) &&
+        } else if (PasswordBasedDecrypter.SUPPORTED_ALGORITHMS.contains(header.getAlgorithm()) &&
                 PasswordBasedDecrypter.SUPPORTED_ENCRYPTION_METHODS.contains(header.getEncryptionMethod())) {
 
             if (!(key instanceof SecretKey)) {
