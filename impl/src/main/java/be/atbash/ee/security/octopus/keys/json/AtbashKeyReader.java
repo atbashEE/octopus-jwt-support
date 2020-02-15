@@ -57,7 +57,7 @@ public class AtbashKeyReader implements JsonbDeserializer<AtbashKey> {
                 if (ecKey.isPrivate()) {
                     builder.withKey(ecKey.toPrivateKey());
                 } else {
-                    builder.withKey(ecKey.toECPublicKey(BouncyCastleProviderSingleton.getInstance()));
+                    builder.withKey(ecKey.toECPublicKey());
                 }
                 handled = true;
             }

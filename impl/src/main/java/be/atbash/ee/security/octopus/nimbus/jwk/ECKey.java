@@ -19,6 +19,7 @@ package be.atbash.ee.security.octopus.nimbus.jwk;
 import be.atbash.ee.security.octopus.exception.InvalidKeyException;
 import be.atbash.ee.security.octopus.nimbus.jose.Algorithm;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
+import be.atbash.ee.security.octopus.nimbus.jose.crypto.bc.BouncyCastleProviderSingleton;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.utils.ECChecks;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.ee.security.octopus.nimbus.util.Base64Value;
@@ -978,11 +979,9 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
         return d;
     }
 
-
     /**
      * Returns a standard {@code java.security.interfaces.ECPublicKey}
-     * representation of this Elliptic Curve JWK. Uses the default JCA
-     * provider.
+     * representation of this Elliptic Curve JWK.
      *
      * @return The public Elliptic Curve key.
      * @throws InvalidKeyException If EC is not supported by the underlying Java
@@ -990,23 +989,6 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
      *                             parameters are invalid for a public EC key.
      */
     public ECPublicKey toECPublicKey() {
-
-        return toECPublicKey(null);
-    }
-
-
-    /**
-     * Returns a standard {@code java.security.interfaces.ECPublicKey}
-     * representation of this Elliptic Curve JWK.
-     *
-     * @param provider The specific JCA provider to use, {@code null}
-     *                 implies the default one.
-     * @return The public Elliptic Curve key.
-     * @throws InvalidKeyException If EC is not supported by the underlying Java
-     *                             Cryptography (JCA) provider or if the JWK
-     *                             parameters are invalid for a public EC key.
-     */
-    public ECPublicKey toECPublicKey(Provider provider) {
 
         ECParameterSpec spec = crv.toECParameterSpec();
 
@@ -1019,13 +1001,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
         ECPublicKeySpec publicKeySpec = new ECPublicKeySpec(w, spec);
 
         try {
-            KeyFactory keyFactory;
-
-            if (provider == null) {
-                keyFactory = KeyFactory.getInstance("EC");
-            } else {
-                keyFactory = KeyFactory.getInstance("EC", provider);
-            }
+            KeyFactory keyFactory = KeyFactory.getInstance("EC", BouncyCastleProviderSingleton.getInstance());
 
             return (ECPublicKey) keyFactory.generatePublic(publicKeySpec);
 
@@ -1035,11 +1011,9 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
         }
     }
 
-
     /**
      * Returns a standard {@code java.security.interfaces.ECPrivateKey}
-     * representation of this Elliptic Curve JWK. Uses the default JCA
-     * provider.
+     * representation of this Elliptic Curve JWK.
      *
      * @return The private Elliptic Curve key, {@code null} if not
      * specified by this JWK.
@@ -1048,24 +1022,6 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
      *                             parameters are invalid for a private EC key.
      */
     public ECPrivateKey toECPrivateKey() {
-
-        return toECPrivateKey(null);
-    }
-
-
-    /**
-     * Returns a standard {@code java.security.interfaces.ECPrivateKey}
-     * representation of this Elliptic Curve JWK.
-     *
-     * @param provider The specific JCA provider to use, {@code null}
-     *                 implies the default one.
-     * @return The private Elliptic Curve key, {@code null} if not
-     * specified by this JWK.
-     * @throws InvalidKeyException If EC is not supported by the underlying Java
-     *                             Cryptography (JCA) provider or if the JWK
-     *                             parameters are invalid for a private EC key.
-     */
-    public ECPrivateKey toECPrivateKey(Provider provider) {
 
         if (d == null) {
             // No private 'd' param
@@ -1081,13 +1037,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
         ECPrivateKeySpec privateKeySpec = new ECPrivateKeySpec(d.decodeToBigInteger(), spec);
 
         try {
-            KeyFactory keyFactory;
-
-            if (provider == null) {
-                keyFactory = KeyFactory.getInstance("EC");
-            } else {
-                keyFactory = KeyFactory.getInstance("EC", provider);
-            }
+            KeyFactory keyFactory = KeyFactory.getInstance("EC", BouncyCastleProviderSingleton.getInstance());
 
             return (ECPrivateKey) keyFactory.generatePrivate(privateKeySpec);
 
@@ -1119,31 +1069,10 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
         return privateKey;
     }
 
-
-    /**
-     * Returns a standard {@code java.security.KeyPair} representation of
-     * this Elliptic Curve JWK. Uses the default JCA provider.
-     *
-     * @return The Elliptic Curve key pair. The private Elliptic Curve key
-     * will be {@code null} if not specified.
-     * @throws InvalidKeyException If EC is not supported by the underlying Java
-     *                             Cryptography (JCA) provider or if the JWK
-     *                             parameters are invalid for a public and / or
-     *                             private EC key.
-     */
-    @Override
-    public KeyPair toKeyPair() {
-
-        return toKeyPair(null);
-    }
-
-
     /**
      * Returns a standard {@code java.security.KeyPair} representation of
      * this Elliptic Curve JWK.
      *
-     * @param provider The specific JCA provider to use, {@code null}
-     *                 implies the default one.
      * @return The Elliptic Curve key pair. The private Elliptic Curve key
      * will be {@code null} if not specified.
      * @throws InvalidKeyException If EC is not supported by the underlying Java
@@ -1151,13 +1080,13 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
      *                             parameters are invalid for a public and / or
      *                             private EC key.
      */
-    public KeyPair toKeyPair(Provider provider) {
+    public KeyPair toKeyPair() {
 
         if (privateKey != null) {
             // Private key as PKCS#11 handle
-            return new KeyPair(toECPublicKey(provider), privateKey);
+            return new KeyPair(toECPublicKey(), privateKey);
         } else {
-            return new KeyPair(toECPublicKey(provider), toECPrivateKey(provider));
+            return new KeyPair(toECPublicKey(), toECPrivateKey());
         }
     }
 

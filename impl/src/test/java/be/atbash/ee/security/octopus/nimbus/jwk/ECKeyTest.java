@@ -484,7 +484,7 @@ public class ECKeyTest {
         ECKey key = new ECKey.Builder(ExampleKeyP256Alt.CRV, ExampleKeyP256Alt.X, ExampleKeyP256Alt.Y).build();
 
         // Export
-        KeyPair pair = key.toKeyPair(BouncyCastleProviderSingleton.getInstance());
+        KeyPair pair = key.toKeyPair();
 
         ECPublicKey pub = (ECPublicKey) pair.getPublic();
         assertThat(pub.getParams().getCurve().getField().getFieldSize()).isEqualTo(256);

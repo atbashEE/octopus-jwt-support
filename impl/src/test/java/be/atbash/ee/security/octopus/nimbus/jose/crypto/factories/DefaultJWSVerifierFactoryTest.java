@@ -224,7 +224,7 @@ public class DefaultJWSVerifierFactoryTest {
 
             KeyTypeException exception = Assertions.assertThrows(KeyTypeException.class, () -> factory.createJWSVerifier(header, publicKeys.get(0).getKey()));
 
-            assertThat(exception.getMessage()).isEqualTo("Invalid key: Must be an class of class org.bouncycastle.jcajce.provider.asymmetric.edec.BCEdDSAPublicKey");
+            assertThat(exception.getMessage()).isEqualTo("Invalid key: Must be an instance of class org.bouncycastle.jcajce.provider.asymmetric.edec.BCEdDSAPublicKey");
         }
     }
 

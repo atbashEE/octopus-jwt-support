@@ -110,8 +110,7 @@ public class KeyReaderJWK {
 
             PrivateKey privateKey;
             if (jwk instanceof ECKey) {
-                // We need to use the BouncyCastle provider, otherwise we have a EC Private Key based on sun packages!
-                privateKey = ((ECKey) jwk).toECPrivateKey(BouncyCastleProviderSingleton.getInstance());
+                privateKey = ((ECKey) jwk).toECPrivateKey();
             } else {
                 privateKey = ((AsymmetricJWK) jwk).toPrivateKey();
             }
