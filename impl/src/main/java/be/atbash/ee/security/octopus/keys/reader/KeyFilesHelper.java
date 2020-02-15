@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import be.atbash.util.CDIUtils;
 import be.atbash.util.resource.ResourceScanner;
 import be.atbash.util.resource.ResourceUtil;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
@@ -80,13 +81,7 @@ public class KeyFilesHelper {
                         result.add(ResourceUtil.CLASSPATH_PREFIX + resource);
                     }
                 }
-            } else {
-                // file, URL exists -> OK
-                result.add(keyConfigParameterValue);
-            }
-        } else {
-            // Not found, so it can be that it is a directory
-            if (keyConfigParameterValue.startsWith(ResourceUtil.FILE_PREFIX)) {
+            } else if (keyConfigParameterValue.startsWith(ResourceUtil.FILE_PREFIX)) {
                 File file = new File(keyConfigParameterValue.substring(ResourceUtil.FILE_PREFIX.length()));
                 if (file.exists() && file.canRead()) {
                     if (file.isDirectory()) {
@@ -98,15 +93,23 @@ public class KeyFilesHelper {
                                 result.add(ResourceUtil.FILE_PREFIX + f.getAbsoluteFile().toString());
                             }
                         }
+                    } else {
+                        result.add(keyConfigParameterValue);
                     }
                 }
-            }
 
+            } else {
+                // URL exists -> OK
+                result.add(keyConfigParameterValue);
+            }
         }
 
         Iterator<String> iterator = result.iterator();
         while (iterator.hasNext()) {
             String path = iterator.next();
+            if (path.startsWith("http")) {
+                break;  // We assume any URL will return a valid supported type.
+            }
             if (keyResourceTypeProvider.determineKeyResourceType(path) == null) {
                 // When file isn't matched to any of the types -> remove from list
                 iterator.remove();
@@ -144,6 +147,10 @@ public class KeyFilesHelper {
 
         if (resourceUtil == null) {
             resourceUtil = ResourceUtil.getInstance();
+        }
+
+        if (logger == null) {
+            logger = LoggerFactory.getLogger(KeyFilesHelper.class);
         }
     }
 
