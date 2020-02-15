@@ -107,6 +107,7 @@ public class DefaultJWSVerifierFactory implements JWSVerifierFactory {
         } else if (Ed25519Verifier.SUPPORTED_ALGORITHMS.contains(header.getAlgorithm())) {
 
             if (!(key instanceof BCEdDSAPublicKey)) {
+                // TODO better to check for EdDSAKey and PublicKey?
                 throw new KeyTypeException(BCEdDSAPublicKey.class);
             }
 
