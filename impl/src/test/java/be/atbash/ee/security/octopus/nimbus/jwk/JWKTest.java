@@ -38,6 +38,7 @@ import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -283,4 +284,16 @@ public class JWKTest {
         assertThat(okp.isPrivate()).isFalse();
     }
 
+    @Test
+    public void testParseJsonNotJWK() throws ParseException {
+        String json = "{\"crv\":\"X448\",\"kid\":\"Dave\",\"x\":\"PreoKbDNIPW8_AtZm2_sz22kYnEHvbDU80W0MCfYuXL8PjT7QjKhPKcG3LV67D2uB73BxnvzNgk\"}";
+        JWK jwk = JWK.parse(json);
+        assertThat(jwk).isNull();
+    }
+
+    @Test
+    public void testParseJsonNotJSON()  {
+        String json = "ThisIsJustSomeRandomText";
+        Assertions.assertThrows(ParseException.class, () -> JWK.parse(json));
+    }
 }
