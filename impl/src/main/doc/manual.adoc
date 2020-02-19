@@ -259,6 +259,14 @@ Some _KeyManager_ support some kind of separation of the keys (like tenants). Th
 
 Therefor we can pass some kind of _discriminator_ object to the SelectorCriteria. This discriminator (a string, a POJO, whatever will be understood by the KeyManager) will then be used by it to distinct keys.
 
+=== Reading any format
+
+As described in above sections, the suffix of the file which is read, determines the format of the file and determines how the file is read by the code.
+
+However, there are situations where the format is not know, like in the case when you read some keys from an URL. For that use case, the _keyReader_ has the _readKeyResource_ method. it takes an _InputStream_ and tries to read the contents using different formats until one of them returns something valid.  The method has 2 overloaded versions, one taken the _InputStream_ and the other one an _URI_.
+
+The order in which the formats are tried on the input can be configured. With the configuration parameter `jwt.reader.order`, one can defione the order in which the formats are tried.
+
 === Customization
 
 Password are by default read from configuration (parameter _lookup.password.class_ define the class)
@@ -512,3 +520,9 @@ When no value is set, JVM configured one will be taken.
 default : **true**
 
 Are private Keys written by the `KeyWriter` 'encrypted' using the Custom Atbash format?
+
+=== jwt.reader.order
+
+dafault : **JWKSET, JWK, PEM, KEYSTORE**
+
+Defines the order in whioch the Key formats are tried to read a certain 'input stream'. Values are the enum names of `KeyResourceType` (case insensitive)

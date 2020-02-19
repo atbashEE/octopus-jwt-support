@@ -18,7 +18,6 @@ package be.atbash.ee.security.octopus.keys.reader;
 import be.atbash.ee.security.octopus.exception.ResourceNotFoundException;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup;
-import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.util.JsonbUtil;
 import be.atbash.util.exception.AtbashUnexpectedException;
 import be.atbash.util.resource.ResourceUtil;
@@ -26,6 +25,7 @@ import be.atbash.util.resource.ResourceUtil;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.bind.Jsonb;
+import javax.json.stream.JsonParsingException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
@@ -58,15 +58,26 @@ public class KeyReaderJWKSet extends KeyReaderJWK {
             throw new AtbashUnexpectedException(e);
         }
 
-        return parseContent(path, passwordLookup, fileContent);
+        return parseContent(fileContent, path, passwordLookup);
 
     }
 
-    public List<AtbashKey> parseContent(String path, KeyResourcePasswordLookup passwordLookup, String fileContent) {
+    public List<AtbashKey> parseContent(String fileContent, String path, KeyResourcePasswordLookup passwordLookup) {
         List<AtbashKey> result = new ArrayList<>();
 
         Jsonb jsonb = JsonbUtil.getJsonb();
-        JsonObject jsonObject = jsonb.fromJson(fileContent, JsonObject.class);
+        JsonObject jsonObject;
+        try {
+            jsonObject = jsonb.fromJson(fileContent, JsonObject.class);
+        } catch (JsonParsingException e) {
+            // Not a JSON, No error as this can be part of 'testing' out which type it is.
+            return result;
+        }
+
+        if (!jsonObject.containsKey("keys")) {
+            // If it is not a jwkSet JSON
+            return result;
+        }
 
         JsonArray keys = jsonObject.getJsonArray("keys");
         try {

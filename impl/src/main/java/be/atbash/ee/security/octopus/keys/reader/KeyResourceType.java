@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,5 +29,15 @@ public enum KeyResourceType {
 
     public String[] getSuffixes() {
         return suffixes;
+    }
+
+    public static KeyResourceType valueFor(String data) {
+        KeyResourceType result = null;
+        for (KeyResourceType value : KeyResourceType.values()) {
+            if (value.name().equalsIgnoreCase(data)) {
+                result = value;
+            }
+        }
+        return result;
     }
 }

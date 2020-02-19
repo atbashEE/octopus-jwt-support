@@ -24,6 +24,7 @@ import be.atbash.config.logging.StartupLogging;
 import be.atbash.ee.security.octopus.keys.KeyManager;
 import be.atbash.ee.security.octopus.keys.LocalKeyManager;
 import be.atbash.ee.security.octopus.keys.reader.DefaultKeyResourceTypeProvider;
+import be.atbash.ee.security.octopus.keys.reader.KeyResourceType;
 import be.atbash.ee.security.octopus.keys.reader.KeyResourceTypeProvider;
 import be.atbash.ee.security.octopus.keys.reader.password.ConfigKeyResourcePasswordLookup;
 import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup;
@@ -34,8 +35,11 @@ import be.atbash.util.StringUtils;
 import be.atbash.util.reflection.CDICheck;
 import be.atbash.util.reflection.ClassUtils;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -48,6 +52,8 @@ public class JwtSupportConfiguration extends AbstractConfiguration implements Mo
 
     private static final List<JWSAlgorithm> RSA_SUPPORTED_ALGOS = Arrays.asList(JWSAlgorithm.RS256, JWSAlgorithm.RS384
             , JWSAlgorithm.RS512, JWSAlgorithm.PS256, JWSAlgorithm.PS384, JWSAlgorithm.PS512);
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(JwtSupportConfiguration.class);
 
     /**
      * The return value can also be a directory where multiple files are located (and retrieved).
@@ -228,6 +234,29 @@ public class JwtSupportConfiguration extends AbstractConfiguration implements Mo
     @ConfigEntry
     public boolean isJWKEncrypted() {
         return getOptionalValue("jwt.jwk.encrypted", Boolean.TRUE, Boolean.class);
+    }
+
+    @ConfigProperty
+    public List<KeyResourceType> getReaderOrder() {
+        List<KeyResourceType> result = new ArrayList<>();
+        String order = getOptionalValue("jwt.reader.order", "JWKSET, JWK, PEM, KEYSTORE", String.class);
+        String[] parts = order.split(",");
+        for (String part : parts) {
+            KeyResourceType type = KeyResourceType.valueFor(part.trim());
+            if (type == null) {
+                LOGGER.error(String.format("Parameter 'jwt.reader.order' must contain only values of 'KeyResourceType' but found '%s'.", part));
+            } else {
+                result.add(type);
+            }
+        }
+        if (result.isEmpty()) {
+            LOGGER.error("Parameter 'jwt.reader.order' resulted in an empty list. Taken the default order.");
+            result.add(KeyResourceType.JWKSET);
+            result.add(KeyResourceType.JWK);
+            result.add(KeyResourceType.PEM);
+            result.add(KeyResourceType.KEYSTORE);
+        }
+        return result;
     }
 
     // Java SE Support

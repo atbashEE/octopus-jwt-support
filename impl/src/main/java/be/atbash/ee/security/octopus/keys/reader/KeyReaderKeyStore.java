@@ -43,8 +43,40 @@ public class KeyReaderKeyStore {
         if (passwordLookup == null) {
             throw new MissingPasswordLookupException();
         }
-        List<AtbashKey> result = new ArrayList<>();
+        List<AtbashKey> result;
 
+        try (InputStream inputStream = ResourceUtil.getInstance().getStream(path)) {
+            // When path not found, FileNotFoundException is thrown by getStream
+            result = parseContent(inputStream, path, passwordLookup);
+        } catch (FileNotFoundException e) {
+            throw new ResourceNotFoundException(path);
+        } catch (KeyStoreException | IOException | NoSuchAlgorithmException | CertificateException | UnrecoverableKeyException e) {
+            throw new AtbashUnexpectedException(e);
+        }
+        return result;
+    }
+
+    public List<AtbashKey> parseContent(InputStream inputStream, String path, KeyResourcePasswordLookup passwordLookup) throws IOException, NoSuchAlgorithmException, CertificateException, KeyStoreException, UnrecoverableKeyException {
+        List<AtbashKey> result = new ArrayList<>();
+        KeyStore keyStore = createKeyStore();
+        keyStore.load(inputStream, passwordLookup.getResourcePassword(path));
+
+        for (Enumeration<String> keyAliases = keyStore.aliases(); keyAliases.hasMoreElements(); ) {
+            String alias = keyAliases.nextElement();
+            if (keyStore.isKeyEntry(alias)) {
+                char[] password = passwordLookup.getKeyPassword(path, alias);
+                result.addAll(readKeysFromKeyEntry(keyStore, alias, password));
+            }
+            if (keyStore.isCertificateEntry(alias)) {
+                Certificate certificate = keyStore.getCertificate(alias);
+                result.add(new AtbashKey(alias, certificate.getPublicKey()));
+            }
+
+        }
+        return result;
+    }
+
+    private KeyStore createKeyStore() {
         KeyStore keyStore;
         try {
             String keyStoreType = JwtSupportConfiguration.getInstance().getKeyStoreType();
@@ -57,29 +89,7 @@ public class KeyReaderKeyStore {
         } catch (KeyStoreException e) {
             throw new AtbashUnexpectedException(e);
         }
-
-        try (InputStream inputStream = ResourceUtil.getInstance().getStream(path)) {
-            // When path not found, FileNotFoundException is thrown by getStream
-            keyStore.load(inputStream, passwordLookup.getResourcePassword(path));
-
-            for (Enumeration<String> keyAliases = keyStore.aliases(); keyAliases.hasMoreElements(); ) {
-                String alias = keyAliases.nextElement();
-                if (keyStore.isKeyEntry(alias)) {
-                    char[] password = passwordLookup.getKeyPassword(path, alias);
-                    result.addAll(readKeysFromKeyEntry(keyStore, alias, password));
-                }
-                if (keyStore.isCertificateEntry(alias)) {
-                    Certificate certificate = keyStore.getCertificate(alias);
-                    result.add(new AtbashKey(alias, certificate.getPublicKey()));
-                }
-
-            }
-        } catch (FileNotFoundException e) {
-            throw new ResourceNotFoundException(path);
-        } catch (KeyStoreException | IOException | NoSuchAlgorithmException | CertificateException | UnrecoverableKeyException e) {
-            throw new AtbashUnexpectedException(e);
-        }
-        return result;
+        return keyStore;
     }
 
     private List<AtbashKey> readKeysFromKeyEntry(KeyStore keyStore, String alias, char[] password) throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException {

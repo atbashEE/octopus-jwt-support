@@ -18,12 +18,29 @@ package be.atbash.ee.security.octopus.keys.reader;
 import be.atbash.ee.security.octopus.config.JwtSupportConfiguration;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup;
+import be.atbash.ee.security.octopus.nimbus.util.ByteUtils;
 import be.atbash.util.CDIUtils;
 import be.atbash.util.PublicAPI;
+import be.atbash.util.exception.AtbashUnexpectedException;
+import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.pkcs.PKCSException;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URL;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 @PublicAPI
@@ -113,6 +130,73 @@ public class KeyReader {
 
         return result;
     }
+
+    /**
+     * @param uri
+     * @param passwordLookup
+     * @return
+     */
+    public List<AtbashKey> readKeyResource(URI uri, KeyResourcePasswordLookup passwordLookup) {
+        URL url;
+        InputStream stream;
+        try {
+            url = uri.toURL();
+
+            stream = url.openStream();
+        } catch (IOException e) {
+            throw new AtbashUnexpectedException(e);
+        }
+        return readKeyResource(stream, uri.toASCIIString(), passwordLookup);
+    }
+
+    /**
+     * @param stream
+     * @param passwordLookup
+     * @return
+     */
+    public List<AtbashKey> readKeyResource(InputStream stream, String path, KeyResourcePasswordLookup passwordLookup) {
+        checkDependencies();
+        List<AtbashKey> result = new ArrayList<>();
+        byte[] content;
+        try {
+            content = ByteUtils.readAllBytes(stream);
+        } catch (IOException e) {
+            throw new AtbashUnexpectedException(e);
+        }
+
+        List<KeyResourceType> order = jwtSupportConfiguration.getReaderOrder();
+
+        String json = new String(content);
+
+        Iterator<KeyResourceType> iterator = order.iterator();
+        while (iterator.hasNext() && result.isEmpty()) {
+            KeyResourceType resourceType = iterator.next();
+            try {
+                if (resourceType == KeyResourceType.PEM) {
+                    result.addAll(keyReaderPEM.parseContent(new InputStreamReader(new ByteArrayInputStream(content)), path, passwordLookup));
+                }
+
+                if (resourceType == KeyResourceType.JWK) {
+                    try {
+                        result = keyReaderJWK.parse(json, path, passwordLookup);
+                    } catch (ParseException e) {
+                        ;// Carry on with next format.
+                    }
+                }
+                if (resourceType == KeyResourceType.JWKSET) {
+                    result = keyReaderJWKSet.parseContent(json, path, passwordLookup);
+                }
+                if (resourceType == KeyResourceType.KEYSTORE) {
+                    result = keyReaderKeyStore.parseContent(new ByteArrayInputStream(content), path, passwordLookup);
+                }
+            } catch (IOException | PKCSException | OperatorCreationException | NoSuchAlgorithmException | CertificateException | KeyStoreException | UnrecoverableKeyException e) {
+                throw new AtbashUnexpectedException(e);
+            }
+        }
+
+        return result;
+    }
+
 
     private void checkDependencies() {
         // duplicated in KeyFilesHelper

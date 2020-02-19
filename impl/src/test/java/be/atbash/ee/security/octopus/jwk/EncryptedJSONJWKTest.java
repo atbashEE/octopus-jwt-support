@@ -15,9 +15,11 @@
  */
 package be.atbash.ee.security.octopus.jwk;
 
+import be.atbash.ee.security.octopus.exception.MissingPasswordException;
 import be.atbash.ee.security.octopus.nimbus.jose.Algorithm;
 import be.atbash.ee.security.octopus.nimbus.jwk.OctetSequenceKey;
 import be.atbash.ee.security.octopus.util.EncryptionHelper;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import javax.json.JsonObject;
@@ -63,6 +65,33 @@ public class EncryptedJSONJWKTest {
         assertThat(secureJson.keySet()).containsOnly("k");
         // check if value is same as the byteArray we started with
         assertThat(secureJson.getString("k")).isEqualTo(Base64.getUrlEncoder().withoutPadding().encodeToString(key));
+
+    }
+
+    @Test
+    public void encryptedOutput_passwordRequired() {
+        byte[] key = new byte[20];
+        new SecureRandom().nextBytes(key);
+        OctetSequenceKey jwk = new OctetSequenceKey.Builder(key)
+                .algorithm(new Algorithm("algo"))
+                .keyID("keyId")
+                .build();
+
+        MissingPasswordException exception = Assertions.assertThrows(MissingPasswordException.class, () -> EncryptedJSONJWK.encryptedOutput(jwk, null));
+        assertThat(exception.getMessage()).isEqualTo("Password required for encryption/decryption");
+
+    }
+    @Test
+    public void encryptedOutput_passwordRequired2() {
+        byte[] key = new byte[20];
+        new SecureRandom().nextBytes(key);
+        OctetSequenceKey jwk = new OctetSequenceKey.Builder(key)
+                .algorithm(new Algorithm("algo"))
+                .keyID("keyId")
+                .build();
+
+        MissingPasswordException exception = Assertions.assertThrows(MissingPasswordException.class, () -> EncryptedJSONJWK.encryptedOutput(jwk, "  ".toCharArray()));
+        assertThat(exception.getMessage()).isEqualTo("Password required for encryption/decryption");
 
     }
 }

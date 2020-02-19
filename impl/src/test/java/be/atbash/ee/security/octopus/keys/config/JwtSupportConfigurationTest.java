@@ -30,10 +30,14 @@ import be.atbash.ee.security.octopus.keys.reader.password.ConfigKeyResourcePassw
 import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup;
 import be.atbash.ee.security.octopus.keys.selector.SelectorCriteria;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
+import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import uk.org.lidalia.slf4jtest.LoggingEvent;
+import uk.org.lidalia.slf4jtest.TestLogger;
+import uk.org.lidalia.slf4jtest.TestLoggerFactory;
 
 import java.util.List;
 
@@ -47,6 +51,8 @@ public class JwtSupportConfigurationTest {
 
     private JwtSupportConfiguration configuration;
 
+    private TestLogger logger = TestLoggerFactory.getTestLogger(JwtSupportConfiguration.class);
+
     @BeforeEach
     public void setup() {
         configuration = new JwtSupportConfiguration();
@@ -56,6 +62,7 @@ public class JwtSupportConfigurationTest {
     @AfterEach
     public void cleanup() {
         TestConfig.resetConfig();
+        logger.clear();
     }
 
     @Test
@@ -287,6 +294,54 @@ public class JwtSupportConfigurationTest {
     public void getJWKSetCachePeriod_invalid() {
         TestConfig.addConfigValue("jwt.remote.jwk.cache.period", "abc");
         Assertions.assertThrows(ConfigurationException.class, () -> configuration.getJWKSetCachePeriod());
+    }
+
+    @Test
+    public void getReaderOrder() {
+        // The Default Order
+        List<KeyResourceType> order = configuration.getReaderOrder();
+        assertThat(order).containsExactly(KeyResourceType.JWKSET, KeyResourceType.JWK, KeyResourceType.PEM, KeyResourceType.KEYSTORE);
+        assertThat(logger.getLoggingEvents()).isEmpty();
+    }
+
+    @Test
+    public void getReaderOrder_custom() {
+        // some order
+        TestConfig.addConfigValue("jwt.reader.order", "PEM, JWK, JWKSET, KEYSTORE");
+        List<KeyResourceType> order = configuration.getReaderOrder();
+        assertThat(order).containsExactly(KeyResourceType.PEM, KeyResourceType.JWK, KeyResourceType.JWKSET, KeyResourceType.KEYSTORE);
+        assertThat(logger.getLoggingEvents()).isEmpty();
+    }
+
+    @Test
+    public void getReaderOrder_wrong_values() {
+        // some order
+        TestConfig.addConfigValue("jwt.reader.order", "just, some, values");
+        List<KeyResourceType> order = configuration.getReaderOrder();
+
+        assertThat(order).containsExactly(KeyResourceType.JWKSET, KeyResourceType.JWK, KeyResourceType.PEM, KeyResourceType.KEYSTORE);
+        ImmutableList<LoggingEvent> events = logger.getLoggingEvents();
+        assertThat(events).hasSize(4);
+        assertThat(events.get(0).getMessage()).isEqualTo("Parameter 'jwt.reader.order' must contain only values of 'KeyResourceType' but found 'just'.");
+        assertThat(events.get(3).getMessage()).isEqualTo("Parameter 'jwt.reader.order' resulted in an empty list. Taken the default order.");
+    }
+
+    @Test
+    public void getReaderOrder_caseInsensitive() {
+        // some order
+        TestConfig.addConfigValue("jwt.reader.order", "JwkSet");
+        List<KeyResourceType> order = configuration.getReaderOrder();
+        assertThat(order).containsExactly(KeyResourceType.JWKSET);
+        assertThat(logger.getLoggingEvents()).isEmpty();
+    }
+
+    @Test
+    public void getReaderOrder_noCheckOnDoubles() {
+        // some order
+        TestConfig.addConfigValue("jwt.reader.order", "JwkSet, JWKSET");
+        List<KeyResourceType> order = configuration.getReaderOrder();
+        assertThat(order).containsExactly(KeyResourceType.JWKSET, KeyResourceType.JWKSET);
+        assertThat(logger.getLoggingEvents()).isEmpty();
     }
 
     public static class TestKeyManager implements KeyManager {

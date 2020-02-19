@@ -43,7 +43,7 @@ public class KeyReaderJWKSetTest {
     @Test
     public void parseContent() {
 
-        List<AtbashKey> keys = reader.parseContent(null, new TestPasswordLookup(), data);
+        List<AtbashKey> keys = reader.parseContent(data, null, new TestPasswordLookup());
 
         assertThat(keys).hasSize(4);
 
@@ -62,7 +62,7 @@ public class KeyReaderJWKSetTest {
     @Test
     public void parseContent2() {
 
-        List<AtbashKey> keys = reader.parseContent(null, null, data2);
+        List<AtbashKey> keys = reader.parseContent(data2, null, null);
         assertThat(keys).hasSize(1);
 
         AtbashKey atbashKey = keys.get(0);
@@ -74,7 +74,7 @@ public class KeyReaderJWKSetTest {
     @Test
     public void parseContent3() {
 
-        List<AtbashKey> keys = reader.parseContent(null, null, data3);
+        List<AtbashKey> keys = reader.parseContent(data3, null, null);
         assertThat(keys).hasSize(1);
 
         AtbashKey atbashKey = keys.get(0);

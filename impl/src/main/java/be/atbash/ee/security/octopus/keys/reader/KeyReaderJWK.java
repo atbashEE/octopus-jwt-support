@@ -31,6 +31,7 @@ import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 import javax.json.bind.Jsonb;
+import javax.json.stream.JsonParsingException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.PrivateKey;
@@ -79,7 +80,13 @@ public class KeyReaderJWK {
     protected List<AtbashKey> parse(String json, String path, KeyResourcePasswordLookup passwordLookup) throws ParseException {
 
         Jsonb jsonb = JsonbUtil.getJsonb();
-        JsonObject jwkJsonObject = jsonb.fromJson(json, JsonObject.class);
+        JsonObject jwkJsonObject;
+        try {
+            jwkJsonObject = jsonb.fromJson(json, JsonObject.class);
+        } catch (JsonParsingException e) {
+            // Not a JSON, but as this can be part of 'testing' out which type it is.
+            return new ArrayList<>();
+        }
 
         JWK jwk;
         if (jwkJsonObject.get("enc") == null) {

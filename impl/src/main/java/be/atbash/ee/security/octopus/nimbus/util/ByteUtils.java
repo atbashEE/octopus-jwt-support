@@ -18,6 +18,7 @@ package be.atbash.ee.security.octopus.nimbus.util;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 
 /**
@@ -150,5 +151,28 @@ public final class ByteUtils {
     public static int byteLength(int bitLength) {
 
         return bitLength / 8;
+    }
+
+    /**
+     * Read all bytes from the inputstream. The stream is closed after it is fully read.
+     *
+     * @param inputStream The stream to read from
+     * @return The byte array contained in the stream.
+     * @throws IOException
+     */
+    public static byte[] readAllBytes(InputStream inputStream) throws IOException {
+        final int bufLen = 4 * 0x400; // 4KB
+        byte[] buf = new byte[bufLen];
+        int readLen;
+
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            while ((readLen = inputStream.read(buf, 0, bufLen)) != -1) {
+                outputStream.write(buf, 0, readLen);
+            }
+
+            return outputStream.toByteArray();
+        } finally {
+            inputStream.close();
+        }
     }
 }
