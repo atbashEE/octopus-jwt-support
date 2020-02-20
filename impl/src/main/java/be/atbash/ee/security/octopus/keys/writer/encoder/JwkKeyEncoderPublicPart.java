@@ -26,8 +26,6 @@ import org.bouncycastle.asn1.*;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.security.interfaces.ECPublicKey;
-import java.security.interfaces.RSAPublicKey;
 
 
 /**
@@ -53,7 +51,7 @@ public class JwkKeyEncoderPublicPart implements KeyEncoder {
     }
 
     private byte[] encodeRSAKey(AtbashKey atbashKey) {
-        RSAKey rsaKey = new RSAKey.Builder((RSAPublicKey) atbashKey.getKey()).keyID(atbashKey.getKeyId())
+        RSAKey rsaKey = new RSAKey.Builder(atbashKey).keyID(atbashKey.getKeyId())
                 .build();
 
         return rsaKey.toJSONObject().build().toString().getBytes(StandardCharsets.UTF_8);
@@ -65,7 +63,7 @@ public class JwkKeyEncoderPublicPart implements KeyEncoder {
             throw new AtbashUnexpectedException(String.format("Unable to determine EC Curve of %s", atbashKey.getKeyId()));
         }
 
-        ECKey ecKey = new ECKey.Builder(curve, (ECPublicKey) atbashKey.getKey()).keyID(atbashKey.getKeyId())
+        ECKey ecKey = new ECKey.Builder(curve, atbashKey).keyID(atbashKey.getKeyId())
                 .build();
 
         return ecKey.toJSONObject().build().toString().getBytes(StandardCharsets.UTF_8);

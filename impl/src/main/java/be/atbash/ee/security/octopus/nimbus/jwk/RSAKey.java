@@ -17,8 +17,11 @@ package be.atbash.ee.security.octopus.nimbus.jwk;
 
 
 import be.atbash.ee.security.octopus.exception.InvalidKeyException;
+import be.atbash.ee.security.octopus.keys.AtbashKey;
+import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.nimbus.jose.Algorithm;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
+import be.atbash.ee.security.octopus.nimbus.jose.KeyTypeException;
 import be.atbash.ee.security.octopus.nimbus.util.*;
 
 import javax.json.*;
@@ -457,7 +460,6 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
             e = Base64URLValue.encode(pub.getPublicExponent());
         }
 
-
         /**
          * Creates a new RSA JWK builder.
          *
@@ -486,6 +488,24 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
             keystore = rsaJWK.getKeyStore();
         }
 
+        /**
+         * Creates a new RSA JWK builder.
+         *
+         * @param atbashKey The RSA public key as AtbashKey top start with.
+         */
+        public Builder(AtbashKey atbashKey) {
+            this(getRSAPublicKey(atbashKey));
+        }
+
+        private static RSAPublicKey getRSAPublicKey(AtbashKey atbashKey) {
+            if (atbashKey.getSecretKeyType().getKeyType() != KeyType.RSA) {
+                throw new KeyTypeException(atbashKey.getSecretKeyType().getKeyType(), "RSAKey creation");
+            }
+            if (atbashKey.getSecretKeyType().getAsymmetricPart() != AsymmetricPart.PUBLIC) {
+                throw new KeyTypeException(AsymmetricPart.PUBLIC, "RSAKey creation");
+            }
+            return (RSAPublicKey) atbashKey.getKey();
+        }
 
         /**
          * Sets the private exponent ({@code d}) of the RSA key.

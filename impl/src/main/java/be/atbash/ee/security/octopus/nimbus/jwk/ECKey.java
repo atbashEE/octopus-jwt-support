@@ -17,8 +17,11 @@ package be.atbash.ee.security.octopus.nimbus.jwk;
 
 
 import be.atbash.ee.security.octopus.exception.InvalidKeyException;
+import be.atbash.ee.security.octopus.keys.AtbashKey;
+import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.nimbus.jose.Algorithm;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
+import be.atbash.ee.security.octopus.nimbus.jose.KeyTypeException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.bc.BouncyCastleProviderSingleton;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.utils.ECChecks;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
@@ -264,6 +267,19 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
                     encodeCoordinate(pub.getParams().getCurve().getField().getFieldSize(), pub.getW().getAffineY()));
         }
 
+        public Builder(Curve crv, AtbashKey key) {
+            this(crv, getECPublicKey(key));
+        }
+
+        private static ECPublicKey getECPublicKey(AtbashKey atbashKey) {
+            if (atbashKey.getSecretKeyType().getKeyType() != KeyType.EC) {
+                throw new KeyTypeException(atbashKey.getSecretKeyType().getKeyType(), "ECKey creation");
+            }
+            if (atbashKey.getSecretKeyType().getAsymmetricPart() != AsymmetricPart.PUBLIC) {
+                throw new KeyTypeException(AsymmetricPart.PUBLIC, "ECKey creation");
+            }
+            return (ECPublicKey) atbashKey.getKey();
+        }
 
         /**
          * Creates a new Elliptic Curve JWK builder.

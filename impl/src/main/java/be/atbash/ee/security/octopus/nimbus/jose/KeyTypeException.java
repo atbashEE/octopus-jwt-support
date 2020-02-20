@@ -27,7 +27,7 @@ public class KeyTypeException extends AtbashException {
     /**
      * Creates a new key type exception.
      *
-     * @param keyType The expected key type
+     * @param keyType The key type
      * @param action  The action which is performed
      */
     public KeyTypeException(KeyType keyType, String action) {
@@ -37,11 +37,11 @@ public class KeyTypeException extends AtbashException {
     /**
      * Creates a new key type exception.
      *
-     * @param asymmetricPart The expected type of key
-     * @param action         The action which is performed
+     * @param expectedAsymmetricPart The expected type of key
+     * @param action                 The action which is performed
      */
-    public KeyTypeException(AsymmetricPart asymmetricPart, String action) {
-        super(String.format("%s key required for %s", asymmetricPart.name(), action));
+    public KeyTypeException(AsymmetricPart expectedAsymmetricPart, String action) {
+        super(String.format("%s key required for %s", expectedAsymmetricPart.name(), action));
     }
 
     /**

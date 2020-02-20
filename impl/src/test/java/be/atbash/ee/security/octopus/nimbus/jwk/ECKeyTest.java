@@ -16,9 +16,14 @@
 package be.atbash.ee.security.octopus.nimbus.jwk;
 
 
+import be.atbash.ee.security.octopus.keys.AtbashKey;
+import be.atbash.ee.security.octopus.keys.TestKeys;
+import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
+import be.atbash.ee.security.octopus.keys.selector.filter.AsymmetricPartKeyFilter;
 import be.atbash.ee.security.octopus.nimbus.IOUtil;
 import be.atbash.ee.security.octopus.nimbus.SampleCertificates;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
+import be.atbash.ee.security.octopus.nimbus.jose.KeyTypeException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.bc.BouncyCastleProviderSingleton;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
@@ -1142,5 +1147,32 @@ public class ECKeyTest {
 
         //Then
         assertThat(ecKeyA).isNotEqualTo(ecKeyB);
+    }
+
+
+    @Test
+    public void testBuilderWithAtbashKey() {
+        List<AtbashKey> keys = TestKeys.generateECKeys("kid");
+        List<AtbashKey> publicKey = new AsymmetricPartKeyFilter(AsymmetricPart.PUBLIC).filter(keys);
+        ECKey ecKey = new ECKey.Builder(Curve.P_256, publicKey.get(0)).build();
+        assertThat(ecKey).isNotNull();
+    }
+
+    @Test
+    public void testBuilderWithAtbashKey_WrongType() {
+        List<AtbashKey> keys = TestKeys.generateECKeys("kid");
+        List<AtbashKey> publicKey = new AsymmetricPartKeyFilter(AsymmetricPart.PRIVATE).filter(keys);
+        KeyTypeException exception = Assertions.assertThrows(KeyTypeException.class, () -> new ECKey.Builder(Curve.P_256, publicKey.get(0)).build());
+        assertThat(exception.getMessage()).isEqualTo("PUBLIC key required for ECKey creation");
+
+    }
+
+    @Test
+    public void testBuilderWithAtbashKey_WrongKey() {
+        List<AtbashKey> keys = TestKeys.generateRSAKeys("kid");
+        List<AtbashKey> publicKey = new AsymmetricPartKeyFilter(AsymmetricPart.PUBLIC).filter(keys);
+        KeyTypeException exception = Assertions.assertThrows(KeyTypeException.class, () -> new ECKey.Builder(Curve.P_256, publicKey.get(0)).build());
+        assertThat(exception.getMessage()).isEqualTo("Unsupported KeyType RSA for ECKey creation");
+
     }
 }

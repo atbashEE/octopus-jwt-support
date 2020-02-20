@@ -16,8 +16,10 @@
 package be.atbash.ee.security.octopus.nimbus.jwk;
 
 
+import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.nimbus.jose.Algorithm;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
+import be.atbash.ee.security.octopus.nimbus.jose.KeyTypeException;
 import be.atbash.ee.security.octopus.nimbus.util.*;
 
 import javax.crypto.SecretKey;
@@ -185,6 +187,25 @@ public final class OctetSequenceKey extends JWK implements SecretJWK {
             this(secretKey.getEncoded());
         }
 
+
+        /**
+         * Creates a new octet sequence JWK builder.
+         *
+         * @param key The AtbashKey to represent. Must not be
+         *            {@code null}.
+         */
+        public Builder(AtbashKey key) {
+
+            this(getSecretKey(key));
+        }
+
+        private static SecretKey getSecretKey(AtbashKey atbashKey) {
+            if (atbashKey.getSecretKeyType().getKeyType() != KeyType.OCT) {
+                throw new KeyTypeException(atbashKey.getSecretKeyType().getKeyType(), "OctetSequenceKey creation");
+            }
+
+            return (SecretKey) atbashKey.getKey();
+        }
 
         /**
          * Sets the use ({@code use}) of the JWK.

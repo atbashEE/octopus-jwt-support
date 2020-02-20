@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ public class JwkKeyEncoderSymmetric implements KeyEncoder {
     @Override
     public byte[] encodeKey(AtbashKey atbashKey, KeyEncoderParameters parameters) {
 
-        OctetSequenceKey octKey = new OctetSequenceKey.Builder((SecretKey) atbashKey.getKey()).keyID(atbashKey.getKeyId())
+        OctetSequenceKey octKey = new OctetSequenceKey.Builder(atbashKey).keyID(atbashKey.getKeyId())
                 .build();
 
         return octKey.toJSONObject().build().toString().getBytes(StandardCharsets.UTF_8);

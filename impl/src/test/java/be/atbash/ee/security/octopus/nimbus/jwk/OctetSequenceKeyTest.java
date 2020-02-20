@@ -16,7 +16,10 @@
 package be.atbash.ee.security.octopus.nimbus.jwk;
 
 
+import be.atbash.ee.security.octopus.keys.AtbashKey;
+import be.atbash.ee.security.octopus.keys.TestKeys;
 import be.atbash.ee.security.octopus.nimbus.SampleCertificates;
+import be.atbash.ee.security.octopus.nimbus.jose.KeyTypeException;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
@@ -585,4 +588,22 @@ public class OctetSequenceKeyTest {
         assertThat(jwkA).isNotEqualTo(jwkB);
 
     }
+
+    @Test
+    public void testBuilderWithAtbashKey() {
+        List<AtbashKey> keys = TestKeys.generateOCTKeys("kid");
+
+        OctetSequenceKey key = new OctetSequenceKey.Builder(keys.get(0)).build();
+        assertThat(key).isNotNull();
+    }
+
+    @Test
+    public void testBuilderWithAtbashKey_WrongKey() {
+        List<AtbashKey> keys = TestKeys.generateRSAKeys("kid");
+        KeyTypeException exception = Assertions.assertThrows(KeyTypeException.class, () -> new OctetSequenceKey.Builder(keys.get(0)).build());
+        assertThat(exception.getMessage()).isEqualTo("Unsupported KeyType RSA for OctetSequenceKey creation");
+
+    }
+
+
 }
