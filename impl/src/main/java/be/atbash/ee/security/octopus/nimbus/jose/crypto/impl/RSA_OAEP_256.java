@@ -53,10 +53,8 @@ public final class RSA_OAEP_256 {
      * @param cek The Content Encryption Key (CEK) to encrypt. Must
      *            not be {@code null}.
      * @return The encrypted Content Encryption Key (CEK).
-     * @throws JOSEException If encryption failed.
      */
-    public static byte[] encryptCEK(RSAPublicKey pub, SecretKey cek)
-            throws JOSEException {
+    public static byte[] encryptCEK(RSAPublicKey pub, SecretKey cek) {
 
         try {
             AlgorithmParameters algp = AlgorithmParametersHelper.getInstance("OAEP");
@@ -85,11 +83,9 @@ public final class RSA_OAEP_256 {
      * @param encryptedCEK The encrypted Content Encryption Key (CEK) to
      *                     decrypt. Must not be {@code null}.
      * @return The decrypted Content Encryption Key (CEK).
-     * @throws JOSEException If decryption failed.
      */
     public static SecretKey decryptCEK(PrivateKey priv,
-                                       byte[] encryptedCEK)
-            throws JOSEException {
+                                       byte[] encryptedCEK) {
 
         try {
             AlgorithmParameters algp = AlgorithmParametersHelper.getInstance("OAEP");

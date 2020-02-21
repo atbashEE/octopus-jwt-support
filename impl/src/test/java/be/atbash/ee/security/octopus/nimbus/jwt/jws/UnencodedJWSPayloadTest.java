@@ -65,8 +65,7 @@ public class UnencodedJWSPayloadTest {
     }
 
     @Test
-    public void testControlJWS()
-            throws Exception {
+    public void testControlJWS() {
 
         JWSObject jwsObject = new JWSObject(new JWSHeader(JWSAlgorithm.HS256), new Payload("$.02"));
         jwsObject.sign(new MACSigner(JWK));

@@ -108,10 +108,8 @@ public abstract class ECDHCryptoProvider extends BaseJWEProvider {
      *
      * @param curve The elliptic curve. Must be supported and not
      *              {@code null}.
-     * @throws JOSEException If the elliptic curve is not supported.
      */
-    protected ECDHCryptoProvider(Curve curve)
-            throws JOSEException {
+    protected ECDHCryptoProvider(Curve curve) {
 
         super(SUPPORTED_ALGORITHMS, ContentCryptoProvider.SUPPORTED_ENCRYPTION_METHODS);
 
@@ -162,8 +160,7 @@ public abstract class ECDHCryptoProvider extends BaseJWEProvider {
      * Encrypts the specified plaintext using the specified shared secret
      * ("Z").
      */
-    protected JWECryptoParts encryptWithZ(JWEHeader header, SecretKey Z, byte[] clearText)
-            throws JOSEException {
+    protected JWECryptoParts encryptWithZ(JWEHeader header, SecretKey Z, byte[] clearText) {
 
         return encryptWithZ(header, Z, clearText, null);
     }
@@ -175,8 +172,7 @@ public abstract class ECDHCryptoProvider extends BaseJWEProvider {
     protected JWECryptoParts encryptWithZ(JWEHeader header,
                                           SecretKey Z,
                                           byte[] clearText,
-                                          SecretKey contentEncryptionKey)
-            throws JOSEException {
+                                          SecretKey contentEncryptionKey) {
 
         JWEAlgorithm alg = header.getAlgorithm();
         ECDH.AlgorithmMode algMode = ECDH.resolveAlgorithmMode(alg);
@@ -214,8 +210,7 @@ public abstract class ECDHCryptoProvider extends BaseJWEProvider {
                                   Base64URLValue encryptedKey,
                                   Base64URLValue iv,
                                   Base64URLValue cipherText,
-                                  Base64URLValue authTag)
-            throws JOSEException {
+                                  Base64URLValue authTag) {
 
         JWEAlgorithm alg = header.getAlgorithm();
         ECDH.AlgorithmMode algMode = ECDH.resolveAlgorithmMode(alg);

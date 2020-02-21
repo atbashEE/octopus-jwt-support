@@ -83,10 +83,8 @@ public final class PRFParams {
      * @param alg The JWE algorithm. Must be supported and not
      *            {@code null}.
      * @return The PRF parameters.
-     * @throws JOSEException If the JWE algorithm is not supported.
      */
-    public static PRFParams resolve(JWEAlgorithm alg)
-            throws JOSEException {
+    public static PRFParams resolve(JWEAlgorithm alg) {
 
         String jcaMacAlg;
         int dkLen;

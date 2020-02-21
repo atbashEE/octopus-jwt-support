@@ -19,8 +19,6 @@ import be.atbash.ee.security.octopus.exception.MissingPasswordLookupException;
 import be.atbash.ee.security.octopus.exception.ResourceNotFoundException;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup;
-import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
-import be.atbash.ee.security.octopus.nimbus.jose.crypto.bc.BouncyCastleProviderSingleton;
 import be.atbash.ee.security.octopus.nimbus.jwk.*;
 import be.atbash.ee.security.octopus.util.EncryptionHelper;
 import be.atbash.ee.security.octopus.util.JsonbUtil;

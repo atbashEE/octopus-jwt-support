@@ -74,9 +74,8 @@ public class Ed25519Signer extends EdDSAProvider implements JWSSigner {
 	 *
 	 * @param privateKey The private key. Must be non-{@code null}, and must
 	 *                   be of type Ed25519 ({@code "crv": "Ed25519"}).
-	 * @throws JOSEException If the key subtype is not supported or if the key is not a private key
 	 */
-	public Ed25519Signer(BCEdDSAPrivateKey privateKey) throws JOSEException {
+	public Ed25519Signer(BCEdDSAPrivateKey privateKey) {
 
 		if (!Curve.Ed25519.getName().equals(privateKey.getAlgorithm())) {
 			throw new JOSEException("Ed25519Signer only supports OctetKeyPairs with crv=Ed25519");
@@ -91,13 +90,12 @@ public class Ed25519Signer extends EdDSAProvider implements JWSSigner {
 	/**
 	 * Creates a new Ed25519 signer.
 	 *
-     * @param atbashKey The private key. Must be non-{@code null}, and must
-     *                   be of type Ed25519 ({@code "crv": "Ed25519"}).
-     * @throws JOSEException If the key subtype is not supported or if the key is not a private key
-     */
-    public Ed25519Signer(AtbashKey atbashKey) throws JOSEException {
+	 * @param atbashKey The private key. Must be non-{@code null}, and must
+	 *                  be of type Ed25519 ({@code "crv": "Ed25519"}).
+	 */
+	public Ed25519Signer(AtbashKey atbashKey) {
 
-        this(getPrivateKey(atbashKey));
+		this(getPrivateKey(atbashKey));
 
     }
 
@@ -134,8 +132,7 @@ public class Ed25519Signer extends EdDSAProvider implements JWSSigner {
 
 
 	@Override
-	public Base64URLValue sign(JWSHeader header, byte[] signingInput)
-			throws JOSEException {
+	public Base64URLValue sign(JWSHeader header, byte[] signingInput) {
 
 		// Check alg field in header
 		JWSAlgorithm alg = header.getAlgorithm();

@@ -112,10 +112,8 @@ public class ECDHDecrypter extends ECDHCryptoProvider implements JWEDecrypter {
      * Creates a new Elliptic Curve Diffie-Hellman decrypter.
      *
      * @param privateKey The private EC key. Must not be {@code null}.
-     * @throws JOSEException If the elliptic curve is not supported.
      */
-    public ECDHDecrypter(ECPrivateKey privateKey)
-            throws JOSEException {
+    public ECDHDecrypter(ECPrivateKey privateKey) {
 
         this(privateKey, null);
     }
@@ -126,10 +124,8 @@ public class ECDHDecrypter extends ECDHCryptoProvider implements JWEDecrypter {
      *
      * @param ecJWK The EC JSON Web Key (JWK). Must contain a private
      *              part. Must not be {@code null}.
-     * @throws JOSEException If the elliptic curve is not supported.
      */
-    public ECDHDecrypter(ECKey ecJWK)
-            throws JOSEException {
+    public ECDHDecrypter(ECKey ecJWK) {
 
         super(ecJWK.getCurve());
 
@@ -148,10 +144,8 @@ public class ECDHDecrypter extends ECDHCryptoProvider implements JWEDecrypter {
      * @param defCritHeaders The names of the critical header parameters
      *                       that are deferred to the application for
      *                       processing, empty set or {@code null} if none.
-     * @throws JOSEException If the elliptic curve is not supported.
      */
-    public ECDHDecrypter(ECPrivateKey privateKey, final Set<String> defCritHeaders)
-            throws JOSEException {
+    public ECDHDecrypter(ECPrivateKey privateKey, final Set<String> defCritHeaders) {
 
         this(privateKey, defCritHeaders, Curve.forECParameterSpec(privateKey.getParams()));
     }
@@ -168,12 +162,10 @@ public class ECDHDecrypter extends ECDHCryptoProvider implements JWEDecrypter {
      *                       that are deferred to the application for
      *                       processing, empty set or {@code null} if none.
      * @param curve          The key curve. Must not be {@code null}.
-     * @throws JOSEException If the elliptic curve is not supported.
      */
     public ECDHDecrypter(PrivateKey privateKey,
                          Set<String> defCritHeaders,
-                         Curve curve)
-            throws JOSEException {
+                         Curve curve) {
 
         super(curve);
 
@@ -221,8 +213,7 @@ public class ECDHDecrypter extends ECDHCryptoProvider implements JWEDecrypter {
                           Base64URLValue encryptedKey,
                           Base64URLValue iv,
                           Base64URLValue cipherText,
-                          Base64URLValue authTag)
-            throws JOSEException {
+                          Base64URLValue authTag) {
 
         critPolicy.ensureHeaderPasses(header);
 

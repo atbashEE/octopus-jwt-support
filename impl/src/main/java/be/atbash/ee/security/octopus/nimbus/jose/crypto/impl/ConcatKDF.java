@@ -82,12 +82,10 @@ public class ConcatKDF {
      * @param keyLengthBits The length of the key to derive, in bits.
      * @param otherInfo     Other info, {@code null} if not specified.
      * @return The derived key, with algorithm set to "AES".
-     * @throws JOSEException If the key derivation failed.
      */
     public SecretKey deriveKey(SecretKey sharedSecret,
                                int keyLengthBits,
-                               byte[] otherInfo)
-            throws JOSEException {
+                               byte[] otherInfo) {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
@@ -136,7 +134,6 @@ public class ConcatKDF {
      * @param suppPubInfo  The suppPubInfo, {@code null} if not specified.
      * @param suppPrivInfo The suppPrivInfo, {@code null} if not specified.
      * @return The derived key, with algorithm set to "AES".
-     * @throws JOSEException If the key derivation failed.
      */
     public SecretKey deriveKey(SecretKey sharedSecret,
                                int keyLength,
@@ -144,8 +141,7 @@ public class ConcatKDF {
                                byte[] partyUInfo,
                                byte[] partyVInfo,
                                byte[] suppPubInfo,
-                               byte[] suppPrivInfo)
-            throws JOSEException {
+                               byte[] suppPrivInfo) {
 
         byte[] otherInfo = composeOtherInfo(algID, partyUInfo, partyVInfo, suppPubInfo, suppPrivInfo);
 
@@ -180,11 +176,8 @@ public class ConcatKDF {
      * {@link #jcaHashAlg hash algorithm}.
      *
      * @return The message digest instance.
-     * @throws JOSEException If the message digest algorithm is not
-     *                       supported by the underlying JCA provider.
      */
-    private MessageDigest getMessageDigest()
-            throws JOSEException {
+    private MessageDigest getMessageDigest() {
 
         try {
             return MessageDigest.getInstance(jcaHashAlg, BouncyCastleProviderSingleton.getInstance());

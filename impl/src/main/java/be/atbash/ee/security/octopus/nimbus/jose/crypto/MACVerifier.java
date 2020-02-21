@@ -16,7 +16,6 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto;
 
 
-import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.CriticalHeaderParamsDeferral;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.HMAC;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.MACProvider;
@@ -68,11 +67,8 @@ public class MACVerifier extends MACProvider implements JWSVerifier {
      *
      * @param secret The secret. Must be at least 256 bits long and not
      *               {@code null}.
-     * @throws JOSEException If the secret length is shorter than the
-     *                       minimum 256-bit requirement.
      */
-    public MACVerifier(byte[] secret)
-            throws JOSEException {
+    public MACVerifier(byte[] secret) {
 
         this(secret, null);
     }
@@ -83,11 +79,8 @@ public class MACVerifier extends MACProvider implements JWSVerifier {
      *
      * @param secretString The secret as a UTF-8 encoded string. Must be at
      *                     least 256 bits long and not {@code null}.
-     * @throws JOSEException If the secret length is shorter than the
-     *                       minimum 256-bit requirement.
      */
-    public MACVerifier(String secretString)
-            throws JOSEException {
+    public MACVerifier(String secretString) {
 
         this(secretString.getBytes(UTF_8));
     }
@@ -98,11 +91,8 @@ public class MACVerifier extends MACProvider implements JWSVerifier {
      *
      * @param secretKey The secret key. Must be at least 256 bits long and
      *                  not {@code null}.
-     * @throws JOSEException If the secret length is shorter than the
-     *                       minimum 256-bit requirement.
      */
-    public MACVerifier(SecretKey secretKey)
-            throws JOSEException {
+    public MACVerifier(SecretKey secretKey) {
 
         this(secretKey.getEncoded());
     }
@@ -113,11 +103,8 @@ public class MACVerifier extends MACProvider implements JWSVerifier {
      *
      * @param jwk The secret as a JWK. Must be at least 256 bits long and
      *            not {@code null}.
-     * @throws JOSEException If the secret length is shorter than the
-     *                       minimum 256-bit requirement.
      */
-    public MACVerifier(OctetSequenceKey jwk)
-            throws JOSEException {
+    public MACVerifier(OctetSequenceKey jwk) {
 
         this(jwk.toByteArray());
     }
@@ -131,12 +118,9 @@ public class MACVerifier extends MACProvider implements JWSVerifier {
      * @param defCritHeaders The names of the critical header parameters
      *                       that are deferred to the application for
      *                       processing, empty set or {@code null} if none.
-     * @throws JOSEException If the secret length is shorter than the
-     *                       minimum 256-bit requirement.
      */
     public MACVerifier(OctetSequenceKey jwk,
-                       Set<String> defCritHeaders)
-            throws JOSEException {
+                       Set<String> defCritHeaders) {
 
         this(jwk.toByteArray(), defCritHeaders);
     }
@@ -149,12 +133,9 @@ public class MACVerifier extends MACProvider implements JWSVerifier {
      * @param defCritHeaders The names of the critical header parameters
      *                       that are deferred to the application for
      *                       processing, empty set or {@code null} if none.
-     * @throws JOSEException If the secret length is shorter than the
-     *                       minimum 256-bit requirement.
      */
     public MACVerifier(byte[] secret,
-                       Set<String> defCritHeaders)
-            throws JOSEException {
+                       Set<String> defCritHeaders) {
 
         super(secret, SUPPORTED_ALGORITHMS);
 
@@ -175,8 +156,7 @@ public class MACVerifier extends MACProvider implements JWSVerifier {
     @Override
     public boolean verify(JWSHeader header,
                           byte[] signedContent,
-                          Base64URLValue signature)
-            throws JOSEException {
+                          Base64URLValue signature) {
 
         if (!critPolicy.headerPasses(header)) {
             return false;

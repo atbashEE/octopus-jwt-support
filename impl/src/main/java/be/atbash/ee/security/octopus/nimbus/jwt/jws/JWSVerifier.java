@@ -16,7 +16,6 @@
 package be.atbash.ee.security.octopus.nimbus.jwt.jws;
 
 
-import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 
 /**
@@ -41,10 +40,6 @@ public interface JWSVerifier extends JWSProvider {
      * {@code false} if the signature is invalid or if a critical
      * header is neither supported nor marked for deferral to the
      * application.
-     * @throws JOSEException If the JWS algorithm is not supported, or if
-     *                       signature verification failed for some other
-     *                       internal reason.
      */
-    boolean verify(JWSHeader header, byte[] signingInput, Base64URLValue signature)
-            throws JOSEException;
+    boolean verify(JWSHeader header, byte[] signingInput, Base64URLValue signature);
 }

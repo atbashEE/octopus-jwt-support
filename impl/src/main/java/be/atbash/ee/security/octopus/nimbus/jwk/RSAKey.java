@@ -795,11 +795,8 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
          * parameter value.
          *
          * @return This builder.
-         * @throws JOSEException If the SHA-256 hash algorithm is not
-         *                       supported.
          */
-        public Builder keyIDFromThumbprint()
-                throws JOSEException {
+        public Builder keyIDFromThumbprint() {
 
             return keyIDFromThumbprint("SHA-256");
         }
@@ -815,11 +812,8 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
          * @param hashAlg The hash algorithm for the JWK thumbprint
          *                computation. Must not be {@code null}.
          * @return This builder.
-         * @throws JOSEException If the hash algorithm is not
-         *                       supported.
          */
-        public Builder keyIDFromThumbprint(String hashAlg)
-                throws JOSEException {
+        public Builder keyIDFromThumbprint(String hashAlg) {
 
             // Put mandatory params in sorted order
             LinkedHashMap<String, String> requiredParams = new LinkedHashMap<>();
@@ -1632,9 +1626,6 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
      * representation of this RSA JWK.
      *
      * @return The public RSA key.
-     * @throws InvalidKeyException If RSA is not supported by the underlying Java
-     *                             Cryptography (JCA) provider or if the JWK
-     *                             parameters are invalid for a public RSA key.
      */
     public RSAPublicKey toRSAPublicKey() {
 
@@ -1661,9 +1652,6 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
      *
      * @return The private RSA key, {@code null} if not specified by this
      * JWK.
-     * @throws InvalidKeyException If RSA is not supported by the underlying Java
-     *                             Cryptography (JCA) provider or if the JWK
-     *                             parameters are invalid for a private RSA key.
      */
     public RSAPrivateKey toRSAPrivateKey() {
 
@@ -1769,10 +1757,6 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
      *
      * @return The RSA key pair. The private RSA key will be {@code null}
      * if not specified.
-     * @throws InvalidKeyException If RSA is not supported by the underlying Java
-     *                             Cryptography (JCA) provider or if the JWK
-     *                             parameters are invalid for a public and / or
-     *                             private RSA key.
      */
     @Override
     public KeyPair toKeyPair() {
@@ -2016,10 +2000,8 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
      *
      * @param cert The X.509 certificate. Must not be {@code null}.
      * @return The public RSA key.
-     * @throws JOSEException If parsing failed.
      */
-    public static RSAKey parse(X509Certificate cert)
-            throws JOSEException {
+    public static RSAKey parse(X509Certificate cert) {
 
         if (!(cert.getPublicKey() instanceof RSAPublicKey)) {
             throw new JOSEException("The public key of the X.509 certificate is not RSA");
@@ -2057,12 +2039,11 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
      * @return The public / private RSA key, {@code null} if no key with
      * the specified alias was found.
      * @throws KeyStoreException On a key store exception.
-     * @throws JOSEException     If RSA key loading failed.
      */
     public static RSAKey load(KeyStore keyStore,
                               String alias,
                               char[] pin)
-            throws KeyStoreException, JOSEException {
+            throws KeyStoreException {
 
         java.security.cert.Certificate cert = keyStore.getCertificate(alias);
 

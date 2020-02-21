@@ -75,7 +75,6 @@ public class DefaultJWTProcessorTest {
         logger.clear();
     }
 
-
     @Test
     public void testConstructor() throws NoSuchFieldException {
 
@@ -129,7 +128,7 @@ public class DefaultJWTProcessorTest {
 
 
     @Test
-    public void testVerifyClaimsDeny() throws Exception {
+    public void testVerifyClaimsDeny() {
 
         JWTClaimsSet claims = new JWTClaimsSet.Builder()
                 .issuer("https://test.c2id.com")
@@ -165,7 +164,7 @@ public class DefaultJWTProcessorTest {
 
 
     @Test
-    public void testProcessInvalidHmac() throws Exception {
+    public void testProcessInvalidHmac() {
 
         JWTClaimsSet claims = new JWTClaimsSet.Builder().subject("alice").build();
         SignedJWT jwt = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), claims);
@@ -192,7 +191,7 @@ public class DefaultJWTProcessorTest {
     }
 
     @Test
-    public void testProcessHmac() throws Exception {
+    public void testProcessHmac() {
 
         JWTClaimsSet claims = new JWTClaimsSet.Builder().subject("alice").build();
         SignedJWT jwt = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), claims);
@@ -215,7 +214,7 @@ public class DefaultJWTProcessorTest {
     }
 
     @Test
-    public void testProcessAES() throws Exception {
+    public void testProcessAES() {
 
         JWTClaimsSet claims = new JWTClaimsSet.Builder().subject("alice").build();
         SignedJWT jwt = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), claims);
@@ -547,7 +546,7 @@ public class DefaultJWTProcessorTest {
     }
 
     @Test
-    public void testJWTExpired() throws Exception {
+    public void testJWTExpired() {
 
         Date now = new Date();
         Date yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
@@ -741,7 +740,7 @@ public class DefaultJWTProcessorTest {
 
 
     @Test
-    public void testNestedWithPlainJWT() throws Exception {
+    public void testNestedWithPlainJWT() {
 
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder().subject("alice").build();
         PlainJWT plainJWT = new PlainJWT(claimsSet);

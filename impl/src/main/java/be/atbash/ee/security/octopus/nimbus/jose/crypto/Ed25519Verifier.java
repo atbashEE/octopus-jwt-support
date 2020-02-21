@@ -77,27 +77,23 @@ public class Ed25519Verifier extends EdDSAProvider implements JWSVerifier {
 
 
 	/**
-	 * Creates a new Ed25519 verifier.
-	 *
-	 * @param publicKey The public Ed25519 key. Must not be {@code null}.
-	 * @throws JOSEException If the key subtype is not supported
-	 */
-	public Ed25519Verifier(BCEdDSAPublicKey publicKey)
-			throws JOSEException {
+     * Creates a new Ed25519 verifier.
+     *
+     * @param publicKey The public Ed25519 key. Must not be {@code null}.
+     */
+    public Ed25519Verifier(BCEdDSAPublicKey publicKey) {
 
-		this(publicKey, null);
-	}
+        this(publicKey, null);
+    }
 
-	/**
-	 * Creates a new Ed25519 verifier.
-	 *
-	 * @param atbashKey The public Ed25519 key. Must not be {@code null}.
-	 * @throws JOSEException If the key subtype is not supported
-	 */
-	public Ed25519Verifier(AtbashKey atbashKey)
-			throws JOSEException {
+    /**
+     * Creates a new Ed25519 verifier.
+     *
+     * @param atbashKey The public Ed25519 key. Must not be {@code null}.
+     */
+    public Ed25519Verifier(AtbashKey atbashKey) {
 
-		this(getPublicKey(atbashKey));
+        this(getPublicKey(atbashKey));
 	}
 
 	private static BCEdDSAPublicKey getPublicKey(AtbashKey atbashKey) {
@@ -108,30 +104,28 @@ public class Ed25519Verifier extends EdDSAProvider implements JWSVerifier {
 			throw new KeyTypeException(ECPrivateKey.class);
 		}
 		return (BCEdDSAPublicKey) atbashKey.getKey();
-	}
+    }
 
 
-	/**
-	 * Creates a Ed25519 verifier.
-	 *
-	 * @param publicKey      The public Ed25519 key. Must not be {@code null}.
-	 * @param defCritHeaders The names of the critical header parameters
-	 *                       that are deferred to the application for
-	 *                       processing, empty set or {@code null} if none.
-	 * @throws JOSEException If the key subtype is not supported.
-	 */
-	public Ed25519Verifier(BCEdDSAPublicKey publicKey, Set<String> defCritHeaders)
-			throws JOSEException {
+    /**
+     * Creates a Ed25519 verifier.
+     *
+     * @param publicKey      The public Ed25519 key. Must not be {@code null}.
+     * @param defCritHeaders The names of the critical header parameters
+     *                       that are deferred to the application for
+     *                       processing, empty set or {@code null} if none.
+     */
+    public Ed25519Verifier(BCEdDSAPublicKey publicKey, Set<String> defCritHeaders) {
 
-		super();
+        super();
 
-		if (!Curve.Ed25519.getName().equals(publicKey.getAlgorithm())) {
-			throw new JOSEException("Ed25519Verifier only supports OctetKeyPairs with crv=Ed25519");
-		}
+        if (!Curve.Ed25519.getName().equals(publicKey.getAlgorithm())) {
+            throw new JOSEException("Ed25519Verifier only supports OctetKeyPairs with crv=Ed25519");
+        }
 
-		this.publicKey = publicKey;
-		verifier = new org.bouncycastle.crypto.signers.Ed25519Signer();
-		CipherParameters parameters = new Ed25519PublicKeyParameters(getDecodedX(), 0);
+        this.publicKey = publicKey;
+        verifier = new org.bouncycastle.crypto.signers.Ed25519Signer();
+        CipherParameters parameters = new Ed25519PublicKeyParameters(getDecodedX(), 0);
 		verifier.init(false, parameters);
 		critPolicy.setDeferredCriticalHeaderParams(defCritHeaders);
 	}
@@ -150,23 +144,22 @@ public class Ed25519Verifier extends EdDSAProvider implements JWSVerifier {
 		ASN1Encodable x1 = sequence.getObjectAt(1);
 		DERBitString publicBytes = (DERBitString) x1;
 
-		return publicBytes.getOctets();
-	}
+        return publicBytes.getOctets();
+    }
 
-	@Override
-	public boolean verify(JWSHeader header,
-						  byte[] signedContent,
-						  Base64URLValue signature)
-			throws JOSEException {
+    @Override
+    public boolean verify(JWSHeader header,
+                          byte[] signedContent,
+                          Base64URLValue signature) {
 
-		// Check alg field in header
-		JWSAlgorithm alg = header.getAlgorithm();
-		if (!JWSAlgorithm.EdDSA.equals(alg)) {
-			throw new JOSEException("Ed25519Verifier requires alg=EdDSA in JWSHeader");
-		}
+        // Check alg field in header
+        JWSAlgorithm alg = header.getAlgorithm();
+        if (!JWSAlgorithm.EdDSA.equals(alg)) {
+            throw new JOSEException("Ed25519Verifier requires alg=EdDSA in JWSHeader");
+        }
 
-		// Check for unrecognized "crit" properties
-		if (!critPolicy.headerPasses(header)) {
+        // Check for unrecognized "crit" properties
+        if (!critPolicy.headerPasses(header)) {
 			return false;
 		}
 

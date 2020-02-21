@@ -278,11 +278,8 @@ public class JWSObject extends JOSEObject {
     /**
      * Ensures the specified JWS signer supports the algorithm of this JWS
      * object.
-     *
-     * @throws JOSEException If the JWS algorithm is not supported.
      */
-    private void ensureJWSSignerSupport(JWSSigner signer)
-            throws JOSEException {
+    private void ensureJWSSignerSupport(JWSSigner signer) {
 
         if (!signer.supportedJWSAlgorithms().contains(getHeader().getAlgorithm())) {
 
@@ -299,28 +296,15 @@ public class JWSObject extends JOSEObject {
      * @param signer The JWS signer. Must not be {@code null}.
      * @throws IllegalStateException If the JWS object is not in an
      *                               {@link State#UNSIGNED unsigned state}.
-     * @throws JOSEException         If the JWS object couldn't be signed.
      */
-    public synchronized void sign(JWSSigner signer)
-            throws JOSEException {
+    public synchronized void sign(JWSSigner signer) {
 
         ensureUnsignedState();
 
         ensureJWSSignerSupport(signer);
 
-        try {
-            signature = signer.sign(getHeader(), getSigningInput());
+        signature = signer.sign(getHeader(), getSigningInput());
 
-        } catch (JOSEException e) {
-
-            throw e;
-
-        } catch (Exception e) {
-
-            // Prevent throwing unchecked exceptions at this point,
-            // see issue #20
-            throw new JOSEException(e.getMessage(), e);
-        }
 
         state = State.SIGNED;
     }
@@ -336,29 +320,12 @@ public class JWSObject extends JOSEObject {
      * @throws IllegalStateException If the JWS object is not in a
      *                               {@link State#SIGNED signed} or
      *                               {@link State#VERIFIED verified state}.
-     * @throws JOSEException         If the JWS object couldn't be
-     *                               verified.
      */
-    public synchronized boolean verify(JWSVerifier verifier)
-            throws JOSEException {
+    public synchronized boolean verify(JWSVerifier verifier) {
 
         ensureSignedOrVerifiedState();
 
-        boolean verified;
-
-        try {
-            verified = verifier.verify(getHeader(), getSigningInput(), getSignature());
-
-        } catch (JOSEException e) {
-
-            throw e;
-
-        } catch (Exception e) {
-
-            // Prevent throwing unchecked exceptions at this point,
-            // see issue #20
-            throw new JOSEException(e.getMessage(), e);
-        }
+        boolean verified = verifier.verify(getHeader(), getSigningInput(), getSignature());
 
         if (verified) {
 

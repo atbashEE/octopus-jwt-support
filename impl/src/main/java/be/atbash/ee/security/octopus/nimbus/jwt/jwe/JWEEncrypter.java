@@ -16,8 +16,6 @@
 package be.atbash.ee.security.octopus.nimbus.jwt.jwe;
 
 
-import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
-
 /**
  * JSON Web Encryption (JWE) encrypter.
  *
@@ -34,10 +32,6 @@ public interface JWEEncrypter extends JWEProvider {
      *                  {@code null}.
      * @param clearText The clear text to encrypt. Must not be {@code null}.
      * @return The resulting JWE crypto parts.
-     * @throws JOSEException If the JWE algorithm or method is not
-     *                       supported or if encryption failed for some
-     *                       other internal reason.
      */
-    JWECryptoParts encrypt(JWEHeader header, byte[] clearText)
-            throws JOSEException;
+    JWECryptoParts encrypt(JWEHeader header, byte[] clearText);
 }

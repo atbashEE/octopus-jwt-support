@@ -17,7 +17,6 @@ package be.atbash.ee.security.octopus.nimbus.jwk;
 
 
 import be.atbash.ee.security.octopus.nimbus.jose.Algorithm;
-import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.ee.security.octopus.nimbus.util.Base64Value;
 import be.atbash.ee.security.octopus.nimbus.util.ByteUtils;
@@ -316,11 +315,8 @@ public class OctetKeyPair extends JWK implements AsymmetricJWK, CurveBasedJWK {
          * parameter value.
          *
          * @return This builder.
-         * @throws JOSEException If the SHA-256 hash algorithm is not
-         *                       supported.
          */
-        public OctetKeyPair.Builder keyIDFromThumbprint()
-                throws JOSEException {
+        public OctetKeyPair.Builder keyIDFromThumbprint() {
 
             return keyIDFromThumbprint("SHA-256");
         }
@@ -336,11 +332,8 @@ public class OctetKeyPair extends JWK implements AsymmetricJWK, CurveBasedJWK {
          * @param hashAlg The hash algorithm for the JWK thumbprint
          *                computation. Must not be {@code null}.
          * @return This builder.
-         * @throws JOSEException If the hash algorithm is not
-         *                       supported.
          */
-        public OctetKeyPair.Builder keyIDFromThumbprint(String hashAlg)
-                throws JOSEException {
+        public OctetKeyPair.Builder keyIDFromThumbprint(String hashAlg) {
 
             // Put mandatory params in sorted order
             LinkedHashMap<String, String> requiredParams = new LinkedHashMap<>();

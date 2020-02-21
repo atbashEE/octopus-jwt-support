@@ -15,11 +15,9 @@
  */
 package be.atbash.ee.security.octopus.jwt.encoder;
 
-import be.atbash.ee.security.octopus.exception.UnsupportedECCurveException;
 import be.atbash.ee.security.octopus.exception.UnsupportedKeyLengthException;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersEncryption;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
-import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.KeyLengthException;
 import be.atbash.ee.security.octopus.nimbus.jose.KeyTypeException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.AESEncrypter;
@@ -53,13 +51,7 @@ public class JWEEncryptionFactory {
 
         if (KeyType.EC.equals(parametersEncryption.getKeyType())) {
             if (parametersEncryption.getKey() instanceof ECPublicKey) {
-                try {
                     result = new ECDHEncrypter((ECPublicKey) parametersEncryption.getKey());
-                } catch (JOSEException e) {
-                    // thrown by com.nimbusds.jose.crypto.ECDHCryptoProvider.ECDHCryptoProvider
-                    // when EC Key with unsupported curve is found.
-                    throw new UnsupportedECCurveException(e.getMessage());
-                }
             } else {
                 throw new KeyTypeException(AsymmetricPart.PUBLIC, JWE_CREATION);
             }

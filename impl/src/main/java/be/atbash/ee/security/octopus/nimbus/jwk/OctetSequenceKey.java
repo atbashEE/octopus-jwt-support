@@ -276,11 +276,8 @@ public final class OctetSequenceKey extends JWK implements SecretJWK {
          * parameter value.
          *
          * @return This builder.
-         * @throws JOSEException If the SHA-256 hash algorithm is not
-         *                       supported.
          */
-        public Builder keyIDFromThumbprint()
-                throws JOSEException {
+        public Builder keyIDFromThumbprint() {
 
             return keyIDFromThumbprint("SHA-256");
         }
@@ -296,11 +293,8 @@ public final class OctetSequenceKey extends JWK implements SecretJWK {
          * @param hashAlg The hash algorithm for the JWK thumbprint
          *                computation. Must not be {@code null}.
          * @return This builder.
-         * @throws JOSEException If the hash algorithm is not
-         *                       supported.
          */
-        public Builder keyIDFromThumbprint(String hashAlg)
-                throws JOSEException {
+        public Builder keyIDFromThumbprint(String hashAlg) {
 
             // Put mandatory params in sorted order
             LinkedHashMap<String, String> requiredParams = new LinkedHashMap<>();
@@ -595,10 +589,9 @@ public final class OctetSequenceKey extends JWK implements SecretJWK {
      * @return The octet sequence JWK, {@code null} if no key with the
      * specified alias was found.
      * @throws KeyStoreException On a key store exception.
-     * @throws JOSEException     If octet sequence key loading failed.
      */
     public static OctetSequenceKey load(KeyStore keyStore, String alias, char[] pin)
-            throws KeyStoreException, JOSEException {
+            throws KeyStoreException {
 
         Key key;
         try {

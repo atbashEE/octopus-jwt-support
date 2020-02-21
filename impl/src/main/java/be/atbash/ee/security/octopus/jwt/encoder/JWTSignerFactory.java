@@ -67,20 +67,12 @@ public class JWTSignerFactory {
         }
         if (KeyType.EC.equals(parametersSigning.getKeyType())) {
 
-            try {
                 result = new ECDSASigner(parametersSigning.getAtbashKey());
-            } catch (JOSEException e) {
-                throw new UnsupportedECCurveException(e.getMessage());
-            }
         }
 
         if (KeyType.OKP.equals(parametersSigning.getKeyType())) {
 
-            try {
                 result = new Ed25519Signer(parametersSigning.getAtbashKey());
-            } catch (JOSEException e) {
-                throw new UnsupportedECCurveException(e.getMessage());
-            }
         }
 
         if (result == null) {
@@ -108,11 +100,7 @@ public class JWTSignerFactory {
         }
         if (KeyType.EC.equals(parametersSigning.getKeyType())) {
 
-            try {
                 result = resolveAlgorithm((ECKey) parametersSigning.getKey());
-            } catch (JOSEException e) {
-                throw new UnsupportedECCurveException(e.getMessage());
-            }
         }
         if (result == null) {
             throw new KeyTypeException(parametersSigning.getKeyType(), "JWT Signing");
@@ -122,18 +110,16 @@ public class JWTSignerFactory {
     }
 
     /* FIXME Copied from com.nimbusds.jose.crypto.ECDSA which has package scope */
-    private JWSAlgorithm resolveAlgorithm(ECKey ecKey)
-            throws JOSEException {
+    private JWSAlgorithm resolveAlgorithm(ECKey ecKey) {
 
         ECParameterSpec ecParameterSpec = ecKey.getParams();
         return resolveAlgorithm(Curve.forECParameterSpec(ecParameterSpec));
     }
 
-    private JWSAlgorithm resolveAlgorithm(Curve curve)
-            throws JOSEException {
+    private JWSAlgorithm resolveAlgorithm(Curve curve) {
 
         if (curve == null) {
-            throw new JOSEException("The EC key curve is not supported, must be P-256, P-384 or P-521");
+            throw new UnsupportedECCurveException("The EC key curve is not supported, must be P-256, P-384 or P-521");
         } else if (Curve.P_256.equals(curve)) {
             return JWSAlgorithm.ES256;
         } else if (Curve.P_256K.equals(curve)) {

@@ -80,8 +80,7 @@ public class JWKTest {
     }
 
     @Test
-    public void testParseRSAJWKFromX509Cert()
-            throws Exception {
+    public void testParseRSAJWKFromX509Cert() {
 
         String pemEncodedCert = IOUtil.readFileToString("src/test/resources/sample-certs/ietf.crt");
         X509Certificate cert = X509CertUtils.parse(pemEncodedCert);
@@ -91,8 +90,7 @@ public class JWKTest {
     }
 
     @Test
-    public void testParseECJWKFromX509Cert()
-            throws Exception {
+    public void testParseECJWKFromX509Cert() {
 
         String pemEncodedCert = IOUtil.readFileToString("src/test/resources/sample-certs/wikipedia.crt");
         X509Certificate cert = X509CertUtils.parse(pemEncodedCert);
@@ -103,8 +101,7 @@ public class JWKTest {
     }
 
     @Test
-    public void testParseRSAJWKFromX509Cert_pem()
-            throws Exception {
+    public void testParseRSAJWKFromX509Cert_pem() {
 
         String pemEncodedCert = IOUtil.readFileToString("src/test/resources/sample-certs/ietf.crt");
         JWK jwk = JWK.parseFromPEMEncodedX509Cert(pemEncodedCert);
@@ -112,8 +109,7 @@ public class JWKTest {
     }
 
     @Test
-    public void testParseECJWKFromX509Cert_pem()
-            throws Exception {
+    public void testParseECJWKFromX509Cert_pem() {
 
         String pemEncodedCert = IOUtil.readFileToString("src/test/resources/sample-certs/wikipedia.crt");
         JWK jwk = JWK.parseFromPEMEncodedX509Cert(pemEncodedCert);

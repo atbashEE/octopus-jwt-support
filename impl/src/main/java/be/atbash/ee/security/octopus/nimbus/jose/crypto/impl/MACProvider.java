@@ -69,10 +69,8 @@ public abstract class MACProvider extends BaseJWSProvider {
      * @param alg The JSON Web Algorithm (JWA). Must be supported and not
      *            {@code null}.
      * @return The matching JCA algorithm name.
-     * @throws JOSEException If the algorithm is not supported.
      */
-    protected static String getJCAAlgorithmName(JWSAlgorithm alg)
-            throws JOSEException {
+    protected static String getJCAAlgorithmName(JWSAlgorithm alg) {
 
         if (alg.equals(JWSAlgorithm.HS256)) {
             return "HMACSHA256";
@@ -101,12 +99,9 @@ public abstract class MACProvider extends BaseJWSProvider {
      *                      not {@code null}.
      * @param supportedAlgs The supported HMAC algorithms. Must not be
      *                      {@code null}.
-     * @throws KeyLengthException If the secret length is shorter than the
-     *                            minimum 256-bit requirement.
      */
     protected MACProvider(byte[] secret,
-                          Set<JWSAlgorithm> supportedAlgs)
-            throws KeyLengthException {
+                          Set<JWSAlgorithm> supportedAlgs) {
 
         super(supportedAlgs);
 

@@ -412,8 +412,7 @@ public class OctetKeyPairTest {
     }
 
     @Test
-    public void testKeyIDFromThumbprint()
-            throws Exception {
+    public void testKeyIDFromThumbprint() {
 
         OctetKeyPair key = new OctetKeyPair.Builder(Curve.Ed25519, EXAMPLE_OKP_ED25519.X)
                 .keyIDFromThumbprint()

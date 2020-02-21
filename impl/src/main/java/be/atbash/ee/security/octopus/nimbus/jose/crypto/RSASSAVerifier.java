@@ -142,8 +142,7 @@ public class RSASSAVerifier extends RSASSAProvider implements JWSVerifier {
     @Override
     public boolean verify(JWSHeader header,
                           byte[] signedContent,
-                          Base64URLValue signature)
-            throws JOSEException {
+                          Base64URLValue signature) {
 
         if (!critPolicy.headerPasses(header)) {
             return false;

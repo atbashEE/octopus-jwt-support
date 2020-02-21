@@ -96,8 +96,7 @@ public class PasswordBasedDecrypter extends PasswordBasedCryptoProvider implemen
                           Base64URLValue encryptedKey,
                           Base64URLValue iv,
                           Base64URLValue cipherText,
-                          Base64URLValue authTag)
-            throws JOSEException {
+                          Base64URLValue authTag) {
 
         // Validate required JWE parts
         if (encryptedKey == null) {

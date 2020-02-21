@@ -43,11 +43,8 @@ public final class ThumbprintUtils {
      *
      * @param jwk The JWK. Must not be {@code null}.
      * @return The JWK thumbprint.
-     * @throws JOSEException If the SHA-256 hash algorithm is not
-     *                       supported.
      */
-    public static Base64URLValue compute(JWK jwk)
-            throws JOSEException {
+    public static Base64URLValue compute(JWK jwk) {
 
         return compute("SHA-256", jwk);
     }
@@ -59,10 +56,8 @@ public final class ThumbprintUtils {
      * @param hashAlg The hash algorithm. Must not be {@code null}.
      * @param jwk     The JWK. Must not be {@code null}.
      * @return The JWK thumbprint.
-     * @throws JOSEException If the hash algorithm is not supported.
      */
-    public static Base64URLValue compute(String hashAlg, JWK jwk)
-            throws JOSEException {
+    public static Base64URLValue compute(String hashAlg, JWK jwk) {
 
         LinkedHashMap<String, ?> orderedParams = jwk.getRequiredParams();
 
@@ -78,10 +73,8 @@ public final class ThumbprintUtils {
      *                by parameter name and ready for JSON object
      *                serialisation. Must not be {@code null}.
      * @return The JWK thumbprint.
-     * @throws JOSEException If the hash algorithm is not supported.
      */
-    public static Base64URLValue compute(String hashAlg, LinkedHashMap<String, ?> params)
-            throws JOSEException {
+    public static Base64URLValue compute(String hashAlg, LinkedHashMap<String, ?> params) {
 
         Jsonb jsonb = JsonbUtil.getJsonb();
         String json = jsonb.toJson(params);

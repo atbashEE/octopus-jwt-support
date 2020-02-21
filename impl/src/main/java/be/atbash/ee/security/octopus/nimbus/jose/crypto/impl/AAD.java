@@ -19,7 +19,6 @@ package be.atbash.ee.security.octopus.nimbus.jose.crypto.impl;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEHeader;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.ee.security.octopus.nimbus.util.ByteUtils;
-import be.atbash.ee.security.octopus.nimbus.util.IntegerOverflowException;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -72,10 +71,8 @@ public final class AAD {
      *            {@code null}.
      * @return The computed AAD bit length, as a 64 bit big-endian
      * representation (8 byte array).
-     * @throws IntegerOverflowException On a integer overflow.
      */
-    static byte[] computeLength(byte[] aad)
-            throws IntegerOverflowException {
+    static byte[] computeLength(byte[] aad) {
 
         int bitLength = ByteUtils.safeBitLength(aad);
         return ByteBuffer.allocate(8).putLong(bitLength).array();

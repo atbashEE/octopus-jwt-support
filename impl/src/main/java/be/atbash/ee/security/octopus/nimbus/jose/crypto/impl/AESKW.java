@@ -40,16 +40,14 @@ public final class AESKW {
     /**
      * Wraps the specified Content Encryption Key (CEK).
      *
-     * @param cek      The Content Encryption Key (CEK) to wrap. Must not
-     *                 be {@code null}.
-     * @param kek      The AES Key Encryption Key (KEK) (wrapping key).
-     *                 Must not be {@code null}.
+     * @param cek The Content Encryption Key (CEK) to wrap. Must not
+     *            be {@code null}.
+     * @param kek The AES Key Encryption Key (KEK) (wrapping key).
+     *            Must not be {@code null}.
      * @return The wrapped Content Encryption Key (CEK).
-     * @throws JOSEException If wrapping failed.
      */
     public static byte[] wrapCEK(SecretKey cek,
-                                 SecretKey kek)
-            throws JOSEException {
+                                 SecretKey kek) {
 
         try {
             Cipher cipher = Cipher.getInstance("AESWrap", BouncyCastleProviderSingleton.getInstance());
@@ -71,11 +69,9 @@ public final class AESKW {
      * @param encryptedCEK The wrapped Content Encryption Key (CEK) with
      *                     authentication tag. Must not be {@code null}.
      * @return The unwrapped Content Encryption Key (CEK).
-     * @throws JOSEException If unwrapping failed.
      */
     public static SecretKey unwrapCEK(SecretKey kek,
-                                      byte[] encryptedCEK)
-            throws JOSEException {
+                                      byte[] encryptedCEK) {
 
         try {
             Cipher cipher = Cipher.getInstance("AESWrap", BouncyCastleProviderSingleton.getInstance());

@@ -434,11 +434,8 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
          * parameter value.
          *
          * @return This builder.
-         * @throws JOSEException If the SHA-256 hash algorithm is not
-         *                       supported.
          */
-        public Builder keyIDFromThumbprint()
-                throws JOSEException {
+        public Builder keyIDFromThumbprint() {
 
             return keyIDFromThumbprint("SHA-256");
         }
@@ -454,11 +451,8 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
          * @param hashAlg The hash algorithm for the JWK thumbprint
          *                computation. Must not be {@code null}.
          * @return This builder.
-         * @throws JOSEException If the hash algorithm is not
-         *                       supported.
          */
-        public Builder keyIDFromThumbprint(String hashAlg)
-                throws JOSEException {
+        public Builder keyIDFromThumbprint(String hashAlg) {
 
             // Put mandatory params in sorted order
             LinkedHashMap<String, String> requiredParams = new LinkedHashMap<>();
@@ -1000,9 +994,6 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
      * representation of this Elliptic Curve JWK.
      *
      * @return The public Elliptic Curve key.
-     * @throws InvalidKeyException If EC is not supported by the underlying Java
-     *                             Cryptography (JCA) provider or if the JWK
-     *                             parameters are invalid for a public EC key.
      */
     public ECPublicKey toECPublicKey() {
 
@@ -1033,9 +1024,6 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
      *
      * @return The private Elliptic Curve key, {@code null} if not
      * specified by this JWK.
-     * @throws InvalidKeyException If EC is not supported by the underlying Java
-     *                             Cryptography (JCA) provider or if the JWK
-     *                             parameters are invalid for a private EC key.
      */
     public ECPrivateKey toECPrivateKey() {
 
@@ -1091,10 +1079,6 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
      *
      * @return The Elliptic Curve key pair. The private Elliptic Curve key
      * will be {@code null} if not specified.
-     * @throws InvalidKeyException If EC is not supported by the underlying Java
-     *                             Cryptography (JCA) provider or if the JWK
-     *                             parameters are invalid for a public and / or
-     *                             private EC key.
      */
     public KeyPair toKeyPair() {
 
@@ -1317,10 +1301,8 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
      *
      * @param cert The X.509 certificate. Must not be {@code null}.
      * @return The public Elliptic Curve JWK.
-     * @throws JOSEException If parsing failed.
      */
-    public static ECKey parse(X509Certificate cert)
-            throws JOSEException {
+    public static ECKey parse(X509Certificate cert) {
 
         if (!(cert.getPublicKey() instanceof ECPublicKey)) {
             throw new JOSEException("The public key of the X.509 certificate is not EC");
@@ -1369,12 +1351,11 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
      * @return The public / private Elliptic Curve JWK., {@code null} if no
      * key with the specified alias was found.
      * @throws KeyStoreException On a key store exception.
-     * @throws JOSEException     If EC key loading failed.
      */
     public static ECKey load(KeyStore keyStore,
                              String alias,
                              char[] pin)
-            throws KeyStoreException, JOSEException {
+            throws KeyStoreException {
 
         Certificate cert = keyStore.getCertificate(alias);
 

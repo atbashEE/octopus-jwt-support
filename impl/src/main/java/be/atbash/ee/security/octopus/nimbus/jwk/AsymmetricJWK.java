@@ -16,8 +16,6 @@
 package be.atbash.ee.security.octopus.nimbus.jwk;
 
 
-import be.atbash.ee.security.octopus.exception.InvalidKeyException;
-
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -36,7 +34,6 @@ public interface AsymmetricJWK {
      * Returns a Java public key representation of the JWK.
      *
      * @return The Java public key.
-     * @throws InvalidKeyException If conversion failed or is not supported.
      */
     PublicKey toPublicKey();
 
@@ -45,7 +42,6 @@ public interface AsymmetricJWK {
      * Returns a Java private key representation of this JWK.
      *
      * @return The Java private key, {@code null} if not specified.
-     * @throws InvalidKeyException If conversion failed or is not supported.
      */
     PrivateKey toPrivateKey();
 
@@ -55,7 +51,6 @@ public interface AsymmetricJWK {
      *
      * @return The Java key pair. The private key will be {@code null} if
      * not specified.
-     * @throws InvalidKeyException If conversion failed or is not supported.
      */
     KeyPair toKeyPair();
 

@@ -55,8 +55,7 @@ public class JWSObjectTest {
 
 
     @Test
-    public void testSignAndSerialize()
-            throws Exception {
+    public void testSignAndSerialize() {
 
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS256);
 

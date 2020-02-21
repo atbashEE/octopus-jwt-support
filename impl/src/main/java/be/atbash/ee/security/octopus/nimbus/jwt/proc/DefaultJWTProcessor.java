@@ -141,8 +141,7 @@ public class DefaultJWTProcessor {
         this.claimsVerifier = claimsVerifier;
     }
 
-    private JWTClaimsSet extractJWTClaimsSet(JWT jwt)
-            throws BadJWTException {
+    private JWTClaimsSet extractJWTClaimsSet(JWT jwt) {
 
         try {
             return jwt.getJWTClaimsSet();
@@ -152,8 +151,7 @@ public class DefaultJWTProcessor {
         }
     }
 
-    private JWTClaimsSet verifyClaims(JWSHeader header, JWTClaimsSet claimsSet)
-            throws BadJWTException {
+    private JWTClaimsSet verifyClaims(JWSHeader header, JWTClaimsSet claimsSet) {
 
         if (claimsVerifier != null) {
             if (!claimsVerifier.verify(header, claimsSet)) {
@@ -190,13 +188,13 @@ public class DefaultJWTProcessor {
 
 
     public JWTClaimsSet process(String jwtString)
-            throws ParseException, JOSEException {
+            throws ParseException {
 
         return process(JWTParser.parse(jwtString));
     }
 
 
-    public JWTClaimsSet process(JWT jwt) throws JOSEException {
+    public JWTClaimsSet process(JWT jwt) {
 
         if (jwt instanceof SignedJWT) {
             return process((SignedJWT) jwt);
@@ -215,13 +213,13 @@ public class DefaultJWTProcessor {
     }
 
 
-    public JWTClaimsSet process(PlainJWT plainJWT) throws JOSEException {
+    public JWTClaimsSet process(PlainJWT plainJWT) {
 
         throw new BadJOSEException("Unsecured (plain) JWTs are rejected, TODO Implementation needs to be done!!");
     }
 
 
-    public JWTClaimsSet process(SignedJWT signedJWT) throws JOSEException {
+    public JWTClaimsSet process(SignedJWT signedJWT) {
 
         JOSEObjectType objectType = signedJWT.getHeader().getType();
         if (objectType != null && !objectType.equals(JOSEObjectType.JWT)) {
@@ -267,7 +265,7 @@ public class DefaultJWTProcessor {
 
     }
 
-    public JWTClaimsSet process(EncryptedJWT encryptedJWT) throws JOSEException {
+    public JWTClaimsSet process(EncryptedJWT encryptedJWT) {
 
         if (jweKeySelector == null) {
             // JWE key selector may have been deliberately omitted

@@ -16,7 +16,6 @@
 package be.atbash.ee.security.octopus.nimbus.jwt.jws;
 
 
-import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 
 /**
@@ -36,11 +35,6 @@ public interface JWSSigner extends JWSProvider {
      *                     be {@code null}.
      * @param signingInput The input to sign. Must not be {@code null}.
      * @return The resulting signature part (third part) of the JWS object.
-     * @throws JOSEException If the JWS algorithm is not supported, if a
-     *                       critical header parameter is not supported or
-     *                       marked for deferral to the application, or if
-     *                       signing failed for some other internal reason.
      */
-    Base64URLValue sign(JWSHeader header, byte[] signingInput)
-            throws JOSEException;
+    Base64URLValue sign(JWSHeader header, byte[] signingInput);
 }

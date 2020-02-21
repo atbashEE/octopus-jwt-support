@@ -16,7 +16,6 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto;
 
 
-import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.AESKW;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.ContentCryptoProvider;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.PasswordBasedCryptoProvider;
@@ -86,8 +85,7 @@ public class PasswordBasedEncrypter extends PasswordBasedCryptoProvider implemen
 	}
 
 	@Override
-	public JWECryptoParts encrypt(JWEHeader header, byte[] clearText)
-			throws JOSEException {
+	public JWECryptoParts encrypt(JWEHeader header, byte[] clearText) {
 
 		EncryptionMethod enc = header.getEncryptionMethod();
 

@@ -42,10 +42,8 @@ public final class RSASSA {
      * @param alg The JSON Web Algorithm (JWA). Must be supported and not
      *            {@code null}.
      * @return A signer and verifier instance.
-     * @throws JOSEException If the algorithm is not supported.
      */
-    public static Signature getSignerAndVerifier(JWSAlgorithm alg)
-            throws JOSEException {
+    public static Signature getSignerAndVerifier(JWSAlgorithm alg) {
 
         // The JCE crypto provider uses different alg names
 

@@ -18,7 +18,6 @@ package be.atbash.ee.security.octopus.jwt.decoder;
 import be.atbash.ee.security.octopus.jwt.InvalidJWTException;
 import be.atbash.ee.security.octopus.jwt.JWTEncoding;
 import be.atbash.ee.security.octopus.keys.selector.KeySelector;
-import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jwt.EncryptedJWT;
 import be.atbash.ee.security.octopus.nimbus.jwt.JWTClaimsSet;
 import be.atbash.ee.security.octopus.nimbus.jwt.PlainJWT;
@@ -28,7 +27,6 @@ import be.atbash.ee.security.octopus.util.JsonbUtil;
 import be.atbash.util.PublicAPI;
 import be.atbash.util.StringUtils;
 import be.atbash.util.exception.AtbashIllegalActionException;
-import be.atbash.util.exception.AtbashUnexpectedException;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.json.bind.Jsonb;
@@ -86,8 +84,6 @@ public class JWTDecoder {
             }
         } catch (ParseException e) {
             throw new InvalidJWTException("Invalid JWT structure");
-        } catch (JOSEException e) {
-            throw new AtbashUnexpectedException(e);
         }
         return result;
     }
@@ -105,7 +101,7 @@ public class JWTDecoder {
         return readJSONString(jwtClaimsSet.toJSONObject().toString(), classType, metaJWTData);
     }
 
-    private <T> JWTData<T> readEncryptedJWT(String data, KeySelector keySelector, Class<T> classType, JWTVerifier verifier) throws ParseException, JOSEException {
+    private <T> JWTData<T> readEncryptedJWT(String data, KeySelector keySelector, Class<T> classType, JWTVerifier verifier) throws ParseException {
 
         EncryptedJWT encryptedJWT = EncryptedJWT.parse(data);
 
@@ -131,7 +127,7 @@ public class JWTDecoder {
 
     }
 
-    private <T> JWTData<T> readSignedJWT(String data, KeySelector keySelector, Class<T> classType, JWTVerifier verifier) throws ParseException, JOSEException {
+    private <T> JWTData<T> readSignedJWT(String data, KeySelector keySelector, Class<T> classType, JWTVerifier verifier) throws ParseException {
         SignedJWT signedJWT = SignedJWT.parse(data);
 
         DefaultJWTProcessor processor = new DefaultJWTProcessor();

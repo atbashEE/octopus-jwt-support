@@ -15,7 +15,6 @@
  */
 package be.atbash.ee.security.octopus.nimbus.jose.crypto.impl;
 
-import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.KeyLengthException;
 import be.atbash.ee.security.octopus.nimbus.util.ByteUtils;
 import be.atbash.ee.security.octopus.nimbus.util.Container;
@@ -44,12 +43,10 @@ public final class AESGCMKW {
      * @param kek      The AES Key Encryption Key (KEK). Must not be
      *                 {@code null}.
      * @return The encrypted Content Encryption Key (CEK).
-     * @throws JOSEException If encryption failed.
      */
     public static AuthenticatedCipherText encryptCEK(SecretKey cek,
                                                      Container<byte[]> iv,
-                                                     SecretKey kek)
-            throws JOSEException {
+                                                     SecretKey kek) {
 
         return AESGCM.encrypt(kek, iv, cek.getEncoded(), new byte[0]);
     }
@@ -66,13 +63,11 @@ public final class AESGCMKW {
      *                    decrypt and authentication tag. Must not be
      *                    {@code null}.
      * @return The decrypted Content Encryption Key (CEK).
-     * @throws JOSEException If decryption failed.
      */
     public static SecretKey decryptCEK(SecretKey kek,
                                        byte[] iv,
                                        AuthenticatedCipherText authEncrCEK,
-                                       int keyLength)
-            throws JOSEException {
+                                       int keyLength) {
 
         byte[] keyBytes = AESGCM.decrypt(kek, iv, authEncrCEK.getCipherText(), new byte[0], authEncrCEK.getAuthenticationTag());
 

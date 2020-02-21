@@ -64,10 +64,8 @@ final class CompositeKey {
      *
      * @param inputKey The input key. Must be 256, 384 or 512 bits long.
      *                 Must not be {@code null}.
-     * @throws KeyLengthException If the input key length is not supported.
      */
-    CompositeKey(SecretKey inputKey)
-            throws KeyLengthException {
+    CompositeKey(SecretKey inputKey) {
 
         this.inputKey = inputKey;
 

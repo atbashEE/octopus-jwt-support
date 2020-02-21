@@ -394,8 +394,7 @@ public class OctetSequenceKeyTest {
     }
 
     @Test
-    public void testThumbprintSHA1()
-            throws Exception {
+    public void testThumbprintSHA1() {
 
         Base64URLValue k = new Base64URLValue("GawgguFyGrWKav7AX4VKUg");
 
@@ -429,8 +428,7 @@ public class OctetSequenceKeyTest {
     }
 
     @Test
-    public void testThumbprintSHA1AsKeyID()
-            throws Exception {
+    public void testThumbprintSHA1AsKeyID() {
 
         Base64URLValue k = new Base64URLValue("GawgguFyGrWKav7AX4VKUg");
 

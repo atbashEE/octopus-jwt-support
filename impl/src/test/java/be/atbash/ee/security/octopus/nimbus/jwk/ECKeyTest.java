@@ -654,8 +654,7 @@ public class ECKeyTest {
     }
 
     @Test
-    public void testThumbprintSHA1()
-            throws Exception {
+    public void testThumbprintSHA1() {
 
         ECKey ecKey = new ECKey.Builder(ExampleKeyP256.CRV, ExampleKeyP256.X, ExampleKeyP256.Y).build();
 
@@ -687,8 +686,7 @@ public class ECKeyTest {
     }
 
     @Test
-    public void testThumbprintSHA1AsKeyID()
-            throws Exception {
+    public void testThumbprintSHA1AsKeyID() {
 
         ECKey ecKey = new ECKey.Builder(ExampleKeyP256.CRV, ExampleKeyP256.X, ExampleKeyP256.Y)
                 .keyIDFromThumbprint("SHA-1")

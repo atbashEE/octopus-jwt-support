@@ -73,8 +73,7 @@ public final class AESCBC {
      */
     private static Cipher createAESCBCCipher(SecretKey secretKey,
                                              boolean forEncryption,
-                                             byte[] iv)
-            throws JOSEException {
+                                             byte[] iv) {
 
         Cipher cipher;
 
@@ -111,12 +110,10 @@ public final class AESCBC {
      *                  {@code null}.
      * @param plainText The plain text. Must not be {@code null}.
      * @return The cipher text.
-     * @throws JOSEException If encryption failed.
      */
     public static byte[] encrypt(SecretKey secretKey,
                                  byte[] iv,
-                                 byte[] plainText)
-            throws JOSEException {
+                                 byte[] plainText) {
 
         Cipher cipher = createAESCBCCipher(secretKey, true, iv);
 
@@ -146,13 +143,11 @@ public final class AESCBC {
      * @param aad         The additional authenticated data. Must not be
      *                    {@code null}.
      * @return The authenticated cipher text.
-     * @throws JOSEException If encryption failed.
      */
     public static AuthenticatedCipherText encryptAuthenticated(SecretKey secretKey,
                                                                byte[] iv,
                                                                byte[] plainText,
-                                                               byte[] aad)
-            throws JOSEException {
+                                                               byte[] aad) {
 
         // Extract MAC + AES/CBC keys from input secret key
         CompositeKey compositeKey = new CompositeKey(secretKey);
@@ -181,12 +176,10 @@ public final class AESCBC {
      *                   {@code null}.
      * @param cipherText The cipher text. Must not be {@code null}.
      * @return The decrypted plain text.
-     * @throws JOSEException If decryption failed.
      */
     public static byte[] decrypt(SecretKey secretKey,
                                  byte[] iv,
-                                 byte[] cipherText)
-            throws JOSEException {
+                                 byte[] cipherText) {
 
         Cipher cipher = createAESCBCCipher(secretKey, false, iv);
 
@@ -217,14 +210,12 @@ public final class AESCBC {
      *                    {@code null}.
      * @param authTag     The authentication tag. Must not be {@code null}.
      * @return The decrypted plain text.
-     * @throws JOSEException If decryption failed.
      */
     public static byte[] decryptAuthenticated(SecretKey secretKey,
                                               byte[] iv,
                                               byte[] cipherText,
                                               byte[] aad,
-                                              byte[] authTag)
-            throws JOSEException {
+                                              byte[] authTag) {
 
 
         // Extract MAC + AES/CBC keys from input secret key

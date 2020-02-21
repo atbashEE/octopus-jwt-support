@@ -31,7 +31,10 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.security.*;
+import java.security.AlgorithmParameters;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidParameterSpecException;
 import java.util.Base64;
 
@@ -108,7 +111,7 @@ public final class EncryptionHelper {
         } catch (BadPaddingException e) {
             // BadPaddingException -> Wrong PW
             throw new DecryptionFailedException();
-        } catch (JOSEException | IllegalBlockSizeException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | InvalidKeyException | NoSuchPaddingException e) {
+        } catch (IllegalBlockSizeException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | InvalidKeyException | NoSuchPaddingException e) {
             throw new AtbashUnexpectedException(e);
         }
 

@@ -67,10 +67,8 @@ public final class ECDH {
      * @param alg The JWE algorithm. Must be supported and not
      *            {@code null}.
      * @return The algorithm mode.
-     * @throws JOSEException If the JWE algorithm is not supported.
      */
-    public static AlgorithmMode resolveAlgorithmMode(JWEAlgorithm alg)
-            throws JOSEException {
+    public static AlgorithmMode resolveAlgorithmMode(JWEAlgorithm alg) {
 
         if (alg.equals(JWEAlgorithm.ECDH_ES)) {
 
@@ -99,11 +97,8 @@ public final class ECDH {
      * @param enc The encryption method. Must be supported} and not
      *            {@code null}.
      * @return The bit length of the shared key.
-     * @throws JOSEException If the JWE algorithm or encryption method is
-     *                       not supported.
      */
-    public static int sharedKeyLength(JWEAlgorithm alg, EncryptionMethod enc)
-            throws JOSEException {
+    public static int sharedKeyLength(JWEAlgorithm alg, EncryptionMethod enc) {
 
         if (alg.equals(JWEAlgorithm.ECDH_ES)) {
 
@@ -139,11 +134,9 @@ public final class ECDH {
      *                   key on encryption, or the consumer's private EC
      *                   key on decryption. Must not be {@code null}.
      * @return The derived shared secret ('Z'), with algorithm "AES".
-     * @throws JOSEException If derivation of the shared secret failed.
      */
     public static SecretKey deriveSharedSecret(ECPublicKey publicKey,
-                                               PrivateKey privateKey)
-            throws JOSEException {
+                                               PrivateKey privateKey) {
 
         // Get an ECDH key agreement instance from the JCA provider
         KeyAgreement keyAgreement;
@@ -179,11 +172,9 @@ public final class ECDH {
      *                   key on encryption, or the consumer's private EC
      *                   key on decryption. Must not be {@code null}.
      * @return The derived shared secret ('Z'), with algorithm "AES".
-     * @throws JOSEException If derivation of the shared secret failed.
      */
     // FIXME How do we use this? And if not, can be removed
-    public static SecretKey deriveSharedSecret(OctetKeyPair publicKey, OctetKeyPair privateKey)
-            throws JOSEException {
+    public static SecretKey deriveSharedSecret(OctetKeyPair publicKey, OctetKeyPair privateKey) {
 
         if (publicKey.isPrivate()) {
             throw new JOSEException("Expected public key but received OKP with 'd' value");
@@ -226,12 +217,10 @@ public final class ECDH {
      * @param concatKDF The concat KDF. Must be initialised and not
      *                  {@code null}.
      * @return The derived shared key.
-     * @throws JOSEException If derivation of the shared key failed.
      */
     public static SecretKey deriveSharedKey(JWEHeader header,
                                             SecretKey Z,
-                                            ConcatKDF concatKDF)
-            throws JOSEException {
+                                            ConcatKDF concatKDF) {
 
         int sharedKeyLength = sharedKeyLength(header.getAlgorithm(), header.getEncryptionMethod());
 

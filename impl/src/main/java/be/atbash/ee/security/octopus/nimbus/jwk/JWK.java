@@ -343,11 +343,8 @@ public abstract class JWK implements Serializable {
      * information.
      *
      * @return The SHA-256 thumbprint.
-     * @throws JOSEException If the SHA-256 hash algorithm is not
-     *                       supported.
      */
-    public Base64URLValue computeThumbprint()
-            throws JOSEException {
+    public Base64URLValue computeThumbprint() {
 
         return computeThumbprint("SHA-256");
     }
@@ -359,10 +356,8 @@ public abstract class JWK implements Serializable {
      *
      * @param hashAlg The hash algorithm. Must not be {@code null}.
      * @return The SHA-256 thumbprint.
-     * @throws JOSEException If the hash algorithm is not supported.
      */
-    public Base64URLValue computeThumbprint(String hashAlg)
-            throws JOSEException {
+    public Base64URLValue computeThumbprint(String hashAlg) {
 
         return ThumbprintUtils.compute(hashAlg, this);
     }
@@ -561,10 +556,8 @@ public abstract class JWK implements Serializable {
      *
      * @param cert The X.509 certificate. Must not be {@code null}.
      * @return The public RSA or EC JWK.
-     * @throws JOSEException If parsing failed.
      */
-    public static JWK parse(X509Certificate cert)
-            throws JOSEException {
+    public static JWK parse(X509Certificate cert) {
 
         if (cert.getPublicKey() instanceof RSAPublicKey) {
             return RSAKey.parse(cert);
@@ -597,10 +590,8 @@ public abstract class JWK implements Serializable {
      * @param pemEncodedCert The PEM-encoded X.509 certificate. Must not be
      *                       {@code null}.
      * @return The public RSA or EC JWK.
-     * @throws JOSEException If parsing failed.
      */
-    public static JWK parseFromPEMEncodedX509Cert(String pemEncodedCert)
-            throws JOSEException {
+    public static JWK parseFromPEMEncodedX509Cert(String pemEncodedCert) {
 
         X509Certificate cert = X509CertUtils.parse(pemEncodedCert);
 
@@ -628,10 +619,9 @@ public abstract class JWK implements Serializable {
      * @return The public / private RSA or EC JWK, or secret JWK, or
      * {@code null} if no key with the specified alias was found.
      * @throws KeyStoreException On a key store exception.
-     * @throws JOSEException     If RSA or EC key loading failed.
      */
     public static JWK load(KeyStore keyStore, String alias, char[] pin)
-            throws KeyStoreException, JOSEException {
+            throws KeyStoreException {
 
         java.security.cert.Certificate cert = keyStore.getCertificate(alias);
 

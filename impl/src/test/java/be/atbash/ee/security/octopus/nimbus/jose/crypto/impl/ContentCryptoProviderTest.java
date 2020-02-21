@@ -71,7 +71,7 @@ public class ContentCryptoProviderTest {
 	}
 
 	@Test
-    public void test_A256CBC_HS512() throws Exception {
+	public void test_A256CBC_HS512() {
 
 		JWEHeader header = new JWEHeader(JWEAlgorithm.DIR, EncryptionMethod.A256CBC_HS512);
 		byte[] clearText = "Hello world!".getBytes(StandardCharsets.UTF_8);
@@ -95,8 +95,7 @@ public class ContentCryptoProviderTest {
 	}
 
 	@Test
-	public void test_A256CBC_HS512_cekTooShort()
-            throws Exception {
+	public void test_A256CBC_HS512_cekTooShort() {
 
 		JWEHeader header = new JWEHeader(JWEAlgorithm.DIR, EncryptionMethod.A256CBC_HS512);
 		byte[] clearText = "Hello world!".getBytes(StandardCharsets.UTF_8);
@@ -116,8 +115,7 @@ public class ContentCryptoProviderTest {
 	}
 
 	@Test
-	public void test_A256GCM_cekTooShort()
-            throws Exception {
+	public void test_A256GCM_cekTooShort() {
 
 		JWEHeader header = new JWEHeader(JWEAlgorithm.DIR, EncryptionMethod.A256GCM);
 		byte[] clearText = "Hello world!".getBytes(StandardCharsets.UTF_8);
@@ -140,8 +138,7 @@ public class ContentCryptoProviderTest {
 	}
 
 	@Test
-	public void testKeyGen()
-            throws Exception {
+	public void testKeyGen() {
 
 		assertThat(ContentCryptoProvider.generateCEK(EncryptionMethod.A128GCM).getEncoded().length).isEqualTo(ByteUtils.byteLength(128));
 		assertThat(ContentCryptoProvider.generateCEK(EncryptionMethod.A192GCM).getEncoded().length).isEqualTo(ByteUtils.byteLength(192));

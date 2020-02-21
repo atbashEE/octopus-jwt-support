@@ -89,10 +89,8 @@ public class ContentCryptoProvider {
      *
      * @param enc The encryption method. Must not be {@code null}.
      * @return The generated CEK (with algorithm "AES").
-     * @throws JOSEException If the encryption method is not supported.
      */
-    public static SecretKey generateCEK(EncryptionMethod enc)
-            throws JOSEException {
+    public static SecretKey generateCEK(EncryptionMethod enc) {
 
         if (!SUPPORTED_ENCRYPTION_METHODS.contains(enc)) {
             throw new JOSEException(AlgorithmSupportMessage.unsupportedEncryptionMethod(enc, SUPPORTED_ENCRYPTION_METHODS));
@@ -112,11 +110,8 @@ public class ContentCryptoProvider {
      *
      * @param cek The CEK. Must not be {@code null}.
      * @param enc The encryption method. Must not be {@code null}.
-     * @throws KeyLengthException If the CEK length doesn't match the
-     *                            encryption method.
      */
-    private static void checkCEKLength(SecretKey cek, EncryptionMethod enc)
-            throws KeyLengthException {
+    private static void checkCEKLength(SecretKey cek, EncryptionMethod enc) {
 
         try {
             if (enc.cekBitLength() != ByteUtils.safeBitLength(cek.getEncoded())) {
@@ -138,13 +133,11 @@ public class ContentCryptoProvider {
      *                     {@code null}.
      * @param encryptedKey The encrypted CEK, {@code null} if not required.
      * @return The JWE crypto parts.
-     * @throws JOSEException If encryption failed.
      */
     public static JWECryptoParts encrypt(JWEHeader header,
                                          byte[] clearText,
                                          SecretKey cek,
-                                         Base64URLValue encryptedKey)
-    throws JOSEException {
+                                         Base64URLValue encryptedKey) {
 
         checkCEKLength(cek, header.getEncryptionMethod());
 
@@ -206,14 +199,12 @@ public class ContentCryptoProvider {
      * @param cek          The Content Encryption Key (CEK). Must not be
      *                     {@code null}.
      * @return The clear text.
-     * @throws JOSEException If decryption failed.
      */
     public static byte[] decrypt(JWEHeader header,
                                  Base64URLValue iv,
                                  Base64URLValue cipherText,
                                  Base64URLValue authTag,
-                                 SecretKey cek)
-    throws JOSEException {
+                                 SecretKey cek) {
 
         checkCEKLength(cek, header.getEncryptionMethod());
 

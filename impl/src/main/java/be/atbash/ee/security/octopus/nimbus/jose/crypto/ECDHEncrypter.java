@@ -113,10 +113,8 @@ public class ECDHEncrypter extends ECDHCryptoProvider implements JWEEncrypter {
      * Creates a new Elliptic Curve Diffie-Hellman encrypter.
      *
      * @param publicKey The public EC key. Must not be {@code null}.
-     * @throws JOSEException If the elliptic curve is not supported.
      */
-    public ECDHEncrypter(ECPublicKey publicKey)
-            throws JOSEException {
+    public ECDHEncrypter(ECPublicKey publicKey) {
 
         this(publicKey, null);
     }
@@ -126,10 +124,8 @@ public class ECDHEncrypter extends ECDHCryptoProvider implements JWEEncrypter {
      * Creates a new Elliptic Curve Diffie-Hellman encrypter.
      *
      * @param ecJWK The EC JSON Web Key (JWK). Must not be {@code null}.
-     * @throws JOSEException If the elliptic curve is not supported.
      */
-    public ECDHEncrypter(ECKey ecJWK) throws
-            JOSEException {
+    public ECDHEncrypter(ECKey ecJWK) {
 
         super(ecJWK.getCurve());
 
@@ -149,10 +145,8 @@ public class ECDHEncrypter extends ECDHCryptoProvider implements JWEEncrypter {
      *                             for the JWE encryption method ("enc").
      *                             If {@code null} a CEK will be generated
      *                             for each JWE.
-     * @throws JOSEException If the elliptic curve is not supported.
      */
-    public ECDHEncrypter(ECPublicKey publicKey, SecretKey contentEncryptionKey)
-            throws JOSEException {
+    public ECDHEncrypter(ECPublicKey publicKey, SecretKey contentEncryptionKey) {
 
         super(Curve.forECParameterSpec(publicKey.getParams()));
 
@@ -189,8 +183,7 @@ public class ECDHEncrypter extends ECDHCryptoProvider implements JWEEncrypter {
 
 
     @Override
-    public JWECryptoParts encrypt(JWEHeader header, final byte[] clearText)
-            throws JOSEException {
+    public JWECryptoParts encrypt(JWEHeader header, final byte[] clearText) {
 
         // Generate ephemeral EC key pair on the same curve as the consumer's public key
         KeyPair ephemeralKeyPair = generateEphemeralKeyPair(publicKey.getParams());
@@ -216,10 +209,8 @@ public class ECDHEncrypter extends ECDHCryptoProvider implements JWEEncrypter {
      *
      * @param ecParameterSpec The EC key spec. Must not be {@code null}.
      * @return The EC key pair.
-     * @throws JOSEException If the EC key pair couldn't be generated.
      */
-    private KeyPair generateEphemeralKeyPair(ECParameterSpec ecParameterSpec)
-            throws JOSEException {
+    private KeyPair generateEphemeralKeyPair(ECParameterSpec ecParameterSpec) {
 
         try {
             KeyPairGenerator generator = KeyPairGenerator.getInstance("EC", BouncyCastleProviderSingleton.getInstance());

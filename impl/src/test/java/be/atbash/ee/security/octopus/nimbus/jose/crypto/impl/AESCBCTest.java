@@ -153,8 +153,7 @@ public class AESCBCTest {
     }
 
     @Test
-    public void testAuthenticatedEncryption256()
-            throws Exception {
+    public void testAuthenticatedEncryption256() {
 
         SecretKey inputKey = new SecretKeySpec(INPUT_KEY_256, "AES");
 
@@ -167,8 +166,7 @@ public class AESCBCTest {
     }
 
     @Test
-    public void testAuthenticatedEncryption512()
-            throws Exception {
+    public void testAuthenticatedEncryption512() {
 
         SecretKey inputKey = new SecretKeySpec(INPUT_KEY_512, "AES");
 
@@ -181,8 +179,7 @@ public class AESCBCTest {
     }
 
     @Test
-    public void testCBCPaddingOracleAttack()
-            throws Exception {
+    public void testCBCPaddingOracleAttack() {
 
         SecretKey inputKey = new SecretKeySpec(INPUT_KEY_256, "AES");
 
@@ -195,17 +192,14 @@ public class AESCBCTest {
         // Now change the cipher text to make CBC padding invalid.
         cipherText[cipherText.length - 1] ^= 0x01;
 
-        try {
-            AESCBC.decryptAuthenticated(inputKey, IV, cipherText, AAD_VALUE, act.getAuthenticationTag());
-        } catch (JOSEException e) {
-			assertThat(e.getMessage()).isEqualTo("MAC check failed");
-        }
+
+        JOSEException exception = Assertions.assertThrows(JOSEException.class, () -> AESCBC.decryptAuthenticated(inputKey, IV, cipherText, AAD_VALUE, act.getAuthenticationTag()));
+        assertThat(exception.getMessage()).isEqualTo("MAC check failed");
     }
 
 
     @Test
-    public void testIntegerOverflowHmacBypass()
-            throws Exception {
+    public void testIntegerOverflowHmacBypass() {
 
         SecretKey inputKey = new SecretKeySpec(INPUT_KEY_256, "AES");
 

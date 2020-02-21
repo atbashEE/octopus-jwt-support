@@ -17,12 +17,10 @@ package be.atbash.ee.security.octopus.nimbus.jose;
 
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
-import be.atbash.util.exception.AtbashException;
 
 import java.security.Key;
 
-public class KeyTypeException extends AtbashException {
-    // FIXME We  change it back to extends KeyException when JoseException extends AtbashException
+public class KeyTypeException extends JOSEException {
 
     /**
      * Creates a new key type exception.

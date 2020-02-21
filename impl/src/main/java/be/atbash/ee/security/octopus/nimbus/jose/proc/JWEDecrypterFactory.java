@@ -16,7 +16,6 @@
 package be.atbash.ee.security.octopus.nimbus.jose.proc;
 
 
-import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEDecrypter;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEHeader;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEProvider;
@@ -39,10 +38,6 @@ public interface JWEDecrypterFactory extends JWEProvider {
      * @param key    The key intended to verify the JWS message. Not
      *               {@code null}.
      * @return The JWE decrypter.
-     * @throws JOSEException If the JWE algorithm / encryption method is
-     *                       not supported or the key type or length
-     *                       doesn't match expected for the JWE algorithm.
      */
-    JWEDecrypter createJWEDecrypter(JWEHeader header, Key key)
-            throws JOSEException;
+    JWEDecrypter createJWEDecrypter(JWEHeader header, Key key);
 }

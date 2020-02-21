@@ -114,10 +114,8 @@ public abstract class AESCryptoProvider extends BaseJWEProvider {
      *
      * @param kekLength The KEK length in bits.
      * @return The compatible JWE algorithms.
-     * @throws KeyLengthException If the KEK length is not compatible.
      */
-    private static Set<JWEAlgorithm> getCompatibleJWEAlgorithms(int kekLength)
-            throws KeyLengthException {
+    private static Set<JWEAlgorithm> getCompatibleJWEAlgorithms(int kekLength) {
 
         Set<JWEAlgorithm> algs = COMPATIBLE_ALGORITHMS.get(kekLength);
 
@@ -135,10 +133,8 @@ public abstract class AESCryptoProvider extends BaseJWEProvider {
      * @param kek The Key Encryption Key. Must be 128 bits (16 bytes), 192
      *            bits (24 bytes) or 256 bits (32 bytes). Must not be
      *            {@code null}.
-     * @throws KeyLengthException If the KEK length is invalid.
      */
-    protected AESCryptoProvider(SecretKey kek)
-            throws KeyLengthException {
+    protected AESCryptoProvider(SecretKey kek) {
 
         super(getCompatibleJWEAlgorithms(ByteUtils.bitLength(kek.getEncoded())), ContentCryptoProvider.SUPPORTED_ENCRYPTION_METHODS);
 

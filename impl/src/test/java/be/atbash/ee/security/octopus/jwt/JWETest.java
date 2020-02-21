@@ -32,6 +32,7 @@ import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.KeyTypeException;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEObject;
+import be.atbash.ee.security.octopus.nimbus.jwt.proc.BadJWEException;
 import be.atbash.util.TestReflectionUtils;
 import be.atbash.util.exception.AtbashUnexpectedException;
 import org.junit.jupiter.api.AfterEach;
@@ -416,9 +417,7 @@ public class JWETest {
 
         KeySelector keySelector = new TestKeySelector(keyManager);
 
-        Exception e = Assertions.assertThrows(AtbashUnexpectedException.class, () -> new JWTDecoder().decode(encoded, Payload.class, keySelector));
-        assertThat(e).isInstanceOf(AtbashUnexpectedException.class);
-        assertThat(e.getCause()).isInstanceOf(JOSEException.class);
+        Exception e = Assertions.assertThrows(BadJWEException.class, () -> new JWTDecoder().decode(encoded, Payload.class, keySelector));
         // Message can vary
 
     }
@@ -450,11 +449,9 @@ public class JWETest {
 
         KeySelector keySelector = new TestKeySelector(keyManager);
 
-        Exception e = Assertions.assertThrows(AtbashUnexpectedException.class, () -> new JWTDecoder().decode(new StringBuilder(encoded).deleteCharAt(450).insert(450, "1").toString(), Payload.class, keySelector));
+        Exception e = Assertions.assertThrows(BadJWEException.class, () -> new JWTDecoder().decode(new StringBuilder(encoded).deleteCharAt(450).insert(450, "1").toString(), Payload.class, keySelector));
 
-        assertThat(e).isInstanceOf(AtbashUnexpectedException.class);
-        assertThat(e.getCause()).isInstanceOf(JOSEException.class);
-        assertThat(e.getCause().getCause().getMessage()).isEqualTo("AES/GCM/NoPadding decryption failed: mac check in GCM failed");
+        assertThat(e.getMessage()).isEqualTo("Encrypted JWT rejected: AES/GCM/NoPadding decryption failed: mac check in GCM failed");
 
     }
 
@@ -485,11 +482,9 @@ public class JWETest {
 
         KeySelector keySelector = new TestKeySelector(keyManager);
 
-        Exception e = Assertions.assertThrows(AtbashUnexpectedException.class, () -> new JWTDecoder().decode(new StringBuilder(encoded).deleteCharAt(440).insert(440, "1").toString(), Payload.class, keySelector));
+        Exception e = Assertions.assertThrows(BadJWEException.class, () -> new JWTDecoder().decode(new StringBuilder(encoded).deleteCharAt(440).insert(440, "1").toString(), Payload.class, keySelector));
 
-        assertThat(e).isInstanceOf(AtbashUnexpectedException.class);
-        assertThat(e.getCause()).isInstanceOf(JOSEException.class);
-        assertThat(e.getCause().getCause().getMessage()).isEqualTo("AES/GCM/NoPadding decryption failed: mac check in GCM failed");
+        assertThat(e.getMessage()).isEqualTo("Encrypted JWT rejected: AES/GCM/NoPadding decryption failed: mac check in GCM failed");
 
     }
 

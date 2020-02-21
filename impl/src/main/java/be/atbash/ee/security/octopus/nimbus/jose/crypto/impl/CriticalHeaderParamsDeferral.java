@@ -110,10 +110,8 @@ public class CriticalHeaderParamsDeferral {
      * critical header parameters check.
      *
      * @param header The JWE header to check. Must not be {@code null}.
-     * @throws JOSEException If the JWE header doesn't pass the check.
      */
-    public void ensureHeaderPasses(JWEHeader header)
-            throws JOSEException {
+    public void ensureHeaderPasses(JWEHeader header) {
 
         if (!headerPasses(header)) {
             throw new JOSEException("Unsupported critical header parameter(s)");

@@ -153,8 +153,7 @@ public class RSASSASigner extends RSASSAProvider implements JWSSigner {
     }
 
     @Override
-    public Base64URLValue sign(JWSHeader header, byte[] signingInput)
-            throws JOSEException {
+    public Base64URLValue sign(JWSHeader header, byte[] signingInput) {
 
         Signature signer = RSASSA.getSignerAndVerifier(header.getAlgorithm());
 

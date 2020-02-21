@@ -98,11 +98,8 @@ public class RSADecrypter extends RSACryptoProvider implements JWEDecrypter {
      *               a private part. Its length must be at least 2048 bits.
      *               Note that the length of an RSA key in a PKCS#11 store
      *               cannot be checked. Must not be {@code null}.
-     * @throws JOSEException If the RSA JWK doesn't contain a private part
-     *                       or its extraction failed.
      */
-    public RSADecrypter(RSAKey rsaJWK)
-            throws JOSEException {
+    public RSADecrypter(RSAKey rsaJWK) {
 
         this(RSAKeyUtils.toRSAPrivateKey(rsaJWK));
     }
@@ -197,8 +194,7 @@ public class RSADecrypter extends RSACryptoProvider implements JWEDecrypter {
                           Base64URLValue encryptedKey,
                           Base64URLValue iv,
                           Base64URLValue cipherText,
-                          Base64URLValue authTag)
-            throws JOSEException {
+                          Base64URLValue authTag) {
 
         // Validate required JWE parts
         if (encryptedKey == null) {

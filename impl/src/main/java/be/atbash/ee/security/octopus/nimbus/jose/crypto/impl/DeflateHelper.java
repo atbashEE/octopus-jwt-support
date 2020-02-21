@@ -39,11 +39,8 @@ final class DeflateHelper {
      * @param jweHeader The JWE header. Must not be {@code null}.
      * @param bytes     The plain text bytes. Must not be {@code null}.
      * @return The bytes to encrypt.
-     * @throws JOSEException If compression failed or the requested
-     *                       compression algorithm is not supported.
      */
-    static byte[] applyCompression(JWEHeader jweHeader, byte[] bytes)
-            throws JOSEException {
+    static byte[] applyCompression(JWEHeader jweHeader, byte[] bytes) {
 
         CompressionAlgorithm compressionAlg = jweHeader.getCompressionAlgorithm();
 
@@ -74,11 +71,8 @@ final class DeflateHelper {
      * @param jweHeader The JWE header. Must not be {@code null}.
      * @param bytes     The plain text bytes. Must not be {@code null}.
      * @return The output bytes, decompressed if requested.
-     * @throws JOSEException If decompression failed or the requested
-     *                       compression algorithm is not supported.
      */
-    static byte[] applyDecompression(JWEHeader jweHeader, byte[] bytes)
-            throws JOSEException {
+    static byte[] applyDecompression(JWEHeader jweHeader, byte[] bytes) {
 
         CompressionAlgorithm compressionAlg = jweHeader.getCompressionAlgorithm();
 

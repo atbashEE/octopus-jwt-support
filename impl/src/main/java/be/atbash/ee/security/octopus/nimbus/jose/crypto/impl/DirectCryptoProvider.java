@@ -79,10 +79,8 @@ public abstract class DirectCryptoProvider extends BaseJWEProvider {
      *
      * @param cekLength The CEK length in bits.
      * @return The compatible encryption methods.
-     * @throws KeyLengthException If the CEK length is not compatible.
      */
-    private static Set<EncryptionMethod> getCompatibleEncryptionMethods(int cekLength)
-            throws KeyLengthException {
+    private static Set<EncryptionMethod> getCompatibleEncryptionMethods(int cekLength) {
 
         Set<EncryptionMethod> encs = ContentCryptoProvider.COMPATIBLE_ENCRYPTION_METHODS.get(cekLength);
 
@@ -107,10 +105,8 @@ public abstract class DirectCryptoProvider extends BaseJWEProvider {
      *            bytes), 192 bits (24 bytes), 256 bits (32 bytes), 384
      *            bits (48 bytes) or 512 bits (64 bytes) long. Must not be
      *            {@code null}.
-     * @throws KeyLengthException If the CEK length is not compatible.
      */
-    protected DirectCryptoProvider(SecretKey cek)
-            throws KeyLengthException {
+    protected DirectCryptoProvider(SecretKey cek) {
 
         super(SUPPORTED_ALGORITHMS, getCompatibleEncryptionMethods(ByteUtils.bitLength(cek.getEncoded())));
 

@@ -20,7 +20,10 @@ import be.atbash.ee.security.octopus.jwt.parameter.JWTParameters;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersEncryption;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersPlain;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersSigning;
-import be.atbash.ee.security.octopus.nimbus.jose.*;
+import be.atbash.ee.security.octopus.nimbus.jose.JOSEObjectType;
+import be.atbash.ee.security.octopus.nimbus.jose.KeyTypeException;
+import be.atbash.ee.security.octopus.nimbus.jose.Payload;
+import be.atbash.ee.security.octopus.nimbus.jose.PlainHeader;
 import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import be.atbash.ee.security.octopus.nimbus.jwt.JWTClaimsSet;
 import be.atbash.ee.security.octopus.nimbus.jwt.PlainJWT;
@@ -63,25 +66,21 @@ public class JWTEncoder {
 
         String result;
 
-        try {
-            switch (parameters.getEncoding()) {
-                case NONE:
-                    result = createJSONString(data);
-                    break;
-                case PLAIN:
-                    result = createPlainJWT(data, (JWTParametersPlain) parameters);
-                    break;
-                case JWS:
-                    result = createSignedJWT(data, (JWTParametersSigning) parameters);
-                    break;
-                case JWE:
-                    result = createEncryptedJWE(data, (JWTParametersEncryption) parameters);
-                    break;
-                default:
-                    throw new IllegalArgumentException(String.format("JWTEncoding not supported %s", parameters.getEncoding()));
-            }
-        } catch (JOSEException e) {
-            throw new AtbashUnexpectedException(e);
+        switch (parameters.getEncoding()) {
+            case NONE:
+                result = createJSONString(data);
+                break;
+            case PLAIN:
+                result = createPlainJWT(data, (JWTParametersPlain) parameters);
+                break;
+            case JWS:
+                result = createSignedJWT(data, (JWTParametersSigning) parameters);
+                break;
+            case JWE:
+                result = createEncryptedJWE(data, (JWTParametersEncryption) parameters);
+                break;
+            default:
+                throw new IllegalArgumentException(String.format("JWTEncoding not supported %s", parameters.getEncoding()));
         }
         return result;
 
@@ -105,7 +104,7 @@ public class JWTEncoder {
         return plainJWT.serialize();
     }
 
-    private String createEncryptedJWE(Object data, JWTParametersEncryption parameters) throws JOSEException {
+    private String createEncryptedJWE(Object data, JWTParametersEncryption parameters) {
 
         JWEAlgorithm jweAlgorithm = parameters.getJweAlgorithm();
         if (jweAlgorithm == null) {
@@ -145,12 +144,12 @@ public class JWTEncoder {
         return result;
     }
 
-    private String createSignedJWT(Object data, JWTParametersSigning parameters) throws JOSEException {
+    private String createSignedJWT(Object data, JWTParametersSigning parameters) {
         JWSObject jwsObject = createJWTObject(data, parameters);
         return jwsObject.serialize();
     }
 
-    private JWSObject createJWTObject(Object data, JWTParametersSigning parameters) throws JOSEException {
+    private JWSObject createJWTObject(Object data, JWTParametersSigning parameters) {
         JWSObject jwsObject;
 
         JWSHeader header = new JWSHeader.Builder(signerFactory.defineJWSAlgorithm(parameters))

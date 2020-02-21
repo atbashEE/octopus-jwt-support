@@ -69,11 +69,8 @@ public class DirectEncrypter extends DirectCryptoProvider implements JWEEncrypte
      *            128 bits (16 bytes), 192 bits (24 bytes), 256 bits (32
      *            bytes), 384 bits (48 bytes) or 512 bits (64 bytes) long.
      *            Must not be {@code null}.
-     * @throws KeyLengthException If the symmetric key length is not
-     *                            compatible.
      */
-    public DirectEncrypter(SecretKey key)
-            throws KeyLengthException {
+    public DirectEncrypter(SecretKey key) {
 
         super(key);
     }
@@ -86,11 +83,8 @@ public class DirectEncrypter extends DirectCryptoProvider implements JWEEncrypte
      *                 (16 bytes), 192 bits (24 bytes), 256 bits (32
      *                 bytes), 384 bits (48 bytes) or 512 bits (64 bytes)
      *                 long. Must not be {@code null}.
-     * @throws KeyLengthException If the symmetric key length is not
-     *                            compatible.
      */
-    public DirectEncrypter(byte[] keyBytes)
-            throws KeyLengthException {
+    public DirectEncrypter(byte[] keyBytes) {
 
         this(new SecretKeySpec(keyBytes, "AES"));
     }
@@ -103,19 +97,15 @@ public class DirectEncrypter extends DirectCryptoProvider implements JWEEncrypte
      *               bytes), 192 bits (24 bytes), 256 bits (32 bytes), 384
      *               bits (48 bytes) or 512 bits (64 bytes) long. Must not
      *               be {@code null}.
-     * @throws KeyLengthException If the symmetric key length is not
-     *                            compatible.
      */
-    public DirectEncrypter(OctetSequenceKey octJWK)
-            throws KeyLengthException {
+    public DirectEncrypter(OctetSequenceKey octJWK) {
 
         this(octJWK.toSecretKey("AES"));
     }
 
 
     @Override
-    public JWECryptoParts encrypt(JWEHeader header, byte[] clearText)
-            throws JOSEException {
+    public JWECryptoParts encrypt(JWEHeader header, byte[] clearText) {
 
         JWEAlgorithm alg = header.getAlgorithm();
 

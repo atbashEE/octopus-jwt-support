@@ -16,7 +16,6 @@
 package be.atbash.ee.security.octopus.nimbus.jwt.jwe;
 
 
-import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 
 /**
@@ -42,16 +41,10 @@ public interface JWEDecrypter extends JWEProvider {
      * @param authTag      The authentication tag, {@code null} if not
      *                     required.
      * @return The clear text.
-     * @throws JOSEException If the JWE algorithm or method is not
-     *                       supported, if a critical header parameter is
-     *                       not supported or marked for deferral to the
-     *                       application, or if decryption failed for some
-     *                       other reason.
      */
     byte[] decrypt(JWEHeader header,
                    Base64URLValue encryptedKey,
                    Base64URLValue iv,
                    Base64URLValue cipherText,
-                   Base64URLValue authTag)
-            throws JOSEException;
+                   Base64URLValue authTag);
 }

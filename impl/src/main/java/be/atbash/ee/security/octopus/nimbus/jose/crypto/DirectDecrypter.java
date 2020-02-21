@@ -17,7 +17,6 @@ package be.atbash.ee.security.octopus.nimbus.jose.crypto;
 
 
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
-import be.atbash.ee.security.octopus.nimbus.jose.KeyLengthException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.AlgorithmSupportMessage;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.ContentCryptoProvider;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.CriticalHeaderParamsDeferral;
@@ -89,11 +88,8 @@ public class DirectDecrypter extends DirectCryptoProvider implements JWEDecrypte
      *            128 bits (16 bytes), 192 bits (24 bytes), 256 bits (32
      *            bytes), 384 bits (48 bytes) or 512 bits (64 bytes) long.
      *            Must not be {@code null}.
-     * @throws KeyLengthException If the symmetric key length is not
-     *                            compatible.
      */
-    public DirectDecrypter(SecretKey key)
-            throws KeyLengthException {
+    public DirectDecrypter(SecretKey key) {
 
         this(key, false);
     }
@@ -114,11 +110,8 @@ public class DirectDecrypter extends DirectCryptoProvider implements JWEDecrypte
      *                        mode the JWE algorithm checks for
      *                        ("alg":"dir") and encrypted key not being
      *                        present will be skipped.
-     * @throws KeyLengthException If the symmetric key length is not
-     *                            compatible.
      */
-    public DirectDecrypter(SecretKey key, boolean promiscuousMode)
-            throws KeyLengthException {
+    public DirectDecrypter(SecretKey key, boolean promiscuousMode) {
 
         super(key);
 
@@ -133,11 +126,8 @@ public class DirectDecrypter extends DirectCryptoProvider implements JWEDecrypte
      *                 (16 bytes), 192 bits (24 bytes), 256 bits (32
      *                 bytes), 384 bits (48 bytes) or 512 bits (64 bytes)
      *                 long. Must not be {@code null}.
-     * @throws KeyLengthException If the symmetric key length is not
-     *                            compatible.
      */
-    public DirectDecrypter(byte[] keyBytes)
-            throws KeyLengthException {
+    public DirectDecrypter(byte[] keyBytes) {
 
         this(new SecretKeySpec(keyBytes, "AES"), false);
     }
@@ -150,11 +140,8 @@ public class DirectDecrypter extends DirectCryptoProvider implements JWEDecrypte
      *               bytes), 192 bits (24 bytes), 256 bits (32 bytes), 384
      *               bits (48 bytes) or 512 bits (64 bytes) long. Must not
      *               be {@code null}.
-     * @throws KeyLengthException If the symmetric key length is not
-     *                            compatible.
      */
-    public DirectDecrypter(OctetSequenceKey octJWK)
-            throws KeyLengthException {
+    public DirectDecrypter(OctetSequenceKey octJWK) {
 
         this(octJWK.toSecretKey("AES"));
     }
@@ -172,11 +159,8 @@ public class DirectDecrypter extends DirectCryptoProvider implements JWEDecrypte
      * @param defCritHeaders The names of the critical header parameters
      *                       that are deferred to the application for
      *                       processing, empty set or {@code null} if none.
-     * @throws KeyLengthException If the symmetric key length is not
-     *                            compatible.
      */
-    public DirectDecrypter(SecretKey key, Set<String> defCritHeaders)
-            throws KeyLengthException {
+    public DirectDecrypter(SecretKey key, Set<String> defCritHeaders) {
 
         this(key, defCritHeaders, false);
     }
@@ -199,13 +183,10 @@ public class DirectDecrypter extends DirectCryptoProvider implements JWEDecrypte
      *                        mode the JWE algorithm checks for
      *                        ("alg":"dir") and encrypted key not being
      *                        present will be skipped.
-     * @throws KeyLengthException If the symmetric key length is not
-     *                            compatible.
      */
     public DirectDecrypter(SecretKey key,
                            Set<String> defCritHeaders,
-                           boolean promiscuousMode)
-            throws KeyLengthException {
+                           boolean promiscuousMode) {
 
         super(key);
         critPolicy.setDeferredCriticalHeaderParams(defCritHeaders);
@@ -228,8 +209,7 @@ public class DirectDecrypter extends DirectCryptoProvider implements JWEDecrypte
                           Base64URLValue encryptedKey,
                           Base64URLValue iv,
                           Base64URLValue cipherText,
-                          Base64URLValue authTag)
-            throws JOSEException {
+                          Base64URLValue authTag) {
 
         // Validate required JWE parts
         if (!promiscuousMode) {

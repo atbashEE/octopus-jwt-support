@@ -41,10 +41,8 @@ public final class ECDSA {
      *
      * @param ecKey The EC key. Must not be {@code null}.
      * @return The matching EC DSA algorithm.
-     * @throws JOSEException If the elliptic curve of key is not supported.
      */
-    public static JWSAlgorithm resolveAlgorithm(ECKey ecKey)
-            throws JOSEException {
+    public static JWSAlgorithm resolveAlgorithm(ECKey ecKey) {
 
         ECParameterSpec ecParameterSpec = ecKey.getParams();
         return resolveAlgorithm(Curve.forECParameterSpec(ecParameterSpec));
@@ -57,10 +55,8 @@ public final class ECDSA {
      *
      * @param curve The elliptic curve. May be {@code null}.
      * @return The matching EC DSA algorithm.
-     * @throws JOSEException If the elliptic curve of key is not supported.
      */
-    public static JWSAlgorithm resolveAlgorithm(Curve curve)
-            throws JOSEException {
+    public static JWSAlgorithm resolveAlgorithm(Curve curve) {
 
         if (curve == null) {
             throw new JOSEException("The EC key curve is not supported, must be P-256, P-384 or P-521");
@@ -84,11 +80,8 @@ public final class ECDSA {
      * @param alg The ECDSA JWS algorithm. Must not be
      *            {@code null}.
      * @return The JCA signer / verifier instance.
-     * @throws JOSEException If a JCA signer / verifier couldn't be
-     *                       created.
      */
-    public static Signature getSignerAndVerifier(JWSAlgorithm alg)
-            throws JOSEException {
+    public static Signature getSignerAndVerifier(JWSAlgorithm alg) {
 
         String jcaAlg;
 
@@ -123,10 +116,8 @@ public final class ECDSA {
      * @param alg The ECDSA algorithm. Must be supported and not
      *            {@code null}.
      * @return The expected byte array length for the signature.
-     * @throws JOSEException If the algorithm is not supported.
      */
-    public static int getSignatureByteArrayLength(JWSAlgorithm alg)
-            throws JOSEException {
+    public static int getSignatureByteArrayLength(JWSAlgorithm alg) {
 
         if (alg.equals(JWSAlgorithm.ES256)) {
 
@@ -160,10 +151,8 @@ public final class ECDSA {
      * @param derSignature The ASN1./DER-encoded. Must not be {@code null}.
      * @param outputLength The expected length of the ECDSA JWS signature.
      * @return The ECDSA JWS encoded signature.
-     * @throws JOSEException If the ASN.1/DER signature format is invalid.
      */
-    public static byte[] transcodeSignatureToConcat(byte[] derSignature, int outputLength)
-            throws JOSEException {
+    public static byte[] transcodeSignatureToConcat(byte[] derSignature, int outputLength) {
 
         if (derSignature.length < 8 || derSignature[0] != 48) {
             throw new JOSEException("Invalid ECDSA signature format");
@@ -219,10 +208,8 @@ public final class ECDSA {
      *                     concatenated R and S values. Must not be
      *                     {@code null}.
      * @return The ASN.1/DER encoded signature.
-     * @throws JOSEException If the ECDSA JWS signature format is invalid.
      */
-    public static byte[] transcodeSignatureToDER(byte[] jwsSignature)
-            throws JOSEException {
+    public static byte[] transcodeSignatureToDER(byte[] jwsSignature) {
 
         // Adapted from org.apache.xml.security.algorithms.implementations.SignatureECDSA
 

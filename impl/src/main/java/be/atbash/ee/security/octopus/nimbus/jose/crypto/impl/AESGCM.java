@@ -86,13 +86,11 @@ public final class AESGCM {
      *                    Special Publication 800-38D </a>.
      * @param authData    The authenticated data. Must not be {@code null}.
      * @return The authenticated cipher text.
-     * @throws JOSEException If encryption failed.
      */
     public static AuthenticatedCipherText encrypt(SecretKey secretKey,
                                                   Container<byte[]> ivContainer,
                                                   byte[] plainText,
-                                                  byte[] authData)
-            throws JOSEException {
+                                                  byte[] authData) {
 
         // Key alg must be "AES"
         SecretKey aesKey = KeyUtils.toAESKey(secretKey);
@@ -144,14 +142,11 @@ public final class AESGCM {
      * @param cipher The cipher to interrogate for the parameters it
      *               actually used.
      * @return The IV used by the specified cipher.
-     * @throws JOSEException If retrieval of the algorithm parameters from
-     *                       the cipher failed, or the parameters are
-     *                       deemed unusable.
+     * deemed unusable.
      * @see #actualParamsOf(Cipher)
      * @see #validate(byte[], int)
      */
-    private static byte[] actualIVOf(Cipher cipher)
-            throws JOSEException {
+    private static byte[] actualIVOf(Cipher cipher) {
 
         GCMParameterSpec actualParams = actualParamsOf(cipher);
 
@@ -172,13 +167,10 @@ public final class AESGCM {
      * @param iv            The IV to check for compliance.
      * @param authTagLength The authentication tag length to check for
      *                      compliance.
-     * @throws JOSEException If the parameters don't match the JWA
-     *                       requirements.
      * @see #IV_BIT_LENGTH
      * @see #AUTH_TAG_BIT_LENGTH
      */
-    private static void validate(byte[] iv, int authTagLength)
-            throws JOSEException {
+    private static void validate(byte[] iv, int authTagLength) {
 
         if (ByteUtils.safeBitLength(iv) != IV_BIT_LENGTH) {
             throw new JOSEException(String.format("IV length of %d bits is required, got %d", IV_BIT_LENGTH, ByteUtils.safeBitLength(iv)));
@@ -196,15 +188,8 @@ public final class AESGCM {
      *
      * @param cipher The cipher to interrogate. Non-{@code null}.
      * @return The AES GCM parameters. Non-{@code null}.
-     * @throws JOSEException If the parameters cannot be retrieved, are
-     *                       uninitialized, or are not in the correct form. We want to have the
-     *                       actual parameters used by the cipher and not rely on the assumption
-     *                       that they were the same as those we supplied it with. If at runtime
-     *                       the assumption is incorrect, the ciphertext would not be
-     *                       decryptable.
      */
-    private static GCMParameterSpec actualParamsOf(Cipher cipher)
-            throws JOSEException {
+    private static GCMParameterSpec actualParamsOf(Cipher cipher) {
 
         AlgorithmParameters algorithmParameters = cipher.getParameters();
 
@@ -231,14 +216,12 @@ public final class AESGCM {
      * @param authData   The authenticated data. Must not be {@code null}.
      * @param authTag    The authentication tag. Must not be {@code null}.
      * @return The decrypted plain text.
-     * @throws JOSEException If decryption failed.
      */
     public static byte[] decrypt(SecretKey secretKey,
                                  byte[] iv,
                                  byte[] cipherText,
                                  byte[] authData,
-                                 byte[] authTag)
-            throws JOSEException {
+                                 byte[] authTag) {
 
         // Key alg must be "AES"
         SecretKey aesKey = KeyUtils.toAESKey(secretKey);

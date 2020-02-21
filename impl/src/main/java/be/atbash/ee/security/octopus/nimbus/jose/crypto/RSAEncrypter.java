@@ -145,8 +145,7 @@ public class RSAEncrypter extends RSACryptoProvider implements JWEEncrypter {
 
 
     @Override
-    public JWECryptoParts encrypt(JWEHeader header, byte[] clearText)
-            throws JOSEException {
+    public JWECryptoParts encrypt(JWEHeader header, byte[] clearText) {
 
         JWEAlgorithm alg = header.getAlgorithm();
         EncryptionMethod enc = header.getEncryptionMethod();

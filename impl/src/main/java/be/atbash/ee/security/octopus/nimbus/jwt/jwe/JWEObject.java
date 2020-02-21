@@ -321,11 +321,8 @@ public class JWEObject extends JOSEObject {
     /**
      * Ensures the specified JWE encrypter supports the algorithms of this
      * JWE object.
-     *
-     * @throws JOSEException If the JWE algorithms are not supported.
      */
-    private void ensureJWEEncrypterSupport(JWEEncrypter encrypter)
-            throws JOSEException {
+    private void ensureJWEEncrypterSupport(JWEEncrypter encrypter) {
 
         if (!encrypter.supportedJWEAlgorithms().contains(getHeader().getAlgorithm())) {
 
@@ -349,11 +346,8 @@ public class JWEObject extends JOSEObject {
      * @throws IllegalStateException If the JWE object is not in an
      *                               {@link State#UNENCRYPTED unencrypted
      *                               state}.
-     * @throws JOSEException         If the JWE object couldn't be
-     *                               encrypted.
      */
-    public synchronized void encrypt(JWEEncrypter encrypter)
-            throws JOSEException {
+    public synchronized void encrypt(JWEEncrypter encrypter) {
 
         ensureUnencryptedState();
 
@@ -361,19 +355,8 @@ public class JWEObject extends JOSEObject {
 
         JWECryptoParts parts;
 
-        try {
-            parts = encrypter.encrypt(getHeader(), getPayload().toBytes());
+        parts = encrypter.encrypt(getHeader(), getPayload().toBytes());
 
-        } catch (JOSEException e) {
-
-            throw e;
-
-        } catch (Exception e) {
-
-            // Prevent throwing unchecked exceptions at this point,
-            // see issue #20
-            throw new JOSEException(e.getMessage(), e);
-        }
 
         // Check if the header has been modified
         if (parts.getHeader() != null) {
@@ -397,31 +380,17 @@ public class JWEObject extends JOSEObject {
      * @throws IllegalStateException If the JWE object is not in an
      *                               {@link State#ENCRYPTED encrypted
      *                               state}.
-     * @throws JOSEException         If the JWE object couldn't be
-     *                               decrypted.
      */
-    public synchronized void decrypt(JWEDecrypter decrypter)
-            throws JOSEException {
+    public synchronized void decrypt(JWEDecrypter decrypter) {
 
         ensureEncryptedState();
 
-        try {
-            setPayload(new Payload(decrypter.decrypt(getHeader(),
-                    getEncryptedKey(),
-                    getIV(),
-                    getCipherText(),
-                    getAuthTag())));
+        setPayload(new Payload(decrypter.decrypt(getHeader(),
+                getEncryptedKey(),
+                getIV(),
+                getCipherText(),
+                getAuthTag())));
 
-        } catch (JOSEException e) {
-
-            throw e;
-
-        } catch (Exception e) {
-
-            // Prevent throwing unchecked exceptions at this point,
-            // see issue #20
-            throw new JOSEException(e.getMessage(), e);
-        }
 
         state = State.DECRYPTED;
     }

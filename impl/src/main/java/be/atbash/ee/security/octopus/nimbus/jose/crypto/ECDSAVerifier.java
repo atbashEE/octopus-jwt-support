@@ -77,10 +77,8 @@ public class ECDSAVerifier extends ECDSAProvider implements JWSVerifier {
      * verifier.
      *
      * @param publicKey The public EC key. Must not be {@code null}.
-     * @throws JOSEException If the elliptic curve of key is not supported.
      */
-    public ECDSAVerifier(ECPublicKey publicKey)
-            throws JOSEException {
+    public ECDSAVerifier(ECPublicKey publicKey) {
 
         this(publicKey, null);
     }
@@ -93,15 +91,14 @@ public class ECDSAVerifier extends ECDSAProvider implements JWSVerifier {
      * @param defCritHeaders The names of the critical header parameters
      *                       that are deferred to the application for
      *                       processing, empty set or {@code null} if none.
-     * @throws JOSEException If the elliptic curve of key is not supported.
      */
-    public ECDSAVerifier(ECPublicKey publicKey, Set<String> defCritHeaders)
-            throws JOSEException {
+    public ECDSAVerifier(ECPublicKey publicKey, Set<String> defCritHeaders) {
 
         super(ECDSA.resolveAlgorithm(publicKey));
 
         this.publicKey = publicKey;
 
+        // FIXME Possible NPE
         if (!ECChecks.isPointOnCurve(
                 publicKey,
                 Curve.forJWSAlgorithm(supportedECDSAAlgorithm()).iterator().next().toECParameterSpec())) {
@@ -125,8 +122,7 @@ public class ECDSAVerifier extends ECDSAProvider implements JWSVerifier {
     @Override
     public boolean verify(JWSHeader header,
                           byte[] signedContent,
-                          Base64URLValue signature)
-            throws JOSEException {
+                          Base64URLValue signature) {
 
         JWSAlgorithm alg = header.getAlgorithm();
 

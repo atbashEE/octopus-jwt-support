@@ -16,15 +16,16 @@
 package be.atbash.ee.security.octopus.nimbus.jose;
 
 
+import be.atbash.util.exception.AtbashException;
+
 /**
  * Javascript Object Signing and Encryption (JOSE) exception.
- *
- * Based on code byVladimir Dzhuvinov
+ * <p>
+ * Based on code by Vladimir Dzhuvinov
  */
-public class JOSEException extends Exception {
+public class JOSEException extends AtbashException {
 
     private static final long serialVersionUID = 1L;
-
 
     /**
      * Creates a new JOSE exception with the specified message.

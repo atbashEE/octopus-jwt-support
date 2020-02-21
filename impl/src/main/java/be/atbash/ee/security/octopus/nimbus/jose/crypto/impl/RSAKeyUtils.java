@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,10 +37,8 @@ public final class RSAKeyUtils {
      *
      * @param rsaJWK The RSA JWK. Must not be {@code null}.
      * @return The private RSA key.
-     * @throws JOSEException If the RSA JWK doesn't contain a private part.
      */
-    public static PrivateKey toRSAPrivateKey(RSAKey rsaJWK)
-            throws JOSEException {
+    public static PrivateKey toRSAPrivateKey(RSAKey rsaJWK) {
 
         if (!rsaJWK.isPrivate()) {
             throw new JOSEException("The RSA JWK doesn't contain a private part");

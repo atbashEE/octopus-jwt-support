@@ -85,10 +85,8 @@ public class AESEncrypter extends AESCryptoProvider implements JWEEncrypter {
      * @param kek The Key Encryption Key. Must be 128 bits (16 bytes), 192
      *            bits (24 bytes) or 256 bits (32 bytes). Must not be
      *            {@code null}.
-     * @throws KeyLengthException If the KEK length is invalid.
      */
-    public AESEncrypter(SecretKey kek)
-            throws KeyLengthException {
+    public AESEncrypter(SecretKey kek) {
 
         super(kek);
     }
@@ -99,10 +97,8 @@ public class AESEncrypter extends AESCryptoProvider implements JWEEncrypter {
      * @param keyBytes The Key Encryption Key, as a byte array. Must be 128
      *                 bits (16 bytes), 192 bits (24 bytes) or 256 bits (32
      *                 bytes). Must not be {@code null}.
-     * @throws KeyLengthException If the KEK length is invalid.
      */
-    public AESEncrypter(byte[] keyBytes)
-            throws KeyLengthException {
+    public AESEncrypter(byte[] keyBytes) {
 
         this(new SecretKeySpec(keyBytes, "AES"));
     }
@@ -115,18 +111,15 @@ public class AESEncrypter extends AESCryptoProvider implements JWEEncrypter {
      *               bytes), 192 bits (24 bytes), 256 bits (32 bytes), 384
      *               bits (48 bytes) or 512 bits (64 bytes) long. Must not
      *               be {@code null}.
-     * @throws KeyLengthException If the KEK length is invalid.
      */
-    public AESEncrypter(OctetSequenceKey octJWK)
-            throws KeyLengthException {
+    public AESEncrypter(OctetSequenceKey octJWK) {
 
         this(octJWK.toSecretKey("AES"));
     }
 
 
     @Override
-    public JWECryptoParts encrypt(JWEHeader header, byte[] clearText)
-            throws JOSEException {
+    public JWECryptoParts encrypt(JWEHeader header, byte[] clearText) {
 
         JWEAlgorithm alg = header.getAlgorithm();
 

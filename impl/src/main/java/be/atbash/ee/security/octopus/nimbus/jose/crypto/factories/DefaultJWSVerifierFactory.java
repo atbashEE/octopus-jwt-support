@@ -69,8 +69,7 @@ public class DefaultJWSVerifierFactory implements JWSVerifierFactory {
     }
 
     @Override
-    public JWSVerifier createJWSVerifier(JWSHeader header, Key key)
-            throws JOSEException {
+    public JWSVerifier createJWSVerifier(JWSHeader header, Key key) {
 
         JWSVerifier verifier;
 

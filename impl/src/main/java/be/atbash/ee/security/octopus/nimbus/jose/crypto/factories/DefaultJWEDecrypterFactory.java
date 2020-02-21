@@ -90,8 +90,7 @@ public class DefaultJWEDecrypterFactory implements JWEDecrypterFactory {
 
 
     @Override
-    public JWEDecrypter createJWEDecrypter(JWEHeader header, Key key)
-            throws JOSEException {
+    public JWEDecrypter createJWEDecrypter(JWEHeader header, Key key) {
 
         JWEDecrypter decrypter;
 

@@ -78,10 +78,8 @@ public class ECDSASigner extends ECDSAProvider implements JWSSigner {
      * signer.
      *
      * @param privateKey The private EC key. Must not be {@code null}.
-     * @throws JOSEException If the elliptic curve of key is not supported.
      */
-    public ECDSASigner(ECPrivateKey privateKey)
-            throws JOSEException {
+    public ECDSASigner(ECPrivateKey privateKey) {
 
         super(ECDSA.resolveAlgorithm(privateKey));
 
@@ -93,10 +91,8 @@ public class ECDSASigner extends ECDSAProvider implements JWSSigner {
      * signer.
      *
      * @param atbashKey The private EC key. Must not be {@code null}.
-     * @throws JOSEException If the elliptic curve of key is not supported.
      */
-    public ECDSASigner(AtbashKey atbashKey)
-            throws JOSEException {
+    public ECDSASigner(AtbashKey atbashKey) {
 
         this(getPrivateKey(atbashKey));
     }
@@ -112,8 +108,7 @@ public class ECDSASigner extends ECDSAProvider implements JWSSigner {
     }
 
     @Override
-    public Base64URLValue sign(JWSHeader header, byte[] signingInput)
-            throws JOSEException {
+    public Base64URLValue sign(JWSHeader header, byte[] signingInput) {
 
         JWSAlgorithm alg = header.getAlgorithm();
 

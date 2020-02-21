@@ -16,7 +16,6 @@
 package be.atbash.ee.security.octopus.nimbus.jose.proc;
 
 
-import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSProvider;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSVerifier;
@@ -39,10 +38,6 @@ public interface JWSVerifierFactory extends JWSProvider {
      * @param key    The key intended to verify the JWS message. Not
      *               {@code null}.
      * @return The JWS verifier.
-     * @throws JOSEException If the JWS algorithm is not supported or the
-     *                       key type or length doesn't match the expected
-     *                       for the JWS algorithm.
      */
-    JWSVerifier createJWSVerifier(JWSHeader header, Key key)
-            throws JOSEException;
+    JWSVerifier createJWSVerifier(JWSHeader header, Key key);
 }

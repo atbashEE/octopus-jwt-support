@@ -17,7 +17,6 @@ package be.atbash.ee.security.octopus.nimbus.jose.crypto;
 
 
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
-import be.atbash.ee.security.octopus.nimbus.jose.KeyLengthException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.*;
 import be.atbash.ee.security.octopus.nimbus.jwk.OctetSequenceKey;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
@@ -82,10 +81,8 @@ public class AESDecrypter extends AESCryptoProvider implements JWEDecrypter {
      * @param kek The Key Encrypting Key. Must be 128 bits (16 bytes), 192
      *            bits (24 bytes) or 256 bits (32 bytes). Must not be
      *            {@code null}.
-     * @throws KeyLengthException If the KEK length is invalid.
      */
-    public AESDecrypter(SecretKey kek)
-            throws KeyLengthException {
+    public AESDecrypter(SecretKey kek) {
 
         this(kek, null);
     }
@@ -97,10 +94,8 @@ public class AESDecrypter extends AESCryptoProvider implements JWEDecrypter {
      * @param keyBytes The Key Encrypting Key, as a byte array. Must be 128
      *                 bits (16 bytes), 192 bits (24 bytes) or 256 bits (32
      *                 bytes). Must not be {@code null}.
-     * @throws KeyLengthException If the KEK length is invalid.
      */
-    public AESDecrypter(byte[] keyBytes)
-            throws KeyLengthException {
+    public AESDecrypter(byte[] keyBytes) {
 
         this(new SecretKeySpec(keyBytes, "AES"));
     }
@@ -113,10 +108,8 @@ public class AESDecrypter extends AESCryptoProvider implements JWEDecrypter {
      *               bytes), 192 bits (24 bytes), 256 bits (32 bytes), 384
      *               bits (48 bytes) or 512 bits (64 bytes) long. Must not
      *               be {@code null}.
-     * @throws KeyLengthException If the KEK length is invalid.
      */
-    public AESDecrypter(OctetSequenceKey octJWK)
-            throws KeyLengthException {
+    public AESDecrypter(OctetSequenceKey octJWK) {
 
         this(octJWK.toSecretKey("AES"));
     }
@@ -131,10 +124,8 @@ public class AESDecrypter extends AESCryptoProvider implements JWEDecrypter {
      * @param defCritHeaders The names of the critical header parameters
      *                       that are deferred to the application for
      *                       processing, empty set or {@code null} if none.
-     * @throws KeyLengthException If the KEK length is invalid.
      */
-    public AESDecrypter(SecretKey kek, Set<String> defCritHeaders)
-            throws KeyLengthException {
+    public AESDecrypter(SecretKey kek, Set<String> defCritHeaders) {
 
         super(kek);
 
@@ -157,8 +148,7 @@ public class AESDecrypter extends AESCryptoProvider implements JWEDecrypter {
                           Base64URLValue encryptedKey,
                           Base64URLValue iv,
                           Base64URLValue cipherText,
-                          Base64URLValue authTag)
-            throws JOSEException {
+                          Base64URLValue authTag) {
 
         // Validate required JWE parts
         if (encryptedKey == null) {

@@ -67,10 +67,8 @@ public abstract class ECDSAProvider extends BaseJWSProvider {
      *
      * @param alg The EC-DSA algorithm. Must be supported and not
      *            {@code null}.
-     * @throws JOSEException If JWS algorithm is not supported.
      */
-    protected ECDSAProvider(JWSAlgorithm alg)
-            throws JOSEException {
+    protected ECDSAProvider(JWSAlgorithm alg) {
 
         super(new HashSet<>(Collections.singletonList(alg)));
 

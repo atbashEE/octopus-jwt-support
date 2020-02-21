@@ -97,8 +97,7 @@ public class CompositeKeyTest  {
 
 
 	@Test
-	public void testExample256()
-		throws Exception {
+	public void testExample256() {
 
 		SecretKey inputKey = new SecretKeySpec(K_256, "AES");
 
@@ -116,8 +115,7 @@ public class CompositeKeyTest  {
 
 
 	@Test
-	public void testExample384()
-		throws Exception {
+	public void testExample384() {
 
 		SecretKey inputKey = new SecretKeySpec(K_384, "AES");
 
@@ -134,8 +132,7 @@ public class CompositeKeyTest  {
 	}
 
 	@Test
-	public void testExample512()
-		throws Exception {
+	public void testExample512() {
 
 		SecretKey inputKey = new SecretKeySpec(K_512, "AES");
 

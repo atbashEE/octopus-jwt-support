@@ -18,7 +18,6 @@ package be.atbash.ee.security.octopus.jwt.parameter;
 import be.atbash.ee.security.octopus.config.JCASupportConfiguration;
 import be.atbash.ee.security.octopus.jwt.JWTEncoding;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
-import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.PasswordBasedEncrypter;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.PBKDF;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.PRFParams;
@@ -28,7 +27,6 @@ import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.util.PublicAPI;
 import be.atbash.util.Reviewed;
 import be.atbash.util.exception.AtbashIllegalActionException;
-import be.atbash.util.exception.AtbashUnexpectedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -124,11 +122,7 @@ public final class JWTParametersBuilder {
 
         if (encoding == JWTEncoding.JWE) {
             if (password != null) {
-                try {
                     defineKeyBasedOnPassword();
-                } catch (JOSEException e) {
-                    throw new AtbashUnexpectedException(e);
-                }
             }
         }
         validateParameters();
@@ -153,7 +147,7 @@ public final class JWTParametersBuilder {
         return result;
     }
 
-    private void defineKeyBasedOnPassword() throws JOSEException {
+    private void defineKeyBasedOnPassword() {
         byte[] salt = new byte[PasswordBasedEncrypter.MIN_SALT_LENGTH];  // FIXME Config
         JCASupportConfiguration.getInstance().getSecureRandom().nextBytes(salt);
 

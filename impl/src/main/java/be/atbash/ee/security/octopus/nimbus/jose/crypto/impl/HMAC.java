@@ -37,8 +37,7 @@ public final class HMAC {
     private HMAC() {
     }
 
-    public static Mac getInitMac(SecretKey secretKey)
-            throws JOSEException {
+    public static Mac getInitMac(SecretKey secretKey) {
 
         Mac mac;
 
@@ -70,13 +69,10 @@ public final class HMAC {
      * @param secret   The secret. Must not be {@code null}.
      * @param message  The message. Must not be {@code null}.
      * @return A MAC service instance.
-     * @throws JOSEException If the algorithm is not supported or the
-     *                       MAC secret key is invalid.
      */
     public static byte[] compute(String alg,
                                  byte[] secret,
-                                 byte[] message)
-            throws JOSEException {
+                                 byte[] message) {
 
         return compute(new SecretKeySpec(secret, alg), message);
     }
@@ -90,12 +86,9 @@ public final class HMAC {
      *                  algorithm. Must not be {@code null}.
      * @param message   The message. Must not be {@code null}.
      * @return A MAC service instance.
-     * @throws JOSEException If the algorithm is not supported or the MAC
-     *                       secret key is invalid.
      */
     public static byte[] compute(SecretKey secretKey,
-                                 byte[] message)
-            throws JOSEException {
+                                 byte[] message) {
 
         Mac mac = getInitMac(secretKey);
         mac.update(message);
