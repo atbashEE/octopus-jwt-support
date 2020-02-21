@@ -1,2 +1,4 @@
-be.atbash.ee.security.octopus.json.testclasses.TestAbstractJacksonJsonSerializer
+be.atbash.ee.security.octopus.json.testclasses.MainClassJacksonJsonSerializer
+be.atbash.ee.security.octopus.json.testclasses.SomePojoJacksonJsonSerializer
+be.atbash.ee.security.octopus.json.testclasses.CollectionPojoJacksonJsonSerializer
 be.atbash.ee.security.octopus.jwt.encoder.testclasses.MyColorSerializer

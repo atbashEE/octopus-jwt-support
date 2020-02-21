@@ -15,8 +15,10 @@
  */
 package be.atbash.ee.security.octopus.json;
 
+import be.atbash.ee.security.octopus.json.testclasses.JacksonCollectionPojoClass;
 import be.atbash.ee.security.octopus.json.testclasses.MainClass;
 import be.atbash.ee.security.octopus.json.testclasses.ReferencedClass;
+import be.atbash.ee.security.octopus.json.testclasses.SomePojo;
 import be.atbash.ee.security.octopus.jwt.encoder.JWTEncoder;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersNone;
 import org.junit.jupiter.api.Test;
@@ -57,6 +59,32 @@ public class AbstractJacksonJsonSerializerTest {
 
         assertThat(json).isEqualTo("{\"field-a\":\"stringValue\",\"age\":42,\"counter\":1,\"flag\":1,\"roles\":[\"role1\",\"role2\"],\"reference\":{\"data\":[\"value2\",\"value1\"]},\"parent\":\"parentString\"}");
 
+    }
+
+    @Test
+    public void collectionOfPojo() {
+        JacksonCollectionPojoClass main = new JacksonCollectionPojoClass();
+
+        List<SomePojo> pojos = new ArrayList<>();
+
+        pojos.add(createPojo(1L, "name1"));
+        pojos.add(createPojo(2L, "name2"));
+
+        main.setPojos(pojos);
+        main.setType("test");
+
+        JWTEncoder encoder = new JWTEncoder();
+        String json = encoder.encode(main, new JWTParametersNone());
+
+        assertThat(json).isEqualTo("{\"type\":\"test\",\"pojo-arr\":[{\"pojo-id\":1,\"pojo-name\":\"name1\"},{\"pojo-id\":2,\"pojo-name\":\"name2\"}]}");
+
+    }
+
+    private SomePojo createPojo(long id, String name) {
+        SomePojo somePojo = new SomePojo();
+        somePojo.setId(id);
+        somePojo.setName(name);
+        return somePojo;
     }
 
 }

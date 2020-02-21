@@ -15,11 +15,14 @@
  */
 package be.atbash.ee.security.octopus.json;
 
+import be.atbash.ee.security.octopus.util.JsonbUtil;
 import be.atbash.util.exception.AtbashUnexpectedException;
 
 import javax.json.Json;
 import javax.json.JsonArrayBuilder;
+import javax.json.JsonObject;
 import javax.json.JsonValue;
+import javax.json.bind.Jsonb;
 import javax.json.bind.serializer.JsonbSerializer;
 import javax.json.bind.serializer.SerializationContext;
 import javax.json.stream.JsonGenerator;
@@ -93,10 +96,19 @@ public abstract class AbstractJacksonJsonSerializer<T> implements JsonbSerialize
                         value = Json.createValue(flag ? 1 : 0);
                     }
                     if (Collection.class.isAssignableFrom(type)) {
-                        // FIXME Collection of POJO
+                        Jsonb jsonb = JsonbUtil.getJsonb();
+
                         JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
-                        Collection collection = (Collection) fieldValue;
-                        collection.forEach(item -> arrayBuilder.add(item.toString()));
+                        Collection<?> collection = (Collection<?>) fieldValue;
+                        collection.forEach(item -> {
+                            JsonValue jsonItem;
+                            if (item.getClass().getName().startsWith("java")) {
+                                jsonItem = Json.createValue(item.toString());  // We assume Strong, int, etc ...
+                            } else {
+                                jsonItem = jsonb.fromJson(jsonb.toJson(item), JsonObject.class);
+                            }
+                            arrayBuilder.add(jsonItem);
+                        });
                         value = arrayBuilder.build();
                     }
                     if (value == null) {
