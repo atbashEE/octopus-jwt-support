@@ -327,7 +327,7 @@ public final class Curve implements Serializable {
                     ))
             );
         } else {
-            return null;
+            return new HashSet<>();
         }
     }
 

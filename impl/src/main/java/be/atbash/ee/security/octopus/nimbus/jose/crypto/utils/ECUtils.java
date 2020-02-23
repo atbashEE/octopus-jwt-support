@@ -16,7 +16,13 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto.utils;
 
 
+import be.atbash.ee.security.octopus.exception.UnsupportedECCurveException;
+import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
+import be.atbash.ee.security.octopus.nimbus.jwk.Curve;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
+
 import java.math.BigInteger;
+import java.security.interfaces.ECKey;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.spec.ECFieldFp;
@@ -27,10 +33,10 @@ import java.security.spec.EllipticCurve;
 
 /**
  * Elliptic curve checks.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
-public final class ECChecks {
+public final class ECUtils {
 
 
     /**
@@ -100,10 +106,31 @@ public final class ECChecks {
         return leftSide.equals(rightSide);
     }
 
+    public static JWSAlgorithm resolveAlgorithm(ECKey ecKey) {
+        ECParameterSpec ecParameterSpec = ecKey.getParams();
+        return resolveAlgorithm(Curve.forECParameterSpec(ecParameterSpec));
+    }
+
+    private static JWSAlgorithm resolveAlgorithm(Curve curve) {
+
+        if (curve == null) {
+            throw new UnsupportedECCurveException("The EC key curve is not supported, must be P-256, P-384 or P-521");
+        } else if (Curve.P_256.equals(curve)) {
+            return JWSAlgorithm.ES256;
+        } else if (Curve.P_256K.equals(curve)) {
+            return JWSAlgorithm.ES256K;
+        } else if (Curve.P_384.equals(curve)) {
+            return JWSAlgorithm.ES384;
+        } else if (Curve.P_521.equals(curve)) {
+            return JWSAlgorithm.ES512;
+        } else {
+            throw new JOSEException("Unexpected curve: " + curve);
+        }
+    }
 
     /**
      * Prevents public instantiation.
      */
-    private ECChecks() {
+    private ECUtils() {
     }
 }

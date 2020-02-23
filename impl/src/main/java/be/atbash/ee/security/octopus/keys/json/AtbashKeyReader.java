@@ -17,7 +17,6 @@ package be.atbash.ee.security.octopus.keys.json;
 
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.nimbus.jose.KeyTypeException;
-import be.atbash.ee.security.octopus.nimbus.jose.crypto.bc.BouncyCastleProviderSingleton;
 import be.atbash.ee.security.octopus.nimbus.jwk.*;
 import be.atbash.util.exception.AtbashUnexpectedException;
 

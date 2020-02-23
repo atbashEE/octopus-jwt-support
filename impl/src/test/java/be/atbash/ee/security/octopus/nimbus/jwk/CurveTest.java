@@ -140,20 +140,20 @@ public class CurveTest {
         assertThat(Curve.forJWSAlgorithm(JWSAlgorithm.EdDSA)).isEqualTo(new HashSet<>(Arrays.asList(Curve.Ed25519, Curve.Ed448)));
 
         // Not EC based
-        assertThat(Curve.forJWSAlgorithm(JWSAlgorithm.RS256)).isNull();
-        assertThat(Curve.forJWSAlgorithm(JWSAlgorithm.RS384)).isNull();
-        assertThat(Curve.forJWSAlgorithm(JWSAlgorithm.RS512)).isNull();
-        assertThat(Curve.forJWSAlgorithm(JWSAlgorithm.PS256)).isNull();
-        assertThat(Curve.forJWSAlgorithm(JWSAlgorithm.PS384)).isNull();
-        assertThat(Curve.forJWSAlgorithm(JWSAlgorithm.PS512)).isNull();
-        assertThat(Curve.forJWSAlgorithm(JWSAlgorithm.HS256)).isNull();
-        assertThat(Curve.forJWSAlgorithm(JWSAlgorithm.HS384)).isNull();
-        assertThat(Curve.forJWSAlgorithm(JWSAlgorithm.HS512)).isNull();
+        assertThat(Curve.forJWSAlgorithm(JWSAlgorithm.RS256)).isEmpty();
+        assertThat(Curve.forJWSAlgorithm(JWSAlgorithm.RS384)).isEmpty();
+        assertThat(Curve.forJWSAlgorithm(JWSAlgorithm.RS512)).isEmpty();
+        assertThat(Curve.forJWSAlgorithm(JWSAlgorithm.PS256)).isEmpty();
+        assertThat(Curve.forJWSAlgorithm(JWSAlgorithm.PS384)).isEmpty();
+        assertThat(Curve.forJWSAlgorithm(JWSAlgorithm.PS512)).isEmpty();
+        assertThat(Curve.forJWSAlgorithm(JWSAlgorithm.HS256)).isEmpty();
+        assertThat(Curve.forJWSAlgorithm(JWSAlgorithm.HS384)).isEmpty();
+        assertThat(Curve.forJWSAlgorithm(JWSAlgorithm.HS512)).isEmpty();
 
         // Unsupported
-        assertThat(Curve.forJWSAlgorithm(JWSAlgorithm.parse("unsupported-jws-alg"))).isNull();
+        assertThat(Curve.forJWSAlgorithm(JWSAlgorithm.parse("unsupported-jws-alg"))).isEmpty();
 
         // null
-        assertThat(Curve.forJWSAlgorithm(null)).isNull();
+        assertThat(Curve.forJWSAlgorithm(null)).isEmpty();
     }
 }

@@ -28,7 +28,7 @@ import java.security.spec.ECParameterSpec;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-public class ECChecksTest {
+public class ECUtilsTest {
 
     private static ECPrivateKey generateECPrivateKey(Curve curve)
             throws Exception {
@@ -61,6 +61,6 @@ public class ECChecksTest {
 
         ECPublicKey ephemeralPublicKey = generateECPublicKey(Curve.P_256);
         ECPrivateKey privateKey = generateECPrivateKey(Curve.P_256);
-        assertThat(ECChecks.isPointOnCurve(ephemeralPublicKey, privateKey)).isTrue();
+        assertThat(ECUtils.isPointOnCurve(ephemeralPublicKey, privateKey)).isTrue();
     }
 }

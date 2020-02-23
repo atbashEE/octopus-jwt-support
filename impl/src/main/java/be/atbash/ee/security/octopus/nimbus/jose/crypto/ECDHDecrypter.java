@@ -20,7 +20,7 @@ import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.CriticalHeaderParamsDeferral;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.ECDH;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.ECDHCryptoProvider;
-import be.atbash.ee.security.octopus.nimbus.jose.crypto.utils.ECChecks;
+import be.atbash.ee.security.octopus.nimbus.jose.crypto.utils.ECUtils;
 import be.atbash.ee.security.octopus.nimbus.jwk.Curve;
 import be.atbash.ee.security.octopus.nimbus.jwk.ECKey;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.*;
@@ -229,11 +229,11 @@ public class ECDHDecrypter extends ECDHCryptoProvider implements JWEDecrypter {
         // Curve check
         if (getPrivateKey() instanceof ECPrivateKey) {
             ECPrivateKey ecPrivateKey = (ECPrivateKey) getPrivateKey();
-            if (!ECChecks.isPointOnCurve(ephemeralPublicKey, ecPrivateKey)) {
+            if (!ECUtils.isPointOnCurve(ephemeralPublicKey, ecPrivateKey)) {
                 throw new JOSEException("Invalid ephemeral public EC key: Point(s) not on the expected curve");
             }
         } else {
-            if (!ECChecks.isPointOnCurve(ephemeralPublicKey, getCurve().toECParameterSpec())) {
+            if (!ECUtils.isPointOnCurve(ephemeralPublicKey, getCurve().toECParameterSpec())) {
                 throw new JOSEException("Invalid ephemeral public EC key: Point(s) not on the expected curve");
             }
         }

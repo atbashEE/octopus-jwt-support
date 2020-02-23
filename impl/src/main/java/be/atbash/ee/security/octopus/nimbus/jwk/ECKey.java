@@ -23,7 +23,7 @@ import be.atbash.ee.security.octopus.nimbus.jose.Algorithm;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.KeyTypeException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.bc.BouncyCastleProviderSingleton;
-import be.atbash.ee.security.octopus.nimbus.jose.crypto.utils.ECChecks;
+import be.atbash.ee.security.octopus.nimbus.jose.crypto.utils.ECUtils;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.ee.security.octopus.nimbus.util.Base64Value;
 import be.atbash.ee.security.octopus.nimbus.util.BigIntegerUtils;
@@ -626,7 +626,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
             throw new IllegalArgumentException("Unknown / unsupported curve: " + crv);
         }
 
-        if (!ECChecks.isPointOnCurve(x.decodeToBigInteger(), y.decodeToBigInteger(), crv.toECParameterSpec())) {
+        if (!ECUtils.isPointOnCurve(x.decodeToBigInteger(), y.decodeToBigInteger(), crv.toECParameterSpec())) {
             throw new IllegalArgumentException("Invalid EC JWK: The 'x' and 'y' public coordinates are not on the " + crv + " curve");
         }
     }

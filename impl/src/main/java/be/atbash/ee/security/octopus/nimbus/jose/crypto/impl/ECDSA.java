@@ -18,13 +18,10 @@ package be.atbash.ee.security.octopus.nimbus.jose.crypto.impl;
 
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.bc.BouncyCastleProviderSingleton;
-import be.atbash.ee.security.octopus.nimbus.jwk.Curve;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.Signature;
-import java.security.interfaces.ECKey;
-import java.security.spec.ECParameterSpec;
 
 
 /**
@@ -33,45 +30,6 @@ import java.security.spec.ECParameterSpec;
  * Based on code by Vladimir Dzhuvinov and Aleksei Doroganov
  */
 public final class ECDSA {
-
-
-    /**
-     * Resolves the matching EC DSA algorithm for the specified EC key
-     * (public or private).
-     *
-     * @param ecKey The EC key. Must not be {@code null}.
-     * @return The matching EC DSA algorithm.
-     */
-    public static JWSAlgorithm resolveAlgorithm(ECKey ecKey) {
-
-        ECParameterSpec ecParameterSpec = ecKey.getParams();
-        return resolveAlgorithm(Curve.forECParameterSpec(ecParameterSpec));
-    }
-
-
-    /**
-     * Resolves the matching EC DSA algorithm for the specified elliptic
-     * curve.
-     *
-     * @param curve The elliptic curve. May be {@code null}.
-     * @return The matching EC DSA algorithm.
-     */
-    public static JWSAlgorithm resolveAlgorithm(Curve curve) {
-
-        if (curve == null) {
-            throw new JOSEException("The EC key curve is not supported, must be P-256, P-384 or P-521");
-        } else if (Curve.P_256.equals(curve)) {
-            return JWSAlgorithm.ES256;
-        } else if (Curve.P_256K.equals(curve)) {
-            return JWSAlgorithm.ES256K;
-        } else if (Curve.P_384.equals(curve)) {
-            return JWSAlgorithm.ES384;
-        } else if (Curve.P_521.equals(curve)) {
-            return JWSAlgorithm.ES512;
-        } else {
-            throw new JOSEException("Unexpected curve: " + curve);
-        }
-    }
 
 
     /**

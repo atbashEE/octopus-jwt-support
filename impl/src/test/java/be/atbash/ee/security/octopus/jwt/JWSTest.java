@@ -49,8 +49,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * This in one of the high level test for testing complete process end to end.
  * Focusing on no wrapping in JWT, or using signed JWT
  */
-public class JWTTest {
-    // FIXME Rename to JWSTest as it is about signing
+public class JWSTest {
     private static final String KID_SIGN = "sign";
 
     private TestLogger logger;

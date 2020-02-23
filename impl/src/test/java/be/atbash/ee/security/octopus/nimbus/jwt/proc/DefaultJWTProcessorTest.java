@@ -44,7 +44,6 @@ import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.util.TestReflectionUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import uk.org.lidalia.slf4jtest.LoggingEvent;
 import uk.org.lidalia.slf4jtest.TestLogger;
@@ -112,14 +111,7 @@ public class DefaultJWTProcessorTest {
 
         processor.setJWSKeySelector(new TestKeySelector(key));
 
-        processor.setJWTClaimsSetVerifier((header, claimsSet) -> {
-
-            if (claimsSet.getIssuer() == null || !claimsSet.getIssuer().equals("https://openid.c2id.com")) {
-                return false;
-            }
-            return true;
-        });
-
+        processor.setJWTClaimsSetVerifier((header, claimsSet) -> claimsSet.getIssuer() != null && claimsSet.getIssuer().equals("https://openid.c2id.com"));
 
         JWTClaimsSet claimSet = processor.process(jwt.serialize());
         assertThat(claimSet.getSubject()).isEqualTo("alice");
@@ -610,108 +602,8 @@ public class DefaultJWTProcessorTest {
         }
     }
 
-
-    // Example for the WiKi
     @Test
-    @Disabled
-    public void testValidateJWTAccessToken() {
-
-        /*
-        // The access token to validate, typically submitted with a HTTP header like
-        // Authorization: Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6InMxIn0.eyJzY3A...
-        String accessToken =
-                "eyJraWQiOiJDWHVwIiwidHlwIjoiYXQrand0IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJib2IiLCJzY" +
-                        "3AiOlsib3BlbmlkIiwiZW1haWwiXSwiY2xtIjpbIiFCZyJdLCJpc3MiOiJodHRwczpcL1wvZGVtby5jM" +
-                        "mlkLmNvbVwvYzJpZCIsImV4cCI6MTU3MTE3MTI2MiwiaWF0IjoxNTcxMTcwNjYyLCJ1aXAiOnsiZ3Jvd" +
-                        "XBzIjpbImFkbWluIiwiYXVkaXQiXX0sImp0aSI6IllzcXZadE5fZFNRIiwiY2lkIjoiMDAwMTIzIn0.A" +
-                        "99SrlpLmPxg_qttxsh2np_Czf9fJRIhMR90mwciPDsQLvswTTaLeK7jcAVXc_TYXaEuYOZQ1iXvxJMut" +
-                        "pRZVUXvPjSQz1W4Ax-3w-zEZvgHRWtOQJgaj_XNGTkYV_2MeJDpW35eByAGPn8jDSRkapDVN-05rbuT5" +
-                        "EZVmjpkJEsV1COqkgXx16J2OIswz13h2Pb9vyCwyspad6D6NW1z5ADjejqEb7Vf08XXAf4w_FbbekD76" +
-                        "x6ToW-P-t6A17Mgy500C3Xq7ekZti8Tu1iz-KBVrH-R12rqPo3YGb98RraOUnYCg-2xDeriJsPmxkb6w" +
-                        "omCTc141azPp6qIUiEfRw";
-
-        // Create a JWT processor for the access tokens
-        DefaultJWTProcessor processor = new DefaultJWTProcessor();
-
-        // The public RSA keys to validate the signatures will be sourced from the
-        // OAuth 2.0 server's JWK set, published at a well-known URL. The RemoteJWKSet
-        // object caches the retrieved keys to speed up subsequent look-ups and can
-        // also gracefully handle key-rollover
-        JWKSource<SecurityContext> keySource = new RemoteJWKSet<>(new URL("https://demo.c2id.com/c2id/jwks.json"));
-
-        https://demo.c2id.com/c2id/jwks.json
-        {"keys":[{"kty":"RSA","e":"AQAB","use":"sig","kid":"CXup","n":"hrwD-lc-IwzwidCANmy4qsiZk11yp9kHykOuP0yOnwi36VomYTQVEzZXgh2sDJpGgAutdQudgwLoV8tVSsTG9SQHgJjH9Pd_9V4Ab6PANyZNG6DSeiq1QfiFlEP6Obt0JbRB3W7X2vkxOVaNoWrYskZodxU2V0ogeVL_LkcCGAyNu2jdx3j0DjJatNVk7ystNxb9RfHhJGgpiIkO5S3QiSIVhbBKaJHcZHPF1vq9g0JMGuUCI-OTSVg6XBkTLEGw1C_R73WD_oVEBfdXbXnLukoLHBS11p3OxU7f4rfxA_f_72_UwmWGJnsqS3iahbms3FkvqoL9x_Vj3GhuJSf97Q"},{"kty":"EC","use":"sig","crv":"P-256","kid":"yGvt","x":"pvgdqM3RCshljmuCF1D2Ez1w5ei5k7-bpimWLPNeEHI","y":"JSmUhbUTqiFclVLEdw6dz038F7Whw4URobjXbAReDuM"},{"kty":"EC","use":"sig","crv":"P-384","kid":"9nHY","x":"JPKhjhE0Bj579Mgj3Cn3ERGA8fKVYoGOaV9BPKhtnEobphf8w4GSeigMesL-038W","y":"UbJa1QRX7fo9LxSlh7FOH5ABT5lEtiQeQUcX9BW0bpJFlEVGqwec80tYLdOIl59M"},{"kty":"EC","use":"sig","crv":"P-521","kid":"tVzS","x":"AZgkRHlIyNQJlPIwTWdHqouw41k9dS3GJO04BDEnJnd_Dd1owlCn9SMXA-JuXINn4slwbG4wcECbctXb2cvdGtmn","y":"AdBC6N9lpupzfzcIY3JLIuc8y8MnzV-ItmzHQcC5lYWMTbuM9NU_FlvINeVo8g6i4YZms2xFB-B0VVdaoF9kUswC"},{"kty":"RSA","e":"AQAB","use":"enc","kid":"IHMc","n":"lLrhwERiPmq7XOz6Rwk8q4ey_OGcL4P56Ip01mzKMUfysIwo-nUdwDI_9ntYohpvqiTjnrtZOENhhoqne5M4hqpSfBMmCWSvWL_3wa8FanRWd6lPgGdKJ1a3vV0gLxnCbmdho1CSuSszV4736WkjdDhLcXSRN1kWwWbok94FdPD_egCyBY3cwhvuRzmUgE8LDh-VnNRh1BYc7e9yEMublza8qJpW-N5ljHEU0on08X-lsyl4djEac74H7taDcmtchPLYZy0-ZIxgLmosQ2aYIt6xycfPYsm5x9CGetUqhClpLLaTcyTGq_pH4ECdZtkYHcYJM-3q-XDZTqB6wUaggw"},{"kty":"EC","use":"enc","crv":"P-256","kid":"1yFA","x":"_-aKZeuwWDv4v89dPGdKtpOuOepc_0qDZDhcv3omzX0","y":"Gc5b7muOqbi4QvYJO24a4IqQoOY1pPM69DcpI605Vmw"},{"kty":"EC","use":"enc","crv":"P-384","kid":"TqZ6","x":"3Ex0yUSLvhaOriP8U78kZEEJXxkC0oQmwo1zHTe_nhgKx2YPS97-qmDdRMkByxJ9","y":"MCosrhjIYP4lkoan45MxAZE3QB6IKau5nZHpQ_qDXH8jgcIo2l3M8wdN6iI08kcW"},{"kty":"EC","use":"enc","crv":"P-521","kid":"h38C","x":"AVMBSexPHgq536pZQjN6Si1HAdUdfiW4xrdYzNHR2A9z4zovnKi5xrQ9hWX8QUs4ejVQ3bE9ufhOYL3D7oTwx9Jb","y":"AeMeo858k_6ktxNhlpxBSwGL2hmTI1nBeGi2ZrMVl2qzdjOFf-AVFRSsE9DhAD9sWVUrGrzwONbfmqwIlgbjeH7L"}]}
-
-
-        // The expected JWS algorithm of the access tokens (agreed out-of-band)
-        JWSAlgorithm expectedJWSAlg = JWSAlgorithm.RS256;
-
-        // Configure the JWT processor with a key selector to feed matching public
-        // RSA keys sourced from the JWK set URL
-        JWSKeySelector<SecurityContext> keySelector = new JWSVerificationKeySelector<>(expectedJWSAlg, keySource);
-        jwtProcessor.setJWSKeySelector(keySelector);
-
-        // Set the required JWT claims for access tokens
-        DefaultJWTClaimsVerifier claimsVerifier = new DefaultJWTClaimsVerifier(
-                null,
-                new JWTClaimsSet.Builder().issuer("https://demo.c2id.com/c2id").build(),
-                new HashSet<>(Arrays.asList("sub", "iat", "exp", "scp", "cid"))
-        );
-        jwtProcessor.setJWTClaimsSetVerifier(claimsVerifier);
-
-        // Process the token
-        SecurityContext ctx = null; // optional context parameter, not required here
-        JWTClaimsSet claimsSet = jwtProcessor.process(accessToken, ctx);
-
-        // Print out the token claims set
-        System.out.println(claimsSet.toJSONObject());
-
-         */
-    }
-
-
-    // iss178
-    @Test
-    @Disabled
-    public void testGoogleIDToken() {
-
-        // FIXME, We need some kind of RemoteKetManager which doesn't depend on jwkURI in the header.
-        /*
-        // ID token from Google
-        String token = "eyJhbGciOiJSUzI1NiIsImtpZCI6ImU3ZGJmNTI2ZjYzOWMyMTRjZDc3YjM5NmVjYjlkN2Y4MWQ0N2IzODIifQ.eyJpc3MiOiJhY2NvdW50cy5nb29nbGUuY29tIiwiYXRfaGFzaCI6ImdYM0ZJYzFxVUZzXy16RTNYYVMtZUEiLCJhdWQiOiI0MDc0MDg3MTgxOTIuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIiOiIxMTI4OTY5MTg4OTk2MjY2OTEzNzQiLCJhenAiOiI0MDc0MDg3MTgxOTIuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJpYXQiOjE0NjMxMzg2NDksImV4cCI6MTQ2MzE0MjI0OX0.GqQ0DPQQ5ixOGGAxcEu_5vqbMS7RyNzLrcn21AEid-61eQU0roq7gMVmCrTLeSghenNKNgFWQeErPe5i-6gxqV0r89dOdXRegpCLPAq7d-acPK_8bw-gOtbEo9Hhzcc56r51FwnZ3IUDgyKB_ZRNdp1LMnBgX--c6vPhy4_ZkVnJvmCzTz6bz-pdZNGFhtKd-xt35qVuyUok9tiGumKh-Tjrov5KPuZI90leRfLpoWDj_ktTClg3VUvXAtvDFhW94xEOS4s8DcvbxP9OrR3zhp4bgLohF-B0OrEqc9pTpYO87HyGJlvT74Re288tGZfCRJFX92BT1M063yt3QPrE8W";
-        String jwkUri = "https://www.googleapis.com/oauth2/v3/certs";
-
-        // Set up a JWT processor to parse the tokens and then check their signature
-        // and validity time window (bounded by the "iat", "nbf" and "exp" claims)
-        DefaultJWTProcessor processor = new DefaultJWTProcessor();
-
-        // The public RSA keys to validate the signatures will be sourced from the
-        // OAuth 2.0 server's JWK set, published at a well-known URL. The RemoteJWKSet
-        // object caches the retrieved keys to speed up subsequent look-ups and can
-        // also gracefully handle key-rollover
-        JWKSource<SecurityContext> keySource = new RemoteJWKSet<>(new URL(jwkUri));
-
-        // The expected JWS algorithm of the access tokens (agreed out-of-band)
-        JWSAlgorithm expectedJWSAlg = JWSAlgorithm.RS256;
-
-        // Configure the JWT processor with a key selector to feed matching public
-        // RSA keys sourced from the JWK set URL
-        JWSKeySelector<SecurityContext> keySelector = new JWSVerificationKeySelector<>(expectedJWSAlg, keySource);
-        jwtProcessor.setJWSKeySelector(keySelector);
-
-        // Process the token
-        SecurityContext ctx = null; // optional context parameter, not required here
-        JWTClaimsSet claimsSet = jwtProcessor.process(token, ctx);
-
-        // Print out the token claims set
-        System.out.println(claimsSet.toJSONObject());
-
-         */
-    }
-
-
-    @Test
-    public void testNestedWithMissingContentTypeHeader() throws Exception {
+    public void testNestedWithMissingContentTypeHeader() {
 
         byte[] random32 = new byte[32];
         new SecureRandom().nextBytes(random32);

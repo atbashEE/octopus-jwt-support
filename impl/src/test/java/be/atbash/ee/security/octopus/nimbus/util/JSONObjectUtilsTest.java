@@ -89,10 +89,18 @@ public class JSONObjectUtilsTest {
     }
 
     @Test
-    public void testGetStringList_missing()  {
+    public void testGetStringList_missing() {
 
         JsonObjectBuilder builder = Json.createObjectBuilder();
         assertThat(JSONObjectUtils.getStringList(builder.build(), "key")).isEmpty();
+    }
+
+    @Test
+    public void testGetStringList_wrongType() throws ParseException {
+
+        JsonObject jsonObject = JSONObjectUtils.parse("{\"crit\":[123,321]}");
+        IncorrectJsonValueException exception = Assertions.assertThrows(IncorrectJsonValueException.class, () -> JSONObjectUtils.getStringList(jsonObject, "crit"));
+        assertThat(exception.getMessage()).isEqualTo("JSON key 'crit' is expected to be an array of String");
     }
 
     @Test

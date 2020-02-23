@@ -27,7 +27,6 @@ import uk.org.lidalia.slf4jtest.TestLoggerFactory;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

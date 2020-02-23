@@ -142,14 +142,31 @@ public final class JSONObjectUtils {
      */
     public static List<String> getStringList(JsonObject jsonObject, String key) {
 
-        // FIXME Test what happens when using other values as Strings.
         if (!hasValue(jsonObject, key)) {
             return new ArrayList<>();
         }
         JsonArray jsonArray = jsonObject.getJsonArray(key);
 
+        checkItemType(key, jsonArray);
         return jsonArray.getValuesAs(JsonString::getString);
 
+    }
+
+    private static void checkItemType(String key, JsonArray jsonArray) {
+        boolean validType = true;
+        for (JsonValue jsonValue : jsonArray) {
+            if (jsonValue.getValueType() != JsonValue.ValueType.STRING) {
+                validType = false;
+            }
+        }
+        if (!validType) {
+            if (key == null) {
+                throw new IncorrectJsonValueException("JSONArray is expected to be an array of String");
+            } else {
+                throw new IncorrectJsonValueException(String.format("JSON key '%s' is expected to be an array of String", key));
+
+            }
+        }
     }
 
     /**
@@ -177,17 +194,12 @@ public final class JSONObjectUtils {
         switch (value.getValueType()) {
 
             case ARRAY:
-                // TODO We assume List of String
                 JsonArray jsonArray = (JsonArray) value;
+
+                checkItemType(null, jsonArray);
                 result = jsonArray.getValuesAs(JsonString::getString);
                 break;
             case OBJECT:
-                /*
-                JsonObject jsonObject = (JsonObject) value;
-                result = jsonObject.entrySet().stream().collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        e -> getJsonValueAsObject(e.getValue())));
-                        */
                 result = value;
                 break;
             case STRING:

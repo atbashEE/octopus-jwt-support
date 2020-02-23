@@ -85,7 +85,9 @@ public abstract class ECDSAProvider extends BaseJWSProvider {
      * @see #supportedJWSAlgorithms()
      */
     public JWSAlgorithm supportedECDSAAlgorithm() {
-        // FIXME Review? REeturns just the first one?
+        if (supportedJWSAlgorithms().size() != 1) {
+            throw new JOSEException("For EC keys, only 1 algorithm is supported");
+        }
         return supportedJWSAlgorithms().iterator().next();
     }
 }

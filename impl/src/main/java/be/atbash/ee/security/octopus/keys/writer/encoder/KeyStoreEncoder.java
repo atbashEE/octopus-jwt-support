@@ -24,6 +24,7 @@ import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.keys.selector.filter.AsymmetricPartKeyFilter;
 import be.atbash.ee.security.octopus.keys.writer.KeyEncoderParameters;
 import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
+import be.atbash.ee.security.octopus.nimbus.util.KeyUtils;
 import be.atbash.util.exception.AtbashUnexpectedException;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
@@ -49,7 +50,7 @@ import java.util.List;
  *
  */
 
-public class KeyStoreEncoder extends AbstractEncoder implements KeyEncoder {
+public class KeyStoreEncoder implements KeyEncoder {
 
     private JwtSupportConfiguration configuration;
 
@@ -66,7 +67,7 @@ public class KeyStoreEncoder extends AbstractEncoder implements KeyEncoder {
             if (atbashKey.getSecretKeyType().getAsymmetricPart() == AsymmetricPart.PRIVATE) {
 
                 PrivateKey key = (PrivateKey) atbashKey.getKey();
-                X509Certificate certificate = generateCertificate(getPublicKey(atbashKey), key, atbashKey.getSecretKeyType().getKeyType());
+                X509Certificate certificate = generateCertificate(KeyUtils.getPublicKey(atbashKey), key, atbashKey.getSecretKeyType().getKeyType());
                 KeyStore.Entry entry = new KeyStore.PrivateKeyEntry(key, new X509Certificate[]{certificate});
                 keyStore.setEntry(atbashKey.getKeyId(), entry, new KeyStore.PasswordProtection(parameters.getKeyPassword()));
             }

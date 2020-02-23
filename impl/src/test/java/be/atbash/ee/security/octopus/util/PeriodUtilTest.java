@@ -44,21 +44,23 @@ public class PeriodUtilTest {
     @Test
     public void defineSecondsInPeriod_empty() {
 
-        Assertions.assertThrows(ConfigurationException.class, () -> PeriodUtil.defineSecondsInPeriod(""));
-
+        ConfigurationException exception = Assertions.assertThrows(ConfigurationException.class, () -> PeriodUtil.defineSecondsInPeriod(""));
+        assertThat(exception.getMessage()).isEqualTo("Period configuration '' is not valid, see documentation");
     }
 
     @Test
     public void defineSecondsInPeriod_null() {
 
-        Assertions.assertThrows(ConfigurationException.class, () -> PeriodUtil.defineSecondsInPeriod(null));
+        ConfigurationException exception = Assertions.assertThrows(ConfigurationException.class, () -> PeriodUtil.defineSecondsInPeriod(null));
+        assertThat(exception.getMessage()).isEqualTo("Period configuration 'null' is not valid, see documentation");
 
     }
 
     @Test
     public void defineSecondsInPeriod_mixed() {
 
-        Assertions.assertThrows(ConfigurationException.class, () -> PeriodUtil.defineSecondsInPeriod("3m10s"));
+        ConfigurationException exception = Assertions.assertThrows(ConfigurationException.class, () -> PeriodUtil.defineSecondsInPeriod("3m10s"));
+        assertThat(exception.getMessage()).isEqualTo("Period configuration '3m10s' is not valid, see documentation");
 
     }
 

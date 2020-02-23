@@ -22,6 +22,7 @@ import be.atbash.ee.security.octopus.keys.writer.KeyEncoderParameters;
 import be.atbash.ee.security.octopus.nimbus.jose.KeyTypeException;
 import be.atbash.ee.security.octopus.nimbus.jwk.*;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
+import be.atbash.ee.security.octopus.nimbus.util.KeyUtils;
 import be.atbash.util.exception.AtbashUnexpectedException;
 import org.bouncycastle.asn1.*;
 import org.bouncycastle.jcajce.provider.asymmetric.edec.BCEdDSAPrivateKey;
@@ -38,7 +39,7 @@ import java.security.interfaces.RSAPublicKey;
  *
  */
 
-public class JwkKeyEncoderPrivatePart extends AbstractEncoder implements KeyEncoder {
+public class JwkKeyEncoderPrivatePart implements KeyEncoder {
 
     @Override
     public byte[] encodeKey(AtbashKey atbashKey, KeyEncoderParameters parameters) {
@@ -57,7 +58,7 @@ public class JwkKeyEncoderPrivatePart extends AbstractEncoder implements KeyEnco
     }
 
     private byte[] encodeRSAKey(AtbashKey atbashKey, KeyEncoderParameters parameters) {
-        RSAKey rsaKey = new RSAKey.Builder((RSAPublicKey) getPublicKey(atbashKey)).keyID(atbashKey.getKeyId())
+        RSAKey rsaKey = new RSAKey.Builder((RSAPublicKey) KeyUtils.getPublicKey(atbashKey)).keyID(atbashKey.getKeyId())
                 .privateKey((RSAPrivateKey) atbashKey.getKey())
                 .build();
 
@@ -73,7 +74,7 @@ public class JwkKeyEncoderPrivatePart extends AbstractEncoder implements KeyEnco
     private byte[] encodeECKey(AtbashKey atbashKey, KeyEncoderParameters parameters) {
         Curve curve = ECCurveHelper.getCurve((java.security.interfaces.ECKey) atbashKey.getKey());
 
-        ECKey ecKey = new ECKey.Builder(curve, (ECPublicKey) getPublicKey(atbashKey)).keyID(atbashKey.getKeyId())
+        ECKey ecKey = new ECKey.Builder(curve, (ECPublicKey) KeyUtils.getPublicKey(atbashKey)).keyID(atbashKey.getKeyId())
                 .privateKey((ECPrivateKey) atbashKey.getKey())
                 .build();
 

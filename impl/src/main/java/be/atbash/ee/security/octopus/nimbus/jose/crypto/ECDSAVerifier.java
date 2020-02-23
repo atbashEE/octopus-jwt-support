@@ -21,7 +21,7 @@ import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.AlgorithmSupportMes
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.CriticalHeaderParamsDeferral;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.ECDSA;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.ECDSAProvider;
-import be.atbash.ee.security.octopus.nimbus.jose.crypto.utils.ECChecks;
+import be.atbash.ee.security.octopus.nimbus.jose.crypto.utils.ECUtils;
 import be.atbash.ee.security.octopus.nimbus.jwk.Curve;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
@@ -94,14 +94,22 @@ public class ECDSAVerifier extends ECDSAProvider implements JWSVerifier {
      */
     public ECDSAVerifier(ECPublicKey publicKey, Set<String> defCritHeaders) {
 
-        super(ECDSA.resolveAlgorithm(publicKey));
+        super(ECUtils.resolveAlgorithm(publicKey));
 
         this.publicKey = publicKey;
 
-        // FIXME Possible NPE
-        if (!ECChecks.isPointOnCurve(
-                publicKey,
-                Curve.forJWSAlgorithm(supportedECDSAAlgorithm()).iterator().next().toECParameterSpec())) {
+        Set<Curve> curves = Curve.forJWSAlgorithm(supportedECDSAAlgorithm());
+
+        boolean found = false;
+        for (Curve curve : curves) {
+
+            if (ECUtils.isPointOnCurve(
+                    publicKey,
+                    curve.toECParameterSpec())) {
+                found = true;
+            }
+        }
+        if (!found) {
             throw new JOSEException("Curve / public key parameters mismatch");
         }
 

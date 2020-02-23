@@ -19,7 +19,6 @@ import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.writer.KeyEncoderParameters;
 import be.atbash.ee.security.octopus.nimbus.jwk.OctetSequenceKey;
 
-import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 
 /**

@@ -23,8 +23,6 @@ import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.List;
 

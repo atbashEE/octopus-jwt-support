@@ -24,6 +24,7 @@ import be.atbash.ee.security.octopus.nimbus.jose.KeyTypeException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.AlgorithmSupportMessage;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.ECDSA;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.ECDSAProvider;
+import be.atbash.ee.security.octopus.nimbus.jose.crypto.utils.ECUtils;
 import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
@@ -81,7 +82,7 @@ public class ECDSASigner extends ECDSAProvider implements JWSSigner {
      */
     public ECDSASigner(ECPrivateKey privateKey) {
 
-        super(ECDSA.resolveAlgorithm(privateKey));
+        super(ECUtils.resolveAlgorithm(privateKey));
 
         this.privateKey = privateKey;
     }

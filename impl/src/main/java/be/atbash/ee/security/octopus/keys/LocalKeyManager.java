@@ -19,7 +19,6 @@ import be.atbash.config.exception.ConfigurationException;
 import be.atbash.ee.security.octopus.config.JwtSupportConfiguration;
 import be.atbash.ee.security.octopus.keys.reader.KeyFilesHelper;
 import be.atbash.ee.security.octopus.keys.reader.KeyReader;
-import be.atbash.ee.security.octopus.keys.reader.KeyReaderJWKSet;
 import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup;
 import be.atbash.ee.security.octopus.keys.selector.SelectorCriteria;
 import be.atbash.ee.security.octopus.keys.selector.filter.KeyFilter;

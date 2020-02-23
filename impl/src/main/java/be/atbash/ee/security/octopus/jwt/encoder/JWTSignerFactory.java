@@ -16,25 +16,20 @@
 package be.atbash.ee.security.octopus.jwt.encoder;
 
 import be.atbash.ee.security.octopus.config.JwtSupportConfiguration;
-import be.atbash.ee.security.octopus.exception.UnsupportedECCurveException;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersSigning;
-import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
-import be.atbash.ee.security.octopus.nimbus.jose.KeyLengthException;
 import be.atbash.ee.security.octopus.nimbus.jose.KeyTypeException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.ECDSASigner;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.Ed25519Signer;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.MACSigner;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.RSASSASigner;
-import be.atbash.ee.security.octopus.nimbus.jwk.Curve;
+import be.atbash.ee.security.octopus.nimbus.jose.crypto.utils.ECUtils;
 import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSSigner;
-import be.atbash.util.exception.AtbashUnexpectedException;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.security.interfaces.ECKey;
-import java.security.spec.ECParameterSpec;
 
 /**
  *
@@ -52,15 +47,9 @@ public class JWTSignerFactory {
         JWSSigner result = null;
 
         if (KeyType.OCT.equals(parametersSigning.getKeyType())) {
-            try {
-                result = new MACSigner(parametersSigning.getAtbashKey());
-            } catch (KeyLengthException e) {
-                // FIXME better exception here
-                throw new AtbashUnexpectedException(e);
-                // TODO
-                //This should be already covered by HMACAlgorithmFactory.
-                // What when developers are using this directly?
-            }
+
+            result = new MACSigner(parametersSigning.getAtbashKey());
+
         }
         if (KeyType.RSA.equals(parametersSigning.getKeyType())) {
                 result = new RSASSASigner(parametersSigning.getAtbashKey());
@@ -100,37 +89,13 @@ public class JWTSignerFactory {
         }
         if (KeyType.EC.equals(parametersSigning.getKeyType())) {
 
-                result = resolveAlgorithm((ECKey) parametersSigning.getKey());
+            result = ECUtils.resolveAlgorithm((ECKey) parametersSigning.getKey());
         }
         if (result == null) {
             throw new KeyTypeException(parametersSigning.getKeyType(), "JWT Signing");
         }
 
         return result;
-    }
-
-    /* FIXME Copied from com.nimbusds.jose.crypto.ECDSA which has package scope */
-    private JWSAlgorithm resolveAlgorithm(ECKey ecKey) {
-
-        ECParameterSpec ecParameterSpec = ecKey.getParams();
-        return resolveAlgorithm(Curve.forECParameterSpec(ecParameterSpec));
-    }
-
-    private JWSAlgorithm resolveAlgorithm(Curve curve) {
-
-        if (curve == null) {
-            throw new UnsupportedECCurveException("The EC key curve is not supported, must be P-256, P-384 or P-521");
-        } else if (Curve.P_256.equals(curve)) {
-            return JWSAlgorithm.ES256;
-        } else if (Curve.P_256K.equals(curve)) {
-            return JWSAlgorithm.ES256K;
-        } else if (Curve.P_384.equals(curve)) {
-            return JWSAlgorithm.ES384;
-        } else if (Curve.P_521.equals(curve)) {
-            return JWSAlgorithm.ES512;
-        } else {
-            throw new JOSEException("Unexpected curve: " + curve);
-        }
     }
 
     private void checkDependencies() {
