@@ -16,6 +16,7 @@
 package be.atbash.ee.security.octopus.jwt.parameter;
 
 import be.atbash.ee.security.octopus.config.JCASupportConfiguration;
+import be.atbash.ee.security.octopus.config.JwtSupportConfiguration;
 import be.atbash.ee.security.octopus.jwt.JWTEncoding;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.PasswordBasedEncrypter;
@@ -148,7 +149,7 @@ public final class JWTParametersBuilder {
     }
 
     private void defineKeyBasedOnPassword() {
-        byte[] salt = new byte[PasswordBasedEncrypter.MIN_SALT_LENGTH];  // FIXME Config
+        byte[] salt = new byte[JwtSupportConfiguration.getInstance().getSaltLengthPasswordBasedEJWEEncryption()];
         JCASupportConfiguration.getInstance().getSecureRandom().nextBytes(salt);
 
         PRFParams prfParams = PRFParams.resolve(jweAlgorithm);

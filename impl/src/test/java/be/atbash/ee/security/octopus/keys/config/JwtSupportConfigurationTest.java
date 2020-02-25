@@ -344,6 +344,39 @@ public class JwtSupportConfigurationTest {
         assertThat(logger.getLoggingEvents()).isEmpty();
     }
 
+    @Test
+    public void getSaltLengthPasswordBasedEJWEEncryption() {
+        int length = configuration.getSaltLengthPasswordBasedEJWEEncryption();
+        assertThat(length).isEqualTo(8);
+    }
+
+    @Test
+    public void getSaltLengthPasswordBasedEJWEEncryption_value() {
+        TestConfig.addConfigValue("jwt.jwe.pwbased.salt.length", "16");
+        int length = configuration.getSaltLengthPasswordBasedEJWEEncryption();
+        assertThat(length).isEqualTo(16);
+    }
+
+    @Test
+    public void getSaltLengthPasswordBasedEJWEEncryption_invalid1() {
+        TestConfig.addConfigValue("jwt.jwe.pwbased.salt.length", "7");
+        ConfigurationException exception = Assertions.assertThrows(ConfigurationException.class, () -> configuration.getSaltLengthPasswordBasedEJWEEncryption());
+        assertThat(exception.getMessage()).isEqualTo("The value for the parameter 'jwt.jwe.pwbased.salt.length' must be at minimum 8 but was '7'.");
+    }
+
+    @Test
+    public void getSaltLengthPasswordBasedEJWEEncryption_invalid2() {
+        TestConfig.addConfigValue("jwt.jwe.pwbased.salt.length", "-1");
+        ConfigurationException exception = Assertions.assertThrows(ConfigurationException.class, () -> configuration.getSaltLengthPasswordBasedEJWEEncryption());
+        assertThat(exception.getMessage()).isEqualTo("The value for the parameter 'jwt.jwe.pwbased.salt.length' must be at minimum 8 but was '-1'.");
+    }
+
+    @Test
+    public void getSaltLengthPasswordBasedEJWEEncryption_invalid3() {
+        TestConfig.addConfigValue("jwt.jwe.pwbased.salt.length", "NotNumber");
+        Assertions.assertThrows(NumberFormatException.class, () -> configuration.getSaltLengthPasswordBasedEJWEEncryption());
+    }
+
     public static class TestKeyManager implements KeyManager {
 
         @Override

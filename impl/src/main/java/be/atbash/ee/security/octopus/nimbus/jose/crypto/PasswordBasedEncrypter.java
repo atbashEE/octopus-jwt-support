@@ -61,16 +61,9 @@ public class PasswordBasedEncrypter extends PasswordBasedCryptoProvider implemen
 
 
 	/**
-	 * The minimum salt length (8 bytes).
-	 */
-	public static final int MIN_SALT_LENGTH = 8;
-
-	/**
 	 * The minimum recommended iteration count (1000).
 	 */
 	public static final int MIN_RECOMMENDED_ITERATION_COUNT = 1000;
-
-
 
 	/**
 	 * Creates a new password-based encrypter.

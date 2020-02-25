@@ -259,6 +259,15 @@ public class JwtSupportConfiguration extends AbstractConfiguration implements Mo
         return result;
     }
 
+    @ConfigProperty
+    public int getSaltLengthPasswordBasedEJWEEncryption() {
+        Integer saltLength = getOptionalValue("jwt.jwe.pwbased.salt.length", 8, Integer.class);
+        if (saltLength < 8) {
+            throw new ConfigurationException(String.format("The value for the parameter 'jwt.jwe.pwbased.salt.length' must be at minimum 8 but was '%s'.", saltLength));
+        }
+        return saltLength;
+    }
+
     // Java SE Support
     private static JwtSupportConfiguration INSTANCE;
 
