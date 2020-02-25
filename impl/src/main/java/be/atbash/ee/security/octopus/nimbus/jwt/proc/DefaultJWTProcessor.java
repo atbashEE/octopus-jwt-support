@@ -81,7 +81,7 @@ import java.text.ParseException;
  *
  * Based on code by Vladimir Dzhuvinov
  */
-public class DefaultJWTProcessor {
+public class DefaultJWTProcessor implements JWTProcessor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(KeySelector.class);
 
@@ -101,14 +101,12 @@ public class DefaultJWTProcessor {
      * The JWS verifier factory.
      */
     private JWSVerifierFactory jwsVerifierFactory = new DefaultJWSVerifierFactory();
-    // FIXME This is now not configurable
 
 
     /**
      * The JWE decrypter factory.
      */
     private JWEDecrypterFactory jweDecrypterFactory = new DefaultJWEDecrypterFactory();
-    // FIXME This is now not configurable
 
 
     /**
@@ -117,11 +115,13 @@ public class DefaultJWTProcessor {
     private JWTVerifier claimsVerifier = new DefaultJWTClaimsVerifier();
 
 
+    @Override
     public void setJWSKeySelector(KeySelector jwsKeySelector) {
 
         this.jwsKeySelector = jwsKeySelector;
     }
 
+    @Override
     public void setJWEKeySelector(KeySelector jweKeySelector) {
 
         this.jweKeySelector = jweKeySelector;
@@ -187,13 +187,7 @@ public class DefaultJWTProcessor {
     }
 
 
-    public JWTClaimsSet process(String jwtString)
-            throws ParseException {
-
-        return process(JWTParser.parse(jwtString));
-    }
-
-
+    @Override
     public JWTClaimsSet process(JWT jwt) {
 
         if (jwt instanceof SignedJWT) {
@@ -213,13 +207,13 @@ public class DefaultJWTProcessor {
     }
 
 
-    public JWTClaimsSet process(PlainJWT plainJWT) {
+    private JWTClaimsSet process(PlainJWT plainJWT) {
 
         throw new BadJOSEException("Unsecured (plain) JWTs are rejected, TODO Implementation needs to be done!!");
     }
 
 
-    public JWTClaimsSet process(SignedJWT signedJWT) {
+    private JWTClaimsSet process(SignedJWT signedJWT) {
 
         JOSEObjectType objectType = signedJWT.getHeader().getType();
         if (objectType != null && !objectType.equals(JOSEObjectType.JWT)) {
@@ -265,7 +259,7 @@ public class DefaultJWTProcessor {
 
     }
 
-    public JWTClaimsSet process(EncryptedJWT encryptedJWT) {
+    private JWTClaimsSet process(EncryptedJWT encryptedJWT) {
 
         if (jweKeySelector == null) {
             // JWE key selector may have been deliberately omitted

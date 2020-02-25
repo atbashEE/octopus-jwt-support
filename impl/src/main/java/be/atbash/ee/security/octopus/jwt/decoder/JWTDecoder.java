@@ -23,6 +23,7 @@ import be.atbash.ee.security.octopus.nimbus.jwt.JWTClaimsSet;
 import be.atbash.ee.security.octopus.nimbus.jwt.PlainJWT;
 import be.atbash.ee.security.octopus.nimbus.jwt.SignedJWT;
 import be.atbash.ee.security.octopus.nimbus.jwt.proc.DefaultJWTProcessor;
+import be.atbash.ee.security.octopus.nimbus.jwt.proc.JWTProcessor;
 import be.atbash.ee.security.octopus.util.JsonbUtil;
 import be.atbash.util.PublicAPI;
 import be.atbash.util.StringUtils;
@@ -31,6 +32,8 @@ import be.atbash.util.exception.AtbashIllegalActionException;
 import javax.enterprise.context.ApplicationScoped;
 import javax.json.bind.Jsonb;
 import java.text.ParseException;
+import java.util.Iterator;
+import java.util.ServiceLoader;
 
 /**
  *
@@ -38,6 +41,8 @@ import java.text.ParseException;
 @PublicAPI
 @ApplicationScoped
 public class JWTDecoder {
+
+    private JWTProcessor jwtProcessor;
 
     public <T> JWTData<T> decode(String data, Class<T> classType) {
         return decode(data, classType, null, null);
@@ -107,7 +112,7 @@ public class JWTDecoder {
 
         String keyID = encryptedJWT.getHeader().getKeyID();
 
-        DefaultJWTProcessor processor = new DefaultJWTProcessor();
+        JWTProcessor processor = getJwtProcessor();
         processor.setJWSKeySelector(keySelector);
         processor.setJWEKeySelector(keySelector);
         JWTClaimsSet jwtClaimsSet = processor.process(encryptedJWT);
@@ -130,7 +135,7 @@ public class JWTDecoder {
     private <T> JWTData<T> readSignedJWT(String data, KeySelector keySelector, Class<T> classType, JWTVerifier verifier) throws ParseException {
         SignedJWT signedJWT = SignedJWT.parse(data);
 
-        DefaultJWTProcessor processor = new DefaultJWTProcessor();
+        JWTProcessor processor = getJwtProcessor();
         processor.setJWSKeySelector(keySelector);
         JWTClaimsSet jwtClaimsSet = processor.process(signedJWT);
 
@@ -184,5 +189,18 @@ public class JWTDecoder {
             }
         }
         return result;
+    }
+
+    private synchronized JWTProcessor getJwtProcessor() {
+        if (jwtProcessor == null) {
+            Iterator<JWTProcessor> iterator = ServiceLoader.load(JWTProcessor.class).iterator();
+            if (iterator.hasNext()) {
+                jwtProcessor = iterator.next();
+            } else {
+                jwtProcessor = new DefaultJWTProcessor();
+            }
+
+        }
+        return jwtProcessor;
     }
 }
