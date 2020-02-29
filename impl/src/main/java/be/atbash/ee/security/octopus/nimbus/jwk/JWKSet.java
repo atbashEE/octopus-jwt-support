@@ -169,7 +169,7 @@ public class JWKSet implements Serializable {
                 }
             } else {
                 OctetSequenceKey octetSequenceKey = (OctetSequenceKey) jwk;
-                octetSequenceKey.toSecretKey("AES"); // AES is ok, HMAC is another option.
+                result.add(new AtbashKey(jwk.getKeyID(), octetSequenceKey.toSecretKey()));
             }
         }
         return result;

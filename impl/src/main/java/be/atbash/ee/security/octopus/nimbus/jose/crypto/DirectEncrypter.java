@@ -100,7 +100,7 @@ public class DirectEncrypter extends DirectCryptoProvider implements JWEEncrypte
      */
     public DirectEncrypter(OctetSequenceKey octJWK) {
 
-        this(octJWK.toSecretKey("AES"));
+        this(octJWK.toSecretKey());
     }
 
 

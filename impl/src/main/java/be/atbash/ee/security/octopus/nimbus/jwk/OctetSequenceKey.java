@@ -444,25 +444,12 @@ public final class OctetSequenceKey extends JWK implements SecretJWK {
      * Returns a secret key representation of this octet sequence key.
      *
      * @return The secret key representation, with an algorithm set to
-     * {@code NONE}.
+     * {@code AES}.
      */
     @Override
     public SecretKey toSecretKey() {
 
-        return toSecretKey("NONE");
-    }
-
-
-    /**
-     * Returns a secret key representation of this octet sequence key with
-     * the specified Java Cryptography Architecture (JCA) algorithm.
-     *
-     * @param jcaAlg The JCA algorithm. Must not be {@code null}.
-     * @return The secret key representation.
-     */
-    public SecretKey toSecretKey(String jcaAlg) {
-
-        return new SecretKeySpec(toByteArray(), jcaAlg);
+        return new SecretKeySpec(toByteArray(), "AES");
     }
 
 

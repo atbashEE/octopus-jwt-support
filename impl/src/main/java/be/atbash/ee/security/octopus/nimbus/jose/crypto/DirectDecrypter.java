@@ -143,7 +143,7 @@ public class DirectDecrypter extends DirectCryptoProvider implements JWEDecrypte
      */
     public DirectDecrypter(OctetSequenceKey octJWK) {
 
-        this(octJWK.toSecretKey("AES"));
+        this(octJWK.toSecretKey());
     }
 
 

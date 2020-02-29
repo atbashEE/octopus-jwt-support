@@ -127,7 +127,7 @@ public class AtbashKeyJSONTest {
         String json = new JWTEncoder().encode(keys.get(0), parameters);
 
         AtbashKey key = new JWTDecoder().decode(json, AtbashKey.class).getData();
-        // key.getKey().getAlgorithm());  FIXME NONE, is this OK? or should it be AES?
+        assertThat(key.getKey().getAlgorithm()).isEqualTo("AES");
         assertThat(key.getKey().getEncoded()).isEqualTo(keys.get(0).getKey().getEncoded());
     }
 

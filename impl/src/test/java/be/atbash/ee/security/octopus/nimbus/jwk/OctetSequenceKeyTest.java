@@ -303,7 +303,7 @@ public class OctetSequenceKeyTest {
 
         SecretKey secretKey = oct.toSecretKey();
         assertThat(Arrays.equals(key, secretKey.getEncoded())).isTrue();
-        assertThat(secretKey.getAlgorithm()).isEqualTo("NONE");
+        assertThat(secretKey.getAlgorithm()).isEqualTo("AES");  // Since Algorithm isn't preserved in the JWK
     }
 
     @Test
@@ -360,7 +360,7 @@ public class OctetSequenceKeyTest {
         OctetSequenceKey jwk = new OctetSequenceKey.Builder(k).build();
 
         assertThat(Arrays.equals(k.decode(), jwk.toSecretKey().getEncoded())).isTrue();
-        assertThat(jwk.toSecretKey().getAlgorithm()).isEqualTo("NONE");
+        assertThat(jwk.toSecretKey().getAlgorithm()).isEqualTo("AES");
     }
 
     @Test
@@ -370,8 +370,8 @@ public class OctetSequenceKeyTest {
 
         OctetSequenceKey jwk = new OctetSequenceKey.Builder(k).build();
 
-        assertThat(Arrays.equals(k.decode(), jwk.toSecretKey("AES").getEncoded())).isTrue();
-        assertThat(jwk.toSecretKey("AES").getAlgorithm()).isEqualTo("AES");
+        assertThat(Arrays.equals(k.decode(), jwk.toSecretKey().getEncoded())).isTrue();
+        assertThat(jwk.toSecretKey().getAlgorithm()).isEqualTo("AES");
     }
 
     @Test

@@ -114,7 +114,7 @@ public class AESEncrypter extends AESCryptoProvider implements JWEEncrypter {
      */
     public AESEncrypter(OctetSequenceKey octJWK) {
 
-        this(octJWK.toSecretKey("AES"));
+        this(octJWK.toSecretKey());
     }
 
 
