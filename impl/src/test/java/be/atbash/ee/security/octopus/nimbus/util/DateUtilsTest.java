@@ -19,6 +19,7 @@ package be.atbash.ee.security.octopus.nimbus.util;
 import be.atbash.ee.security.octopus.nimbus.jwt.util.DateUtils;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,6 +37,15 @@ public class DateUtilsTest {
         Date date = new Date(2000L);
 
         assertThat(DateUtils.toSecondsSinceEpoch(date)).isEqualTo(2);
+    }
+
+    @Test
+    public void testToSecondsFromLocalDate() {
+
+        LocalDateTime date = LocalDateTime.of(1970, 1, 1, 7, 15);
+        // (7*60+15) -> min * 60 -> sec
+
+        assertThat(DateUtils.toSecondsSinceEpoch(date)).isEqualTo(26100);
     }
 
     @Test
