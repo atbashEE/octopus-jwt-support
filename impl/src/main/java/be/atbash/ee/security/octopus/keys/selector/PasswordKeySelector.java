@@ -23,7 +23,7 @@ import be.atbash.util.CDIUtils;
 import be.atbash.util.reflection.CDICheck;
 
 import javax.crypto.SecretKey;
-import javax.enterprise.inject.Vetoed;
+import jakarta.enterprise.inject.Vetoed;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

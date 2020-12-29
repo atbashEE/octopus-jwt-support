@@ -19,7 +19,7 @@ package be.atbash.ee.security.octopus.nimbus.jose;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 
-import javax.json.JsonObject;
+import jakarta.json.JsonObject;
 import java.io.Serializable;
 import java.text.ParseException;
 

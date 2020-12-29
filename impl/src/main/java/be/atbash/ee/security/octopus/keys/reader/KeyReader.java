@@ -25,15 +25,17 @@ import be.atbash.util.exception.AtbashUnexpectedException;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.pkcs.PKCSException;
 
-import javax.annotation.PostConstruct;
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
+import jakarta.annotation.PostConstruct;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
@@ -166,7 +168,7 @@ public class KeyReader {
 
         List<KeyResourceType> order = jwtSupportConfiguration.getReaderOrder();
 
-        String json = new String(content);
+        String json = new String(content, StandardCharsets.UTF_8);
 
         Iterator<KeyResourceType> iterator = order.iterator();
         while (iterator.hasNext() && result.isEmpty()) {

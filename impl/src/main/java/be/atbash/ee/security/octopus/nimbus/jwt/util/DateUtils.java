@@ -18,6 +18,7 @@ package be.atbash.ee.security.octopus.nimbus.jwt.util;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Date;
 
 
@@ -46,7 +47,7 @@ public class DateUtils {
      */
     public static long toSecondsSinceEpoch(LocalDateTime date) {
 
-        return date.toEpochSecond(OffsetDateTime.now().getOffset());
+        return date.toEpochSecond(ZoneOffset.UTC);
     }
 
     /**

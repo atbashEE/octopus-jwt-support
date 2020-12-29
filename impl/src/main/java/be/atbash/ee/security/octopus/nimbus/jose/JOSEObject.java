@@ -23,7 +23,7 @@ import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSObject;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.ee.security.octopus.nimbus.util.JSONObjectUtils;
 
-import javax.json.JsonObject;
+import jakarta.json.JsonObject;
 import java.io.Serializable;
 import java.text.ParseException;
 

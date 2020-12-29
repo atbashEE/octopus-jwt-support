@@ -25,7 +25,7 @@ import be.atbash.ee.security.octopus.keys.selector.filter.KeyFilter;
 import be.atbash.util.StringUtils;
 import be.atbash.util.exception.AtbashIllegalActionException;
 
-import javax.enterprise.inject.Vetoed;
+import jakarta.enterprise.inject.Vetoed;
 import java.util.ArrayList;
 import java.util.List;
 

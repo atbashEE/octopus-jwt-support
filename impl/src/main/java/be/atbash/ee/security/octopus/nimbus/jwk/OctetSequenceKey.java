@@ -24,8 +24,8 @@ import be.atbash.ee.security.octopus.nimbus.util.*;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonObjectBuilder;
 import java.net.URI;
 import java.security.*;
 import java.text.ParseException;

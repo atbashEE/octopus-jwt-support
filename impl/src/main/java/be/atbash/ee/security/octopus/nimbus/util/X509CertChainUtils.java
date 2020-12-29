@@ -16,9 +16,9 @@
 package be.atbash.ee.security.octopus.nimbus.util;
 
 
-import javax.json.JsonArray;
-import javax.json.JsonString;
-import javax.json.JsonValue;
+import jakarta.json.JsonArray;
+import jakarta.json.JsonString;
+import jakarta.json.JsonValue;
 import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.util.LinkedList;

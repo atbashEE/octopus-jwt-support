@@ -39,10 +39,10 @@ import be.atbash.ee.security.octopus.util.JsonbUtil;
 import be.atbash.util.PublicAPI;
 import be.atbash.util.exception.AtbashUnexpectedException;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import javax.json.JsonObject;
-import javax.json.bind.Jsonb;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.json.JsonObject;
+import jakarta.json.bind.Jsonb;
 import java.text.ParseException;
 
 /**

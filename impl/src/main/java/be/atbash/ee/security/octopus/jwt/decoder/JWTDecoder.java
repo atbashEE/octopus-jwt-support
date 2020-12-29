@@ -29,8 +29,8 @@ import be.atbash.util.PublicAPI;
 import be.atbash.util.StringUtils;
 import be.atbash.util.exception.AtbashIllegalActionException;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.json.bind.Jsonb;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.json.bind.Jsonb;
 import java.text.ParseException;
 import java.util.Iterator;
 import java.util.ServiceLoader;

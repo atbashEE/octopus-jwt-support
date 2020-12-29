@@ -19,7 +19,7 @@ package be.atbash.ee.security.octopus.nimbus.jwk;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.nimbus.util.JSONObjectUtils;
 
-import javax.json.*;
+import jakarta.json.*;
 import java.io.Serializable;
 import java.security.PrivateKey;
 import java.security.PublicKey;

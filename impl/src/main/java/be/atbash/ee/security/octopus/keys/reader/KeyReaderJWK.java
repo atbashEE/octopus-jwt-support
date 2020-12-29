@@ -25,11 +25,12 @@ import be.atbash.ee.security.octopus.util.JsonbUtil;
 import be.atbash.util.exception.AtbashUnexpectedException;
 import be.atbash.util.resource.ResourceUtil;
 
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
-import javax.json.bind.Jsonb;
-import javax.json.stream.JsonParsingException;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonObjectBuilder;
+import jakarta.json.bind.Jsonb;
+import jakarta.json.bind.JsonbException;
+import jakarta.json.stream.JsonParsingException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.PrivateKey;
@@ -81,7 +82,7 @@ public class KeyReaderJWK {
         JsonObject jwkJsonObject;
         try {
             jwkJsonObject = jsonb.fromJson(json, JsonObject.class);
-        } catch (JsonParsingException e) {
+        } catch (JsonParsingException | JsonbException e) {
             // Not a JSON, but as this can be part of 'testing' out which type it is.
             return new ArrayList<>();
         }

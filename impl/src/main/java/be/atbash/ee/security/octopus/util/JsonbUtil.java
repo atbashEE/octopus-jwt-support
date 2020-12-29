@@ -17,9 +17,9 @@ package be.atbash.ee.security.octopus.util;
 
 import be.atbash.ee.security.octopus.jwt.serializer.spi.SerializerProvider;
 
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
-import javax.json.bind.JsonbConfig;
+import jakarta.json.bind.Jsonb;
+import jakarta.json.bind.JsonbBuilder;
+import jakarta.json.bind.JsonbConfig;
 
 public final class JsonbUtil {
 

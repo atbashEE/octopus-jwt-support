@@ -30,8 +30,8 @@ import be.atbash.ee.security.octopus.nimbus.util.BigIntegerUtils;
 import be.atbash.ee.security.octopus.nimbus.util.JSONObjectUtils;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 
-import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonObjectBuilder;
 import java.math.BigInteger;
 import java.net.URI;
 import java.security.*;

@@ -22,10 +22,11 @@ import be.atbash.ee.security.octopus.util.JsonbUtil;
 import be.atbash.util.exception.AtbashUnexpectedException;
 import be.atbash.util.resource.ResourceUtil;
 
-import javax.json.JsonArray;
-import javax.json.JsonObject;
-import javax.json.bind.Jsonb;
-import javax.json.stream.JsonParsingException;
+import jakarta.json.JsonArray;
+import jakarta.json.JsonObject;
+import jakarta.json.bind.Jsonb;
+import jakarta.json.bind.JsonbException;
+import jakarta.json.stream.JsonParsingException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
@@ -69,7 +70,7 @@ public class KeyReaderJWKSet extends KeyReaderJWK {
         JsonObject jsonObject;
         try {
             jsonObject = jsonb.fromJson(fileContent, JsonObject.class);
-        } catch (JsonParsingException e) {
+        } catch (JsonParsingException | JsonbException e) {
             // Not a JSON, No error as this can be part of 'testing' out which type it is.
             return result;
         }

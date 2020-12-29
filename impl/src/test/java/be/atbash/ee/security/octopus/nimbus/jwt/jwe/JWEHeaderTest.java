@@ -26,9 +26,9 @@ import be.atbash.ee.security.octopus.nimbus.util.Base64Value;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonObjectBuilder;
 import java.net.URI;
 import java.text.ParseException;
 import java.util.*;

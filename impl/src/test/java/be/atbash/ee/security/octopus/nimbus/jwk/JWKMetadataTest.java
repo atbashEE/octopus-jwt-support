@@ -19,8 +19,8 @@ package be.atbash.ee.security.octopus.nimbus.jwk;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import javax.json.Json;
-import javax.json.JsonObjectBuilder;
+import jakarta.json.Json;
+import jakarta.json.JsonObjectBuilder;
 import java.text.ParseException;
 
 import static org.assertj.core.api.Assertions.assertThat;

@@ -19,7 +19,7 @@ package be.atbash.ee.security.octopus.nimbus.jose;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.ee.security.octopus.nimbus.util.JSONObjectUtils;
 
-import javax.json.JsonObject;
+import jakarta.json.JsonObject;
 import java.text.ParseException;
 import java.util.*;
 

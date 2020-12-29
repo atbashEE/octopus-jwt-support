@@ -21,8 +21,8 @@ import be.atbash.ee.security.octopus.keys.KeyManager;
 import be.atbash.util.CDIUtils;
 import be.atbash.util.PublicAPI;
 
-import javax.annotation.PostConstruct;
-import javax.enterprise.context.ApplicationScoped;
+import jakarta.annotation.PostConstruct;
+import jakarta.enterprise.context.ApplicationScoped;
 import java.security.Key;
 import java.util.List;
 

@@ -17,7 +17,7 @@ package be.atbash.ee.security.octopus.json.testclasses;
 
 import be.atbash.ee.security.octopus.json.AbstractJacksonJsonSerializer;
 
-import javax.json.bind.serializer.JsonbSerializer;
+import jakarta.json.bind.serializer.JsonbSerializer;
 
 public class CollectionPojoJacksonJsonSerializer extends AbstractJacksonJsonSerializer<JacksonCollectionPojoClass> implements JsonbSerializer<JacksonCollectionPojoClass> {
 }

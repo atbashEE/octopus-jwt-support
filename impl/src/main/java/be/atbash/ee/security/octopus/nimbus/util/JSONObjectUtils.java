@@ -18,9 +18,9 @@ package be.atbash.ee.security.octopus.nimbus.util;
 
 import be.atbash.ee.security.octopus.util.JsonbUtil;
 
-import javax.json.*;
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbException;
+import jakarta.json.*;
+import jakarta.json.bind.Jsonb;
+import jakarta.json.bind.JsonbException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;

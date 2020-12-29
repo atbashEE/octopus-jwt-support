@@ -24,7 +24,7 @@ import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import javax.json.JsonObject;
+import jakarta.json.JsonObject;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.interfaces.ECPrivateKey;
@@ -993,5 +993,35 @@ public class JWKSetTest {
         List<AtbashKey> keys = jwkSet.getAtbashKeys();
 
         assertThat(keys).hasSize(2);
+    }
+
+    @Test
+    public void getAtbashKeys_withOctKey() {
+        List<AtbashKey> atbashKeys = TestKeys.generateRSAKeys("kid");
+        RSAPrivateKey privateKey = null;
+        RSAPublicKey publicKey = null;
+        for (AtbashKey atbashKey : atbashKeys) {
+            if (atbashKey.getKey() instanceof RSAPrivateKey) {
+                privateKey = (RSAPrivateKey) atbashKey.getKey();
+            }
+            if (atbashKey.getKey() instanceof RSAPublicKey) {
+                publicKey = (RSAPublicKey) atbashKey.getKey();
+            }
+        }
+
+        RSAKey rsaKey = new RSAKey(publicKey, privateKey, KeyUse.SIGNATURE, null, null, "kid", null, null, null, null);
+
+        OctetSequenceKey octKey = new OctetSequenceKey.Builder(TestKeys.generateOCTKeys("kid2").get(0))
+                .keyID("kid2")
+                .build();
+
+        List<JWK> keyList = new ArrayList<>();
+        keyList.add(rsaKey);
+        keyList.add(octKey);
+        JWKSet jwkSet = new JWKSet(keyList);
+
+        List<AtbashKey> keys = jwkSet.getAtbashKeys();
+
+        assertThat(keys).hasSize(3);
     }
 }

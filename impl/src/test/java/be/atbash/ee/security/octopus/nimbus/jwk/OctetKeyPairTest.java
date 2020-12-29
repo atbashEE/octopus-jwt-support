@@ -23,7 +23,7 @@ import be.atbash.ee.security.octopus.nimbus.util.Base64Value;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import javax.json.JsonObject;
+import jakarta.json.JsonObject;
 import java.net.URI;
 import java.security.KeyStore;
 import java.util.Arrays;

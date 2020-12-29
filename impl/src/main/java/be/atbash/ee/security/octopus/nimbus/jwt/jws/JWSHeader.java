@@ -27,7 +27,7 @@ import be.atbash.ee.security.octopus.nimbus.util.Base64Value;
 import be.atbash.ee.security.octopus.nimbus.util.JSONObjectUtils;
 import be.atbash.ee.security.octopus.nimbus.util.X509CertChainUtils;
 
-import javax.json.JsonObject;
+import jakarta.json.JsonObject;
 import java.net.URI;
 import java.text.ParseException;
 import java.util.*;

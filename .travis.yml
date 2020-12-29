@@ -1,7 +1,6 @@
 language: java
 sudo: false # faster builds
 
-jdk: openjdk7
+jdk: openjdk8
 
-install: "mvn package -pl '!keyhelper'"
-script: "mvn test -pl '!keyhelper'"
+script: "mvn package"

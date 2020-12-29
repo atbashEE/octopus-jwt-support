@@ -24,7 +24,7 @@ import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.KeyTypeException;
 import be.atbash.ee.security.octopus.nimbus.util.*;
 
-import javax.json.*;
+import jakarta.json.*;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.net.URI;
