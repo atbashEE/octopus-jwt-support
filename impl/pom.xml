@@ -127,7 +127,7 @@
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcpkix-jdk15on</artifactId>
-            <version>1.64</version>
+            <version>1.66</version>
         </dependency>
 
         <!-- test dependencies-->
@@ -442,7 +442,7 @@
                             <doctitle>${project.name} ${project.version}</doctitle>
                             <additionalparam>-Xdoclint:none</additionalparam>
                             <bottom>
-                                <![CDATA[]]>
+                                
                             </bottom>
                         </configuration>
                         <executions>
