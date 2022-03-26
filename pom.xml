@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+    Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -58,17 +58,19 @@
     </scm>
 
     <properties>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <atbash-utils.version>1.0.0-SNAPSHOT</atbash-utils.version>
+        <atbash-utils.version>1.0.0</atbash-utils.version>
+        <atbash-utils.jakarta.version>1.1.0-SNAPSHOT</atbash-utils.jakarta.version>
         <atbash-config.version>1.0.0-SNAPSHOT</atbash-config.version>
         <jakarta.json.bind.version>1.0</jakarta.json.bind.version>
         <jakarta.json.version>1.1</jakarta.json.version>
+        <atbash-runtime.version>0.3-SNAPSHOT</atbash-runtime.version>
 
-        <microprofile-config.version>1.3</microprofile-config.version>
+        <microprofile-config.version>3.0.1</microprofile-config.version>
 
         <slf4j.version>1.7.25</slf4j.version>
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,9 @@ package be.atbash.ee.security.octopus;
 import be.atbash.ee.security.octopus.config.PemKeyEncryption;
 import org.eclipse.microprofile.config.spi.ConfigSource;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class ProgramConfigSource implements ConfigSource {
 
@@ -48,4 +50,8 @@ public class ProgramConfigSource implements ConfigSource {
         return Integer.MAX_VALUE;  // Make sure we are always the first one.
     }
 
+    @Override
+    public Set<String> getPropertyNames() {
+        return new HashSet<>();
+    }
 }

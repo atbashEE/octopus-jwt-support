@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -169,7 +169,7 @@ public class JWKTest {
         // Try to load with bad pin
         JOSEException e = Assertions.assertThrows(JOSEException.class,
                 () -> JWK.load(keyStore, "1", "".toCharArray()));
-        assertThat(e.getMessage()).isEqualTo("Couldn't retrieve private RSA key (bad pin?): Cannot recover key");
+        assertThat(e.getMessage()).isEqualTo("Couldn't retrieve private RSA key (bad pin?): Get Key failed: Given final block not properly padded. Such issues can arise if a bad key is used during decryption.");
         assertThat(e.getCause() instanceof UnrecoverableKeyException).isTrue();
     }
 
@@ -226,7 +226,7 @@ public class JWKTest {
         // Try to load with bad pin
         JOSEException e = Assertions.assertThrows(JOSEException.class,
                 () -> JWK.load(keyStore, "1", "".toCharArray()));
-        assertThat(e.getMessage()).isEqualTo("Couldn't retrieve private EC key (bad pin?): Cannot recover key");
+        assertThat(e.getMessage()).isEqualTo("Couldn't retrieve private EC key (bad pin?): Get Key failed: Given final block not properly padded. Such issues can arise if a bad key is used during decryption.");
         assertThat(e.getCause() instanceof UnrecoverableKeyException).isTrue();
     }
 
