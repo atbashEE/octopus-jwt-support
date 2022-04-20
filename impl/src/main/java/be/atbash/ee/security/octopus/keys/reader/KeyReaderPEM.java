@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,13 @@ import be.atbash.ee.security.octopus.nimbus.jose.crypto.bc.BouncyCastleProviderS
 import be.atbash.util.StringUtils;
 import be.atbash.util.exception.AtbashUnexpectedException;
 import be.atbash.util.resource.ResourceUtil;
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.DERNull;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
+import org.bouncycastle.asn1.pkcs.RSAPrivateKey;
+import org.bouncycastle.asn1.pkcs.RSAPublicKey;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.openssl.PEMDecryptorProvider;
 import org.bouncycastle.openssl.PEMEncryptedKeyPair;
@@ -125,12 +131,19 @@ public class KeyReaderPEM {
             result.add(new AtbashKey(path, privateKey));
 
         }
-        // Unencrypted key - no password needed
         if (pemData instanceof SubjectPublicKeyInfo) {
+            // Unencrypted key - no password needed
             PublicKey publicKey = converter.getPublicKey((SubjectPublicKeyInfo) pemData);
             result.add(new AtbashKey(path, publicKey));
 
         }
+        if (pemData instanceof PrivateKeyInfo) {
+            // Unencrypted key
+            PrivateKeyInfo info = (PrivateKeyInfo) pemData;
+            pemData = convertPrivateKeyFromPKCS8ToPKCS1(info);
+
+        }
+
         if (pemData instanceof PEMKeyPair) {
             PEMKeyPair keyPair = (PEMKeyPair) pemData;
             PrivateKey privateKey = converter.getPrivateKey(keyPair.getPrivateKeyInfo());
@@ -140,5 +153,20 @@ public class KeyReaderPEM {
         }
 
         return result;
+    }
+
+    private static PEMKeyPair convertPrivateKeyFromPKCS8ToPKCS1(PrivateKeyInfo privateKeyInfo) throws IOException {
+        // Parse the key wrapping to determine the internal key structure
+        ASN1Encodable asn1PrivateKey = privateKeyInfo.parsePrivateKey();
+        // Convert the parsed key to an RSA private key
+        RSAPrivateKey keyStruct = RSAPrivateKey.getInstance(asn1PrivateKey);
+        // Create the RSA public key from the modulus and exponent
+        RSAPublicKey pubSpec = new RSAPublicKey(
+                keyStruct.getModulus(), keyStruct.getPublicExponent());
+        // Create an algorithm identifier for forming the key pair
+        AlgorithmIdentifier algId = new AlgorithmIdentifier(PKCSObjectIdentifiers.rsaEncryption, DERNull.INSTANCE);
+
+        // Create the key pair container
+        return new PEMKeyPair(new SubjectPublicKeyInfo(algId, pubSpec), new PrivateKeyInfo(algId, keyStruct));
     }
 }

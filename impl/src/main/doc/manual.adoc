@@ -5,9 +5,13 @@ v1.0.0, ??/??/20??
 ifndef::imagesdir[:imagesdir: images]
 ifndef::sourcedir[:sourcedir: ../../main/java]
 
-User manual for Atbash configuration.
+User manual for Atbash JWT Support.
 
 == Release Notes
+
+=== 1.1.0
+
+. Support for Reading PEM in PKCS8 unencrypted format.
 
 === 1.0.0
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -99,6 +99,20 @@ public class KeyReaderTest {
         assertThat(keys).hasSize(1);
         assertThat(keys.get(0).getKeyId()).isEqualTo("authentication.pkcs8");  // filename without extension
         assertThat(keys.get(0).getKey()).isInstanceOf(RSAPrivateKey.class);
+
+    }
+
+    @Test
+    public void readKeyResource_scenario3bis() {
+        // RSA  PKCS#8 format, No password
+
+        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.pkcs8.free.pem", null);
+
+        assertThat(keys).hasSize(2);
+        assertThat(keys.get(0).getKeyId()).isEqualTo("rsa.pkcs8.free");  // filename without extension
+        assertThat(keys.get(0).getKey()).isInstanceOf(RSAPrivateKey.class);
+        assertThat(keys.get(1).getKeyId()).isEqualTo("rsa.pkcs8.free");  // filename without extension
+        assertThat(keys.get(1).getKey()).isInstanceOf(RSAPublicKey.class);
 
     }
 
