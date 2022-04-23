@@ -6,7 +6,7 @@ Wrap Java Objects as JWT and Sign or encrypt. Also support JWT tokens.
 
 Support library for Atbash Octopus, Atbash Config Server and others.
 
-Support for Java 8 and Jakarta Namespace
+Support for Java 11 and Jakarta Namespace
 
 Does have issues on OpenJDK with EC keys (not with Oracle JDK and Azul Zulu)
 
