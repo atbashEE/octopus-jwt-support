@@ -13,6 +13,7 @@ User manual for Atbash JWT Support.
 
 . Support for Reading PEM in PKCS8 unencrypted format.
 . Support custom claims of type number array in JWT payload.
+. More alternative interpretations of claims (like comma separated string for aud interpreted as array)
 
 === Jakarta version
 
