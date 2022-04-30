@@ -17,8 +17,18 @@ package be.atbash.ee.security.octopus.keys.reader;
 
 import be.atbash.ee.security.octopus.exception.MissingPasswordLookupException;
 import be.atbash.ee.security.octopus.exception.ResourceNotFoundException;
+import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.TestPasswordLookup;
+import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup;
+import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
+import be.atbash.ee.security.octopus.keys.selector.SecretKeyType;
+import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+import java.util.Scanner;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -38,4 +48,29 @@ class KeyReaderKeyStoreTest {
         MissingPasswordLookupException missingException = assertThrows(MissingPasswordLookupException.class, () -> keyStore.readResource("./some.path", null));
         assertThat(missingException.getMessage()).isEqualTo("KeyResourcePasswordLookup instance required");
     }
+
+    @Test
+    void parseContent() throws IOException {
+        InputStream inputStream = KeyReaderKeyStoreTest.class.getResourceAsStream("/keystore.jks.b64");
+        assertThat(inputStream).isNotNull();
+        String fileContent = new Scanner(inputStream).useDelimiter("\\Z").next();
+        inputStream.close();
+
+        KeyReaderKeyStore keyStore = new KeyReaderKeyStore();
+        KeyResourcePasswordLookup lookup = new TestPasswordLookup("atbash".toCharArray());
+        List<AtbashKey> keys = keyStore.parseContent(fileContent, lookup);
+
+        assertThat(keys).hasSize(2);
+        AtbashKey atbashKey = keys.get(0);
+        assertThat(atbashKey.getKeyId()).isEqualTo("thealias");
+        // Private part is added first
+        assertThat(atbashKey.getSecretKeyType()).isEqualTo(new SecretKeyType(KeyType.RSA, AsymmetricPart.PRIVATE));
+
+        atbashKey = keys.get(1);
+        assertThat(atbashKey.getKeyId()).isEqualTo("thealias");
+        // Public part is added second
+        assertThat(atbashKey.getSecretKeyType()).isEqualTo(new SecretKeyType(KeyType.RSA, AsymmetricPart.PUBLIC));
+
+    }
+
 }

@@ -18,17 +18,20 @@ package be.atbash.ee.security.octopus.keys.reader;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.Filters;
 import be.atbash.ee.security.octopus.keys.TestKeys;
-import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup;
+import be.atbash.ee.security.octopus.keys.TestPasswordLookup;
 import be.atbash.ee.security.octopus.keys.writer.KeyWriter;
 import be.atbash.ee.security.octopus.nimbus.jwk.Curve;
 import org.junit.jupiter.api.Test;
 
 import java.text.ParseException;
+import java.util.Base64;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class KeyReaderJWKTest {
+
+    public static final String PASSWORD = "atbash";
 
     private KeyReaderJWK keyReader = new KeyReaderJWK();
 
@@ -39,12 +42,12 @@ class KeyReaderJWKTest {
         List<AtbashKey> keys = TestKeys.generateRSAKeys("kid");
         AtbashKey privateKey = Filters.findPrivateKey(keys);
 
-        byte[] bytes = keyWriter.writeKeyResource(privateKey, KeyResourceType.JWK, "atbash".toCharArray());
+        byte[] bytes = keyWriter.writeKeyResource(privateKey, KeyResourceType.JWK, PASSWORD.toCharArray());
         String json = new String(bytes);
 
         assertThat(json).contains("\"enc\":");
         assertThat(json).contains("\"kty\":\"RSA\"");
-        List<AtbashKey> parsedKeys = keyReader.parse(json, "somePath", new TestLookup());
+        List<AtbashKey> parsedKeys = keyReader.parse(json, "somePath", new TestPasswordLookup(null, PASSWORD.toCharArray()));
         AtbashKey parsedKey = Filters.findPrivateKey(parsedKeys);
 
         // Both keys are the same when their encoded format is the same.
@@ -57,12 +60,12 @@ class KeyReaderJWKTest {
         List<AtbashKey> keys = TestKeys.generateECKeys("kid", Curve.P_256.getName());
         AtbashKey privateKey = Filters.findPrivateKey(keys);
 
-        byte[] bytes = keyWriter.writeKeyResource(privateKey, KeyResourceType.JWK, "atbash".toCharArray());
+        byte[] bytes = keyWriter.writeKeyResource(privateKey, KeyResourceType.JWK, PASSWORD.toCharArray());
         String json = new String(bytes);
 
         assertThat(json).contains("\"enc\":");
         assertThat(json).contains("\"kty\":\"EC\"");
-        List<AtbashKey> parsedKeys = keyReader.parse(json, "somePath", new TestLookup());
+        List<AtbashKey> parsedKeys = keyReader.parse(json, "somePath", new TestPasswordLookup(null, PASSWORD.toCharArray()));
         AtbashKey parsedKey = Filters.findPrivateKey(parsedKeys);
 
         //TODO Both keys are the same but encrypted is not the same hmmmm
@@ -75,12 +78,12 @@ class KeyReaderJWKTest {
         List<AtbashKey> keys = TestKeys.generateOKPKeys("kid");
         AtbashKey privateKey = Filters.findPrivateKey(keys);
 
-        byte[] bytes = keyWriter.writeKeyResource(privateKey, KeyResourceType.JWK, "atbash".toCharArray());
+        byte[] bytes = keyWriter.writeKeyResource(privateKey, KeyResourceType.JWK, PASSWORD.toCharArray());
         String json = new String(bytes);
 
         assertThat(json).contains("\"enc\":");
         assertThat(json).contains("\"kty\":\"OKP\"");
-        List<AtbashKey> parsedKeys = keyReader.parse(json, "somePath", new TestLookup());
+        List<AtbashKey> parsedKeys = keyReader.parse(json, "somePath", new TestPasswordLookup(null, PASSWORD.toCharArray()));
         AtbashKey parsedKey = Filters.findPrivateKey(parsedKeys);
 
         // Both keys are the same when their encoded format is the same.
@@ -88,15 +91,19 @@ class KeyReaderJWKTest {
 
     }
 
-    private static class TestLookup implements KeyResourcePasswordLookup {
-        @Override
-        public char[] getResourcePassword(String path) {
-            return new char[0];
-        }
+    @Test
+    void parse_b64() {
+        List<AtbashKey> keys = TestKeys.generateRSAKeys("kid");
+        AtbashKey publicKey = Filters.findPublicKey(keys);
 
-        @Override
-        public char[] getKeyPassword(String path, String keyId) {
-            return "atbash".toCharArray();
-        }
+        byte[] bytes = keyWriter.writeKeyResource(publicKey, KeyResourceType.JWK);
+        String content = Base64.getEncoder().encodeToString(bytes);
+
+        List<AtbashKey> parsedKeys = keyReader.parseContent(content, null);
+
+        assertThat(parsedKeys).hasSize(1);
+        // Both keys are the same when their encoded format is the same.
+        assertThat(parsedKeys.get(0).getKey().getEncoded()).isEqualTo(publicKey.getKey().getEncoded());
+
     }
 }

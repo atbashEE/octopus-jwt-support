@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,9 @@ import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLoo
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.bc.BouncyCastleProviderSingleton;
 import be.atbash.util.exception.AtbashUnexpectedException;
 import be.atbash.util.resource.ResourceUtil;
+import org.bouncycastle.util.encoders.Base64;
 
+import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -50,7 +52,25 @@ public class KeyReaderKeyStore {
             result = parseContent(inputStream, path, passwordLookup);
         } catch (FileNotFoundException e) {
             throw new ResourceNotFoundException(path);
-        } catch (KeyStoreException | IOException | NoSuchAlgorithmException | CertificateException | UnrecoverableKeyException e) {
+        } catch (KeyStoreException | IOException | NoSuchAlgorithmException | CertificateException |
+                 UnrecoverableKeyException e) {
+            throw new AtbashUnexpectedException(e);
+        }
+        return result;
+    }
+
+    public List<AtbashKey> parseContent(String content, KeyResourcePasswordLookup passwordLookup) {
+        List<AtbashKey> result = new ArrayList<>();
+        KeyStore keyStore = createKeyStore();
+
+        try {
+            InputStream inputStream = new ByteArrayInputStream(Base64.decode(content));
+            keyStore.load(inputStream, passwordLookup.getResourcePassword("inline"));
+
+            defineKeys("inline", passwordLookup, result, keyStore);
+        } catch (IOException | NoSuchAlgorithmException | CertificateException | KeyStoreException |
+                 UnrecoverableKeyException e) {
+            // FIXME This needs to be tuned based on the actual exception. Not all are unexpected.
             throw new AtbashUnexpectedException(e);
         }
         return result;
@@ -61,19 +81,23 @@ public class KeyReaderKeyStore {
         KeyStore keyStore = createKeyStore();
         keyStore.load(inputStream, passwordLookup.getResourcePassword(path));
 
+        defineKeys(path, passwordLookup, result, keyStore);
+        return result;
+    }
+
+    private void defineKeys(String path, KeyResourcePasswordLookup passwordLookup, List<AtbashKey> keys, KeyStore keyStore) throws KeyStoreException, UnrecoverableKeyException, NoSuchAlgorithmException {
         for (Enumeration<String> keyAliases = keyStore.aliases(); keyAliases.hasMoreElements(); ) {
             String alias = keyAliases.nextElement();
             if (keyStore.isKeyEntry(alias)) {
                 char[] password = passwordLookup.getKeyPassword(path, alias);
-                result.addAll(readKeysFromKeyEntry(keyStore, alias, password));
+                keys.addAll(readKeysFromKeyEntry(keyStore, alias, password));
             }
             if (keyStore.isCertificateEntry(alias)) {
                 Certificate certificate = keyStore.getCertificate(alias);
-                result.add(new AtbashKey(alias, certificate.getPublicKey()));
+                keys.add(new AtbashKey(alias, certificate.getPublicKey()));
             }
 
         }
-        return result;
     }
 
     private KeyStore createKeyStore() {
