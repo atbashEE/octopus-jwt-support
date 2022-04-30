@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -112,10 +112,13 @@ public class Ed25519Signer extends EdDSAProvider implements JWSSigner {
     private byte[] getD(BCEdDSAPrivateKey privateKey) {
 		// The next code statements are required to get access to the x and d values of the private Key.
 		// BouncyCastle should have support for it!
-		ASN1InputStream stream = new ASN1InputStream(privateKey.getEncoded());
 		ASN1Primitive primitive;
-		try {
-			primitive = stream.readObject();
+		try (ASN1InputStream stream = new ASN1InputStream(privateKey.getEncoded())) {
+			try {
+				primitive = stream.readObject();
+			} catch (IOException e) {
+				throw new AtbashUnexpectedException(e);
+			}
 		} catch (IOException e) {
 			throw new AtbashUnexpectedException(e);
 		}

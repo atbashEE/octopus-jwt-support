@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -223,11 +223,15 @@ public final class Curve implements Serializable {
 
     @Override
     public boolean equals(Object object) {
-
+        // Same name of the Curve?
         return object instanceof Curve &&
                 this.toString().equals(object.toString());
     }
 
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
 
     /**
      * Parses a cryptographic curve from the specified string.

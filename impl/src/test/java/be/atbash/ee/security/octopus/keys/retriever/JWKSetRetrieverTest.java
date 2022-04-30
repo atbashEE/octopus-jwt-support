@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,10 +29,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Proxy;
-import java.net.ServerSocket;
-import java.net.URL;
+import java.net.*;
 import java.security.interfaces.RSAPublicKey;
 import java.util.concurrent.TimeUnit;
 
@@ -228,7 +225,8 @@ public class JWKSetRetrieverTest {
 
         JWKSetRetriever resourceRetriever = new JWKSetRetriever(50, 0);
 
-        IOException e = Assertions.assertThrows(IOException.class, () -> resourceRetriever.retrieveResource(new URL("http://localhost:" + port + "/c2id/jwks.json")));
+        URL url = new URL("http://localhost:" + port + "/c2id/jwks.json");
+        IOException e = Assertions.assertThrows(IOException.class, () -> resourceRetriever.retrieveResource(url));
         assertThat(e.getMessage()).startsWith("Connection refused");
 
     }
@@ -243,13 +241,14 @@ public class JWKSetRetrieverTest {
         JWKSetRetriever resourceRetriever = new JWKSetRetriever(50, 0);
         resourceRetriever.setProxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress("localhost", proxyPort)));
 
-        IOException e = Assertions.assertThrows(IOException.class, () -> resourceRetriever.retrieveResource(new URL("http://localhost:" + Jadler.port() + "/c2id/jwks.json")));
+        URL url = new URL("http://localhost:" + Jadler.port() + "/c2id/jwks.json");
+        IOException e = Assertions.assertThrows(IOException.class, () -> resourceRetriever.retrieveResource(url));
         assertThat(e.getMessage()).startsWith("Connection refused");
 
     }
 
     @Test
-    public void testReadTimeout() {
+    public void testReadTimeout() throws MalformedURLException {
         AtbashKey publicKey = Filters.findPublicKey(TestKeys.generateRSAKeys("kid"));
         RSAKey rsaKey = new RSAKey.Builder((RSAPublicKey) publicKey.getKey()).keyID("kid").build();
         JWKSet set = new JWKSet(rsaKey);
@@ -265,7 +264,8 @@ public class JWKSetRetrieverTest {
 
         JWKSetRetriever resourceRetriever = new JWKSetRetriever(0, 50);
 
-        IOException e = Assertions.assertThrows(IOException.class, () -> resourceRetriever.retrieveResource(new URL("http://localhost:" + Jadler.port() + "/c2id/jwks.json")));
+        URL url = new URL("http://localhost:" + Jadler.port() + "/c2id/jwks.json");
+        IOException e = Assertions.assertThrows(IOException.class, () -> resourceRetriever.retrieveResource(url));
         assertThat(e.getMessage()).isEqualTo("Read timed out");
 
     }

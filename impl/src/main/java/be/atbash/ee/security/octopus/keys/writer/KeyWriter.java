@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -114,6 +114,7 @@ public class KeyWriter {
 
     }
 
+    @SuppressWarnings("S1143")
     private JWKSet loadExistingJWKSet(String target) {
         JWKSet result;
         InputStream inputStream = null;
@@ -138,6 +139,7 @@ public class KeyWriter {
                 try {
                     inputStream.close();
                 } catch (IOException e) {
+                    // Intended and does not hide any other exception or statement executions.
                     throw new AtbashUnexpectedException(e);
                 }
             }

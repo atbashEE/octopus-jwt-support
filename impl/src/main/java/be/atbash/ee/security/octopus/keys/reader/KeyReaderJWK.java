@@ -44,6 +44,7 @@ import java.util.Scanner;
 
 public class KeyReaderJWK {
 
+    @SuppressWarnings("S1143")
     public List<AtbashKey> readResource(String path, KeyResourcePasswordLookup passwordLookup) {
         List<AtbashKey> result;
         InputStream inputStream = null;
@@ -68,6 +69,7 @@ public class KeyReaderJWK {
                 try {
                     inputStream.close();
                 } catch (IOException e) {
+                    // Intended and does not hide any other exception or statement executions.
                     throw new AtbashUnexpectedException(e);
                 }
             }
