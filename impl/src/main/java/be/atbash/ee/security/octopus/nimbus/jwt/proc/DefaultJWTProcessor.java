@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package be.atbash.ee.security.octopus.nimbus.jwt.proc;
 
 
+import be.atbash.ee.security.octopus.config.JwtSupportConfiguration;
 import be.atbash.ee.security.octopus.jwt.InvalidJWTException;
 import be.atbash.ee.security.octopus.jwt.decoder.JWTVerifier;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
@@ -114,6 +115,8 @@ public class DefaultJWTProcessor implements JWTProcessor {
      */
     private JWTVerifier claimsVerifier = new DefaultJWTClaimsVerifier();
 
+
+    private final JwtSupportConfiguration jwtSupportConfiguration = JwtSupportConfiguration.getInstance();
 
     @Override
     public void setJWSKeySelector(KeySelector jwsKeySelector) {
@@ -309,6 +312,10 @@ public class DefaultJWTProcessor implements JWTProcessor {
             }
 
             return process(signedJWTPayload);
+        }
+
+        if (jwtSupportConfiguration.isContentTypeRequiredForJWE()) {
+            throw new InvalidJWTException("Missing Content Type in the header 'cty=JWT' ");
         }
 
         JWTClaimsSet claimsSet = extractJWTClaimsSet(encryptedJWT);
