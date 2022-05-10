@@ -148,7 +148,7 @@ public class KeyReader {
         List<AtbashKey> result = new ArrayList<>();
         try {
             result = keyReaderPEM.readResource(path, passwordLookup);
-            matched = true;
+            matched = !result.isEmpty();
         } catch (AtbashUnexpectedException e) {
             // Capture exception and try next format.
         }
@@ -159,7 +159,17 @@ public class KeyReader {
 
         try {
             result = keyReaderJWK.readResource(path, passwordLookup);
-            matched = true;
+            matched = !result.isEmpty();
+        } catch (AtbashUnexpectedException e) {
+            // Capture exception and try next format.
+        }
+        if (matched) {
+            return result;
+        }
+
+        try {
+            result = keyReaderJWKSet.readResource(path, passwordLookup);
+            matched = !result.isEmpty();
         } catch (AtbashUnexpectedException e) {
             // Capture exception and try next format.
         }
@@ -225,7 +235,17 @@ public class KeyReader {
 
         try {
             result = keyReaderJWK.parseContent(content, passwordLookup);
-            matched = true;
+            matched = !result.isEmpty();  // When  a JWKS is read by keyReaderJWK, it returns empty list.
+        } catch (AtbashUnexpectedException e) {
+            // Capture exception and try next format.
+        }
+        if (matched) {
+            return result;
+        }
+
+        try {
+            result = keyReaderJWKSet.parseContent(content, passwordLookup);
+            matched = !result.isEmpty();
         } catch (AtbashUnexpectedException e) {
             // Capture exception and try next format.
         }
