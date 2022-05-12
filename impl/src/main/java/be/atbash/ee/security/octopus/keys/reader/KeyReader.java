@@ -244,7 +244,7 @@ public class KeyReader {
         }
 
         try {
-            result = keyReaderJWKSet.parseContent(content, passwordLookup);
+            result = keyReaderJWKSet.parseContent(content, "inline", passwordLookup);
             matched = !result.isEmpty();
         } catch (AtbashUnexpectedException e) {
             // Capture exception and try next format.
@@ -261,12 +261,6 @@ public class KeyReader {
         }
         if (matched) {
             return result;
-        }
-
-        try {
-            result = keyReaderJWKSet.parseContent(content, "inline", passwordLookup);
-        } catch (AtbashUnexpectedException e) {
-            // Capture exception and try next format.
         }
 
         return result;
