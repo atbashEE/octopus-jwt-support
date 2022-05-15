@@ -41,7 +41,6 @@ import java.security.cert.CertificateException;
 import java.text.ParseException;
 import java.util.Scanner;
 
-import static be.atbash.ee.security.octopus.exception.MissingPasswordException.ObjectType.STORE;
 
 /**
  *
@@ -217,7 +216,7 @@ public class KeyWriter {
 
             if (checkRequired) {
                 // Only when encrypting the key, we need to check the password/passphrase.
-                checkKeyPassword(atbashKey, keyPassword);
+                checkKeyPassword(atbashKey, keyPassword, MissingPasswordException.ObjectType.PEM);
             }
         }
 
@@ -229,9 +228,9 @@ public class KeyWriter {
     }
 
     private byte[] writeKeyAsKeyStore(AtbashKey atbashKey, char[] keyPassword, char[] filePassword, KeyStore keyStore) throws IOException {
-        checkKeyPassword(atbashKey, keyPassword);
+        checkKeyPassword(atbashKey, keyPassword, MissingPasswordException.ObjectType.STORE);
         if (StringUtils.isEmpty(filePassword)) {
-            throw new MissingPasswordException(STORE, "A password for the keystore is required in order to save the key info");
+            throw new MissingPasswordException(MissingPasswordException.ObjectType.STORE, "A password for the keystore is required in order to save the key info");
         }
 
         KeyEncoderParameters parameters = new KeyEncoderParameters(keyPassword, filePassword, keyStore);
@@ -241,7 +240,7 @@ public class KeyWriter {
 
     private byte[] writeKeyAsJWK(AtbashKey atbashKey, char[] keyPassword) {
         if (jwtSupportConfiguration.isJWKEncrypted()) {
-            checkKeyPassword(atbashKey, keyPassword);
+            checkKeyPassword(atbashKey, keyPassword, MissingPasswordException.ObjectType.ENCRYPTION);
         }
 
         KeyEncoderParameters parameters = new KeyEncoderParameters(keyPassword);
@@ -284,10 +283,10 @@ public class KeyWriter {
 
     }
 
-    private void checkKeyPassword(AtbashKey atbashKey, char[] keyPasssword) {
+    private void checkKeyPassword(AtbashKey atbashKey, char[] keyPasssword, MissingPasswordException.ObjectType objectType) {
         if (atbashKey.getSecretKeyType().isAsymmetric() && atbashKey.getSecretKeyType().getAsymmetricPart() == AsymmetricPart.PRIVATE) {
             if (StringUtils.isEmpty(keyPasssword)) {
-                throw new MissingPasswordException(STORE, "A passphrase is required in order to save the key info");
+                throw new MissingPasswordException(objectType, "A passphrase is required in order to save the key info");
             }
         }
     }

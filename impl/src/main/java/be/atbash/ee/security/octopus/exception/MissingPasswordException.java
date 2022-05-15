@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,9 @@ public class MissingPasswordException extends AtbashException {
         if (objectType == ObjectType.STORE) {
             return String.format("Password required for opening key store '%s'", path);
         }
+        if (objectType == ObjectType.PEM) {
+            return String.format("Password required for writing encrypted PEM '%s'", path);
+        }
         if (objectType == ObjectType.ENCRYPTION) {
             return "Password required for encryption/decryption";
         }
@@ -43,6 +46,6 @@ public class MissingPasswordException extends AtbashException {
     }
 
     public enum ObjectType {
-        STORE, ENCRYPTION
+        STORE, ENCRYPTION, PEM
     }
 }
