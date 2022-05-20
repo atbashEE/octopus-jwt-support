@@ -15,6 +15,7 @@ User manual for Atbash JWT Support.
 . Support custom claims of type number array in JWT payload.
 . More alternative interpretations of claims (like comma separated string for aud interpreted as array)
 . Support for parsing Strings in the different Readers.
+. Convert 'Java Objects' to JsonValue instances and vice versa.
 
 === Jakarta version
 
@@ -412,19 +413,32 @@ When a custom JSON deserializer is required
 - Create a class implementing `javax.json.bind.serializer.JsonbDeserializer`
 - Define the class (FQCN) through the ServiceLoader mechanism (`META-INF/service/javax.json.bind.serializer.JsonbDeserializer`)
 
+== Conversion from and to JsonValue (Since 1.1)
+
+With the help of the `JSONObjectUtils` class, you can convert a String to the JsonString instance, JsonNumber to a Long etc.
+So you can convert the Java objects to JsonValue instances and vice versa.
+
+The code was already partially available in previous releases but now finalized and usable by the developers (marked as PublicAPI).
+
+- `JSONObjectUtils.getJsonValueAsObject` extracts the basic Java value from any `JSONValue` instance.
+An array is converted to a List.
+- `JSONObjectUtils.getAsJsonValue` wraps the Java value in a `JSONValue` instance.
+Any Collection is converted to an array, and Map to a JsonObject.
+
 == Configuration
 
 === key.manager.class
 
 default : **be.atbash.ee.security.octopus.keys.LocalKeyManager**
 
-The _KeyManager_ that supplies the request key to the KeySelector. Other implementations which are supported by default are **be.atbash.ee.security.octopus.keys.RemoteKeyManager** (to support the jku header claim) and **be.atbash.ee.security.octopus.keys.CombinedKeyManager** which combines the functionality of LocalKeyManager and RemoteKeyManager.
+The _KeyManager_ that supplies the request key to the KeySelector.
+Other implementations which are supported by default are **be.atbash.ee.security.octopus.keys.RemoteKeyManager** (to support the jku header claim) and **be.atbash.ee.security.octopus.keys.CombinedKeyManager** which combines the functionality of LocalKeyManager and RemoteKeyManager.
 
 === keys.location
 
 default : **none**
 
-The location of the Cryptographic keys. The value must start with **classpath:**, **file:** or **url:**. When the value points to a directory, all files (which are identified as containing a key, see _KeyResourceTypeProvider_) are read.
+The location of the Cryptographic keys.The value must start with **classpath:**, **file:** or **url:**.When the value points to a directory, all files (which are identified as containing a key, see _KeyResourceTypeProvider_) are read.
 
 === key.resourcetype.provider.class
 
