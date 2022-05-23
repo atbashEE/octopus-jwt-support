@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,14 @@ package be.atbash.ee.security.octopus.nimbus.util;
 
 
 import be.atbash.ee.security.octopus.nimbus.jwt.util.DateUtils;
+import org.assertj.core.api.Assertions;
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -163,5 +167,19 @@ public class DateUtilsTest {
 
         boolean valid = DateUtils.isBefore(iat, now, 60);
         assertThat(valid).isTrue();
+    }
+
+    @Test
+    public void testAsDateAsLocalDate() {
+        LocalDateTime original = LocalDateTime.now();
+        LocalDateTime converted = DateUtils.asLocalDateTime(DateUtils.asDate(original));
+        Assertions.assertThat(converted).isCloseTo(original, Assertions.within(100, ChronoUnit.MILLIS));
+    }
+
+    @Test
+    public void testAsLocalDateAsDate() {
+        Date original = new Date();
+        Date converted = DateUtils.asDate(DateUtils.asLocalDateTime(original));
+        Assertions.assertThat(converted).isEqualTo(original);
     }
 }

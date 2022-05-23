@@ -16,6 +16,8 @@ User manual for Atbash JWT Support.
 . More alternative interpretations of claims (like comma separated string for aud interpreted as array)
 . Support for parsing Strings in the different Readers.
 . Convert 'Java Objects' to JsonValue instances and vice versa.
+. The _exp_, _iat_, and _nbf_ claims can be set as `LocalDateTime` value using the `JWTClaimsSet.Builder`
+. New method within the builder to define the expiration time as a duration from current time. `Builder.expirationTime(Duration)`.
 
 === Jakarta version
 

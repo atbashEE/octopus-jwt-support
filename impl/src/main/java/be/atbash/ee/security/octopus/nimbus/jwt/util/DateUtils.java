@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package be.atbash.ee.security.octopus.nimbus.jwt.util;
 
 
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.Date;
 
@@ -38,6 +38,23 @@ public class DateUtils {
 
         return date.getTime() / 1000L;
     }
+
+    public static Date asDate(LocalDateTime localDateTime) {
+        if (localDateTime == null) {
+            return null;
+        }
+        return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+    }
+
+    public static LocalDateTime asLocalDateTime(Date date) {
+        if (date == null) {
+            return null;
+        }
+        return date.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
+    }
+
 
     /**
      * Converts the specified date object to a Unix epoch time in seconds.

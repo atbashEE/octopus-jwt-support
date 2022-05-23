@@ -24,6 +24,8 @@ import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.*;
 
 
@@ -223,6 +225,32 @@ public final class JWTClaimsSet implements Serializable {
             return this;
         }
 
+        /**
+         * Sets the expiration time ({@code exp}) claim.
+         *
+         * @param exp The expiration time, {@code null} if not
+         *            specified.
+         * @return This builder.
+         */
+        public Builder expirationTime(LocalDateTime exp) {
+
+            claims.put(EXPIRATION_TIME_CLAIM, DateUtils.asDate(exp));
+            return this;
+        }
+
+        /**
+         * Sets the expiration time ({@code exp}) claim as a duration from current timestamp.
+         *
+         * @param timeDuration The duration, cannot be negative.
+         * @return This builder.
+         */
+        public Builder expirationTime(Duration timeDuration) {
+            if (timeDuration.isNegative()) {
+                throw new IllegalArgumentException("The specified time duration in the parameter can't be smaller then 0.");
+            }
+            return expirationTime(LocalDateTime.now().plus(timeDuration));
+        }
+
 
         /**
          * Sets the not-before ({@code nbf}) claim.
@@ -237,6 +265,19 @@ public final class JWTClaimsSet implements Serializable {
             return this;
         }
 
+        /**
+         * Sets the not-before ({@code nbf}) claim.
+         *
+         * @param nbf The not-before claim, {@code null} if not
+         *            specified.
+         * @return This builder.
+         */
+        public Builder notBeforeTime(LocalDateTime nbf) {
+
+            claims.put(NOT_BEFORE_CLAIM, DateUtils.asDate(nbf));
+            return this;
+        }
+
 
         /**
          * Sets the issued-at ({@code iat}) claim.
@@ -248,6 +289,19 @@ public final class JWTClaimsSet implements Serializable {
         public Builder issueTime(Date iat) {
 
             claims.put(ISSUED_AT_CLAIM, iat);
+            return this;
+        }
+
+        /**
+         * Sets the issued-at ({@code iat}) claim.
+         *
+         * @param iat The issued-at claim, {@code null} if not
+         *            specified.
+         * @return This builder.
+         */
+        public Builder issueTime(LocalDateTime iat) {
+
+            claims.put(ISSUED_AT_CLAIM, DateUtils.asDate(iat));
             return this;
         }
 
