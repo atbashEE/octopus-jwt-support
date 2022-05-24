@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import be.atbash.ee.security.octopus.nimbus.jwt.util.DateUtils;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -45,7 +46,9 @@ public class DateUtilsTest {
         LocalDateTime date = LocalDateTime.of(1970, 1, 1, 7, 15);
         // (7*60+15) -> min * 60 -> sec
 
-        assertThat(DateUtils.toSecondsSinceEpoch(date)).isEqualTo(26100);
+        // toSecondsSinceEpoch is for UTC, LocalDateTime is local time so we need to take into account the TimeZone difference
+        int offsetSeconds = OffsetDateTime.now().getOffset().getTotalSeconds();
+        assertThat(DateUtils.toSecondsSinceEpoch(date)).isEqualTo(26100 - offsetSeconds);
     }
 
     @Test
