@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -116,11 +116,27 @@ public class SelectorCriteria {
         return new Builder();
     }
 
+    public static Builder newBuilder(SelectorCriteria selectorCriteria) {
+        return new Builder(selectorCriteria);
+    }
+
     @PublicAPI
     public static class Builder {
         private SelectorCriteria criteria = new SelectorCriteria();
 
         private Builder() {
+        }
+
+        private Builder(SelectorCriteria selectorCriteria) {
+            criteria.id = selectorCriteria.id;
+            criteria.secretKeyType = selectorCriteria.secretKeyType;
+            criteria.keyType = selectorCriteria.keyType;
+            criteria.asymmetricPart = selectorCriteria.asymmetricPart;
+            criteria.jku = selectorCriteria.jku;
+            criteria.discriminator = selectorCriteria.discriminator;
+            criteria.PBE2Salt = selectorCriteria.PBE2Salt;
+            criteria.PBE2Count = selectorCriteria.PBE2Count;
+            criteria.jweAlgorithm = selectorCriteria.jweAlgorithm;
         }
 
         public Builder withId(String id) {

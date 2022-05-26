@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,6 +49,41 @@ public class SelectorCriteriaTest {
         assertThat(criteria.getKeyType()).isEqualTo(KeyType.RSA);
         assertThat(criteria.getSecretKeyType()).isEqualTo(secretKeyType);
         assertThat(criteria.getAsymmetricPart()).isEqualTo(AsymmetricPart.PUBLIC);
+        assertThat(criteria.getJku().toString()).isEqualTo("http://jkuURL");
+
+        Object d = criteria.getDiscriminator();
+        assertThat(d).isInstanceOf(Long.class);
+        assertThat(d).isEqualTo(123L);
+    }
+
+    @Test
+    public void testBuilder_withExistingCriteria() throws URISyntaxException {
+        SelectorCriteria.Builder builder = SelectorCriteria.newBuilder();
+
+        builder.withId("kid");
+        builder.withKeyType(KeyType.RSA);
+
+        SecretKeyType secretKeyType = SecretKeyType.fromKey(new FakeRSAPublic());
+        builder.withSecretKeyType(secretKeyType);
+
+        builder.withAsymmetricPart(AsymmetricPart.PUBLIC);
+        builder.withJKU(new URI("http://jkuURL"));
+
+        Long discriminator = 123L;
+        builder.withDiscriminator(discriminator);
+
+        SelectorCriteria criteriaTemp = builder.build();
+
+        builder = SelectorCriteria.newBuilder(criteriaTemp);
+        builder.withId("new-kid");
+        builder.withAsymmetricPart(null);
+
+        SelectorCriteria criteria = builder.build();
+
+        assertThat(criteria.getId()).isEqualTo("new-kid");
+        assertThat(criteria.getKeyType()).isEqualTo(KeyType.RSA);
+        assertThat(criteria.getSecretKeyType()).isEqualTo(secretKeyType);
+        assertThat(criteria.getAsymmetricPart()).isNull();
         assertThat(criteria.getJku().toString()).isEqualTo("http://jkuURL");
 
         Object d = criteria.getDiscriminator();
