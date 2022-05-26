@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -185,5 +185,33 @@ public class JSONObjectUtilsTest {
 
         assertThat(jsonObject2.keySet()).contains("key1", "key2");
 
+    }
+
+    @Test
+    public void getJsonValueAsObject_string() throws ParseException {
+
+        JsonObject jsonObject = JSONObjectUtils.parse("{\"key\":[\"apple\",\"pear\"]}");
+        Object value = JSONObjectUtils.getJsonValueAsObject(jsonObject.getJsonArray("key"));
+        assertThat(value).isInstanceOf(List.class);
+        List<String> items = (List<String>) value;
+        assertThat(items).containsExactly("apple", "pear");
+    }
+
+    @Test
+    public void getJsonValueAsObject_int() throws ParseException {
+
+        JsonObject jsonObject = JSONObjectUtils.parse("{\"key\":[123,321]}");
+        Object value = JSONObjectUtils.getJsonValueAsObject(jsonObject.getJsonArray("key"));
+        assertThat(value).isInstanceOf(List.class);
+        List<Integer> items = (List<Integer>) value;
+        assertThat(items).containsExactly(123, 321);
+    }
+
+    @Test
+    public void getJsonValueAsObject_mixed() throws ParseException {
+
+        JsonObject jsonObject = JSONObjectUtils.parse("{\"key\":[\"apple\",321]}");
+        IncorrectJsonValueException exception = Assertions.assertThrows(IncorrectJsonValueException.class, () -> JSONObjectUtils.getJsonValueAsObject(jsonObject.getJsonArray("key")));
+        assertThat(exception.getMessage()).isEqualTo("JSONArray is expected to be an array of only String or Number");
     }
 }

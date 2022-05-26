@@ -1,6 +1,6 @@
 = Atbash Octopus JWT Support
 Rudy De Busscher <rdebusscher@gmail.com>
-v1.0.0, 26/05/2022
+v1.1.0, ??/??/20??
 :example-caption!:
 ifndef::imagesdir[:imagesdir: images]
 ifndef::sourcedir[:sourcedir: ../../main/java]
@@ -12,6 +12,7 @@ User manual for Atbash JWT Support.
 === 1.1.0
 
 . Support for Reading PEM in PKCS8 unencrypted format.
+. Support custom claims of type number array in JWT payload.
 
 === 1.0.0
 

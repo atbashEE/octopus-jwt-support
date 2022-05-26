@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -196,8 +196,16 @@ public final class JSONObjectUtils {
             case ARRAY:
                 JsonArray jsonArray = (JsonArray) value;
 
-                checkItemType(null, jsonArray);
-                result = jsonArray.getValuesAs(JsonString::getString);
+                JsonValue.ValueType valueType = defineItemValueType(jsonArray);
+                if (valueType == JsonValue.ValueType.STRING) {
+                    result = jsonArray.getValuesAs(JsonString::getString);
+                }
+                if (valueType == JsonValue.ValueType.NUMBER) {
+                    result = jsonArray.getValuesAs(JsonNumber::numberValue);
+                }
+                if (result == null) {
+                    throw new IncorrectJsonValueException("JSONArray is expected to be an array of String or Number");
+                }
                 break;
             case OBJECT:
                 result = value;
@@ -222,6 +230,20 @@ public final class JSONObjectUtils {
                 break;
             case NULL:
                 break;
+        }
+        return result;
+    }
+
+    private static JsonValue.ValueType defineItemValueType(JsonArray jsonArray) {
+        JsonValue.ValueType result = null;
+        for (JsonValue jsonValue : jsonArray) {
+            if (result == null) {
+                result = jsonValue.getValueType();
+            } else {
+                if (result != jsonValue.getValueType()) {
+                    throw new IncorrectJsonValueException("JSONArray is expected to be an array of only String or Number");
+                }
+            }
         }
         return result;
     }

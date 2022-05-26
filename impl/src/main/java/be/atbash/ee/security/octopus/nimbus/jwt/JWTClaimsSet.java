@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -624,6 +624,9 @@ public final class JWTClaimsSet implements Serializable {
             return null;
         } else if (value instanceof Number) {
             return ((Number) value).longValue();
+        } else if (value instanceof Date) {
+             // Divided by 1000 to match the value from the JWT JSON.
+            return ((Date) value).getTime()/1000;
         } else {
             throw new ParseException("The \"" + name + "\" claim is not a Number", 0);
         }
