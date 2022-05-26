@@ -24,12 +24,12 @@
     <parent>
         <groupId>be.atbash.json</groupId>
         <artifactId>jwt-support-parent</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.0.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>octopus-jwt-support</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
 
     <inceptionYear>2017</inceptionYear>
