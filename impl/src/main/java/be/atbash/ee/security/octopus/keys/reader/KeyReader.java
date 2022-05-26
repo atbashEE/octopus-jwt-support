@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import org.bouncycastle.pkcs.PKCSException;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.json.bind.JsonbException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -179,12 +180,16 @@ public class KeyReader {
                 if (resourceType == KeyResourceType.JWK) {
                     try {
                         result = keyReaderJWK.parse(json, path, passwordLookup);
-                    } catch (ParseException e) {
+                    } catch (ParseException | JsonbException e) {
                         ;// Carry on with next format.
                     }
                 }
                 if (resourceType == KeyResourceType.JWKSET) {
-                    result = keyReaderJWKSet.parseContent(json, path, passwordLookup);
+                    try {
+                        result = keyReaderJWKSet.parseContent(json, path, passwordLookup);
+                    } catch (JsonbException e) {
+                        ;// Carry on with next format.
+                    }
                 }
                 if (resourceType == KeyResourceType.KEYSTORE) {
                     result = keyReaderKeyStore.parseContent(new ByteArrayInputStream(content), path, passwordLookup);
