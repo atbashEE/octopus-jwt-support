@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,10 +32,12 @@ import javax.json.bind.Jsonb;
 import javax.json.stream.JsonParsingException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Scanner;
 
@@ -74,6 +76,30 @@ public class KeyReaderJWK {
 
     }
 
+    /**
+     * Parses the JWK directly from a String in JSON or Base64 encoded JSON.
+     *
+     * @param json           The JWK content, might be encoded with Base64
+     * @param passwordLookup Lookup for the password/passphrase in case the JWK is encoded.
+     * @return Content of the JWK in AtbashKey format.
+     */
+    public List<AtbashKey> parseContent(String json, KeyResourcePasswordLookup passwordLookup) {
+        if (!json.startsWith("{")) {
+            // The JSON is BASE64 encoded, hopefully.
+            byte[] bytes = Base64.getDecoder().decode(json);
+            json = new String(bytes, StandardCharsets.UTF_8);
+        }
+        if (!json.startsWith("{")) {
+            throw new AtbashUnexpectedException(new ParseException("The content is not a valid JSON", 0));
+        }
+        List<AtbashKey> result;
+        try {
+            result = parse(json, "inline", passwordLookup);
+        } catch (ParseException e) {
+            throw new AtbashUnexpectedException(e);
+        }
+        return result;
+    }
 
     protected List<AtbashKey> parse(String json, String path, KeyResourcePasswordLookup passwordLookup) throws ParseException {
 

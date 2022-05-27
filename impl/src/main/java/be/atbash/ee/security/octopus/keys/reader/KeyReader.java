@@ -133,6 +133,140 @@ public class KeyReader {
     }
 
     /**
+     * This is not a performant implementation as it tries PEM, JWK, KeyStore and JWKSet to read the resource.
+     * This should only be used as a fallback  {@code  KeyReader#readKeyResource(java.lang.String, be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup)}
+     * indicates that the type could not be determined (UnknownKeyResourceTypeException because the file doesn't have an extension)
+     *
+     * @param path
+     * @param passwordLookup
+     * @return
+     */
+    public List<AtbashKey> tryToReadKeyResource(String path, KeyResourcePasswordLookup passwordLookup) {
+        checkDependencies();
+
+        boolean matched = false;
+        List<AtbashKey> result = new ArrayList<>();
+        try {
+            result = keyReaderPEM.readResource(path, passwordLookup);
+            matched = !result.isEmpty();
+        } catch (AtbashUnexpectedException e) {
+            // Capture exception and try next format.
+        }
+
+        if (matched) {
+            return result;
+        }
+
+        try {
+            result = keyReaderJWK.readResource(path, passwordLookup);
+            matched = !result.isEmpty();
+        } catch (AtbashUnexpectedException e) {
+            // Capture exception and try next format.
+        }
+        if (matched) {
+            return result;
+        }
+
+        try {
+            result = keyReaderJWKSet.readResource(path, passwordLookup);
+            matched = !result.isEmpty();
+        } catch (AtbashUnexpectedException e) {
+            // Capture exception and try next format.
+        }
+        if (matched) {
+            return result;
+        }
+
+        try {
+            result = keyReaderKeyStore.readResource(path, passwordLookup);
+            matched = true;
+        } catch (AtbashUnexpectedException e) {
+            // Capture exception and try next format.
+        }
+        if (matched) {
+            return result;
+        }
+
+        try {
+            result = keyReaderJWKSet.readResource(path, passwordLookup);
+        } catch (AtbashUnexpectedException e) {
+            // Capture exception and try next format.
+        }
+
+        return result;
+    }
+
+    /**
+     * This is not a performant implementation as it tries PEM, JWK, KeyStore and JWKSet to read the resource and mainly only of any significance
+     * with MicroProfile JWT Specification. It is not recommended to define the entire key as a string in a property value.
+     * The Keystore format needs to be Base64 encoded and password is looked up with 'inline' as 'path' value
+     *
+     * @param content
+     * @return
+     */
+    public List<AtbashKey> tryToReadKeyContent(String content) {
+        return tryToReadKeyContent(content, null);
+    }
+
+    /**
+     * This is not a performant implementation as it tries PEM, JWK, KeyStore and JWKSet to read the resource and mainly only of any significance
+     * with MicroProfile JWT Specification. It is not recommended to define the entire key as a string in a property value.
+     * The Keystore format needs to be Base64 encoded and password is looked up with 'inline' as 'path' value
+     *
+     * @param content
+     * @param passwordLookup
+     * @return
+     */
+    public List<AtbashKey> tryToReadKeyContent(String content, KeyResourcePasswordLookup passwordLookup) {
+        checkDependencies();
+
+        boolean matched = false;
+        List<AtbashKey> result = new ArrayList<>();
+        try {
+            result = keyReaderPEM.parseContent(content, passwordLookup);
+            matched = !result.isEmpty();  // When not PEM data, the method returns an empty list and not an exception.
+        } catch (AtbashUnexpectedException e) {
+            // Capture exception and try next format.
+        }
+
+        if (matched) {
+            return result;
+        }
+
+        try {
+            result = keyReaderJWK.parseContent(content, passwordLookup);
+            matched = !result.isEmpty();  // When  a JWKS is read by keyReaderJWK, it returns empty list.
+        } catch (AtbashUnexpectedException e) {
+            // Capture exception and try next format.
+        }
+        if (matched) {
+            return result;
+        }
+
+        try {
+            result = keyReaderJWKSet.parseContent(content, "inline", passwordLookup);
+            matched = !result.isEmpty();
+        } catch (AtbashUnexpectedException e) {
+            // Capture exception and try next format.
+        }
+        if (matched) {
+            return result;
+        }
+
+        try {
+            result = keyReaderKeyStore.parseContent(content, passwordLookup);
+            matched = true;
+        } catch (AtbashUnexpectedException e) {
+            // Capture exception and try next format.
+        }
+        if (matched) {
+            return result;
+        }
+
+        return result;
+    }
+
+    /**
      * @param uri
      * @param passwordLookup
      * @return

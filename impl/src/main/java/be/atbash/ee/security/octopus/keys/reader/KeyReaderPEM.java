@@ -44,10 +44,7 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.pkcs.PKCS8EncryptedPrivateKeyInfo;
 import org.bouncycastle.pkcs.PKCSException;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.Provider;
@@ -79,6 +76,35 @@ public class KeyReaderPEM {
         return result;
     }
 
+    public List<AtbashKey> parseContent(String content) {
+        return parseContent(content, null);
+    }
+
+    public List<AtbashKey> parseContent(String content, KeyResourcePasswordLookup passwordLookup) {
+        StringReader reader = new StringReader(content);
+        List<AtbashKey> result;
+        try {
+            result = parseContent(reader, "inline", passwordLookup);
+        } catch (IOException | PKCSException | OperatorCreationException e) {
+            throw new AtbashUnexpectedException(e);
+        }
+
+        return result;
+    }
+
+    /**
+     * Parses the content trying supporting different PEM based encodings.  If the content is not
+     * a PEM based encoding, it returns an empty list.  The method can throw also various BouncyCastle
+     * Exception to indicate problems with the PEM byteds.
+     *
+     * @param reader         Reader providing the contents.
+     * @param path           The Path or identification of the content that will be used by the passwordLookup if needed.
+     * @param passwordLookup Provides the password or passphrase if the PEM data is encoded.
+     * @return List of found Keys or null when not a valid PEM content
+     * @throws IOException               problem during the read of the content
+     * @throws OperatorCreationException
+     * @throws PKCSException
+     */
     protected List<AtbashKey> parseContent(Reader reader, String path, KeyResourcePasswordLookup passwordLookup) throws IOException, OperatorCreationException, PKCSException {
 
         List<AtbashKey> result = new ArrayList<>();
