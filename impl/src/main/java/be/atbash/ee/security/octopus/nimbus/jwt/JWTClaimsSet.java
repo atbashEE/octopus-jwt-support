@@ -18,16 +18,15 @@ package be.atbash.ee.security.octopus.nimbus.jwt;
 
 import be.atbash.ee.security.octopus.nimbus.jwt.util.DateUtils;
 import be.atbash.ee.security.octopus.nimbus.util.JSONObjectUtils;
+import be.atbash.util.StringUtils;
 
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
-import javax.json.JsonValue;
+import javax.json.*;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -206,7 +205,8 @@ public final class JWTClaimsSet implements Serializable {
             if (aud == null) {
                 claims.put(AUDIENCE_CLAIM, null);
             } else {
-                claims.put(AUDIENCE_CLAIM, Collections.singletonList(aud));
+                List<String> audList = getAsList(aud);
+                audience(audList);
             }
             return this;
         }
@@ -278,7 +278,11 @@ public final class JWTClaimsSet implements Serializable {
          */
         public Builder claim(String name, Object value) {
 
-            claims.put(name, value);
+            if (value.getClass().isArray()) {
+                claims.put(name, Arrays.asList((Object[]) value));
+            } else {
+                claims.put(name, value);
+            }
             return this;
         }
 
@@ -294,6 +298,9 @@ public final class JWTClaimsSet implements Serializable {
         }
     }
 
+    private static List<String> getAsList(String value) {
+        return Arrays.stream(StringUtils.split(value)).map(String::trim).collect(Collectors.toList());
+    }
 
     /**
      * The claims map.
@@ -364,7 +371,7 @@ public final class JWTClaimsSet implements Serializable {
 
         if (audValue instanceof String) {
             // Special case
-            return Collections.singletonList((String) audValue);
+            return getAsList(audValue.toString());
         }
 
         List<String> aud;
@@ -373,7 +380,7 @@ public final class JWTClaimsSet implements Serializable {
         } catch (ParseException e) {
             return Collections.emptyList();
         }
-        return aud != null ? Collections.unmodifiableList(aud) : Collections.emptyList();
+        return aud != null ? aud : Collections.emptyList();
     }
 
 
@@ -492,7 +499,7 @@ public final class JWTClaimsSet implements Serializable {
         List<?> list;
 
         try {
-            list = (List<?>) getClaim(name);
+            list = (List<?>) value;
 
         } catch (ClassCastException e) {
             throw new ParseException("The \"" + name + "\" claim is not a list / JSON array", 0);
@@ -503,7 +510,13 @@ public final class JWTClaimsSet implements Serializable {
         for (int i = 0; i < stringArray.length; i++) {
 
             try {
-                stringArray[i] = list.get(i).toString();
+
+                Object item = list.get(i);
+                if (item instanceof JsonString) {
+                    stringArray[i] = ((JsonString) item).getString();
+                } else {
+                    stringArray[i] = item.toString();
+                }
             } catch (ClassCastException e) {
                 throw new ParseException("The \"" + name + "\" claim is not a list / JSON array of strings", 0);
             }
@@ -576,9 +589,12 @@ public final class JWTClaimsSet implements Serializable {
 
         if (value == null || value instanceof Boolean) {
             return (Boolean) value;
-        } else {
-            throw new ParseException("The \"" + name + "\" claim is not a Boolean", 0);
         }
+        if (value instanceof String) {
+            return Boolean.valueOf(value.toString());
+        }
+        throw new ParseException("The \"" + name + "\" claim is not a Boolean", 0);
+
     }
 
 
@@ -847,9 +863,7 @@ public final class JWTClaimsSet implements Serializable {
                         JsonValue audValue = json.get(AUDIENCE_CLAIM);
 
                         if (audValue.getValueType() == JsonValue.ValueType.STRING) {
-                            List<String> singleAud = new ArrayList<>();
-                            singleAud.add(json.getString(AUDIENCE_CLAIM));
-                            builder.audience(singleAud);
+                            builder.audience(getAsList(json.getString(AUDIENCE_CLAIM)));
                         } else if (audValue.getValueType() == JsonValue.ValueType.ARRAY) {
                             builder.audience(JSONObjectUtils.getStringList(json, AUDIENCE_CLAIM));
                         }
@@ -903,8 +917,12 @@ public final class JWTClaimsSet implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof JWTClaimsSet)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof JWTClaimsSet)) {
+            return false;
+        }
         JWTClaimsSet that = (JWTClaimsSet) o;
         return Objects.equals(claims, that.claims);
     }
