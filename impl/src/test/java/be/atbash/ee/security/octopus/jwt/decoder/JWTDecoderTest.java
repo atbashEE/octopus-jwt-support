@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,8 @@ import be.atbash.ee.security.octopus.nimbus.jwt.JWTClaimsSet;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -246,8 +248,42 @@ public class JWTDecoderTest {
         if (headerValues != null) {
             headerValues.forEach(builder::withHeader);
         }
-        return builder
-                .build();
+        return builder.build();
     }
 
+    @Test
+    void determineEncoding_JSON() {
+        JWTEncoding jwtEncoding = decoder.determineEncoding("{\"name\":\"John Doe\",\"age\":42}");
+        assertThat(jwtEncoding).isEqualTo(JWTEncoding.NONE);
+    }
+
+    @Test
+    void determineEncoding_String() {
+        JWTEncoding jwtEncoding = decoder.determineEncoding("Just a plain String");
+        assertThat(jwtEncoding).isNull();
+    }
+
+    @Test
+    void determineEncoding_PlainJWT() {
+        String json = "{\"name\":\"John Doe\",\"age\":42}";
+        String data = Base64.getEncoder().encodeToString(json.getBytes(StandardCharsets.UTF_8));
+        JWTEncoding jwtEncoding = decoder.determineEncoding(data + ".");
+        assertThat(jwtEncoding).isEqualTo(JWTEncoding.PLAIN);
+    }
+
+    @Test
+    void determineEncoding_signedJWT() {
+        String json = "{\"name\":\"John Doe\",\"age\":42}";
+        String data = Base64.getEncoder().encodeToString(json.getBytes(StandardCharsets.UTF_8));
+        JWTEncoding jwtEncoding = decoder.determineEncoding(data + ".payload.signature");
+        assertThat(jwtEncoding).isEqualTo(JWTEncoding.JWS);
+    }
+
+    @Test
+    void determineEncoding_encryptedJWT() {
+        String json = "{\"name\":\"John Doe\",\"age\":42}";
+        String data = Base64.getEncoder().encodeToString(json.getBytes(StandardCharsets.UTF_8));
+        JWTEncoding jwtEncoding = decoder.determineEncoding(data + ".encryptedKey.initializationVector.cipherText.authenticationTag");
+        assertThat(jwtEncoding).isEqualTo(JWTEncoding.JWE);
+    }
 }

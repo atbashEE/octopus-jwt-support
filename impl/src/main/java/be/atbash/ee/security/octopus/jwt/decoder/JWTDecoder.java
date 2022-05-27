@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -165,7 +165,18 @@ public class JWTDecoder {
 
     }
 
-    private JWTEncoding determineEncoding(String data) {
+    /**
+     * Determine the encoding of the data. When it starts with { the encoding is none as it is plain
+     * JSON. When starting with ey and depending on the number of . found, the encoding is JWT or JWE.
+     * Otherwise the encoding is null.
+     * Note that the algorithm gives only an indication and that a wrong encoding can be returned (only false negatives)
+     * @param data the
+     * @return The encoding or null.
+     */
+    public JWTEncoding determineEncoding(String data) {
+        if (data == null) {
+            return null;
+        }
         JWTEncoding result = null;
         if (data.startsWith("{")) {
             result = JWTEncoding.NONE;
