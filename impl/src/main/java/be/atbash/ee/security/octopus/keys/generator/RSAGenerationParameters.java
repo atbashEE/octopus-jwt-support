@@ -21,7 +21,7 @@ import be.atbash.util.PublicAPI;
 @PublicAPI
 public class RSAGenerationParameters extends GenerationParameters {
 
-    private int keySize;  // in bits
+    private final int keySize;  // in bits
 
     private RSAGenerationParameters(RSAGenerationParametersBuilder builder) {
         super(builder, KeyType.RSA);

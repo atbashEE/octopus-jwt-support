@@ -26,7 +26,7 @@ import java.security.Key;
 @Vetoed // parent class is a CDI bean and otherwise this class would gives issues in CDI injection.
 public class SingleKeySelector extends KeySelector {
 
-    private AtbashKey theKey;
+    private final AtbashKey theKey;
 
     public SingleKeySelector(AtbashKey theKey) {
         this.theKey = theKey;

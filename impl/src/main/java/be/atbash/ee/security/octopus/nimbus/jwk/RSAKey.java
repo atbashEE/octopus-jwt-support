@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1125,21 +1125,9 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
             throw new IllegalArgumentException("The first prime factor must not be null");
         }
 
-        if (q == null) {
-            throw new IllegalArgumentException("The second prime factor must not be null");
-        }
+        // We do not need to test on q == null. if p != null and q = null, line 1271 already throws an exception
+        // Same for dp, dq and qi
 
-        if (dp == null) {
-            throw new IllegalArgumentException("The first factor CRT exponent must not be null");
-        }
-
-        if (dq == null) {
-            throw new IllegalArgumentException("The second factor CRT exponent must not be null");
-        }
-
-        if (qi == null) {
-            throw new IllegalArgumentException("The first CRT coefficient must not be null");
-        }
     }
 
 

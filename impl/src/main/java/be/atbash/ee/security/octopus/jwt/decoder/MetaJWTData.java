@@ -25,7 +25,7 @@ import java.util.Map;
 public class MetaJWTData {
 
     private String keyID;
-    private Map<String, Object> headerValues;
+    private final Map<String, Object> headerValues;
 
     public MetaJWTData() {
         headerValues = new HashMap<>();

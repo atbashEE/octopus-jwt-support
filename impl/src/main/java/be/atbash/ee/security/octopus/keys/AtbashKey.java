@@ -30,9 +30,9 @@ import java.security.interfaces.RSAKey;
 @PublicAPI
 public class AtbashKey {
 
-    private String keyId;
-    private SecretKeyType secretKeyType;
-    private Key key;
+    private final String keyId;
+    private final SecretKeyType secretKeyType;
+    private final Key key;
 
     public AtbashKey(String path, Key key) {
 

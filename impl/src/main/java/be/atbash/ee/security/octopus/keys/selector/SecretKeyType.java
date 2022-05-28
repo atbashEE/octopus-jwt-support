@@ -33,8 +33,8 @@ import java.security.interfaces.RSAKey;
 
 public class SecretKeyType {
 
-    private KeyType keyType;
-    private AsymmetricPart asymmetricPart;
+    private final KeyType keyType;
+    private final AsymmetricPart asymmetricPart;
 
     public SecretKeyType(KeyType keyType) {
         this(keyType, AsymmetricPart.SYMMETRIC);

@@ -23,7 +23,6 @@ import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.ContentCryptoProvid
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.DirectCryptoProvider;
 import be.atbash.ee.security.octopus.nimbus.jwk.OctetSequenceKey;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.*;
-import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.ee.security.octopus.nimbus.util.ByteUtils;
 
 import javax.crypto.SecretKey;
@@ -120,8 +119,6 @@ public class DirectEncrypter extends DirectCryptoProvider implements JWEEncrypte
             throw new KeyLengthException(enc.cekBitLength(), enc);
         }
 
-        Base64URLValue encryptedKey = null; // The second JWE part
-
-        return ContentCryptoProvider.encrypt(header, clearText, getKey(), encryptedKey);
+        return ContentCryptoProvider.encrypt(header, clearText, getKey(), null);
     }
 }

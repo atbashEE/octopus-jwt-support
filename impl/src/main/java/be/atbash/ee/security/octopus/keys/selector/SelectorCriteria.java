@@ -122,7 +122,7 @@ public class SelectorCriteria {
 
     @PublicAPI
     public static class Builder {
-        private SelectorCriteria criteria = new SelectorCriteria();
+        private final SelectorCriteria criteria = new SelectorCriteria();
 
         private Builder() {
         }

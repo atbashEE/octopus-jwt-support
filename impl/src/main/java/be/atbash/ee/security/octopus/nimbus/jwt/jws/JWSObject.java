@@ -119,7 +119,7 @@ public class JWSObject extends JOSEObject {
         if (header.getCustomParameter("b64") == null || (Boolean) header.getCustomParameter("b64")) {
             signingInputString = composeSigningInput(header.toBase64URL(), payload.toBase64URL());
         } else {
-            signingInputString = header.toBase64URL().toString() + '.' + payload.toString();
+            signingInputString = header.toBase64URL().toString() + '.' + payload;
         }
         signature = null;
 

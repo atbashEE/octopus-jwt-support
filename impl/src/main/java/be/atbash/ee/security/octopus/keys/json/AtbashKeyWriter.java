@@ -26,7 +26,7 @@ import java.util.Base64;
 
 public class AtbashKeyWriter implements JsonbSerializer<AtbashKey> {
 
-    private KeyWriterFactory keyWriterFactory;
+    private final KeyWriterFactory keyWriterFactory;
 
     public AtbashKeyWriter() {
         keyWriterFactory = new KeyWriterFactory();

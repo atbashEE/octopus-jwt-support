@@ -118,7 +118,7 @@ public abstract class JWK implements Serializable {
     /**
      * X.509 certificate SHA-256 thumbprint, optional.
      */
-    private Base64URLValue x5t256;
+    private final Base64URLValue x5t256;
 
 
     /**

@@ -52,7 +52,7 @@ import java.util.List;
 
 public class KeyStoreEncoder implements KeyEncoder {
 
-    private JwtSupportConfiguration configuration;
+    private final JwtSupportConfiguration configuration;
 
     public KeyStoreEncoder() {
         configuration = JwtSupportConfiguration.getInstance();

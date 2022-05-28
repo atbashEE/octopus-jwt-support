@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,6 @@ import java.security.cert.CertificateException;
 import java.text.ParseException;
 import java.util.Scanner;
 
-import static be.atbash.ee.security.octopus.exception.MissingPasswordException.ObjectType.STORE;
 
 /**
  *
@@ -114,6 +113,7 @@ public class KeyWriter {
 
     }
 
+    @SuppressWarnings("S1143")
     private JWKSet loadExistingJWKSet(String target) {
         JWKSet result;
         InputStream inputStream = null;
@@ -138,6 +138,7 @@ public class KeyWriter {
                 try {
                     inputStream.close();
                 } catch (IOException e) {
+                    // Intended and does not hide any other exception or statement executions.
                     throw new AtbashUnexpectedException(e);
                 }
             }
@@ -208,14 +209,11 @@ public class KeyWriter {
     private byte[] writeKeyAsPEM(AtbashKey atbashKey, char[] keyPassword) throws IOException {
         if (jwtSupportConfiguration.getPemKeyEncryption() != PemKeyEncryption.NONE) {
 
-            boolean checkRequired = true;
-            if (jwtSupportConfiguration.getPemKeyEncryption() == PemKeyEncryption.PKCS1 && StringUtils.isEmpty(jwtSupportConfiguration.getPKCS1EncryptionAlgorithm())) {
-                checkRequired = false;
-            }
+            boolean checkRequired = jwtSupportConfiguration.getPemKeyEncryption() != PemKeyEncryption.PKCS1 || !StringUtils.isEmpty(jwtSupportConfiguration.getPKCS1EncryptionAlgorithm());
 
             if (checkRequired) {
                 // Only when encrypting the key, we need to check the password/passphrase.
-                checkKeyPassword(atbashKey, keyPassword);
+                checkKeyPassword(atbashKey, keyPassword, MissingPasswordException.ObjectType.PEM);
             }
         }
 
@@ -227,9 +225,9 @@ public class KeyWriter {
     }
 
     private byte[] writeKeyAsKeyStore(AtbashKey atbashKey, char[] keyPassword, char[] filePassword, KeyStore keyStore) throws IOException {
-        checkKeyPassword(atbashKey, keyPassword);
+        checkKeyPassword(atbashKey, keyPassword, MissingPasswordException.ObjectType.STORE);
         if (StringUtils.isEmpty(filePassword)) {
-            throw new MissingPasswordException(STORE, "A password for the keystore is required in order to save the key info");
+            throw new MissingPasswordException(MissingPasswordException.ObjectType.STORE, "A password for the keystore is required in order to save the key info");
         }
 
         KeyEncoderParameters parameters = new KeyEncoderParameters(keyPassword, filePassword, keyStore);
@@ -239,7 +237,7 @@ public class KeyWriter {
 
     private byte[] writeKeyAsJWK(AtbashKey atbashKey, char[] keyPassword) {
         if (jwtSupportConfiguration.isJWKEncrypted()) {
-            checkKeyPassword(atbashKey, keyPassword);
+            checkKeyPassword(atbashKey, keyPassword, MissingPasswordException.ObjectType.ENCRYPTION);
         }
 
         KeyEncoderParameters parameters = new KeyEncoderParameters(keyPassword);
@@ -282,10 +280,10 @@ public class KeyWriter {
 
     }
 
-    private void checkKeyPassword(AtbashKey atbashKey, char[] keyPasssword) {
+    private void checkKeyPassword(AtbashKey atbashKey, char[] keyPasssword, MissingPasswordException.ObjectType objectType) {
         if (atbashKey.getSecretKeyType().isAsymmetric() && atbashKey.getSecretKeyType().getAsymmetricPart() == AsymmetricPart.PRIVATE) {
             if (StringUtils.isEmpty(keyPasssword)) {
-                throw new MissingPasswordException(STORE, "A passphrase is required in order to save the key info");
+                throw new MissingPasswordException(objectType, "A passphrase is required in order to save the key info");
             }
         }
     }

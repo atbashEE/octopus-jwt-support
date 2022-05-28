@@ -30,9 +30,9 @@ import java.util.Map;
 @PublicAPI
 public class JWTParametersEncryption extends JWTParametersHeader {
 
-    private AtbashKey secretKeyEncryption;
-    private JWTParametersSigning parametersSigning;
-    private JWEAlgorithm jweAlgorithm;
+    private final AtbashKey secretKeyEncryption;
+    private final JWTParametersSigning parametersSigning;
+    private final JWEAlgorithm jweAlgorithm;
 
     public JWTParametersEncryption(JWTParametersSigning parametersSigning, Map<String, Object> headerValues, AtbashKey secretKeyEncryption, JWEAlgorithm jweAlgorithm) {
         super(headerValues);

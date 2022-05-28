@@ -23,8 +23,8 @@ import be.atbash.util.PublicAPI;
 @PublicAPI
 public class JWTData<T> {
 
-    private T data;
-    private MetaJWTData metaData;
+    private final T data;
+    private final MetaJWTData metaData;
 
     public JWTData(T data, MetaJWTData metaData) {
         this.data = data;

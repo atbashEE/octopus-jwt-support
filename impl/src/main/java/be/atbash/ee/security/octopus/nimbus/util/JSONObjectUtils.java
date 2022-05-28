@@ -317,7 +317,7 @@ public final class JSONObjectUtils {
             }
         }
 
-        throw new IncorrectJsonValueException(String.format("Unexpected value of JSON object member with key \"%s\" for enum %s", key, enumClass.toString()));
+        throw new IncorrectJsonValueException(String.format("Unexpected value of JSON object member with key \"%s\" for enum %s", key, enumClass));
     }
 
     /**

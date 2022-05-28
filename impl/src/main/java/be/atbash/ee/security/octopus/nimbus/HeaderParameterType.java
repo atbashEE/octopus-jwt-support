@@ -28,8 +28,8 @@ import java.util.stream.Collectors;
 
 public class HeaderParameterType {
 
-    private String name;
-    private Class<?> parameterType;
+    private final String name;
+    private final Class<?> parameterType;
 
     private HeaderParameterType(String name, Class<?> parameterType) {
         this.name = name;
@@ -40,11 +40,11 @@ public class HeaderParameterType {
         return name;
     }
 
-    private static Set<String> HEADER_REGISTERED_PARAMETER_NAME;
-    private static Set<String> COMMON_JWT_HEADER_REGISTERED_PARAMETER_NAME;
-    private static Set<String> JWE_HEADER_REGISTERED_PARAMETER_NAME;
+    private static final Set<String> HEADER_REGISTERED_PARAMETER_NAME;
+    private static final Set<String> COMMON_JWT_HEADER_REGISTERED_PARAMETER_NAME;
+    private static final Set<String> JWE_HEADER_REGISTERED_PARAMETER_NAME;
 
-    private static List<HeaderParameterType> ALL_REGISTERED_PARAMETERS;
+    private static final List<HeaderParameterType> ALL_REGISTERED_PARAMETERS;
 
     static {
         List<HeaderParameterType> temp = new ArrayList<>();

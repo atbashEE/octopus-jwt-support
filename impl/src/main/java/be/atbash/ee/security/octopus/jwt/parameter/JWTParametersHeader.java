@@ -20,7 +20,7 @@ import java.util.Map;
 
 abstract class JWTParametersHeader implements JWTParameters {
 
-    private Map<String, Object> headerValues;
+    private final Map<String, Object> headerValues;
 
     JWTParametersHeader(Map<String, Object> headerValues) {
         this.headerValues = headerValues;

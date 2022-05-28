@@ -39,7 +39,7 @@ public final class AlgorithmSupportMessage {
      *                   methods. Must not be {@code null}.
      * @return The string.
      */
-    private static String itemize(Collection collection) {
+    private static String itemize(Collection<?> collection) {
 
         StringBuilder sb = new StringBuilder();
 

@@ -45,7 +45,7 @@ public class LocalKeyManager extends AbstractKeyManager implements KeyManager {
 
     private KeyResourcePasswordLookup passwordLookup;
 
-    private List<AtbashKey> keys = new ArrayList<>();
+    private final List<AtbashKey> keys = new ArrayList<>();
 
     @Override
     public List<AtbashKey> retrieveKeys(SelectorCriteria selectorCriteria) {

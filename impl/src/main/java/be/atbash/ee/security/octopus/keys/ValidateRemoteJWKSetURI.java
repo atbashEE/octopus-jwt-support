@@ -24,9 +24,9 @@ import java.util.Optional;
 
 public class ValidateRemoteJWKSetURI {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(ValidateRemoteJWKSetURI.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ValidateRemoteJWKSetURI.class);
 
-    private List<RemoteJWKSetURIValidator> validators;
+    private final List<RemoteJWKSetURIValidator> validators;
 
     public ValidateRemoteJWKSetURI(List<RemoteJWKSetURIValidator> validators) {
         this.validators = validators;

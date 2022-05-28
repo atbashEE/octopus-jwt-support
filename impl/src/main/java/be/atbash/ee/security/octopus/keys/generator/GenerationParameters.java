@@ -22,10 +22,10 @@ import be.atbash.util.StringUtils;
 @PublicAPI
 public class GenerationParameters {
 
-    private String kid;
-    private KeyType keyType;
+    private final String kid;
+    private final KeyType keyType;
 
-    GenerationParameters(GenerationParametersBuilders builder, KeyType keyType) {
+    GenerationParameters(GenerationParametersBuilders<?> builder, KeyType keyType) {
         this.keyType = keyType;
         if (StringUtils.isEmpty(builder.kid)) {
             throw new KeyGenerationParameterException("Key id is required");

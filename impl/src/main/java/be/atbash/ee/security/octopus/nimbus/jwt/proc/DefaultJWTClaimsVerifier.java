@@ -51,7 +51,7 @@ public class DefaultJWTClaimsVerifier implements JWTVerifier {
     /**
      * The maximum acceptable clock skew, in seconds.
      */
-    private int maxClockSkew;
+    private final int maxClockSkew;
 
     /**
      * Creates a new JWT claims verifier. Will check the expiration ("exp")

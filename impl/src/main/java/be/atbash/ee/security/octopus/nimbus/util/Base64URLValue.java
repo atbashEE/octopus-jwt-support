@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,6 +63,11 @@ public class Base64URLValue extends Base64Value {
                 this.toString().equals(object.toString());
     }
 
+    @Override
+    public int hashCode() {
+        // Duplicate method from super class so it is clear we have equals and hashcode.
+        return value.hashCode();
+    }
 
     /**
      * Creates a new Base64URL-encoded object from the specified string.

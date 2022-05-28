@@ -25,7 +25,7 @@ final class JWTParameterHeaderDefaultProviderServiceLoader {
 
     private static JWTParameterHeaderDefaultProviderServiceLoader INSTANCE;
 
-    private List<JWTParameterHeaderDefaultProvider> defaultProviders;
+    private final List<JWTParameterHeaderDefaultProvider> defaultProviders;
 
     private JWTParameterHeaderDefaultProviderServiceLoader() {
         defaultProviders = new ArrayList<>();

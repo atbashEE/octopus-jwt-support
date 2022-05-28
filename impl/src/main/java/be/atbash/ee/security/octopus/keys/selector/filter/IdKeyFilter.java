@@ -28,7 +28,7 @@ import java.util.List;
 
 public class IdKeyFilter implements KeyFilter {
 
-    private String keyId;
+    private final String keyId;
 
     public IdKeyFilter(String keyId) {
         if (StringUtils.isEmpty(keyId)) {

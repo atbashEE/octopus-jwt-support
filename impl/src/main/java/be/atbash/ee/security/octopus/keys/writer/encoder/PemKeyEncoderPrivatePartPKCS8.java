@@ -45,7 +45,7 @@ public class PemKeyEncoderPrivatePartPKCS8 implements KeyEncoder {
         JceOpenSSLPKCS8EncryptorBuilder encryptorBuilder = new JceOpenSSLPKCS8EncryptorBuilder(PKCS8Generator.AES_256_CBC);
         encryptorBuilder.setRandom(JCASupportConfiguration.getInstance().getSecureRandom());
         encryptorBuilder.setProvider(BouncyCastleProviderSingleton.getInstance());
-        encryptorBuilder.setPasssword(parameters.getKeyPassword());
+        encryptorBuilder.setPassword(parameters.getKeyPassword());
         OutputEncryptor encryptor;
         try {
             encryptor = encryptorBuilder.build();

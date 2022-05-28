@@ -23,9 +23,9 @@ import java.util.List;
 @Vetoed
 public class CombinedKeyManager extends AbstractKeyManager implements KeyManager {
 
-    private LocalKeyManager localKeyManager = new LocalKeyManager();
+    private final LocalKeyManager localKeyManager = new LocalKeyManager();
 
-    private RemoteKeyManager remoteKeyManager = new RemoteKeyManager();
+    private final RemoteKeyManager remoteKeyManager = new RemoteKeyManager();
 
     @Override
     public List<AtbashKey> retrieveKeys(SelectorCriteria selectorCriteria) {

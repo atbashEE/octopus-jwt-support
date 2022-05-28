@@ -162,7 +162,7 @@ public abstract class JOSEObject implements Serializable {
             }
 
             if (part != null) {
-                sb.append(part.toString());
+                sb.append(part);
             }
         }
 

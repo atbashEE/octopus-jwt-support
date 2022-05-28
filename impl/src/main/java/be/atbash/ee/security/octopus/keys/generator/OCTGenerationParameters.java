@@ -21,7 +21,7 @@ import be.atbash.util.PublicAPI;
 @PublicAPI
 public class OCTGenerationParameters extends GenerationParameters {
 
-    private int keySize;  // in bits
+    private final int keySize;  // in bits
 
     private OCTGenerationParameters(OCTGenerationParametersBuilder builder) {
         super(builder, KeyType.OCT);

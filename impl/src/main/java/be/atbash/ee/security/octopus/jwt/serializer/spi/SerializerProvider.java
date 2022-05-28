@@ -25,22 +25,22 @@ public final class SerializerProvider {
 
     private static final SerializerProvider INSTANCE = new SerializerProvider();
 
-    private List<JsonbSerializer> serializers;
-    private List<JsonbDeserializer> deserializers;
+    private final List<JsonbSerializer<?>> serializers;
+    private final List<JsonbDeserializer<?>> deserializers;
 
     private SerializerProvider() {
         serializers = new ArrayList<>();
-        ServiceLoader.load(JsonbSerializer.class).forEach(s -> serializers.add(s));
+        ServiceLoader.load(JsonbSerializer.class).forEach(serializers::add);
 
         deserializers = new ArrayList<>();
-        ServiceLoader.load(JsonbDeserializer.class).forEach(s -> deserializers.add(s));
+        ServiceLoader.load(JsonbDeserializer.class).forEach(deserializers::add);
     }
 
-    public JsonbSerializer[] getSerializers() {
+    public JsonbSerializer<?>[] getSerializers() {
         return serializers.toArray(new JsonbSerializer[0]);
     }
 
-    public JsonbDeserializer[] getDeserializers() {
+    public JsonbDeserializer<?>[] getDeserializers() {
         return deserializers.toArray(new JsonbDeserializer[0]);
     }
 

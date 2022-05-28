@@ -119,8 +119,8 @@ public class ConfigKeyResourcePasswordLookup implements KeyResourcePasswordLooku
     }
 
     private static class ConfigKey {
-        private String path;
-        private String keyId;
+        private final String path;
+        private final String keyId;
 
         public ConfigKey(String path, String keyId) {
 

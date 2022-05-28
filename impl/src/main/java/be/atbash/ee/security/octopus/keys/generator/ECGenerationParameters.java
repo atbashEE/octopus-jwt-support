@@ -25,7 +25,7 @@ import org.bouncycastle.jce.spec.ECParameterSpec;
 @PublicAPI
 public class ECGenerationParameters extends GenerationParameters {
 
-    private String curveName;
+    private final String curveName;
 
     private ECGenerationParameters(ECGenerationParametersBuilder builder) {
 

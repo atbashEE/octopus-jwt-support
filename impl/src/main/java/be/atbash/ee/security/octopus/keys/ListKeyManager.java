@@ -28,7 +28,7 @@ import java.util.List;
 @PublicAPI
 public class ListKeyManager implements KeyManager {
 
-    private List<AtbashKey> keys;
+    private final List<AtbashKey> keys;
 
     public ListKeyManager(List<AtbashKey> keys) {
         this.keys = keys;

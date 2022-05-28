@@ -29,7 +29,7 @@ import java.util.Map;
 @PublicAPI
 public class JWTParametersSigning extends JWTParametersHeader {
 
-    private AtbashKey secretKeySigning;
+    private final AtbashKey secretKeySigning;
 
     public JWTParametersSigning(Map<String, Object> headerValues, AtbashKey secretKeySigning) {
         super(headerValues);

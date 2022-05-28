@@ -21,7 +21,7 @@ import be.atbash.util.PublicAPI;
 public enum KeyResourceType {
     JWK(".jwk", ".jwke"), JWKSET(".jwks", ".jwkset", ".jwksete"), PEM(".pem", ".der"), KEYSTORE(".jks", ".p12", ".pfx");
 
-    private String[] suffixes;
+    private final String[] suffixes;
 
     KeyResourceType(String... suffixes) {
         this.suffixes = suffixes;

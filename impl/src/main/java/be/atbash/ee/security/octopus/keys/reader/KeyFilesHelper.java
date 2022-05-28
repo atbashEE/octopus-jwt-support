@@ -90,7 +90,7 @@ public class KeyFilesHelper {
                         for (File f : defineFiles(file)) {
 
                             if (f.isFile()) {
-                                result.add(ResourceUtil.FILE_PREFIX + f.getAbsoluteFile().toString());
+                                result.add(ResourceUtil.FILE_PREFIX + f.getAbsoluteFile());
                             }
                         }
                     } else {

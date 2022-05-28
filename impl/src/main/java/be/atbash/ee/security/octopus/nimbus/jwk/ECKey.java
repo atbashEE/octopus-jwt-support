@@ -585,31 +585,31 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
     /**
      * The curve name.
      */
-    private Curve crv;
+    private final Curve crv;
 
 
     /**
      * The public 'x' EC coordinate.
      */
-    private Base64URLValue x;
+    private final Base64URLValue x;
 
 
     /**
      * The public 'y' EC coordinate.
      */
-    private Base64URLValue y;
+    private final Base64URLValue y;
 
 
     /**
      * The private 'd' EC coordinate.
      */
-    private Base64URLValue d;
+    private final Base64URLValue d;
 
 
     /**
      * Private PKCS#11 key handle.
      */
-    private PrivateKey privateKey;
+    private final PrivateKey privateKey;
 
 
     /**
