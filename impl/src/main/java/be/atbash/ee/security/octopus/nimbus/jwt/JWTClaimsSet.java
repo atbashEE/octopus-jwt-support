@@ -18,7 +18,6 @@ package be.atbash.ee.security.octopus.nimbus.jwt;
 
 import be.atbash.ee.security.octopus.nimbus.jwt.util.DateUtils;
 import be.atbash.ee.security.octopus.nimbus.util.JSONObjectUtils;
-import be.atbash.util.StringUtils;
 
 import javax.json.*;
 import java.io.Serializable;
@@ -26,7 +25,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 /**
@@ -205,7 +203,7 @@ public final class JWTClaimsSet implements Serializable {
             if (aud == null) {
                 claims.put(AUDIENCE_CLAIM, null);
             } else {
-                List<String> audList = getAsList(aud);
+                List<String> audList = JSONObjectUtils.getAsList(aud);
                 audience(audList);
             }
             return this;
@@ -298,9 +296,6 @@ public final class JWTClaimsSet implements Serializable {
         }
     }
 
-    private static List<String> getAsList(String value) {
-        return Arrays.stream(StringUtils.split(value)).map(String::trim).collect(Collectors.toList());
-    }
 
     /**
      * The claims map.
@@ -371,7 +366,7 @@ public final class JWTClaimsSet implements Serializable {
 
         if (audValue instanceof String) {
             // Special case
-            return getAsList(audValue.toString());
+            return JSONObjectUtils.getAsList(audValue.toString());
         }
 
         List<String> aud;
@@ -863,7 +858,7 @@ public final class JWTClaimsSet implements Serializable {
                         JsonValue audValue = json.get(AUDIENCE_CLAIM);
 
                         if (audValue.getValueType() == JsonValue.ValueType.STRING) {
-                            builder.audience(getAsList(json.getString(AUDIENCE_CLAIM)));
+                            builder.audience(JSONObjectUtils.getAsList(json.getString(AUDIENCE_CLAIM)));
                         } else if (audValue.getValueType() == JsonValue.ValueType.ARRAY) {
                             builder.audience(JSONObjectUtils.getStringList(json, AUDIENCE_CLAIM));
                         }

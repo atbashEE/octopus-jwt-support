@@ -17,140 +17,139 @@ package be.atbash.ee.security.octopus.nimbus.util;
 
 
 import be.atbash.ee.security.octopus.jwt.JWTEncoding;
-import org.junit.jupiter.api.Assertions;
+import org.assertj.core.api.Assertions;
+import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.Test;
 
-import javax.json.Json;
-import javax.json.JsonArray;
-import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
+import javax.json.*;
 import java.net.URI;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Tests the JSON object utilities.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
-public class JSONObjectUtilsTest {
+class JSONObjectUtilsTest {
 
     @Test
-    public void testParseTrailingWhiteSpace()
+    void testParseTrailingWhiteSpace()
             throws Exception {
 
-        assertThat(JSONObjectUtils.parse("{} ").size()).isEqualTo(0);
-        assertThat(JSONObjectUtils.parse("{}\n").size()).isEqualTo(0);
-        assertThat(JSONObjectUtils.parse("{}\r\n").size()).isEqualTo(0);
+        Assertions.assertThat(JSONObjectUtils.parse("{} ").size()).isEqualTo(0);
+        Assertions.assertThat(JSONObjectUtils.parse("{}\n").size()).isEqualTo(0);
+        Assertions.assertThat(JSONObjectUtils.parse("{}\r\n").size()).isEqualTo(0);
     }
 
 
     @Test
-    public void testGetURI() throws ParseException {
+    void testGetURI() throws ParseException {
 
         JsonObjectBuilder builder = Json.createObjectBuilder();
         builder.add("key", "https://c2id.net");
-        assertThat(JSONObjectUtils.getURI(builder.build(), "key")).isEqualTo(URI.create("https://c2id.net"));
+        Assertions.assertThat(JSONObjectUtils.getURI(builder.build(), "key")).isEqualTo(URI.create("https://c2id.net"));
     }
 
     @Test
-    public void testGetURI_null() throws ParseException {
+    void testGetURI_null() throws ParseException {
 
         JsonObjectBuilder builder = Json.createObjectBuilder();
         builder.addNull("key");
-        assertThat(JSONObjectUtils.getURI(builder.build(), "key")).isNull();
+        Assertions.assertThat(JSONObjectUtils.getURI(builder.build(), "key")).isNull();
     }
 
     @Test
-    public void testGetURI_missing() throws ParseException {
+    void testGetURI_missing() throws ParseException {
 
         JsonObjectBuilder builder = Json.createObjectBuilder();
-        assertThat(JSONObjectUtils.getURI(builder.build(), "key")).isNull();
+        Assertions.assertThat(JSONObjectUtils.getURI(builder.build(), "key")).isNull();
     }
 
 
     @Test
-    public void testGetStringList() throws ParseException {
+    void testGetStringList() throws ParseException {
 
         JsonObject jsonObject = JSONObjectUtils.parse("{\"key\":[\"apple\",\"pear\"]}");
-        assertThat(JSONObjectUtils.getStringList(jsonObject, "key")).containsExactly("apple", "pear");
+        Assertions.assertThat(JSONObjectUtils.getStringList(jsonObject, "key")).containsExactly("apple", "pear");
     }
 
     @Test
-    public void testGetStringList_null()  {
+    void testGetStringList_null() {
 
         JsonObjectBuilder builder = Json.createObjectBuilder();
         builder.addNull("key");
-        assertThat(JSONObjectUtils.getStringList(builder.build(), "key")).isEmpty();
+        Assertions.assertThat(JSONObjectUtils.getStringList(builder.build(), "key")).isEmpty();
     }
 
     @Test
-    public void testGetStringList_missing() {
+    void testGetStringList_missing() {
 
         JsonObjectBuilder builder = Json.createObjectBuilder();
-        assertThat(JSONObjectUtils.getStringList(builder.build(), "key")).isEmpty();
+        Assertions.assertThat(JSONObjectUtils.getStringList(builder.build(), "key")).isEmpty();
     }
 
     @Test
-    public void testGetStringList_wrongType() throws ParseException {
+    void testGetStringList_wrongType() throws ParseException {
 
         JsonObject jsonObject = JSONObjectUtils.parse("{\"crit\":[123,321]}");
-        IncorrectJsonValueException exception = Assertions.assertThrows(IncorrectJsonValueException.class, () -> JSONObjectUtils.getStringList(jsonObject, "crit"));
-        assertThat(exception.getMessage()).isEqualTo("JSON key 'crit' is expected to be an array of String");
+        Assertions.assertThatThrownBy(() -> JSONObjectUtils.getStringList(jsonObject, "crit"))
+                .isInstanceOf(IncorrectJsonValueException.class)
+                .hasMessage("JSON key 'crit' is expected to be an array of String");
     }
 
     @Test
-    public void testAsJsonArray() {
+    void testAsJsonArray() {
         List<String> data = new ArrayList<>();
         data.add("item1");
         data.add("item2");
         data.add("item3");
-        JsonArray array = JSONObjectUtils.asJsonArray(data);
+        JsonArray array = JSONObjectUtils.toJsonArray(data);
 
-        assertThat(array.toString()).isEqualTo("[\"item1\",\"item2\",\"item3\"]");
+        Assertions.assertThat(array.toString()).isEqualTo("[\"item1\",\"item2\",\"item3\"]");
     }
 
     @Test
-    public void testAsJsonArray_empty() {
+    void testAsJsonArray_empty() {
         List<String> data = new ArrayList<>();
-        JsonArray array = JSONObjectUtils.asJsonArray(data);
+        JsonArray array = JSONObjectUtils.toJsonArray(data);
 
-        assertThat(array.toString()).isEqualTo("[]");
+        Assertions.assertThat(array.toString()).isEqualTo("[]");
     }
 
     @Test
-    public void testGetEnum() {
+    void testGetEnum() {
         JsonObjectBuilder builder = Json.createObjectBuilder();
         builder.add("key", JWTEncoding.JWS.name());
         JsonObject jsonObject = builder.build();
         JWTEncoding value = JSONObjectUtils.getEnum(jsonObject, "key", JWTEncoding.class);
 
-        assertThat(value).isEqualTo(JWTEncoding.JWS);
+        Assertions.assertThat(value).isEqualTo(JWTEncoding.JWS);
     }
 
     @Test
-    public void testGetEnum_invalid() {
+    void testGetEnum_invalid() {
         JsonObjectBuilder builder = Json.createObjectBuilder();
         builder.add("key", "something");
         JsonObject jsonObject = builder.build();
-        Assertions.assertThrows(IncorrectJsonValueException.class, () -> JSONObjectUtils.getEnum(jsonObject, "key", JWTEncoding.class));
+
+        Assertions.assertThatThrownBy(() -> JSONObjectUtils.getEnum(jsonObject, "key", JWTEncoding.class))
+                .isInstanceOf(IncorrectJsonValueException.class);
+
     }
 
     @Test
-    public void testGetEnum_null() {
+    void testGetEnum_null() {
         JsonObjectBuilder builder = Json.createObjectBuilder();
         builder.addNull("key");
         JsonObject jsonObject = builder.build();
         JWTEncoding value = JSONObjectUtils.getEnum(jsonObject, "key", JWTEncoding.class);
-        assertThat(value).isNull();
+        Assertions.assertThat(value).isNull();
     }
 
     @Test
-    public void addValue() {
+    void addValue() {
         JsonObjectBuilder builder = Json.createObjectBuilder();
         JSONObjectUtils.addValue(builder, "stringKey", "someString");
         JSONObjectUtils.addValue(builder, "longKey", 123456L);
@@ -158,11 +157,11 @@ public class JSONObjectUtilsTest {
         JSONObjectUtils.addValue(builder, "boolKey", Boolean.TRUE);
 
         String data = builder.build().toString();
-        assertThat(data).isEqualTo("{\"stringKey\":\"someString\",\"longKey\":123456,\"intKey\":123,\"boolKey\":true}");
+        Assertions.assertThat(data).isEqualTo("{\"stringKey\":\"someString\",\"longKey\":123456,\"intKey\":123,\"boolKey\":true}");
     }
 
     @Test
-    public void remove() {
+    void remove() {
         JsonObjectBuilder builder = Json.createObjectBuilder();
         builder.add("key1", "value1");
         builder.add("key2", "value2");
@@ -170,12 +169,12 @@ public class JSONObjectUtilsTest {
         JsonObject jsonObject1 = builder.build();
         JsonObject jsonObject2 = JSONObjectUtils.remove(jsonObject1, "key1");
 
-        assertThat(jsonObject2.keySet()).containsOnly("key2");
+        Assertions.assertThat(jsonObject2.keySet()).containsOnly("key2");
 
     }
 
     @Test
-    public void remove_nonExistentKey() {
+    void remove_nonExistentKey() {
         JsonObjectBuilder builder = Json.createObjectBuilder();
         builder.add("key1", "value1");
         builder.add("key2", "value2");
@@ -183,35 +182,200 @@ public class JSONObjectUtilsTest {
         JsonObject jsonObject1 = builder.build();
         JsonObject jsonObject2 = JSONObjectUtils.remove(jsonObject1, "key3");
 
-        assertThat(jsonObject2.keySet()).contains("key1", "key2");
+        Assertions.assertThat(jsonObject2.keySet()).contains("key1", "key2");
 
     }
 
     @Test
-    public void getJsonValueAsObject_string() throws ParseException {
+    void getJsonValueAsObject_string() throws ParseException {
 
         JsonObject jsonObject = JSONObjectUtils.parse("{\"key\":[\"apple\",\"pear\"]}");
         Object value = JSONObjectUtils.getJsonValueAsObject(jsonObject.getJsonArray("key"));
-        assertThat(value).isInstanceOf(List.class);
+        Assertions.assertThat(value).isInstanceOf(List.class);
         List<String> items = (List<String>) value;
-        assertThat(items).containsExactly("apple", "pear");
+        Assertions.assertThat(items).containsExactly("apple", "pear");
     }
 
     @Test
-    public void getJsonValueAsObject_int() throws ParseException {
+    void getJsonValueAsObject_int() throws ParseException {
 
         JsonObject jsonObject = JSONObjectUtils.parse("{\"key\":[123,321]}");
         Object value = JSONObjectUtils.getJsonValueAsObject(jsonObject.getJsonArray("key"));
-        assertThat(value).isInstanceOf(List.class);
+        Assertions.assertThat(value).isInstanceOf(List.class);
         List<Integer> items = (List<Integer>) value;
-        assertThat(items).containsExactly(123, 321);
+        Assertions.assertThat(items).containsExactly(123, 321);
     }
 
     @Test
-    public void getJsonValueAsObject_mixed() throws ParseException {
+    void getJsonValueAsObject_mixed() throws ParseException {
 
         JsonObject jsonObject = JSONObjectUtils.parse("{\"key\":[\"apple\",321]}");
-        IncorrectJsonValueException exception = Assertions.assertThrows(IncorrectJsonValueException.class, () -> JSONObjectUtils.getJsonValueAsObject(jsonObject.getJsonArray("key")));
-        assertThat(exception.getMessage()).isEqualTo("JSONArray is expected to be an array of only String or Number");
+
+        Assertions.assertThatThrownBy(() -> JSONObjectUtils.getJsonValueAsObject(jsonObject.getJsonArray("key")))
+                .isInstanceOf(IncorrectJsonValueException.class)
+                .hasMessage("JSONArray is expected to be an array of only String or Number");
+
+    }
+
+    @Test
+    void mapToJsonObject() {
+        Map<String, Object> data = new HashMap<>();
+
+        Map<String, Object> data2 = new HashMap<>();
+        data2.put("key", "value");
+
+        data.put("map", data2);
+        data.put("list", Arrays.asList("abc", "def"));
+        data.put("long", 12345L);
+        data.put("int", 123);
+        data.put("double", 43.21D);
+        data.put("float", 6543.98F);
+        data.put("boolean", Boolean.TRUE);
+        data.put("string", "someValue");
+        data.put("pojo", new Pojo());
+        data.put("null", null);
+        JsonObject jsonObject = JSONObjectUtils.mapToJsonObject(data);
+        Assertions.assertThat(jsonObject.keySet()).containsOnly("map", "list", "long", "int", "double", "float", "boolean", "string");
+
+        JsonValue jsonValue = jsonObject.get("long");
+        Assertions.assertThat(jsonValue).isInstanceOf(JsonNumber.class);
+        Assertions.assertThat(((JsonNumber) jsonValue).longValue()).isEqualTo(12345L);
+
+        jsonValue = jsonObject.get("int");
+        Assertions.assertThat(jsonValue).isInstanceOf(JsonNumber.class);
+        Assertions.assertThat(((JsonNumber) jsonValue).longValue()).isEqualTo(123L);
+
+        jsonValue = jsonObject.get("double");
+        Assertions.assertThat(jsonValue).isInstanceOf(JsonNumber.class);
+        Assertions.assertThat(((JsonNumber) jsonValue).doubleValue()).isEqualTo(43.21D);
+
+        jsonValue = jsonObject.get("float");
+        Assertions.assertThat(jsonValue).isInstanceOf(JsonNumber.class);
+        Assertions.assertThat(((JsonNumber) jsonValue).doubleValue()).isCloseTo(6543.98D, Offset.offset(0.001));
+
+        jsonValue = jsonObject.get("boolean");
+        Assertions.assertThat(jsonValue).isEqualTo(JsonValue.TRUE);
+
+        jsonValue = jsonObject.get("string");
+        Assertions.assertThat(jsonValue).isInstanceOf(JsonString.class);
+        Assertions.assertThat(((JsonString) jsonValue).getString()).isEqualTo("someValue");
+
+        jsonValue = jsonObject.get("map");
+        Assertions.assertThat(jsonValue).isInstanceOf(JsonObject.class);
+
+        jsonValue = jsonObject.get("list");
+        Assertions.assertThat(jsonValue).isInstanceOf(JsonArray.class);
+
+        List<JsonString> jsonStrings = ((JsonArray) jsonValue).getValuesAs(JsonString.class);
+        List<String> stringList = jsonStrings.stream().map(JsonString::getString).collect(Collectors.toList());
+        Assertions.assertThat(stringList).isEqualTo(Arrays.asList("abc", "def"));
+    }
+
+    @Test
+    void getAsJsonValue_String() {
+        JsonValue jsonValue = JSONObjectUtils.getAsJsonValue("someValue");
+        Assertions.assertThat(jsonValue).isInstanceOf(JsonString.class);
+        Assertions.assertThat(((JsonString) jsonValue).getString()).isEqualTo("someValue");
+
+    }
+
+    @Test
+    void getAsJsonValue_longAndInt() {
+        JsonValue jsonValue = JSONObjectUtils.getAsJsonValue(123L);
+        Assertions.assertThat(jsonValue).isInstanceOf(JsonNumber.class);
+        Assertions.assertThat(((JsonNumber) jsonValue).longValue()).isEqualTo(123L);
+
+        jsonValue = JSONObjectUtils.getAsJsonValue(543);
+        Assertions.assertThat(jsonValue).isInstanceOf(JsonNumber.class);
+        Assertions.assertThat(((JsonNumber) jsonValue).longValue()).isEqualTo(543L);
+    }
+
+    @Test
+    void getAsJsonValue_doubleAndFloat() {
+        JsonValue jsonValue = JSONObjectUtils.getAsJsonValue(543.21D);
+        Assertions.assertThat(jsonValue).isInstanceOf(JsonNumber.class);
+        Assertions.assertThat(((JsonNumber) jsonValue).doubleValue()).isEqualTo(543.21D);
+
+        jsonValue = JSONObjectUtils.getAsJsonValue(6543.98F);
+        Assertions.assertThat(jsonValue).isInstanceOf(JsonNumber.class);
+        Assertions.assertThat(((JsonNumber) jsonValue).doubleValue()).isCloseTo(6543.98D, Offset.offset(0.001));
+    }
+
+    @Test
+    void getAsJsonValue_boolean() {
+        JsonValue jsonValue = JSONObjectUtils.getAsJsonValue(Boolean.TRUE);
+        Assertions.assertThat(jsonValue).isEqualTo(JsonNumber.TRUE);
+
+        jsonValue = JSONObjectUtils.getAsJsonValue(Boolean.FALSE);
+        Assertions.assertThat(jsonValue).isEqualTo(JsonNumber.FALSE);
+
+    }
+
+    @Test
+    void getAsJsonValue_collection() {
+        JsonValue jsonValue = JSONObjectUtils.getAsJsonValue(Arrays.asList("abc", "def"));
+        Assertions.assertThat(jsonValue).isInstanceOf(JsonArray.class);
+
+        List<JsonString> jsonStrings = ((JsonArray) jsonValue).getValuesAs(JsonString.class);
+        List<String> stringList = jsonStrings.stream().map(JsonString::getString).collect(Collectors.toList());
+        Assertions.assertThat(stringList).isEqualTo(Arrays.asList("abc", "def"));
+
+        jsonValue = JSONObjectUtils.getAsJsonValue(new HashSet<>(Arrays.asList(1234L, 5678L)));
+        Assertions.assertThat(jsonValue).isInstanceOf(JsonArray.class);
+
+        List<JsonNumber> jsonNumbers = ((JsonArray) jsonValue).getValuesAs(JsonNumber.class);
+        List<Long> longList = jsonNumbers.stream().map(JsonNumber::longValue).collect(Collectors.toList());
+        Assertions.assertThat(longList).containsOnly(1234L, 5678L);
+    }
+
+    @Test
+    void getAsJsonValue_map() {
+        Map<String, Object> data = new HashMap<>();
+        data.put("key", "value");
+
+        JsonValue jsonValue = JSONObjectUtils.getAsJsonValue(data);
+        Assertions.assertThat(jsonValue).isInstanceOf(JsonObject.class);
+
+    }
+
+    @Test
+    void getAsList_DelimitedString() {
+        List<String> list = JSONObjectUtils.getAsList("abc,def");
+        Assertions.assertThat(list).containsOnly("abc", "def");
+    }
+
+    @Test
+    void getAsList_SingleString() {
+        List<String> list = JSONObjectUtils.getAsList("abc");
+        Assertions.assertThat(list).containsOnly("abc");
+    }
+
+    @Test
+    void getAsList_DelimitedJsonString() {
+        List<String> list = JSONObjectUtils.getAsList(Json.createValue("abc,def"));
+        Assertions.assertThat(list).containsOnly("abc", "def");
+    }
+
+    @Test
+    void getAsList_SingleJsonString() {
+        List<String> list = JSONObjectUtils.getAsList(Json.createValue("abc"));
+        Assertions.assertThat(list).containsOnly("abc");
+    }
+
+    @Test
+    void getAsList_jsonArray() {
+        JsonArray array = Json.createArrayBuilder()
+                .add("abc")
+                .add("def")
+                .build();
+        List<String> list = JSONObjectUtils.getAsList(array);
+        Assertions.assertThat(list).containsOnly("abc", "def");
+    }
+
+    private static class Pojo {
+        @Override
+        public String toString() {
+            return "PojoToStringValue";
+        }
     }
 }

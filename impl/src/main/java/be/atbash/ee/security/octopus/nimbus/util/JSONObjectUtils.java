@@ -17,6 +17,8 @@ package be.atbash.ee.security.octopus.nimbus.util;
 
 
 import be.atbash.ee.security.octopus.util.JsonbUtil;
+import be.atbash.util.PublicAPI;
+import be.atbash.util.StringUtils;
 
 import javax.json.*;
 import javax.json.bind.Jsonb;
@@ -24,9 +26,8 @@ import javax.json.bind.JsonbException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -34,6 +35,7 @@ import java.util.List;
  *
  * Based on code by Vladimir Dzhuvinov
  */
+@PublicAPI
 public final class JSONObjectUtils {
 
 
@@ -47,8 +49,7 @@ public final class JSONObjectUtils {
      * @throws ParseException If the string cannot be parsed to a valid JSON
      *                        object.
      */
-    public static JsonObject parse(String value)
-            throws ParseException {
+    public static JsonObject parse(String value) throws ParseException {
 
         JsonObject result;
 
@@ -148,7 +149,12 @@ public final class JSONObjectUtils {
         JsonArray jsonArray = jsonObject.getJsonArray(key);
 
         checkItemType(key, jsonArray);
-        return jsonArray.getValuesAs(JsonString::getString);
+        return jsonArray.getValuesAs(jsonValue -> {
+            if (jsonValue instanceof JsonString) {
+                return ((JsonString) jsonValue).getString();
+            }
+            return jsonValue.toString();
+        });
 
     }
 
@@ -169,23 +175,6 @@ public final class JSONObjectUtils {
         }
     }
 
-    /**
-     * Gets a String list as Json Array.
-     *
-     * @param data List of String items to be converted to Json Array.
-     * @return JsonArray with the Data
-     */
-    public static JsonArray asJsonArray(List<String> data) {
-
-        JsonArrayBuilder result = Json.createArrayBuilder();
-        for (String item : data) {
-            result.add(item);
-        }
-
-        return result.build();
-
-    }
-
     public static Object getJsonValueAsObject(JsonValue value) {
         Object result = null;
         if (value == null) {
@@ -196,6 +185,7 @@ public final class JSONObjectUtils {
             case ARRAY:
                 JsonArray jsonArray = (JsonArray) value;
 
+                // Cannot use getAsList as that converts the Numbers to String.
                 JsonValue.ValueType valueType = defineItemValueType(jsonArray);
                 if (valueType == JsonValue.ValueType.STRING) {
                     result = jsonArray.getValuesAs(JsonString::getString);
@@ -232,6 +222,73 @@ public final class JSONObjectUtils {
                 break;
         }
         return result;
+    }
+
+    public static JsonValue getAsJsonValue(Object value) {
+        JsonValue jsonValue = null;
+
+        if (value instanceof JsonValue) {
+            // This is already a JsonValue
+            jsonValue = (JsonValue) value;
+        } else if (value instanceof String) {
+            jsonValue = Json.createValue(value.toString());
+        } else if ((value instanceof Long) || (value instanceof Integer)) {
+            jsonValue = Json.createValue(((Number) value).longValue());
+        } else if (value instanceof Number) {
+            jsonValue = Json.createValue(((Number) value).doubleValue());
+        } else if (value instanceof Boolean) {
+            jsonValue = (Boolean) value ? JsonValue.TRUE : JsonValue.FALSE;
+        } else if (value instanceof Collection) {
+            jsonValue = toJsonArray((Collection<?>) value);
+        } else if (value instanceof Map) {
+            @SuppressWarnings("unchecked")
+            JsonObject entryJsonObject = mapToJsonObject((Map<String, Object>) value);
+            jsonValue = entryJsonObject;
+        }
+
+        return jsonValue;
+    }
+
+    public static JsonObject mapToJsonObject(Map<String, Object> map) {
+
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            Object entryValue = entry.getValue();
+            if (entryValue instanceof Map) {
+                @SuppressWarnings("unchecked")
+                JsonObject entryJsonObject = mapToJsonObject((Map<String, Object>) entryValue);
+                builder.add(entry.getKey(), entryJsonObject);
+            } else if (entryValue instanceof List) {
+                JsonArray array = (JsonArray) getAsJsonValue(entryValue);
+                builder.add(entry.getKey(), array);
+            } else if (entryValue instanceof Long || entryValue instanceof Integer) {
+                long lvalue = ((Number) entryValue).longValue();
+                builder.add(entry.getKey(), lvalue);
+            } else if (entryValue instanceof Double || entryValue instanceof Float) {
+                double dvalue = ((Number) entryValue).doubleValue();
+                builder.add(entry.getKey(), dvalue);
+            } else if (entryValue instanceof Boolean) {
+                boolean flag = ((Boolean) entryValue).booleanValue();
+                builder.add(entry.getKey(), flag);
+            } else if (entryValue instanceof String) {
+                builder.add(entry.getKey(), entryValue.toString());
+            }
+        }
+        return builder.build();
+    }
+
+    public static JsonArray toJsonArray(Collection<?> collection) {
+        JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
+
+        for (Object element : collection) {
+            if (element == null) {
+                arrayBuilder.add(JsonValue.NULL);
+            } else {
+                arrayBuilder.add(getAsJsonValue(element));
+            }
+        }
+
+        return arrayBuilder.build();
     }
 
     private static JsonValue.ValueType defineItemValueType(JsonArray jsonArray) {
@@ -319,6 +376,48 @@ public final class JSONObjectUtils {
 
         throw new IncorrectJsonValueException(String.format("Unexpected value of JSON object member with key \"%s\" for enum %s", key, enumClass));
     }
+
+    /**
+     * Converts a String, JsonString or JsonArray to a List of Strings. Correct handles null as input and
+     * returns an empty list.
+     *
+     * @param value The instance to convert.
+     * @return The resulting List of Strings.
+     */
+    public static List<String> getAsList(Object value) {
+
+        if (value == null) {
+            return Collections.emptyList();
+        }
+
+        if (value instanceof JsonArray) {
+            return ((JsonArray) value).getValuesAs(jsonValue -> {
+                if (jsonValue instanceof JsonString) {
+                    return ((JsonString) jsonValue).getString();
+                }
+                return jsonValue.toString();
+            });
+        }
+
+        if (value instanceof List) {
+            return (List<String>) value;
+        }
+
+        if (value instanceof Collection) {
+            return new ArrayList<>((Collection) value);
+        }
+
+        String tempValue;
+        if (value instanceof JsonString) {
+            tempValue = ((JsonString) value).getString();
+        } else if (value instanceof String) {
+            tempValue = ((String) value);
+        } else {
+            tempValue = value.toString();
+        }
+        return Arrays.stream(StringUtils.split(tempValue)).map(String::trim).collect(Collectors.toList());
+    }
+
 
     /**
      * Prevents public instantiation.
