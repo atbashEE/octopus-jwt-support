@@ -15,13 +15,16 @@
  */
 package be.atbash.ee.security.octopus.nimbus.jwt;
 
-import javax.json.*;
+import be.atbash.ee.security.octopus.nimbus.jwt.util.DateUtils;
 import org.assertj.core.api.Assertions;
+import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.Test;
 
+import javax.json.*;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
@@ -177,6 +180,27 @@ class JWTClaimsSetTest {
         Assertions.assertThat(claimsSet.getClaim("exp")).isEqualTo(now);
         // /1000 to remove the ms they are not kept within the JWT either.
         Assertions.assertThat(claimsSet.getLongClaim("exp")).isEqualTo(now.getTime() / 1000);
+
+    }
+
+    @Test
+    void expirationTime_asDuration() throws ParseException {
+        Date now = new Date();
+        JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
+                .expirationTime(Duration.of(30, ChronoUnit.SECONDS))
+                .build();
+
+        long timeDifference = claimsSet.getExpirationTime().getTime() - now.getTime();
+        Assertions.assertThat(timeDifference).isCloseTo(30_000L, Offset.offset(50L));
+    }
+
+    @Test
+    void expirationTime_asDuration_negative() throws ParseException {
+
+        Assertions.assertThatThrownBy(() ->
+                new JWTClaimsSet.Builder()
+                        .expirationTime(Duration.of(-30, ChronoUnit.SECONDS))
+        ).isInstanceOf(IllegalArgumentException.class).hasMessage("The specified time duration in the parameter can't be smaller then 0.");
 
     }
 
@@ -429,7 +453,7 @@ class JWTClaimsSetTest {
                 .claim("now", now.getTime() / 1000)
                 .build();
 
-        LocalDateTime localDateTime = asLocalDateTime(now);
+        LocalDateTime localDateTime = DateUtils.asLocalDateTime(now);
         Date truncatedNow = truncatedDate(localDateTime);
 
         // But a number that is interpreted as date is using the JWT seconds rule.
@@ -438,16 +462,8 @@ class JWTClaimsSetTest {
     }
 
     private Date truncatedDate(LocalDateTime localDateTime) {
-        Date truncatedNow;
         LocalDateTime temp = localDateTime.truncatedTo(ChronoUnit.SECONDS);
-        truncatedNow = Date.from(temp.atZone(ZoneId.systemDefault()).toInstant());
-        return truncatedNow;
-    }
-
-    private LocalDateTime asLocalDateTime(Date date) {
-        return date.toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime();
+        return DateUtils.asDate(temp);
     }
 
 
