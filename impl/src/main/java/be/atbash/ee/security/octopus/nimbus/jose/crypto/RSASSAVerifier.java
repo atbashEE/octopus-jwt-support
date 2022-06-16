@@ -144,6 +144,12 @@ public class RSASSAVerifier extends RSASSAProvider implements JWSVerifier {
                           byte[] signedContent,
                           Base64URLValue signature) {
 
+        JWSAlgorithm alg = header.getAlgorithm();
+
+        if (!supportedJWSAlgorithms().contains(alg)) {
+            throw new JOSEException(AlgorithmSupportMessage.unsupportedJWSAlgorithm(alg, supportedJWSAlgorithms()));
+        }
+
         if (!critPolicy.headerPasses(header)) {
             return false;
         }
