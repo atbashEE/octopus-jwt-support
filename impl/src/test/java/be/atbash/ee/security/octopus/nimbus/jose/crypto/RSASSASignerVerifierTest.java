@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,8 @@ import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -46,5 +48,24 @@ class RSASSASignerVerifierTest {
         boolean verify = verifier.verify(header, "The Secret Message".getBytes(), signature);
 
         assertThat(verify).isTrue();
+    }
+
+    @Test
+    public void wrongHeaderAlgForVerifier() {
+        // This does not happen if you use the higher level classes, only when you instantiate verifiers manually.
+        List<AtbashKey> atbashKeys = TestKeys.generateRSAKeys("kid");
+        AtbashKey privateKey = Filters.findPrivateKey(atbashKeys);
+        RSASSASigner signer = new RSASSASigner(privateKey);
+        JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.parse("RS256")).build();
+        Base64URLValue signature = signer.sign(header, "The Secret Message".getBytes());
+
+        AtbashKey publicKey = Filters.findPublicKey(atbashKeys);
+        RSASSAVerifier verifier = new RSASSAVerifier(publicKey);
+        JWSHeader wrongHeader = new JWSHeader.Builder(JWSAlgorithm.parse("ES256")).build();
+        Assertions.assertThatThrownBy(() -> verifier.verify(wrongHeader, "The Secret Message".getBytes(), signature)
+                ).isInstanceOf(JOSEException.class)
+                .hasMessage("Unsupported JWS algorithm ES256, must be RS256, RS384, RS512, PS256, PS384 or PS512");
+
+
     }
 }
