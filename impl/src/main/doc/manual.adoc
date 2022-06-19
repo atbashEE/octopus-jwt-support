@@ -18,6 +18,7 @@ User manual for Atbash JWT Support.
 . Convert 'Java Objects' to JsonValue instances and vice versa.
 . The _exp_, _iat_, and _nbf_ claims can be set as `LocalDateTime` value using the `JWTClaimsSet.Builder`
 . New method within the builder to define the expiration time as a duration from current time. `Builder.expirationTime(Duration)`.
+. Identify the `SecretKey` through the class `KeyFamilyUtil`.
 
 === Jakarta version
 
