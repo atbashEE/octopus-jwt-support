@@ -111,6 +111,9 @@
                         <exclude>**/*.pem</exclude>
                         <exclude>**/*.jwke</exclude>
                         <exclude>**/*.jwkset</exclude>
+                        <exclude>**/*.b64</exclude>
+                        <exclude>**/*.crt</exclude>
+                        <exclude>**/*.jks</exclude>
                         <exclude>**/README</exclude>
                         <exclude>**/LICENSE</exclude>
                         <exclude>**/NOTICE.txt</exclude>
