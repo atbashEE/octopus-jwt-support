@@ -18,6 +18,7 @@ package be.atbash.ee.security.octopus.nimbus.jwt.proc;
 
 import be.atbash.ee.security.octopus.config.JwtSupportConfiguration;
 import be.atbash.ee.security.octopus.jwt.InvalidJWTException;
+import be.atbash.ee.security.octopus.jwt.JWTValidationConstant;
 import be.atbash.ee.security.octopus.jwt.decoder.JWTVerifier;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.keys.selector.KeySelector;
@@ -36,6 +37,7 @@ import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSVerifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import java.net.URI;
 import java.security.Key;
@@ -219,7 +221,10 @@ public class DefaultJWTProcessor implements JWTProcessor {
     private JWTClaimsSet process(SignedJWT signedJWT) {
 
         JOSEObjectType objectType = signedJWT.getHeader().getType();
+        // If typ is null, it is assumed JWT
         if (objectType != null && !objectType.equals(JOSEObjectType.JWT)) {
+            // These messages are in function of JWT validation by Atbash Runtime so have slightly narrow meaning of the provided parameters.
+            MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, String.format("The provided token did not specify the correct 'JWT' typ in the header (header = %s)", signedJWT.getHeader().toString()));
             throw new BadJOSEException("JOSE header \"typ\" (type) \"" + objectType.getType() + "\" not allowed");
         }
 
@@ -242,12 +247,16 @@ public class DefaultJWTProcessor implements JWTProcessor {
                 LOGGER.error(String.format("(OCT-KEY-010) No or multiple keys found for criteria :%n %s", defineKeyCriteria(signedJWT.getHeader(), AsymmetricPart.PUBLIC)));
 
             }
+            // These messages are in function of JWT validation by Atbash Runtime so have slightly narrow meaning of the provided parameters.
+            MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, String.format("No key found that matches the information from the header (%s)", signedJWT.getHeader().toString()));
             throw new InvalidJWTException(String.format("No key found for keyId '%s'", signedJWT.getHeader().getKeyID()));
         }
 
         JWSVerifier verifier = jwsVerifierFactory.createJWSVerifier(signedJWT.getHeader(), secretKey);
 
         if (verifier == null) {
+            // These messages are in function of JWT validation by Atbash Runtime so have slightly narrow meaning of the provided parameters.
+            MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, String.format("No token verifier found for the header and matching secret key (header = %s, secretKey type = %s)", signedJWT.getHeader().toString(), defineType(secretKey)));
             throw new InvalidJWTException("Signed JWT rejected: Another algorithm expected, or no matching key(s) found");
         }
 
@@ -258,8 +267,13 @@ public class DefaultJWTProcessor implements JWTProcessor {
             return verifyClaims(signedJWT.getHeader(), claimsSet);
         }
 
+        MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, String.format("No token signature verification failed"));
         throw new InvalidJWTException("Signed JWT rejected: Invalid signature");
 
+    }
+
+    private String defineType(Key secretKey) {
+        return KeyFamilyUtil.INSTANCE.determineKeyFamily(secretKey).toString();
     }
 
     private JWTClaimsSet process(EncryptedJWT encryptedJWT) {

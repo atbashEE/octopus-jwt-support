@@ -19,6 +19,7 @@ User manual for Atbash JWT Support.
 . The _exp_, _iat_, and _nbf_ claims can be set as `LocalDateTime` value using the `JWTClaimsSet.Builder`
 . New method within the builder to define the expiration time as a duration from current time. `Builder.expirationTime(Duration)`.
 . Identify the `SecretKey` through the class `KeyFamilyUtil`.
+. The reason for a Failed JWT token verification (signature, verifier, ...) can be found within MDC of SLF4J with key `JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON`.
 
 === Jakarta version
 

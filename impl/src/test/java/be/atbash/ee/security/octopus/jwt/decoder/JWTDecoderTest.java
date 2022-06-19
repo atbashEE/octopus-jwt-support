@@ -17,6 +17,7 @@ package be.atbash.ee.security.octopus.jwt.decoder;
 
 import be.atbash.ee.security.octopus.jwt.InvalidJWTException;
 import be.atbash.ee.security.octopus.jwt.JWTEncoding;
+import be.atbash.ee.security.octopus.jwt.JWTValidationConstant;
 import be.atbash.ee.security.octopus.jwt.encoder.JWTEncoder;
 import be.atbash.ee.security.octopus.jwt.encoder.testclasses.MyColor;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParameters;
@@ -28,8 +29,10 @@ import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.keys.selector.SelectorCriteria;
 import be.atbash.ee.security.octopus.keys.selector.TestKeySelector;
 import be.atbash.ee.security.octopus.nimbus.jwt.JWTClaimsSet;
-import org.junit.jupiter.api.Assertions;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.MDC;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -37,25 +40,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
+class JWTDecoderTest {
 
-public class JWTDecoderTest {
+    private final JWTDecoder decoder = new JWTDecoder();
 
-    private JWTDecoder decoder = new JWTDecoder();
+    @AfterEach
+    public void cleanup() {
+        MDC.clear();
+    }
 
     @Test
-    public void decode() {
+    void decode() {
 
         String data = "{\"pets\":\"dog,cat\",\"dateValue\":\"2017-11-15\",\"valueForClass\":\"Atbash\"}";
 
         Map<String, String> result = decoder.decode(data, HashMap.class).getData();
 
 
-        assertThat(result.keySet()).containsOnlyOnce("pets", "dateValue", "valueForClass");
+        Assertions.assertThat(result.keySet()).containsOnlyOnce("pets", "dateValue", "valueForClass");
     }
 
     @Test
-    public void decode_customSerializer() {
+    void decode_customSerializer() {
         List<AtbashKey> keys = TestKeys.generateRSAKeys("kid");
         JWTParameters parameters = getJwtParameters(keys, null);
         JWTEncoder encoder = new JWTEncoder();
@@ -66,52 +72,52 @@ public class JWTDecoderTest {
         String json = encoder.encode(claims, parameters);
 
         JWTData<MyColor> myColor = decoder.decode(json, MyColor.class, new TestKeySelector(keyManager));
-        assertThat(myColor).isNotNull();
+        Assertions.assertThat(myColor).isNotNull();
         MyColor data = myColor.getData();
-        assertThat(data).isNotNull();
-        assertThat(data.getR()).isEqualTo(200);
-        assertThat(data.getG()).isEqualTo(150);
-        assertThat(data.getB()).isEqualTo(100);
+        Assertions.assertThat(data).isNotNull();
+        Assertions.assertThat(data.getR()).isEqualTo(200);
+        Assertions.assertThat(data.getG()).isEqualTo(150);
+        Assertions.assertThat(data.getB()).isEqualTo(100);
 
     }
 
     @Test
-    public void decode_plainJWT() {
+    void decode_plainJWT() {
         String json = "eyJhbGciOiJub25lIn0.eyJzdWIiOiJhbGljZSJ9.";
         JWTData<Map> jwtData = decoder.decode(json, Map.class);
 
-        assertThat(jwtData).isNotNull();
+        Assertions.assertThat(jwtData).isNotNull();
         Map map = jwtData.getData();
-        assertThat(map).hasSize(1);
-        assertThat(map).containsEntry("sub", "alice");
+        Assertions.assertThat(map).hasSize(1);
+        Assertions.assertThat(map).containsEntry("sub", "alice");
     }
 
     @Test
-    public void decode_plainJWT_omittedDot() {
+    void decode_plainJWT_omittedDot() {
         String json = "eyJhbGciOiJub25lIn0.eyJzdWIiOiJhbGljZSJ9";  // Explicitly omitted the end . (But not recommended !)
         JWTData<Map> jwtData = decoder.decode(json, Map.class);
 
-        assertThat(jwtData).isNotNull();
+        Assertions.assertThat(jwtData).isNotNull();
         Map map = jwtData.getData();
-        assertThat(map).hasSize(1);
-        assertThat(map).containsEntry("sub", "alice");
+        Assertions.assertThat(map).hasSize(1);
+        Assertions.assertThat(map).containsEntry("sub", "alice");
     }
 
     @Test
-    public void decode_plainJWT_ClaimSet() {
+    void decode_plainJWT_ClaimSet() {
         String json = "eyJhbGciOiJub25lIn0.eyJpc3MiOiJodHRwOi8vYXRiYXNoLmJlIiwiYXVkIjoic29tZUNsaWVudCIsInN1YiI6InRoZVN1YmplY3QiLCJleHAiOjE1NzkzNTgxODN9.";
         JWTData<JWTClaimsSet> jwtData = decoder.decode(json, JWTClaimsSet.class);
-        assertThat(jwtData).isNotNull();
+        Assertions.assertThat(jwtData).isNotNull();
         JWTClaimsSet jwtClaimsSet = jwtData.getData();
 
         Map<String, Object> claims = jwtClaimsSet.getClaims();
-        assertThat(claims).hasSize(4);
-        assertThat(claims).containsKeys("aud", "sub", "iss", "exp");
+        Assertions.assertThat(claims).hasSize(4);
+        Assertions.assertThat(claims).containsKeys("aud", "sub", "iss", "exp");
 
     }
 
     @Test
-    public void decode_withVerifier_valid() {
+    void decode_withVerifier_valid() {
 
         List<AtbashKey> keys = TestKeys.generateRSAKeys("kid");
         Map<String, String> headerValues = new HashMap<>();
@@ -139,11 +145,11 @@ public class JWTDecoderTest {
         ListKeyManager keyManager = new ListKeyManager(keys);
         Map<String, String> result = decoder.decode(json, HashMap.class, new TestKeySelector(keyManager), verifier).getData();
 
-        assertThat(result.keySet()).containsOnlyOnce("value");
+        Assertions.assertThat(result.keySet()).containsOnlyOnce("value");
     }
 
     @Test
-    public void decode_withVerifier_invalidHeader() {
+    void decode_withVerifier_invalidHeader() {
 
         List<AtbashKey> keys = TestKeys.generateRSAKeys("kid");
         Map<String, String> headerValues = new HashMap<>();
@@ -169,12 +175,14 @@ public class JWTDecoderTest {
         };
 
         ListKeyManager keyManager = new ListKeyManager(keys);
-        Assertions.assertThrows(InvalidJWTException.class, () -> decoder.decode(json, HashMap.class, new TestKeySelector(keyManager), verifier));
+        Assertions.assertThatThrownBy(() -> decoder.decode(json, HashMap.class, new TestKeySelector(keyManager), verifier))
+                .isInstanceOf(InvalidJWTException.class)
+                .hasMessage("JWT verification failed");
     }
 
 
     @Test
-    public void decode_withVerifier_invalidClaim() {
+    void decode_withVerifier_invalidClaim() {
 
         List<AtbashKey> keys = TestKeys.generateRSAKeys("kid");
         Map<String, String> headerValues = new HashMap<>();
@@ -182,7 +190,6 @@ public class JWTDecoderTest {
         JWTParameters parameters = getJwtParameters(keys, headerValues);
         JWTEncoder encoder = new JWTEncoder();
         JWTClaimsSet claims = new JWTClaimsSet.Builder().claim("value", "123").build();
-
 
         String json = encoder.encode(claims, parameters);
 
@@ -200,11 +207,15 @@ public class JWTDecoderTest {
         };
 
         ListKeyManager keyManager = new ListKeyManager(keys);
-        Assertions.assertThrows(InvalidJWTException.class, () -> decoder.decode(json, HashMap.class, new TestKeySelector(keyManager), verifier));
+
+        Assertions.assertThatThrownBy(() -> decoder.decode(json, HashMap.class, new TestKeySelector(keyManager), verifier))
+                .isInstanceOf(InvalidJWTException.class)
+                .hasMessage("JWT verification failed");
+
     }
 
     @Test
-    public void decode_customSerializer_withVerifier() {
+    void decode_customSerializer_withVerifier() {
         List<AtbashKey> keys = TestKeys.generateRSAKeys("kid");
         JWTParameters parameters = getJwtParameters(keys, null);
         JWTEncoder encoder = new JWTEncoder();
@@ -225,12 +236,12 @@ public class JWTDecoderTest {
             return result;
         };
         JWTData<MyColor> myColor = decoder.decode(json, MyColor.class, new TestKeySelector(keyManager), verifier);
-        assertThat(myColor).isNotNull();
+        Assertions.assertThat(myColor).isNotNull();
         MyColor data = myColor.getData();
-        assertThat(data).isNotNull();
-        assertThat(data.getR()).isEqualTo(200);
-        assertThat(data.getG()).isEqualTo(150);
-        assertThat(data.getB()).isEqualTo(100);
+        Assertions.assertThat(data).isNotNull();
+        Assertions.assertThat(data.getR()).isEqualTo(200);
+        Assertions.assertThat(data.getG()).isEqualTo(150);
+        Assertions.assertThat(data.getB()).isEqualTo(100);
 
     }
 
@@ -240,7 +251,7 @@ public class JWTDecoderTest {
         SelectorCriteria criteria = SelectorCriteria.newBuilder().withAsymmetricPart(AsymmetricPart.PRIVATE).build();
         List<AtbashKey> keyList = keyManager.retrieveKeys(criteria);
 
-        assertThat(keyList).as("We should have 1 Private key").hasSize(1);
+        Assertions.assertThat(keyList).as("We should have 1 Private key").hasSize(1);
 
         JWTParametersBuilder builder = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS)
                 .withSecretKeyForSigning(keyList.get(0));
@@ -254,13 +265,13 @@ public class JWTDecoderTest {
     @Test
     void determineEncoding_JSON() {
         JWTEncoding jwtEncoding = decoder.determineEncoding("{\"name\":\"John Doe\",\"age\":42}");
-        assertThat(jwtEncoding).isEqualTo(JWTEncoding.NONE);
+        Assertions.assertThat(jwtEncoding).isEqualTo(JWTEncoding.NONE);
     }
 
     @Test
     void determineEncoding_String() {
         JWTEncoding jwtEncoding = decoder.determineEncoding("Just a plain String");
-        assertThat(jwtEncoding).isNull();
+        Assertions.assertThat(jwtEncoding).isNull();
     }
 
     @Test
@@ -268,7 +279,7 @@ public class JWTDecoderTest {
         String json = "{\"name\":\"John Doe\",\"age\":42}";
         String data = Base64.getEncoder().encodeToString(json.getBytes(StandardCharsets.UTF_8));
         JWTEncoding jwtEncoding = decoder.determineEncoding(data + ".");
-        assertThat(jwtEncoding).isEqualTo(JWTEncoding.PLAIN);
+        Assertions.assertThat(jwtEncoding).isEqualTo(JWTEncoding.PLAIN);
     }
 
     @Test
@@ -276,7 +287,7 @@ public class JWTDecoderTest {
         String json = "{\"name\":\"John Doe\",\"age\":42}";
         String data = Base64.getEncoder().encodeToString(json.getBytes(StandardCharsets.UTF_8));
         JWTEncoding jwtEncoding = decoder.determineEncoding(data + ".payload.signature");
-        assertThat(jwtEncoding).isEqualTo(JWTEncoding.JWS);
+        Assertions.assertThat(jwtEncoding).isEqualTo(JWTEncoding.JWS);
     }
 
     @Test
@@ -284,6 +295,15 @@ public class JWTDecoderTest {
         String json = "{\"name\":\"John Doe\",\"age\":42}";
         String data = Base64.getEncoder().encodeToString(json.getBytes(StandardCharsets.UTF_8));
         JWTEncoding jwtEncoding = decoder.determineEncoding(data + ".encryptedKey.initializationVector.cipherText.authenticationTag");
-        assertThat(jwtEncoding).isEqualTo(JWTEncoding.JWE);
+        Assertions.assertThat(jwtEncoding).isEqualTo(JWTEncoding.JWE);
+    }
+
+    @Test
+    void decode_NoEncoding() {
+        Assertions.assertThatThrownBy(() -> decoder.decode("Just a plain String", JWTClaimsSet.class, null, null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Unable to determine the encoding of the data");
+
+        Assertions.assertThat(MDC.get(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON)).isEqualTo("Unable to determine the encoding of the provided token");
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto;
 
 
+import be.atbash.ee.security.octopus.jwt.JWTValidationConstant;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.AlgorithmSupportMessage;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.CriticalHeaderParamsDeferral;
@@ -28,6 +29,7 @@ import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSObject;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSVerifier;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
+import org.slf4j.MDC;
 
 import java.security.InvalidKeyException;
 import java.security.Signature;
@@ -135,6 +137,7 @@ public class ECDSAVerifier extends ECDSAProvider implements JWSVerifier {
         JWSAlgorithm alg = header.getAlgorithm();
 
         if (!supportedJWSAlgorithms().contains(alg)) {
+            MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, String.format("Signature algorithm specified in Header %s is not supported.", alg.getName()));
             throw new JOSEException(AlgorithmSupportMessage.unsupportedJWSAlgorithm(alg, supportedJWSAlgorithms()));
         }
 
@@ -161,8 +164,10 @@ public class ECDSAVerifier extends ECDSAProvider implements JWSVerifier {
             return sig.verify(derSignature);
 
         } catch (InvalidKeyException e) {
+            MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, "Selected Public EC key is not valid");
             throw new JOSEException("Invalid EC public key: " + e.getMessage(), e);
         } catch (SignatureException e) {
+            MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, "Signature verification failed with provided Public EC key");
             return false;
         }
     }
