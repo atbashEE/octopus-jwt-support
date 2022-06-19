@@ -16,10 +16,12 @@
 package be.atbash.ee.security.octopus.nimbus.jwt.jwe;
 
 
+import be.atbash.ee.security.octopus.jwt.JWTValidationConstant;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEObject;
 import be.atbash.ee.security.octopus.nimbus.jose.Payload;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
+import org.slf4j.MDC;
 
 import java.text.ParseException;
 
@@ -108,7 +110,6 @@ public class JWEObject extends JOSEObject {
     public JWEObject(JWEHeader header, Payload payload) {
 
         if (header == null) {
-
             throw new IllegalArgumentException("The JWE header must not be null");
         }
 
@@ -155,6 +156,7 @@ public class JWEObject extends JOSEObject {
             throws ParseException {
 
         if (firstPart == null) {
+            MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, "The token has no header");
 
             throw new IllegalArgumentException("The first part must not be null");
         }
@@ -163,7 +165,7 @@ public class JWEObject extends JOSEObject {
             this.header = JWEHeader.parse(firstPart);
 
         } catch (ParseException e) {
-
+            MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, "The token has an invalid header");
             throw new ParseException("Invalid JWE header: " + e.getMessage(), 0);
         }
 
@@ -186,7 +188,7 @@ public class JWEObject extends JOSEObject {
         }
 
         if (fourthPart == null) {
-
+            MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, "The token has no cipher text");
             throw new IllegalArgumentException("The fourth part must not be null");
         }
 

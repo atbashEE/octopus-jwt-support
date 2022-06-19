@@ -17,12 +17,12 @@ package be.atbash.ee.security.octopus.nimbus.jwt.proc;
 
 
 import be.atbash.ee.security.octopus.config.JwtSupportConfiguration;
+import be.atbash.ee.security.octopus.jwt.JWTValidationConstant;
 import be.atbash.ee.security.octopus.jwt.decoder.JWTVerifier;
 import be.atbash.ee.security.octopus.nimbus.jwt.CommonJWTHeader;
 import be.atbash.ee.security.octopus.nimbus.jwt.JWTClaimsSet;
 import be.atbash.ee.security.octopus.nimbus.jwt.util.DateUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import java.util.Date;
 
@@ -44,9 +44,6 @@ import java.util.Date;
  * Based on code by Vladimir Dzhuvinov
  */
 public class DefaultJWTClaimsVerifier implements JWTVerifier {
-
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultJWTClaimsVerifier.class);
 
     /**
      * The maximum acceptable clock skew, in seconds.
@@ -73,8 +70,8 @@ public class DefaultJWTClaimsVerifier implements JWTVerifier {
 
             if (!DateUtils.isAfter(exp, now, maxClockSkew)) {
 
-                // TODO Indicate which jwt failed validation?
-                LOGGER.warn("Expired JWT");
+                // These messages are in function of JWT validation by Atbash Runtime so have slightly narrow meaning of the provided parameters.
+                MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, String.format("The token was expired (exp = %s)", exp));
                 return false;
             }
         }
@@ -83,8 +80,8 @@ public class DefaultJWTClaimsVerifier implements JWTVerifier {
         if (nbf != null) {
 
             if (!DateUtils.isBefore(nbf, now, maxClockSkew)) {
-                // TODO Indicate which jwt failed validation?
-                LOGGER.warn("JWT before use time");
+                // These messages are in function of JWT validation by Atbash Runtime so have slightly narrow meaning of the provided parameters.
+                MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, String.format("The token should not be used (nbf = %s)", nbf));
                 return false;
             }
         }

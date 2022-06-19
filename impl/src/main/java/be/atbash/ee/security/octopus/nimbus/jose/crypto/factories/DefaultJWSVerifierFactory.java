@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto.factories;
 
 
+import be.atbash.ee.security.octopus.jwt.JWTValidationConstant;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.KeyTypeException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.ECDSAVerifier;
@@ -27,6 +28,7 @@ import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSVerifier;
 import org.bouncycastle.jcajce.provider.asymmetric.edec.BCEdDSAPublicKey;
+import org.slf4j.MDC;
 
 import javax.crypto.SecretKey;
 import java.security.Key;
@@ -76,6 +78,7 @@ public class DefaultJWSVerifierFactory implements JWSVerifierFactory {
         if (MACVerifier.SUPPORTED_ALGORITHMS.contains(header.getAlgorithm())) {
 
             if (!(key instanceof SecretKey)) {
+                MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, String.format("The header algorithm '%s' and the Key type '%s' do no match", header.getAlgorithm(), key.getClass().getName()));
                 throw new KeyTypeException(SecretKey.class);
             }
 
@@ -86,6 +89,7 @@ public class DefaultJWSVerifierFactory implements JWSVerifierFactory {
         } else if (RSASSAVerifier.SUPPORTED_ALGORITHMS.contains(header.getAlgorithm())) {
 
             if (!(key instanceof RSAPublicKey)) {
+                MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, String.format("The header algorithm '%s' and the Key type '%s' do no match", header.getAlgorithm(), key.getClass().getName()));
                 throw new KeyTypeException(RSAPublicKey.class);
             }
 
@@ -96,6 +100,7 @@ public class DefaultJWSVerifierFactory implements JWSVerifierFactory {
         } else if (ECDSAVerifier.SUPPORTED_ALGORITHMS.contains(header.getAlgorithm())) {
 
             if (!(key instanceof ECPublicKey)) {
+                MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, String.format("The header algorithm '%s' and the Key type '%s' do no match", header.getAlgorithm(), key.getClass().getName()));
                 throw new KeyTypeException(ECPublicKey.class);
             }
 
@@ -107,12 +112,14 @@ public class DefaultJWSVerifierFactory implements JWSVerifierFactory {
 
             if (!(key instanceof BCEdDSAPublicKey)) {
                 // TODO better to check for EdDSAKey and PublicKey?
+                MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, String.format("The header algorithm '%s' and the Key type '%s' do no match", header.getAlgorithm(), key.getClass().getName()));
                 throw new KeyTypeException(BCEdDSAPublicKey.class);
             }
 
             BCEdDSAPublicKey okpPublicKey = (BCEdDSAPublicKey) key;
             verifier = new Ed25519Verifier(okpPublicKey);
         } else {
+            MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, String.format("No Signature verifier found for the algorithm specified in Header %s.", header.getAlgorithm().getName()));
             throw new JOSEException("Unsupported JWS algorithm: " + header.getAlgorithm());
         }
 

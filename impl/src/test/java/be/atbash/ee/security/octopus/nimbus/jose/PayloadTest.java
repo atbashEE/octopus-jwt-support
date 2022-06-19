@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,26 +16,33 @@
 package be.atbash.ee.security.octopus.nimbus.jose;
 
 
+import be.atbash.ee.security.octopus.jwt.JWTValidationConstant;
 import be.atbash.ee.security.octopus.nimbus.jwt.JWTClaimsSet;
 import be.atbash.ee.security.octopus.nimbus.jwt.SignedJWT;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSObject;
-import org.junit.jupiter.api.Assertions;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.MDC;
 
+import javax.json.JsonObject;
 import java.nio.charset.StandardCharsets;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 
 /**
  * Tests the JOSE payload class.
  */
-public class PayloadTest {
+class PayloadTest {
+
+    @AfterEach
+    public void cleanup() {
+        MDC.clear();
+    }
 
     @Test
-    public void testJWSObject()
+    void testJWSObject()
             throws Exception {
 
         // From http://tools.ietf.org/html/rfc7515#appendix-A.1
@@ -50,15 +57,15 @@ public class PayloadTest {
 
         Payload payload = new Payload(jwsObject);
 
-        assertThat(payload.getOrigin()).isEqualTo(Payload.Origin.JWS_OBJECT);
-        assertThat(payload.toJWSObject()).isEqualTo(jwsObject);
-        assertThat(payload.toString()).isEqualTo(jws);
-        assertThat(new String(payload.toBytes(), StandardCharsets.UTF_8)).isEqualTo(jws);
+        Assertions.assertThat(payload.getOrigin()).isEqualTo(Payload.Origin.JWS_OBJECT);
+        Assertions.assertThat(payload.toJWSObject()).isEqualTo(jwsObject);
+        Assertions.assertThat(payload.toString()).isEqualTo(jws);
+        Assertions.assertThat(new String(payload.toBytes(), StandardCharsets.UTF_8)).isEqualTo(jws);
     }
 
 
     @Test
-    public void testJWSObjectFromString() {
+    void testJWSObjectFromString() {
 
         // From http://tools.ietf.org/html/rfc7515#appendix-A.1
         String jws = "eyJ0eXAiOiJKV1QiLA0KICJhbGciOiJIUzI1NiJ9" +
@@ -70,16 +77,16 @@ public class PayloadTest {
 
         Payload payload = new Payload(jws);
 
-        assertThat(payload.getOrigin()).isEqualTo(Payload.Origin.STRING);
-        assertThat(payload.toJWSObject()).isNotNull();
-        assertThat(payload.toJWSObject().getHeader().getAlgorithm()).isEqualTo(JWSAlgorithm.HS256);
+        Assertions.assertThat(payload.getOrigin()).isEqualTo(Payload.Origin.STRING);
+        Assertions.assertThat(payload.toJWSObject()).isNotNull();
+        Assertions.assertThat(payload.toJWSObject().getHeader().getAlgorithm()).isEqualTo(JWSAlgorithm.HS256);
 
-        assertThat(payload.toString()).isEqualTo(jws);
-        assertThat(new String(payload.toBytes(), StandardCharsets.UTF_8)).isEqualTo(jws);
+        Assertions.assertThat(payload.toString()).isEqualTo(jws);
+        Assertions.assertThat(new String(payload.toBytes(), StandardCharsets.UTF_8)).isEqualTo(jws);
     }
 
     @Test
-    public void testSignedJWT()
+    void testSignedJWT()
             throws Exception {
 
         // From http://tools.ietf.org/html/rfc7515#appendix-A.1
@@ -94,17 +101,17 @@ public class PayloadTest {
 
         Payload payload = new Payload(signedJWT);
 
-        assertThat(payload.getOrigin()).isEqualTo(Payload.Origin.SIGNED_JWT);
-        assertThat(payload.toSignedJWT()).isEqualTo(signedJWT);
+        Assertions.assertThat(payload.getOrigin()).isEqualTo(Payload.Origin.SIGNED_JWT);
+        Assertions.assertThat(payload.toSignedJWT()).isEqualTo(signedJWT);
 
-        assertThat(payload.toJWSObject()).isNotNull();
+        Assertions.assertThat(payload.toJWSObject()).isNotNull();
 
-        assertThat(payload.toString()).isEqualTo(jws);
-        assertThat(new String(payload.toBytes(), StandardCharsets.UTF_8)).isEqualTo(jws);
+        Assertions.assertThat(payload.toString()).isEqualTo(jws);
+        Assertions.assertThat(new String(payload.toBytes(), StandardCharsets.UTF_8)).isEqualTo(jws);
     }
 
     @Test
-    public void testSignedJWTFromString()
+    void testSignedJWTFromString()
             throws Exception {
 
         // From http://tools.ietf.org/html/rfc7515#appendix-A.1
@@ -117,35 +124,42 @@ public class PayloadTest {
 
         Payload payload = new Payload(jws);
 
-        assertThat(payload.getOrigin()).isEqualTo(Payload.Origin.STRING);
-        assertThat(payload.toJWSObject()).isNotNull();
-        assertThat(payload.toJWSObject().getHeader().getAlgorithm()).isEqualTo(JWSAlgorithm.HS256);
-        assertThat(payload.toSignedJWT().getJWTClaimsSet().getIssuer()).isEqualTo("joe");
+        Assertions.assertThat(payload.getOrigin()).isEqualTo(Payload.Origin.STRING);
+        Assertions.assertThat(payload.toJWSObject()).isNotNull();
+        Assertions.assertThat(payload.toJWSObject().getHeader().getAlgorithm()).isEqualTo(JWSAlgorithm.HS256);
+        Assertions.assertThat(payload.toSignedJWT().getJWTClaimsSet().getIssuer()).isEqualTo("joe");
 
-        assertThat(payload.toJWSObject()).isNotNull();
+        Assertions.assertThat(payload.toJWSObject()).isNotNull();
 
-        assertThat(payload.toString()).isEqualTo(jws);
-        assertThat(new String(payload.toBytes(), StandardCharsets.UTF_8)).isEqualTo(jws);
+        Assertions.assertThat(payload.toString()).isEqualTo(jws);
+        Assertions.assertThat(new String(payload.toBytes(), StandardCharsets.UTF_8)).isEqualTo(jws);
     }
 
     @Test
-    public void testRejectUnsignedJWS() {
+    void testRejectUnsignedJWS() {
 
-        IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class, () ->
-                new Payload(new JWSObject(new JWSHeader(JWSAlgorithm.HS256), new Payload("test"))));
+        Assertions.assertThatThrownBy(() ->
+                        new Payload(new JWSObject(new JWSHeader(JWSAlgorithm.HS256), new Payload("test"))))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("The JWS object must be signed");
+    }
 
-        assertThat(e.getMessage()).isEqualTo("The JWS object must be signed");
+    @Test
+    void testRejectUnsignedJWT() {
+
+        Assertions.assertThatThrownBy(() ->
+                        new Payload(new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), new JWTClaimsSet.Builder().build())))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("The JWT must be signed");
 
     }
 
     @Test
-    public void testRejectUnsignedJWT() {
-
-        IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new Payload(new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), new JWTClaimsSet.Builder().build())));
-
-        assertThat(e.getMessage()).isEqualTo("The JWT must be signed");
-
+    void toJsonObject() {
+        Payload payload = new Payload("This is not Json");
+        JsonObject jsonObject = payload.toJSONObject();
+        Assertions.assertThat(jsonObject).isNull();
+        Assertions.assertThat(MDC.get(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON))
+                .isEqualTo("The payload of the token is not a valid JSON: This is not Json");
     }
-
 }

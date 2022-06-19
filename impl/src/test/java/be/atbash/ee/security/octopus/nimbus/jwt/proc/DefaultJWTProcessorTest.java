@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,12 @@
 package be.atbash.ee.security.octopus.nimbus.jwt.proc;
 
 import be.atbash.ee.security.octopus.jwt.InvalidJWTException;
+import be.atbash.ee.security.octopus.jwt.JWTValidationConstant;
 import be.atbash.ee.security.octopus.jwt.decoder.JWTVerifier;
 import be.atbash.ee.security.octopus.keys.selector.KeySelector;
 import be.atbash.ee.security.octopus.keys.selector.SelectorCriteria;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
+import be.atbash.ee.security.octopus.nimbus.jose.JOSEObjectType;
 import be.atbash.ee.security.octopus.nimbus.jose.Payload;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.AESEncrypter;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.DirectEncrypter;
@@ -42,9 +44,10 @@ import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSSigner;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.util.TestReflectionUtils;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.slf4j.MDC;
 import uk.org.lidalia.slf4jtest.LoggingEvent;
 import uk.org.lidalia.slf4jtest.TestLogger;
 import uk.org.lidalia.slf4jtest.TestLoggerFactory;
@@ -60,39 +63,38 @@ import java.security.KeyPairGenerator;
 import java.security.SecureRandom;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.KeySpec;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
+class DefaultJWTProcessorTest {
 
-public class DefaultJWTProcessorTest {
-
-    private TestLogger logger = TestLoggerFactory.getTestLogger(DefaultJWTClaimsVerifier.class);
+    private final TestLogger logger = TestLoggerFactory.getTestLogger(DefaultJWTClaimsVerifier.class);
 
     @AfterEach
     public void tearDown() {
+        MDC.clear();
         logger.clear();
     }
 
     @Test
-    public void testConstructor() throws NoSuchFieldException {
+    void testConstructor() throws NoSuchFieldException {
 
         DefaultJWTProcessor processor = new DefaultJWTProcessor();
 
-        assertThat((KeySelector) TestReflectionUtils.getValueOf(processor, "jwsKeySelector")).isNull();
-        assertThat((KeySelector) TestReflectionUtils.getValueOf(processor, "jweKeySelector")).isNull();
+        Assertions.assertThat((KeySelector) TestReflectionUtils.getValueOf(processor, "jwsKeySelector")).isNull();
+        Assertions.assertThat((KeySelector) TestReflectionUtils.getValueOf(processor, "jweKeySelector")).isNull();
 
-        assertThat((JWSVerifierFactory) TestReflectionUtils.getValueOf(processor, "jwsVerifierFactory")).isInstanceOf(DefaultJWSVerifierFactory.class);
-        assertThat((JWEDecrypterFactory) TestReflectionUtils.getValueOf(processor, "jweDecrypterFactory")).isInstanceOf(DefaultJWEDecrypterFactory.class);
+        Assertions.assertThat((JWSVerifierFactory) TestReflectionUtils.getValueOf(processor, "jwsVerifierFactory")).isInstanceOf(DefaultJWSVerifierFactory.class);
+        Assertions.assertThat((JWEDecrypterFactory) TestReflectionUtils.getValueOf(processor, "jweDecrypterFactory")).isInstanceOf(DefaultJWEDecrypterFactory.class);
 
-        assertThat((JWTVerifier) TestReflectionUtils.getValueOf(processor, "claimsVerifier")).isInstanceOf(DefaultJWTClaimsVerifier.class);
+        Assertions.assertThat((JWTVerifier) TestReflectionUtils.getValueOf(processor, "claimsVerifier")).isInstanceOf(DefaultJWTClaimsVerifier.class);
 
 
     }
 
     @Test
-    public void testVerifyClaimsAllow()
-            throws Exception {
+    void testVerifyClaimsAllow() {
 
         JWTClaimsSet claims = new JWTClaimsSet.Builder()
                 .issuer("https://openid.c2id.com")
@@ -114,13 +116,13 @@ public class DefaultJWTProcessorTest {
         processor.setJWTClaimsSetVerifier((header, claimsSet) -> claimsSet.getIssuer() != null && claimsSet.getIssuer().equals("https://openid.c2id.com"));
 
         JWTClaimsSet claimSet = processor.process(jwt);
-        assertThat(claimSet.getSubject()).isEqualTo("alice");
-        assertThat(claimSet.getIssuer()).isEqualTo("https://openid.c2id.com");
+        Assertions.assertThat(claimSet.getSubject()).isEqualTo("alice");
+        Assertions.assertThat(claimSet.getIssuer()).isEqualTo("https://openid.c2id.com");
     }
 
 
     @Test
-    public void testVerifyClaimsDeny() {
+    void testVerifyClaimsDeny() {
 
         JWTClaimsSet claims = new JWTClaimsSet.Builder()
                 .issuer("https://test.c2id.com")
@@ -148,15 +150,17 @@ public class DefaultJWTProcessorTest {
             return true;
         });
 
-        BadJWTException e = Assertions.assertThrows(BadJWTException.class, () -> processor.process(jwt));
+        Assertions.assertThatThrownBy(() -> processor.process(jwt))
+                .isInstanceOf(BadJWTException.class)
+                .hasMessage("JWT Claims validation failed");
         List<LoggingEvent> loggingEvents = logger.getLoggingEvents();
-        assertThat(loggingEvents.get(0).getMessage()).isEqualTo("Unexpected/missing issuer");
-        assertThat(e.getMessage()).isEqualTo("JWT Claims validation failed");
+        Assertions.assertThat(loggingEvents.get(0).getMessage()).isEqualTo("Unexpected/missing issuer");
+
     }
 
 
     @Test
-    public void testProcessInvalidHmac() {
+    void testProcessInvalidHmac() {
 
         JWTClaimsSet claims = new JWTClaimsSet.Builder().subject("alice").build();
         SignedJWT jwt = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), claims);
@@ -177,13 +181,13 @@ public class DefaultJWTProcessorTest {
 
         processor.setJWSKeySelector(new TestKeySelector(invalidKey));
 
-
-        InvalidJWTException e = Assertions.assertThrows(InvalidJWTException.class, () -> processor.process(jwt));
-        assertThat(e.getMessage()).isEqualTo("Signed JWT rejected: Invalid signature");
+        Assertions.assertThatThrownBy(() -> processor.process(jwt))
+                .isInstanceOf(InvalidJWTException.class)
+                .hasMessage("Signed JWT rejected: Invalid signature");
     }
 
     @Test
-    public void testProcessHmac() {
+    void testProcessHmac() {
 
         JWTClaimsSet claims = new JWTClaimsSet.Builder().subject("alice").build();
         SignedJWT jwt = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), claims);
@@ -201,12 +205,12 @@ public class DefaultJWTProcessorTest {
         processor.setJWSKeySelector(new TestKeySelector(key));
 
         JWTClaimsSet claimsSet = processor.process(jwt);
-        assertThat(claimsSet.getClaims()).hasSize(1);
-        assertThat(claimsSet.getSubject()).isEqualTo("alice");
+        Assertions.assertThat(claimsSet.getClaims()).hasSize(1);
+        Assertions.assertThat(claimsSet.getSubject()).isEqualTo("alice");
     }
 
     @Test
-    public void testProcessAES() {
+    void testProcessAES() {
 
         JWTClaimsSet claims = new JWTClaimsSet.Builder().subject("alice").build();
         SignedJWT jwt = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), claims);
@@ -224,12 +228,12 @@ public class DefaultJWTProcessorTest {
         processor.setJWSKeySelector(new TestKeySelector(key));
 
         JWTClaimsSet claimsSet = processor.process(jwt);
-        assertThat(claimsSet.getClaims()).hasSize(1);
-        assertThat(claimsSet.getSubject()).isEqualTo("alice");
+        Assertions.assertThat(claimsSet.getClaims()).hasSize(1);
+        Assertions.assertThat(claimsSet.getSubject()).isEqualTo("alice");
     }
 
     @Test
-    public void testProcessNestedJWT() throws Exception {
+    void testProcessNestedJWT() throws Exception {
 
         // See http://tools.ietf.org/html/rfc7519#appendix-A.2
 
@@ -323,15 +327,15 @@ public class DefaultJWTProcessorTest {
 
         JWTClaimsSet claims = processor.process(JWTParser.parse(jwt));
 
-        assertThat(claims.getIssuer()).isEqualTo("joe");
-        assertThat(claims.getExpirationTime()).isNotNull();
-        assertThat(claims.getExpirationTime().getTime()).isEqualTo(1300819380L * 1000L);
-        assertThat(claims.getBooleanClaim("http://example.com/is_root")).isTrue();
-        assertThat(claims.getClaims()).hasSize(3);
+        Assertions.assertThat(claims.getIssuer()).isEqualTo("joe");
+        Assertions.assertThat(claims.getExpirationTime()).isNotNull();
+        Assertions.assertThat(claims.getExpirationTime().getTime()).isEqualTo(1300819380L * 1000L);
+        Assertions.assertThat(claims.getBooleanClaim("http://example.com/is_root")).isTrue();
+        Assertions.assertThat(claims.getClaims()).hasSize(3);
     }
 
     @Test
-    public void testRejectPlain() throws Exception {
+    void testRejectPlain() throws Exception {
 
         JWTClaimsSet claims = new JWTClaimsSet.Builder().subject("alice").build();
 
@@ -340,18 +344,18 @@ public class DefaultJWTProcessorTest {
         try {
             new DefaultJWTProcessor().process(jwt);
         } catch (BadJOSEException e) {
-            assertThat(e.getMessage()).isEqualTo("Unsecured (plain) JWTs are rejected, TODO Implementation needs to be done!!");
+            Assertions.assertThat(e.getMessage()).isEqualTo("Unsecured (plain) JWTs are rejected, TODO Implementation needs to be done!!");
         }
 
         try {
             new DefaultJWTProcessor().process(jwt);
         } catch (BadJOSEException e) {
-            assertThat(e.getMessage()).isEqualTo("Unsecured (plain) JWTs are rejected, TODO Implementation needs to be done!!");
+            Assertions.assertThat(e.getMessage()).isEqualTo("Unsecured (plain) JWTs are rejected, TODO Implementation needs to be done!!");
         }
     }
 
     @Test
-    public void testNoJWSKeyCandidates() {
+    void testNoJWSKeyCandidates() {
 
         // See http://tools.ietf.org/html/rfc7515#appendix-A.1
         String jws = "eyJ0eXAiOiJKV1QiLA0KICJhbGciOiJIUzI1NiJ9" +
@@ -366,12 +370,13 @@ public class DefaultJWTProcessorTest {
         // FIXME Another test where no keyId in header but a single private Key in KeySelector. Then that one should be picked up.
         processor.setJWSKeySelector(new TestKeySelector(null));
 
-        InvalidJWTException e = Assertions.assertThrows(InvalidJWTException.class, () -> processor.process(JWTParser.parse(jws)));
-        assertThat(e.getMessage()).isEqualTo("No key found for keyId 'null'");
+        Assertions.assertThatThrownBy(() -> processor.process(JWTParser.parse(jws)))
+                .isInstanceOf(InvalidJWTException.class)
+                .hasMessage("No key found for keyId 'null'");
     }
 
     @Test
-    public void testNoJWEKeyCandidates() {
+    void testNoJWEKeyCandidates() {
 
         String jwt = "eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwiY3R5IjoiSldU" +
                 "In0." +
@@ -398,12 +403,13 @@ public class DefaultJWTProcessorTest {
 
         processor.setJWEKeySelector(new TestKeySelector(null));  // FIXME Test where a single key is in the selector which then gets used for keyId null.
 
-        InvalidJWTException e = Assertions.assertThrows(InvalidJWTException.class, () -> processor.process(JWTParser.parse(jwt)));
-        assertThat(e.getMessage()).isEqualTo("No key found for keyId 'null'");
+        Assertions.assertThatThrownBy(() -> processor.process(JWTParser.parse(jwt)))
+                .isInstanceOf(InvalidJWTException.class)
+                .hasMessage("No key found for keyId 'null'");
     }
 
     @Test
-    public void testNoJWSKeySelector() {
+    void testNoJWSKeySelector() {
 
         String jws = "eyJ0eXAiOiJKV1QiLA0KICJhbGciOiJIUzI1NiJ9" +
                 "." +
@@ -414,12 +420,13 @@ public class DefaultJWTProcessorTest {
 
         DefaultJWTProcessor processor = new DefaultJWTProcessor();
 
-        BadJOSEException e = Assertions.assertThrows(BadJOSEException.class, () -> processor.process(JWTParser.parse(jws)));
-        assertThat(e.getMessage()).isEqualTo("Signed JWT rejected: No JWS key selector is configured");
+        Assertions.assertThatThrownBy(() -> processor.process(JWTParser.parse(jws)))
+                .isInstanceOf(BadJOSEException.class)
+                .hasMessage("Signed JWT rejected: No JWS key selector is configured");
     }
 
     @Test
-    public void testNoJWSFactory() {
+    void testNoJWSFactory() {
 
         String jws = "eyJ0eXAiOiJKV1QiLA0KICJhbGciOiJIUzI1NiJ9" +
                 "." +
@@ -435,13 +442,14 @@ public class DefaultJWTProcessorTest {
         processor.setJWSKeySelector(new TestKeySelector(key));
         processor.setJWSVerifierFactory(null);
 
-        JOSEException e = Assertions.assertThrows(JOSEException.class, () -> processor.process(JWTParser.parse(jws)));
-        assertThat(e.getMessage()).isEqualTo("No JWS verifier is configured");
+        Assertions.assertThatThrownBy(() -> processor.process(JWTParser.parse(jws)))
+                .isInstanceOf(JOSEException.class)
+                .hasMessage("No JWS verifier is configured");
 
     }
 
     @Test
-    public void testNoJWEKeySelector() {
+    void testNoJWEKeySelector() {
 
         String jwe = "eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwiY3R5IjoiSldU" +
                 "In0." +
@@ -466,13 +474,13 @@ public class DefaultJWTProcessorTest {
 
         DefaultJWTProcessor processor = new DefaultJWTProcessor();
 
-        BadJOSEException e = Assertions.assertThrows(BadJOSEException.class, () -> processor.process(JWTParser.parse(jwe)));
-
-        assertThat(e.getMessage()).isEqualTo("Encrypted JWT rejected: No JWE key selector is configured");
+        Assertions.assertThatThrownBy(() -> processor.process(JWTParser.parse(jwe)))
+                .isInstanceOf(BadJOSEException.class)
+                .hasMessage("Encrypted JWT rejected: No JWE key selector is configured");
     }
 
     @Test
-    public void testNoJWEFactory() {
+    void testNoJWEFactory() {
 
         String jwe = "eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwiY3R5IjoiSldU" +
                 "In0." +
@@ -533,12 +541,13 @@ public class DefaultJWTProcessorTest {
 
         processor.setJweDecrypterFactory(null);
 
-        JOSEException e = Assertions.assertThrows(JOSEException.class, () -> processor.process(JWTParser.parse(jwe)));
-        assertThat(e.getMessage()).isEqualTo("No JWE decrypter is configured");
+        Assertions.assertThatThrownBy(() -> processor.process(JWTParser.parse(jwe)))
+                .isInstanceOf(JOSEException.class)
+                .hasMessage("No JWE decrypter is configured");
     }
 
     @Test
-    public void testJWTExpired() {
+    void testJWTExpired() {
 
         Date now = new Date();
         Date yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
@@ -561,15 +570,15 @@ public class DefaultJWTProcessorTest {
 
         processor.setJWSKeySelector(new TestKeySelector(key));
 
-        BadJWTException e = Assertions.assertThrows(BadJWTException.class, () -> processor.process(JWTParser.parse(jwt.serialize())));
-        List<LoggingEvent> loggingEvents = logger.getLoggingEvents();
-        assertThat(loggingEvents.get(0).getMessage()).isEqualTo("Expired JWT");
-        assertThat(e.getMessage()).isEqualTo("JWT Claims validation failed");
+        Assertions.assertThatThrownBy(() -> processor.process(JWTParser.parse(jwt.serialize())))
+                .isInstanceOf(BadJWTException.class)
+                .hasMessage("JWT Claims validation failed");
+        String message = MDC.get(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON);
+        Assertions.assertThat(message).startsWith("The token was expired (exp = ");
     }
 
     @Test
-    public void testJWTBeforeUse()
-            throws Exception {
+    void testJWTBeforeUse() {
 
         Date now = new Date();
         Date tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
@@ -592,18 +601,17 @@ public class DefaultJWTProcessorTest {
 
         processor.setJWSKeySelector(new TestKeySelector(key));
 
-        try {
-            processor.process(jwt);
-        } catch (BadJWTException e) {
-            List<LoggingEvent> loggingEvents = logger.getLoggingEvents();
-            assertThat(loggingEvents.get(0).getMessage()).isEqualTo("JWT before use time");
+        Assertions.assertThatThrownBy(() -> processor.process(jwt))
+                .isInstanceOf(BadJWTException.class)
+                .hasMessage("JWT Claims validation failed");
 
-            assertThat(e.getMessage()).isEqualTo("JWT Claims validation failed");
-        }
+        String message = MDC.get(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON);
+        Assertions.assertThat(message).startsWith("The token should not be used (nbf = ");
+
     }
 
     @Test
-    public void testNestedWithMissingContentTypeHeader() {
+    void testNestedWithMissingContentTypeHeader() {
 
         byte[] random32 = new byte[32];
         new SecureRandom().nextBytes(random32);
@@ -626,13 +634,14 @@ public class DefaultJWTProcessorTest {
 
         proc.setJWSKeySelector(new TestKeySelector(hmacKey));
 
-        BadJWTException e = Assertions.assertThrows(BadJWTException.class, () -> proc.process(JWTParser.parse(jwe)));
-        assertThat(e.getMessage()).isEqualTo("Payload of JWE object is not a valid JSON object");
+        Assertions.assertThatThrownBy(() -> proc.process(JWTParser.parse(jwe)))
+                .isInstanceOf(BadJWTException.class)
+                .hasMessage("Payload of JWE object is not a valid JSON object");
     }
 
 
     @Test
-    public void testNestedWithPlainJWT() {
+    void testNestedWithPlainJWT() {
 
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder().subject("alice").build();
         PlainJWT plainJWT = new PlainJWT(claimsSet);
@@ -650,15 +659,15 @@ public class DefaultJWTProcessorTest {
         DefaultJWTProcessor proc = new DefaultJWTProcessor();
         proc.setJWEKeySelector(new TestKeySelector(aesKey));
 
-
-        BadJWTException e = Assertions.assertThrows(BadJWTException.class, () -> proc.process(JWTParser.parse(jwe)));
-        assertThat(e.getMessage()).isEqualTo("The payload is not a nested signed JWT");
+        Assertions.assertThatThrownBy(() -> proc.process(JWTParser.parse(jwe)))
+                .isInstanceOf(BadJWTException.class)
+                .hasMessage("The payload is not a nested signed JWT");
     }
 
 
     // https://bitbucket.org/connect2id/nimbus-jose-jwt/issues/222/jwe-vulnerability-cannot-force-content
     @Test
-    public void testRejectPlainNestedJWT_noCTY()
+    void testRejectPlainNestedJWT_noCTY()
             throws Exception {
 
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
@@ -688,13 +697,14 @@ public class DefaultJWTProcessorTest {
 
         String jwe = jweObject.serialize();
 
-        BadJWTException e = Assertions.assertThrows(BadJWTException.class, () -> proc.process(JWTParser.parse(jwe)));
-        assertThat(e.getMessage()).isEqualTo("Payload of JWE object is not a valid JSON object");
+        Assertions.assertThatThrownBy(() -> proc.process(JWTParser.parse(jwe)))
+                .isInstanceOf(BadJWTException.class)
+                .hasMessage("Payload of JWE object is not a valid JSON object");
     }
 
     // https://bitbucket.org/connect2id/nimbus-jose-jwt/issues/222/jwe-vulnerability-cannot-force-content
     @Test
-    public void testRejectPlainNestedJWT_withCTY()
+    void testRejectPlainNestedJWT_withCTY()
             throws Exception {
 
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
@@ -726,14 +736,15 @@ public class DefaultJWTProcessorTest {
 
         String jwe = jweObject.serialize();
 
-        BadJWTException e = Assertions.assertThrows(BadJWTException.class, () -> proc.process(JWTParser.parse(jwe)));
-        assertThat(e.getMessage()).isEqualTo("The payload is not a nested signed JWT");
+        Assertions.assertThatThrownBy(() -> proc.process(JWTParser.parse(jwe)))
+                .isInstanceOf(BadJWTException.class)
+                .hasMessage("The payload is not a nested signed JWT");
     }
 
 
     // issue https://bitbucket.org/connect2id/nimbus-jose-jwt/issues/250/error-on-jwe-decryption-wrong-algorithm
     @Test
-    public void testJCAKeyAlgAccepted()
+    void testJCAKeyAlgAccepted()
             throws Exception {
 
         String hostId = "subject";
@@ -785,15 +796,15 @@ public class DefaultJWTProcessorTest {
 
         jwtProcessor.setJWSKeySelector(new TestKeySelector(secretKey));
 
-        JWTClaimsSet outputClaimsSet = jwtProcessor.process((EncryptedJWT) jwt);
+        JWTClaimsSet outputClaimsSet = jwtProcessor.process(jwt);
 
-        assertThat(outputClaimsSet.getSubject()).isEqualTo(hostId);
+        Assertions.assertThat(outputClaimsSet.getSubject()).isEqualTo(hostId);
     }
 
 
     // https://bitbucket.org/connect2id/nimbus-jose-jwt/issues/257/error-on-jwe-decryption-with-aeskw
     @Test
-    public void testJCAKeyAlgAccepted_AES_KW() throws Exception {
+    void testJCAKeyAlgAccepted_AES_KW() throws Exception {
 
         KeyGenerator gen = KeyGenerator.getInstance("AES");
         gen.init(128);
@@ -827,23 +838,41 @@ public class DefaultJWTProcessorTest {
 
         JWTClaimsSet outputClaimsSet = jwtProcessor.process((EncryptedJWT) jwt);
 
-        assertThat(outputClaimsSet.getSubject()).isEqualTo("alice");
+        Assertions.assertThat(outputClaimsSet.getSubject()).isEqualTo("alice");
     }
 
 
     @Test
-    public void testPlainJWT_noJWSTypeVerifier() {
+    void testPlainJWT_noJWSTypeVerifier() {
 
         DefaultJWTProcessor processor = new DefaultJWTProcessor();
 
-        BadJOSEException e = Assertions.assertThrows(BadJOSEException.class, () -> processor.process(new PlainJWT(new JWTClaimsSet.Builder().build())));
-        assertThat(e.getMessage()).isEqualTo("Unsecured (plain) JWTs are rejected, TODO Implementation needs to be done!!");
+        Assertions.assertThatThrownBy(() -> processor.process(new PlainJWT(new JWTClaimsSet.Builder().build())))
+                .isInstanceOf(BadJOSEException.class)
+                .hasMessage("Unsecured (plain) JWTs are rejected, TODO Implementation needs to be done!!");
     }
 
+    @Test
+    public void process_wrongTyp() {
+        DefaultJWTProcessor processor = new DefaultJWTProcessor();
 
+        JWTClaimsSet claims = new JWTClaimsSet.Builder()
+                .issuer("https://openid.c2id.com")
+                .subject("alice")
+                .build();
+        JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.HS256)
+                .type(JOSEObjectType.JOSE)
+                .build();
+        SignedJWT jwt = new SignedJWT(header, claims);
+        Assertions.assertThatThrownBy(() -> processor.process(jwt))
+                .isInstanceOf(BadJOSEException.class)
+                .hasMessage("JOSE header \"typ\" (type) \"JOSE\" not allowed");
+        Assertions.assertThat(MDC.get(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON))
+                .isEqualTo("The provided token did not specify the correct 'JWT' typ in the header (header = {\"alg\":\"HS256\",\"typ\":\"JOSE\"})");
+    }
 
     private static class TestKeySelector extends KeySelector {
-        private Key key;
+        private final Key key;
 
         TestKeySelector(Key key) {
             this.key = key;
@@ -859,7 +888,8 @@ public class DefaultJWTProcessorTest {
         private Key key;
 
         TestJWKKeySelector(String jwk, boolean publicKey) {
-            Assertions.assertDoesNotThrow(() -> {
+
+            try {
                 RSAKey jwkKey = RSAKey.parse(jwk);
                 if (publicKey) {
                     key = jwkKey.toRSAPublicKey();
@@ -867,7 +897,9 @@ public class DefaultJWTProcessorTest {
                     key = jwkKey.toRSAPrivateKey();
 
                 }
-            });
+            } catch (ParseException e) {
+                Assertions.fail(e.getMessage());
+            }
         }
 
         @Override

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,27 +16,23 @@
 package be.atbash.ee.security.octopus.nimbus.jwt.proc;
 
 import be.atbash.config.test.TestConfig;
+import be.atbash.ee.security.octopus.jwt.JWTValidationConstant;
 import be.atbash.ee.security.octopus.jwt.decoder.JWTVerifier;
 import be.atbash.ee.security.octopus.nimbus.jwt.JWTClaimsSet;
 import be.atbash.util.TestReflectionUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import uk.org.lidalia.slf4jtest.LoggingEvent;
-import uk.org.lidalia.slf4jtest.TestLogger;
-import uk.org.lidalia.slf4jtest.TestLoggerFactory;
+import org.slf4j.MDC;
 
 import java.util.Date;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class DefaultJWTClaimsVerifierTest {
 
-    private TestLogger logger = TestLoggerFactory.getTestLogger(DefaultJWTClaimsVerifier.class);
-
     @AfterEach
     public void tearDown() {
-        logger.clear();
+        MDC.clear();
         TestConfig.resetConfig();
     }
 
@@ -56,7 +52,7 @@ public class DefaultJWTClaimsVerifierTest {
         JWTVerifier verifier = new DefaultJWTClaimsVerifier();
         boolean valid = verifier.verify(null, claimsSet);
         assertThat(valid).isTrue();
-        assertThat(logger.getLoggingEvents()).isEmpty();
+        assertThat(MDC.getCopyOfContextMap()).isEmpty();
     }
 
     @Test
@@ -70,7 +66,7 @@ public class DefaultJWTClaimsVerifierTest {
         JWTVerifier verifier = new DefaultJWTClaimsVerifier();
         boolean valid = verifier.verify(null, claimsSet);
         assertThat(valid).isTrue();
-        assertThat(logger.getLoggingEvents()).isEmpty();
+        assertThat(MDC.getCopyOfContextMap()).isEmpty();
     }
 
     @Test
@@ -86,8 +82,8 @@ public class DefaultJWTClaimsVerifierTest {
         boolean valid = verifier.verify(null, claimsSet);
         assertThat(valid).isFalse();
 
-        List<LoggingEvent> loggingEvents = logger.getLoggingEvents();
-        assertThat(loggingEvents.get(0).getMessage()).isEqualTo("Expired JWT");
+        String message = MDC.get(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON);
+        assertThat(message).startsWith("The token was expired (exp = ");
 
     }
 
@@ -102,7 +98,7 @@ public class DefaultJWTClaimsVerifierTest {
         JWTVerifier verifier = new DefaultJWTClaimsVerifier();
         boolean valid = verifier.verify(null, claimsSet);
         assertThat(valid).isTrue();
-        assertThat(logger.getLoggingEvents()).isEmpty();
+        assertThat(MDC.getCopyOfContextMap()).isEmpty();
     }
 
     @Test
@@ -117,8 +113,9 @@ public class DefaultJWTClaimsVerifierTest {
 
         boolean valid = verifier.verify(null, claimsSet);
         assertThat(valid).isFalse();
-        List<LoggingEvent> loggingEvents = logger.getLoggingEvents();
-        assertThat(loggingEvents.get(0).getMessage()).isEqualTo("JWT before use time");
+
+        String message = MDC.get(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON);
+        assertThat(message).startsWith("The token should not be used (nbf = ");
 
     }
 
@@ -135,7 +132,7 @@ public class DefaultJWTClaimsVerifierTest {
         JWTVerifier verifier = new DefaultJWTClaimsVerifier();
         boolean valid = verifier.verify(null, claimsSet);
         assertThat(valid).isTrue();
-        assertThat(logger.getLoggingEvents()).isEmpty();
+        assertThat(MDC.getCopyOfContextMap()).isEmpty();
     }
 
 
@@ -150,7 +147,7 @@ public class DefaultJWTClaimsVerifierTest {
         JWTClaimsSet claimSet = new JWTClaimsSet.Builder().expirationTime(thirtySecondsAgo).build();
         boolean valid = verifier.verify(null, claimSet);
         assertThat(valid).isTrue();
-        assertThat(logger.getLoggingEvents()).isEmpty();
+        assertThat(MDC.getCopyOfContextMap()).isEmpty();
     }
 
     @Test
@@ -165,7 +162,7 @@ public class DefaultJWTClaimsVerifierTest {
 
         boolean valid = verifier.verify(null, claimSet);
         assertThat(valid).isTrue();
-        assertThat(logger.getLoggingEvents()).isEmpty();
+        assertThat(MDC.getCopyOfContextMap()).isEmpty();
 
     }
 

@@ -17,6 +17,7 @@ package be.atbash.ee.security.octopus.jwt.decoder;
 
 import be.atbash.ee.security.octopus.jwt.InvalidJWTException;
 import be.atbash.ee.security.octopus.jwt.JWTEncoding;
+import be.atbash.ee.security.octopus.jwt.JWTValidationConstant;
 import be.atbash.ee.security.octopus.keys.selector.KeySelector;
 import be.atbash.ee.security.octopus.nimbus.jwt.EncryptedJWT;
 import be.atbash.ee.security.octopus.nimbus.jwt.JWTClaimsSet;
@@ -28,6 +29,7 @@ import be.atbash.ee.security.octopus.util.JsonbUtil;
 import be.atbash.util.PublicAPI;
 import be.atbash.util.StringUtils;
 import be.atbash.util.exception.AtbashIllegalActionException;
+import org.slf4j.MDC;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.json.bind.Jsonb;
@@ -59,8 +61,11 @@ public class JWTDecoder {
     public <T> JWTData<T> decode(String data, Class<T> classType, KeySelector keySelector, JWTVerifier verifier) {
         JWTEncoding encoding = determineEncoding(data);
         if (encoding == null) {
+            // These messages are in function of JWT validation by Atbash Runtime so have slightly narrow meaning of the provided parameters.
+            MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, "Unable to determine the encoding of the provided token");
             throw new IllegalArgumentException("Unable to determine the encoding of the data");
         }
+        MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, String.format("The encoding of the provided token : %s", encoding));
 
         JWTData<T> result;
         try {
@@ -88,6 +93,8 @@ public class JWTDecoder {
                     throw new IllegalArgumentException(String.format("JWTEncoding not supported %s", encoding));
             }
         } catch (ParseException e) {
+            // These messages are in function of JWT validation by Atbash Runtime so have slightly narrow meaning of the provided parameters.
+            MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, "The structure of the provided token was not valid");
             throw new InvalidJWTException("Invalid JWT structure");
         }
         return result;

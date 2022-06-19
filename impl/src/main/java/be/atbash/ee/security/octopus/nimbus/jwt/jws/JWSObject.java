@@ -16,10 +16,12 @@
 package be.atbash.ee.security.octopus.nimbus.jwt.jws;
 
 
+import be.atbash.ee.security.octopus.jwt.JWTValidationConstant;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEObject;
 import be.atbash.ee.security.octopus.nimbus.jose.Payload;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
+import org.slf4j.MDC;
 
 import java.text.ParseException;
 
@@ -144,7 +146,7 @@ public class JWSObject extends JOSEObject {
             throws ParseException {
 
         if (firstPart == null) {
-
+            MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, "The token has no header");
             throw new IllegalArgumentException("The first part must not be null");
         }
 
@@ -152,12 +154,12 @@ public class JWSObject extends JOSEObject {
             this.header = JWSHeader.parse(firstPart);
 
         } catch (ParseException e) {
-
+            MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, "The token has an invalid header");
             throw new ParseException("Invalid JWS header: " + e.getMessage(), 0);
         }
 
         if (secondPart == null) {
-
+            MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, "The token has no payload section");
             throw new IllegalArgumentException("The second part must not be null");
         }
 
@@ -166,6 +168,7 @@ public class JWSObject extends JOSEObject {
         signingInputString = composeSigningInput(firstPart, secondPart);
 
         if (thirdPart == null) {
+            MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, "The token has no signature section");
             throw new IllegalArgumentException("The third part must not be null");
         }
 

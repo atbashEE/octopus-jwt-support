@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto.factories;
 
 
+import be.atbash.ee.security.octopus.jwt.JWTValidationConstant;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.TestKeys;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
@@ -31,12 +32,12 @@ import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSProvider;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSVerifier;
-import org.junit.jupiter.api.Assertions;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.MDC;
 
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 
 /**
@@ -44,24 +45,29 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class DefaultJWSVerifierFactoryTest {
 
-    private DefaultJWSVerifierFactory factory = new DefaultJWSVerifierFactory();
+    private final DefaultJWSVerifierFactory factory = new DefaultJWSVerifierFactory();
 
     private static final String KID = "kidValue";
+
+    @AfterEach
+    public void cleanup() {
+        MDC.clear();
+    }
 
     @Test
     void testInterfaces() {
 
-        assertThat(factory).isInstanceOf(JWSVerifierFactory.class);
-        assertThat(factory).isInstanceOf(JWSProvider.class);
+        Assertions.assertThat(factory).isInstanceOf(JWSVerifierFactory.class);
+        Assertions.assertThat(factory).isInstanceOf(JWSProvider.class);
     }
 
     @Test
     void testAlgSupport() {
 
-        assertThat(factory.supportedJWSAlgorithms()).containsAll(JWSAlgorithm.Family.HMAC_SHA);
-        assertThat(factory.supportedJWSAlgorithms()).containsAll(JWSAlgorithm.Family.RSA);
-        assertThat(factory.supportedJWSAlgorithms()).containsAll(JWSAlgorithm.Family.EC);
-        assertThat(factory.supportedJWSAlgorithms()).hasSize(JWSAlgorithm.Family.HMAC_SHA.size()
+        Assertions.assertThat(factory.supportedJWSAlgorithms()).containsAll(JWSAlgorithm.Family.HMAC_SHA);
+        Assertions.assertThat(factory.supportedJWSAlgorithms()).containsAll(JWSAlgorithm.Family.RSA);
+        Assertions.assertThat(factory.supportedJWSAlgorithms()).containsAll(JWSAlgorithm.Family.EC);
+        Assertions.assertThat(factory.supportedJWSAlgorithms()).hasSize(JWSAlgorithm.Family.HMAC_SHA.size()
                 + JWSAlgorithm.Family.RSA.size()
                 + JWSAlgorithm.Family.EC.size());
     }
@@ -75,9 +81,10 @@ public class DefaultJWSVerifierFactoryTest {
             JWSHeader header = new JWSHeader.Builder(supportedAlgorithm).build();
 
             JWSVerifier verifier = factory.createJWSVerifier(header, publicKeys.get(0).getKey());
-            assertThat(verifier).isNotNull();
-            assertThat(verifier).isInstanceOf(RSASSAVerifier.class);
+            Assertions.assertThat(verifier).isNotNull();
+            Assertions.assertThat(verifier).isInstanceOf(RSASSAVerifier.class);
 
+            Assertions.assertThat(MDC.getCopyOfContextMap()).isEmpty();
         }
     }
 
@@ -90,9 +97,14 @@ public class DefaultJWSVerifierFactoryTest {
 
             JWSHeader header = new JWSHeader.Builder(supportedAlgorithm).build();
 
-            KeyTypeException exception = Assertions.assertThrows(KeyTypeException.class, () -> factory.createJWSVerifier(header, publicKeys.get(0).getKey()));
-            assertThat(exception.getMessage()).isEqualTo("Invalid key: Must be an instance of interface java.security.interfaces.RSAPublicKey");
+            Assertions.assertThatThrownBy(() -> factory.createJWSVerifier(header, publicKeys.get(0).getKey()))
+                    .isInstanceOf(KeyTypeException.class)
+                    .hasMessage("Invalid key: Must be an instance of interface java.security.interfaces.RSAPublicKey");
 
+            Assertions.assertThat(MDC.get(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON)).isEqualTo("The header algorithm '" + supportedAlgorithm.getName() + "' and the Key type 'org.bouncycastle.jcajce.provider.asymmetric.rsa.BCRSAPrivateCrtKey' do no match");
+
+            // Since we are using a for loop we need to clear the MDC.
+            MDC.clear();
         }
     }
 
@@ -105,9 +117,11 @@ public class DefaultJWSVerifierFactoryTest {
 
             JWSHeader header = new JWSHeader.Builder(supportedAlgorithm).build();
 
-            KeyTypeException exception = Assertions.assertThrows(KeyTypeException.class, () -> factory.createJWSVerifier(header, publicKeys.get(0).getKey()));
-            assertThat(exception.getMessage()).isEqualTo("Invalid key: Must be an instance of interface java.security.interfaces.RSAPublicKey");
+            Assertions.assertThatThrownBy(() -> factory.createJWSVerifier(header, publicKeys.get(0).getKey()))
+                    .isInstanceOf(KeyTypeException.class)
+                    .hasMessage("Invalid key: Must be an instance of interface java.security.interfaces.RSAPublicKey");
 
+            Assertions.assertThat(MDC.get(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON)).isEqualTo("The header algorithm '" + supportedAlgorithm.getName() + "' and the Key type 'org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPublicKey' do no match");
         }
     }
 
@@ -120,9 +134,10 @@ public class DefaultJWSVerifierFactoryTest {
             JWSHeader header = new JWSHeader.Builder(supportedAlgorithm).build();
 
             JWSVerifier verifier = factory.createJWSVerifier(header, publicKeys.get(0).getKey());
-            assertThat(verifier).isNotNull();
-            assertThat(verifier).isInstanceOf(ECDSAVerifier.class);
+            Assertions.assertThat(verifier).isNotNull();
+            Assertions.assertThat(verifier).isInstanceOf(ECDSAVerifier.class);
 
+            Assertions.assertThat(MDC.getCopyOfContextMap()).isEmpty();
         }
     }
 
@@ -135,9 +150,11 @@ public class DefaultJWSVerifierFactoryTest {
 
             JWSHeader header = new JWSHeader.Builder(supportedAlgorithm).build();
 
-            KeyTypeException exception = Assertions.assertThrows(KeyTypeException.class, () -> factory.createJWSVerifier(header, publicKeys.get(0).getKey()));
-            assertThat(exception.getMessage()).isEqualTo("Invalid key: Must be an instance of interface java.security.interfaces.ECPublicKey");
+            Assertions.assertThatThrownBy(() -> factory.createJWSVerifier(header, publicKeys.get(0).getKey()))
+                    .isInstanceOf(KeyTypeException.class)
+                    .hasMessage("Invalid key: Must be an instance of interface java.security.interfaces.ECPublicKey");
 
+            Assertions.assertThat(MDC.get(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON)).isEqualTo("The header algorithm '" + supportedAlgorithm.getName() + "' and the Key type 'org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey' do no match");
         }
     }
 
@@ -150,9 +167,11 @@ public class DefaultJWSVerifierFactoryTest {
 
             JWSHeader header = new JWSHeader.Builder(supportedAlgorithm).build();
 
-            KeyTypeException exception = Assertions.assertThrows(KeyTypeException.class, () -> factory.createJWSVerifier(header, publicKeys.get(0).getKey()));
-            assertThat(exception.getMessage()).isEqualTo("Invalid key: Must be an instance of interface java.security.interfaces.ECPublicKey");
+            Assertions.assertThatThrownBy(() -> factory.createJWSVerifier(header, publicKeys.get(0).getKey()))
+                    .isInstanceOf(KeyTypeException.class)
+                    .hasMessage("Invalid key: Must be an instance of interface java.security.interfaces.ECPublicKey");
 
+            Assertions.assertThat(MDC.get(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON)).isEqualTo("The header algorithm '" + supportedAlgorithm.getName() + "' and the Key type 'org.bouncycastle.jcajce.provider.asymmetric.rsa.BCRSAPublicKey' do no match");
         }
     }
 
@@ -165,9 +184,10 @@ public class DefaultJWSVerifierFactoryTest {
             JWSHeader header = new JWSHeader.Builder(supportedAlgorithm).build();
 
             JWSVerifier verifier = factory.createJWSVerifier(header, atbashKeys.get(0).getKey());
-            assertThat(verifier).isNotNull();
-            assertThat(verifier).isInstanceOf(MACVerifier.class);
+            Assertions.assertThat(verifier).isNotNull();
+            Assertions.assertThat(verifier).isInstanceOf(MACVerifier.class);
 
+            Assertions.assertThat(MDC.getCopyOfContextMap()).isEmpty();
         }
     }
 
@@ -179,9 +199,10 @@ public class DefaultJWSVerifierFactoryTest {
 
             JWSHeader header = new JWSHeader.Builder(supportedAlgorithm).build();
 
-            KeyTypeException exception = Assertions.assertThrows(KeyTypeException.class, () -> factory.createJWSVerifier(header, atbashKeys.get(0).getKey()));
-            assertThat(exception.getMessage()).isEqualTo("Invalid key: Must be an instance of interface javax.crypto.SecretKey");
-
+            Assertions.assertThatThrownBy(() -> factory.createJWSVerifier(header, atbashKeys.get(0).getKey()))
+                    .isInstanceOf(KeyTypeException.class)
+                    .hasMessage("Invalid key: Must be an instance of interface javax.crypto.SecretKey");
+            Assertions.assertThat(MDC.get(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON)).isEqualTo("The header algorithm '" + supportedAlgorithm.getName() + "' and the Key type 'org.bouncycastle.jcajce.provider.asymmetric.rsa.BCRSAPublicKey' do no match");
         }
     }
 
@@ -194,8 +215,10 @@ public class DefaultJWSVerifierFactoryTest {
             JWSHeader header = new JWSHeader.Builder(supportedAlgorithm).build();
 
             JWSVerifier verifier = factory.createJWSVerifier(header, publicKeys.get(0).getKey());
-            assertThat(verifier).isNotNull();
-            assertThat(verifier).isInstanceOf(Ed25519Verifier.class);
+            Assertions.assertThat(verifier).isNotNull();
+            Assertions.assertThat(verifier).isInstanceOf(Ed25519Verifier.class);
+
+            Assertions.assertThat(MDC.getCopyOfContextMap()).isEmpty();
 
         }
     }
@@ -208,9 +231,12 @@ public class DefaultJWSVerifierFactoryTest {
 
             JWSHeader header = new JWSHeader.Builder(supportedAlgorithm).build();
 
-            KeyTypeException exception = Assertions.assertThrows(KeyTypeException.class, () -> factory.createJWSVerifier(header, privateKeys.get(0).getKey()));
+            Assertions.assertThatThrownBy(() -> factory.createJWSVerifier(header, privateKeys.get(0).getKey()))
+                    .isInstanceOf(KeyTypeException.class)
+                    .hasMessage("Invalid key: Must be an instance of class org.bouncycastle.jcajce.provider.asymmetric.edec.BCEdDSAPublicKey");
 
-            assertThat(exception.getMessage()).isEqualTo("Invalid key: Must be an instance of class org.bouncycastle.jcajce.provider.asymmetric.edec.BCEdDSAPublicKey");
+            Assertions.assertThat(MDC.get(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON)).isEqualTo("The header algorithm '" + supportedAlgorithm.getName() + "' and the Key type 'org.bouncycastle.jcajce.provider.asymmetric.edec.BCEdDSAPrivateKey' do no match");
+
         }
     }
 
@@ -222,11 +248,28 @@ public class DefaultJWSVerifierFactoryTest {
 
             JWSHeader header = new JWSHeader.Builder(supportedAlgorithm).build();
 
-            KeyTypeException exception = Assertions.assertThrows(KeyTypeException.class, () -> factory.createJWSVerifier(header, publicKeys.get(0).getKey()));
+            Assertions.assertThatThrownBy(() -> factory.createJWSVerifier(header, publicKeys.get(0).getKey()))
+                    .isInstanceOf(KeyTypeException.class)
+                    .hasMessage("Invalid key: Must be an instance of class org.bouncycastle.jcajce.provider.asymmetric.edec.BCEdDSAPublicKey");
 
-            assertThat(exception.getMessage()).isEqualTo("Invalid key: Must be an instance of class org.bouncycastle.jcajce.provider.asymmetric.edec.BCEdDSAPublicKey");
+            Assertions.assertThat(MDC.get(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON)).isEqualTo("The header algorithm '" + supportedAlgorithm.getName() + "' and the Key type 'org.bouncycastle.jcajce.provider.asymmetric.rsa.BCRSAPublicKey' do no match");
         }
     }
 
+    @Test
+    void createJWSVerifier_UnknownAlg() {
+        List<AtbashKey> atbashKeys = TestKeys.generateRSAKeys(KID);
+        List<AtbashKey> publicKeys = new AsymmetricPartKeyFilter(AsymmetricPart.PUBLIC).filter(atbashKeys);
+
+
+        JWSHeader header = new JWSHeader.Builder(new JWSAlgorithm("JUnit")).build();
+
+        Assertions.assertThatThrownBy(() -> factory.createJWSVerifier(header, publicKeys.get(0).getKey()))
+                .isInstanceOf(JOSEException.class)
+                .hasMessage("Unsupported JWS algorithm: JUnit");
+
+        Assertions.assertThat(MDC.get(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON)).isEqualTo("No Signature verifier found for the algorithm specified in Header JUnit.");
+
+    }
 
 }

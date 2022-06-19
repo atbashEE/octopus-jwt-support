@@ -16,10 +16,12 @@
 package be.atbash.ee.security.octopus.nimbus.jose;
 
 
+import be.atbash.ee.security.octopus.jwt.JWTValidationConstant;
 import be.atbash.ee.security.octopus.nimbus.jwt.SignedJWT;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSObject;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.ee.security.octopus.nimbus.util.JSONObjectUtils;
+import org.slf4j.MDC;
 
 import javax.json.JsonObject;
 import java.io.Serializable;
@@ -349,6 +351,10 @@ public final class Payload implements Serializable {
 
         } catch (ParseException e) {
             // Payload not a JSON object
+            // These messages are in function of JWT validation by Atbash Runtime so have slightly narrow meaning of the provided parameters.
+            // TODO According to some tests, the reason can be different than mentioned. But when handling a JWT, it should be OK. Double check!
+            MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, String.format("The payload of the token is not a valid JSON: %s", json));
+
             return null;
         }
     }

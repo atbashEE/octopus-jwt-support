@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package be.atbash.ee.security.octopus.nimbus.jose.crypto;
 
+import be.atbash.ee.security.octopus.jwt.JWTValidationConstant;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.Filters;
 import be.atbash.ee.security.octopus.keys.TestKeys;
@@ -22,21 +23,28 @@ import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.slf4j.MDC;
 
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 // A low level test case
 class ECDSASignerVerifierTest {
 
+    @AfterEach
+    public void cleanup() {
+        MDC.clear();
+    }
+
     @ParameterizedTest
     @ValueSource(strings = {"256", "384", "521"})
-    public void happyCase(String data) throws JOSEException {
+    void happyCase(String data) throws JOSEException {
         List<AtbashKey> atbashKeys = TestKeys.generateECKeys("kid", "P-" + data);
         AtbashKey privateKey = Filters.findPrivateKey(atbashKeys);
         ECDSASigner signer = new ECDSASigner((ECPrivateKey) privateKey.getKey());
@@ -47,7 +55,8 @@ class ECDSASignerVerifierTest {
         ECDSAVerifier verifier = new ECDSAVerifier((ECPublicKey) publicKey.getKey());
         boolean verify = verifier.verify(header, "The Secret Message".getBytes(), signature);
 
-        assertThat(verify).isTrue();
+        Assertions.assertThat(verify).isTrue();
+        Assertions.assertThat(MDC.getCopyOfContextMap()).isEmpty();
     }
 
     private JWSAlgorithm defineAlgorithm(String data) {
@@ -60,4 +69,24 @@ class ECDSASignerVerifierTest {
                 throw new IllegalStateException("Unexpected value: " + data);
         }
     }
+
+    @Test
+    void invalidSignature() throws JOSEException {
+        List<AtbashKey> atbashKeys = TestKeys.generateECKeys("kid", "P-256" );
+        AtbashKey privateKey = Filters.findPrivateKey(atbashKeys);
+        ECDSASigner signer = new ECDSASigner((ECPrivateKey) privateKey.getKey());
+        JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.ES256).build();
+        Base64URLValue signature = signer.sign(header, "The Secret Message".getBytes());
+
+        // Create a second key pai so that verification fails
+        atbashKeys = TestKeys.generateECKeys("kid", "P-256");
+        AtbashKey publicKey = Filters.findPublicKey(atbashKeys);
+        ECDSAVerifier verifier = new ECDSAVerifier((ECPublicKey) publicKey.getKey());
+        boolean verify = verifier.verify(header, "The Secret Message".getBytes(), signature);
+
+        Assertions.assertThat(verify).isFalse();
+        Assertions.assertThat(MDC.getCopyOfContextMap()).isEmpty();
+
+    }
+
 }
