@@ -20,6 +20,7 @@ User manual for Atbash JWT Support.
 . New method within the builder to define the expiration time as a duration from current time. `Builder.expirationTime(Duration)`.
 . Identify the `SecretKey` through the class `KeyFamilyUtil`.
 . The reason for a Failed JWT token verification (signature, verifier, ...) can be found within MDC of SLF4J with key `JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON`.
+. Possibility to recreate the `SecureRandom` or developer can provide (implement the interface `SecureRandomProvider`) the instance that is retrieved by `JCASupportConfiguration.getSecureRandom`.
 
 === Jakarta version
 
@@ -429,6 +430,17 @@ An array is converted to a List.
 - `JSONObjectUtils.getAsJsonValue` wraps the Java value in a `JSONValue` instance.
 Any Collection is converted to an array, and Map to a JsonObject.
 
+== SecureRandom
+
+The class `JCASupportConfiguration` has the option to customize a `SecureRandom` instance centrally that is used by the Key Generators, code that perform signing, etc...,  but also that you can use within your application. (use `JCASupportConfiguration.getInstance().getSecureRandom()`).
+
+As of version _1.1_, you can
+
+- Recreate the SecureRandom instance after some time (see configuration parameter _jwt.jca.securerandom.recreate_)
+- Provide an instance through the Java Service Loader mechanism if you want to fine tune the seeding for example. Implement the `SecureRandomProvider`  interface and define a Service Loader configuration file with as content the class name.
+
+Already available in older versions of the library, configure the algorithm that is used by specifying the configuration parameter _jwt.jca.securerandom.algo_.
+
 == Configuration
 
 === key.manager.class
@@ -539,7 +551,7 @@ default : **24h**
 Defines the expiration period of the remote JWKSet data read from a `jku header claim.
 After that period, the data is discarded and needs to be reread from the URI.
 
-The value has following format
+The value has the following format
 
 <v><unit>
 
@@ -553,6 +565,12 @@ default : **none**
 Algorithm name for the SecureRandom implementation.
 
 When no value is set, JVM configured one will be taken.
+
+=== jwt.jca.securerandom.recreate
+
+default : **0**
+
+The time in seconds to recreate the SecureRandom instance. 0 means the instance is never recreated.  Don't use a value that is too low as it can have an impact on performance when you recreate the instance every second for example.
 
 === jwt.jwk.encrypted
 
