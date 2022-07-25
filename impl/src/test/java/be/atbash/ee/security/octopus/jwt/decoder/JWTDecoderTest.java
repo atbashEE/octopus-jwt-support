@@ -88,8 +88,7 @@ class JWTDecoderTest {
 
         Assertions.assertThat(jwtData).isNotNull();
         Map map = jwtData.getData();
-        Assertions.assertThat(map).hasSize(1);
-        Assertions.assertThat(map).containsEntry("sub", "alice");
+        Assertions.assertThat(map).containsExactly(Map.entry("sub", "alice"));
     }
 
     @Test
@@ -99,8 +98,7 @@ class JWTDecoderTest {
 
         Assertions.assertThat(jwtData).isNotNull();
         Map map = jwtData.getData();
-        Assertions.assertThat(map).hasSize(1);
-        Assertions.assertThat(map).containsEntry("sub", "alice");
+        Assertions.assertThat(map).containsExactly(Map.entry("sub", "alice"));
     }
 
     @Test
@@ -111,8 +109,7 @@ class JWTDecoderTest {
         JWTClaimsSet jwtClaimsSet = jwtData.getData();
 
         Map<String, Object> claims = jwtClaimsSet.getClaims();
-        Assertions.assertThat(claims).hasSize(4);
-        Assertions.assertThat(claims).containsKeys("aud", "sub", "iss", "exp");
+        Assertions.assertThat(claims).containsOnlyKeys("aud", "sub", "iss", "exp");
 
     }
 

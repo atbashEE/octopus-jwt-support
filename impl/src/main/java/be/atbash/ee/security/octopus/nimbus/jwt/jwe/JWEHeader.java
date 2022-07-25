@@ -665,7 +665,7 @@ public final class JWEHeader extends CommonJWTHeader {
      * @param enc The encryption method parameter. Must not be
      *            {@code null}.
      */
-    @SuppressWarnings("S2259")  // As the rule incorrectly identify a problem.
+    @SuppressWarnings("java:S2259")  // As the rule incorrectly identify a problem.
     public JWEHeader(JWEAlgorithm alg, EncryptionMethod enc) {
 
         this(

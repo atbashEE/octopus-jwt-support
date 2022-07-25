@@ -39,9 +39,9 @@ class JSONObjectUtilsTest {
     void testParseTrailingWhiteSpace()
             throws Exception {
 
-        Assertions.assertThat(JSONObjectUtils.parse("{} ").size()).isEqualTo(0);
-        Assertions.assertThat(JSONObjectUtils.parse("{}\n").size()).isEqualTo(0);
-        Assertions.assertThat(JSONObjectUtils.parse("{}\r\n").size()).isEqualTo(0);
+        Assertions.assertThat(JSONObjectUtils.parse("{} ").size()).isZero();
+        Assertions.assertThat(JSONObjectUtils.parse("{}\n").size()).isZero();
+        Assertions.assertThat(JSONObjectUtils.parse("{}\r\n").size()).isZero();
     }
 
 
@@ -108,7 +108,7 @@ class JSONObjectUtilsTest {
         data.add("item3");
         JsonArray array = JSONObjectUtils.toJsonArray(data);
 
-        Assertions.assertThat(array.toString()).isEqualTo("[\"item1\",\"item2\",\"item3\"]");
+        Assertions.assertThat(array).hasToString("[\"item1\",\"item2\",\"item3\"]");
     }
 
     @Test
@@ -116,7 +116,7 @@ class JSONObjectUtilsTest {
         List<String> data = new ArrayList<>();
         JsonArray array = JSONObjectUtils.toJsonArray(data);
 
-        Assertions.assertThat(array.toString()).isEqualTo("[]");
+        Assertions.assertThat(array).hasToString("[]");
     }
 
     @Test
@@ -236,7 +236,7 @@ class JSONObjectUtilsTest {
         data.put("pojo", new Pojo());
         data.put("null", null);
         JsonObject jsonObject = JSONObjectUtils.mapToJsonObject(data);
-        Assertions.assertThat(jsonObject.keySet()).containsOnly("map", "list", "long", "int", "double", "float", "boolean", "string");
+        Assertions.assertThat(jsonObject).containsOnlyKeys("map", "list", "long", "int", "double", "float", "boolean", "string");
 
         JsonValue jsonValue = jsonObject.get("long");
         Assertions.assertThat(jsonValue).isInstanceOf(JsonNumber.class);

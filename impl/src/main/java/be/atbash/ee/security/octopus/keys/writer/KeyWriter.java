@@ -113,7 +113,7 @@ public class KeyWriter {
 
     }
 
-    @SuppressWarnings("S1143")
+    @SuppressWarnings("java:S1143")
     private JWKSet loadExistingJWKSet(String target) {
         JWKSet result;
         InputStream inputStream = null;

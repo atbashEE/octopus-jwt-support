@@ -267,7 +267,7 @@ public class DefaultJWTProcessor implements JWTProcessor {
             return verifyClaims(signedJWT.getHeader(), claimsSet);
         }
 
-        MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, String.format("No token signature verification failed"));
+        MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, "Token signature verification failed");
         throw new InvalidJWTException("Signed JWT rejected: Invalid signature");
 
     }

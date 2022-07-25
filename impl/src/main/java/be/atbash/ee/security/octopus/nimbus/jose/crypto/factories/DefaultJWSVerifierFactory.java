@@ -54,6 +54,7 @@ public class DefaultJWSVerifierFactory implements JWSVerifierFactory {
      * The supported JWS algorithms.
      */
     private static final Set<JWSAlgorithm> SUPPORTED_ALGORITHMS;
+    public static final String HEADER_KEY_DO_NOT_MATCH = "The header algorithm '%s' and the Key type '%s' do no match";
 
 
     static {
@@ -78,7 +79,7 @@ public class DefaultJWSVerifierFactory implements JWSVerifierFactory {
         if (MACVerifier.SUPPORTED_ALGORITHMS.contains(header.getAlgorithm())) {
 
             if (!(key instanceof SecretKey)) {
-                MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, String.format("The header algorithm '%s' and the Key type '%s' do no match", header.getAlgorithm(), key.getClass().getName()));
+                MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, String.format(HEADER_KEY_DO_NOT_MATCH, header.getAlgorithm(), key.getClass().getName()));
                 throw new KeyTypeException(SecretKey.class);
             }
 
@@ -89,7 +90,7 @@ public class DefaultJWSVerifierFactory implements JWSVerifierFactory {
         } else if (RSASSAVerifier.SUPPORTED_ALGORITHMS.contains(header.getAlgorithm())) {
 
             if (!(key instanceof RSAPublicKey)) {
-                MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, String.format("The header algorithm '%s' and the Key type '%s' do no match", header.getAlgorithm(), key.getClass().getName()));
+                MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, String.format(HEADER_KEY_DO_NOT_MATCH, header.getAlgorithm(), key.getClass().getName()));
                 throw new KeyTypeException(RSAPublicKey.class);
             }
 
@@ -100,7 +101,7 @@ public class DefaultJWSVerifierFactory implements JWSVerifierFactory {
         } else if (ECDSAVerifier.SUPPORTED_ALGORITHMS.contains(header.getAlgorithm())) {
 
             if (!(key instanceof ECPublicKey)) {
-                MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, String.format("The header algorithm '%s' and the Key type '%s' do no match", header.getAlgorithm(), key.getClass().getName()));
+                MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, String.format(HEADER_KEY_DO_NOT_MATCH, header.getAlgorithm(), key.getClass().getName()));
                 throw new KeyTypeException(ECPublicKey.class);
             }
 
@@ -112,7 +113,7 @@ public class DefaultJWSVerifierFactory implements JWSVerifierFactory {
 
             if (!(key instanceof BCEdDSAPublicKey)) {
                 // TODO better to check for EdDSAKey and PublicKey?
-                MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, String.format("The header algorithm '%s' and the Key type '%s' do no match", header.getAlgorithm(), key.getClass().getName()));
+                MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, String.format(HEADER_KEY_DO_NOT_MATCH, header.getAlgorithm(), key.getClass().getName()));
                 throw new KeyTypeException(BCEdDSAPublicKey.class);
             }
 

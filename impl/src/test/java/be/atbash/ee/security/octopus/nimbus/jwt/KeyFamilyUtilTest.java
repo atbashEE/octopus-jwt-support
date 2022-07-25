@@ -77,7 +77,7 @@ class KeyFamilyUtilTest {
         Assertions.assertThat(keys).hasSize(2);
 
         KeyFamily keyFamily = KeyFamilyUtil.INSTANCE.determineKeyFamily(keys.get(0).getKey());
-        Assertions.assertThat(keyFamily).isEqualTo(KeyFamily.OKP_PUBlIC);
+        Assertions.assertThat(keyFamily).isEqualTo(KeyFamily.OKP_PUBLIC);
 
         keyFamily = KeyFamilyUtil.INSTANCE.determineKeyFamily(keys.get(1).getKey());
         Assertions.assertThat(keyFamily).isEqualTo(KeyFamily.OKP_PRIVATE);

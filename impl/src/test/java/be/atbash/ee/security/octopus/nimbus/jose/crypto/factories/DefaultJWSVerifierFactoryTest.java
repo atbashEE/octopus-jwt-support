@@ -57,19 +57,21 @@ public class DefaultJWSVerifierFactoryTest {
     @Test
     void testInterfaces() {
 
-        Assertions.assertThat(factory).isInstanceOf(JWSVerifierFactory.class);
-        Assertions.assertThat(factory).isInstanceOf(JWSProvider.class);
+        Assertions.assertThat(factory)
+                .isInstanceOf(JWSVerifierFactory.class)
+                .isInstanceOf(JWSProvider.class);
     }
 
     @Test
     void testAlgSupport() {
 
-        Assertions.assertThat(factory.supportedJWSAlgorithms()).containsAll(JWSAlgorithm.Family.HMAC_SHA);
-        Assertions.assertThat(factory.supportedJWSAlgorithms()).containsAll(JWSAlgorithm.Family.RSA);
-        Assertions.assertThat(factory.supportedJWSAlgorithms()).containsAll(JWSAlgorithm.Family.EC);
-        Assertions.assertThat(factory.supportedJWSAlgorithms()).hasSize(JWSAlgorithm.Family.HMAC_SHA.size()
-                + JWSAlgorithm.Family.RSA.size()
-                + JWSAlgorithm.Family.EC.size());
+        Assertions.assertThat(factory.supportedJWSAlgorithms())
+                .containsAll(JWSAlgorithm.Family.HMAC_SHA)
+                .containsAll(JWSAlgorithm.Family.RSA)
+                .containsAll(JWSAlgorithm.Family.EC)
+                .hasSize(JWSAlgorithm.Family.HMAC_SHA.size()
+                        + JWSAlgorithm.Family.RSA.size()
+                        + JWSAlgorithm.Family.EC.size());
     }
 
     @Test

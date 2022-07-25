@@ -44,7 +44,7 @@ import java.util.Scanner;
 
 public class KeyReaderJWK {
 
-    @SuppressWarnings("S1143")
+    @SuppressWarnings("java:S1143")
     public List<AtbashKey> readResource(String path, KeyResourcePasswordLookup passwordLookup) {
         List<AtbashKey> result;
         InputStream inputStream = null;

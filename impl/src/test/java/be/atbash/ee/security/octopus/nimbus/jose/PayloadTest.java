@@ -59,7 +59,7 @@ class PayloadTest {
 
         Assertions.assertThat(payload.getOrigin()).isEqualTo(Payload.Origin.JWS_OBJECT);
         Assertions.assertThat(payload.toJWSObject()).isEqualTo(jwsObject);
-        Assertions.assertThat(payload.toString()).isEqualTo(jws);
+        Assertions.assertThat(payload).hasToString(jws);
         Assertions.assertThat(new String(payload.toBytes(), StandardCharsets.UTF_8)).isEqualTo(jws);
     }
 
@@ -81,7 +81,7 @@ class PayloadTest {
         Assertions.assertThat(payload.toJWSObject()).isNotNull();
         Assertions.assertThat(payload.toJWSObject().getHeader().getAlgorithm()).isEqualTo(JWSAlgorithm.HS256);
 
-        Assertions.assertThat(payload.toString()).isEqualTo(jws);
+        Assertions.assertThat(payload).hasToString(jws);
         Assertions.assertThat(new String(payload.toBytes(), StandardCharsets.UTF_8)).isEqualTo(jws);
     }
 
@@ -106,7 +106,7 @@ class PayloadTest {
 
         Assertions.assertThat(payload.toJWSObject()).isNotNull();
 
-        Assertions.assertThat(payload.toString()).isEqualTo(jws);
+        Assertions.assertThat(payload).hasToString(jws);
         Assertions.assertThat(new String(payload.toBytes(), StandardCharsets.UTF_8)).isEqualTo(jws);
     }
 
@@ -129,9 +129,8 @@ class PayloadTest {
         Assertions.assertThat(payload.toJWSObject().getHeader().getAlgorithm()).isEqualTo(JWSAlgorithm.HS256);
         Assertions.assertThat(payload.toSignedJWT().getJWTClaimsSet().getIssuer()).isEqualTo("joe");
 
-        Assertions.assertThat(payload.toJWSObject()).isNotNull();
 
-        Assertions.assertThat(payload.toString()).isEqualTo(jws);
+        Assertions.assertThat(payload).hasToString(jws);
         Assertions.assertThat(new String(payload.toBytes(), StandardCharsets.UTF_8)).isEqualTo(jws);
     }
 
