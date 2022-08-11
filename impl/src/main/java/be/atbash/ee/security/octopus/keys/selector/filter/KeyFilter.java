@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package be.atbash.ee.security.octopus.keys.selector.filter;
 
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -25,7 +26,7 @@ import java.util.List;
 
 public interface KeyFilter {
 
-    List<AtbashKey> filter(List<AtbashKey> keys);
+    List<AtbashKey> filter(Collection<AtbashKey> keys);
 
     /**
      * When no Key is found by the KeyManager, the information of the KeyFilter(s) in used can be used to log

@@ -20,6 +20,7 @@ import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import be.atbash.util.exception.AtbashIllegalActionException;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -39,7 +40,7 @@ public class KeyTypeKeyFilter implements KeyFilter {
     }
 
     @Override
-    public List<AtbashKey> filter(List<AtbashKey> keys) {
+    public List<AtbashKey> filter(Collection<AtbashKey> keys) {
         if (keys == null) {
             throw new AtbashIllegalActionException("(OCT-DEV-103) List of keys to filter can't be null.");
         }
