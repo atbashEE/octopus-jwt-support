@@ -30,13 +30,13 @@ import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.ee.security.octopus.nimbus.util.Base64Value;
 import be.atbash.ee.security.octopus.nimbus.util.X509CertChainUtils;
 import be.atbash.ee.security.octopus.nimbus.util.X509CertUtils;
+import org.assertj.core.api.Assertions;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import jakarta.json.Json;
@@ -52,14 +52,13 @@ import java.security.interfaces.ECPublicKey;
 import java.security.spec.ECParameterSpec;
 import java.security.spec.ECPoint;
 import java.security.spec.ECPublicKeySpec;
+import java.text.ParseException;
 import java.util.*;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 
 /**
  * Tests the EC JWK class.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
 public class ECKeyTest {
@@ -126,44 +125,40 @@ public class ECKeyTest {
     @Test
     public void testKeySizes() {
 
-        assertThat(new ECKey.Builder(ExampleKeyP256.CRV, ExampleKeyP256.X, ExampleKeyP256.Y).build().size()).isEqualTo(256);
-        assertThat(new ECKey.Builder(ExampleKeyP256Alt.CRV, ExampleKeyP256Alt.X, ExampleKeyP256Alt.Y).build().size()).isEqualTo(256);
-        assertThat(new ECKey.Builder(ExampleKeyP384Alt.CRV, ExampleKeyP384Alt.X, ExampleKeyP384Alt.Y).build().size()).isEqualTo(384);
-        assertThat(new ECKey.Builder(ExampleKeyP521Alt.CRV, ExampleKeyP521Alt.X, ExampleKeyP521Alt.Y).build().size()).isEqualTo(521);
+        Assertions.assertThat(new ECKey.Builder(ExampleKeyP256.CRV, ExampleKeyP256.X, ExampleKeyP256.Y).build().size()).isEqualTo(256);
+        Assertions.assertThat(new ECKey.Builder(ExampleKeyP256Alt.CRV, ExampleKeyP256Alt.X, ExampleKeyP256Alt.Y).build().size()).isEqualTo(256);
+        Assertions.assertThat(new ECKey.Builder(ExampleKeyP384Alt.CRV, ExampleKeyP384Alt.X, ExampleKeyP384Alt.Y).build().size()).isEqualTo(384);
+        Assertions.assertThat(new ECKey.Builder(ExampleKeyP521Alt.CRV, ExampleKeyP521Alt.X, ExampleKeyP521Alt.Y).build().size()).isEqualTo(521);
     }
 
     @Test
     public void testSupportedCurvesConstant() {
 
-        assertThat(ECKey.SUPPORTED_CURVES).contains(Curve.P_256);
-        assertThat(ECKey.SUPPORTED_CURVES).contains(Curve.P_256);
-        assertThat(ECKey.SUPPORTED_CURVES).contains(Curve.P_384);
-        assertThat(ECKey.SUPPORTED_CURVES).contains(Curve.P_521);
-        assertThat(ECKey.SUPPORTED_CURVES).hasSize(4);
+        Assertions.assertThat(ECKey.SUPPORTED_CURVES).containsOnly(Curve.P_256,
+                Curve.P_256K, Curve.SECP256K1, Curve.P_384, Curve.P_521);
+
     }
 
     @Test
     public void testUnknownCurve() {
 
-        IllegalStateException e = Assertions.assertThrows(IllegalStateException.class,
-                () -> new ECKey.Builder(new Curve("unknown"), ExampleKeyP256.X, ExampleKeyP256.Y).build());
-
-        assertThat(e.getMessage()).isEqualTo("Unknown / unsupported curve: unknown");
-        assertThat(e.getCause()).isInstanceOf(IllegalArgumentException.class);
+        Assertions.assertThatThrownBy(() -> new ECKey.Builder(new Curve("unknown"), ExampleKeyP256.X, ExampleKeyP256.Y).build())
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Unknown / unsupported curve: unknown");
 
     }
 
     @Test
     public void testAltECKeyParamLengths() {
 
-        assertThat(ExampleKeyP256Alt.X.decode().length).isEqualTo(32);
-        assertThat(ExampleKeyP256Alt.Y.decode().length).isEqualTo(32);
+        Assertions.assertThat(ExampleKeyP256Alt.X.decode().length).isEqualTo(32);
+        Assertions.assertThat(ExampleKeyP256Alt.Y.decode().length).isEqualTo(32);
 
-        assertThat(ExampleKeyP384Alt.X.decode().length).isEqualTo(48);
-        assertThat(ExampleKeyP384Alt.Y.decode().length).isEqualTo(48);
+        Assertions.assertThat(ExampleKeyP384Alt.X.decode().length).isEqualTo(48);
+        Assertions.assertThat(ExampleKeyP384Alt.Y.decode().length).isEqualTo(48);
 
-        assertThat(ExampleKeyP521Alt.X.decode().length).isEqualTo(66);
-        assertThat(ExampleKeyP521Alt.Y.decode().length).isEqualTo(66);
+        Assertions.assertThat(ExampleKeyP521Alt.X.decode().length).isEqualTo(66);
+        Assertions.assertThat(ExampleKeyP521Alt.Y.decode().length).isEqualTo(66);
     }
 
     @Test
@@ -174,12 +169,12 @@ public class ECKeyTest {
 
         // With no padding required
         int fieldSize = unpadded.length * 8;
-        assertThat(ECKey.encodeCoordinate(fieldSize, bigInteger)).isEqualTo(Base64URLValue.encode(unpadded));
+        Assertions.assertThat(ECKey.encodeCoordinate(fieldSize, bigInteger)).isEqualTo(Base64URLValue.encode(unpadded));
 
         // With two leading zeros padding required
         fieldSize = unpadded.length * 8 + 2 * 8;
-        assertThat(ECKey.encodeCoordinate(fieldSize, bigInteger)).isEqualTo(Base64URLValue.encode(new byte[]{0, 0, 1, 2, 3, 4, 5}));
-        assertThat(ECKey.encodeCoordinate(fieldSize, bigInteger).decodeToBigInteger().toString()).isEqualTo(bigInteger.toString());
+        Assertions.assertThat(ECKey.encodeCoordinate(fieldSize, bigInteger)).isEqualTo(Base64URLValue.encode(new byte[]{0, 0, 1, 2, 3, 4, 5}));
+        Assertions.assertThat(ECKey.encodeCoordinate(fieldSize, bigInteger).decodeToBigInteger().toString()).isEqualTo(bigInteger.toString());
     }
 
     @Test
@@ -197,26 +192,26 @@ public class ECKeyTest {
         ECKey key = new ECKey(ExampleKeyP256.CRV, ExampleKeyP256.X, ExampleKeyP256.Y, ExampleKeyP256.D,
                 KeyUse.SIGNATURE, ops, JWSAlgorithm.ES256, "1", x5u, x5t256, x5c, keyStore);
 
-        assertThat(key).isInstanceOf(AsymmetricJWK.class);
-        assertThat(key).isInstanceOf(CurveBasedJWK.class);
+        Assertions.assertThat(key).isInstanceOf(AsymmetricJWK.class);
+        Assertions.assertThat(key).isInstanceOf(CurveBasedJWK.class);
 
         // Test getters
-        assertThat(key.getKeyUse()).isEqualTo(KeyUse.SIGNATURE);
-        assertThat(key.getKeyOperations()).isNull();
-        assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.ES256);
-        assertThat(key.getKeyID()).isEqualTo("1");
-        assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
-        assertThat(key.getX509CertSHA256Thumbprint().toString()).isEqualTo(x5t256.toString());
-        assertThat(key.getX509CertChain()).isNull();
-        assertThat(key.getParsedX509CertChain()).isNull();
-        assertThat(key.getKeyStore()).isEqualTo(keyStore);
+        Assertions.assertThat(key.getKeyUse()).isEqualTo(KeyUse.SIGNATURE);
+        Assertions.assertThat(key.getKeyOperations()).isNull();
+        Assertions.assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.ES256);
+        Assertions.assertThat(key.getKeyID()).isEqualTo("1");
+        Assertions.assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
+        Assertions.assertThat(key.getX509CertSHA256Thumbprint().toString()).isEqualTo(x5t256.toString());
+        Assertions.assertThat(key.getX509CertChain()).isNull();
+        Assertions.assertThat(key.getParsedX509CertChain()).isNull();
+        Assertions.assertThat(key.getKeyStore()).isEqualTo(keyStore);
 
-        assertThat(key.getCurve()).isEqualTo(Curve.P_256);
-        assertThat(key.getX()).isEqualTo(ExampleKeyP256.X);
-        assertThat(key.getY()).isEqualTo(ExampleKeyP256.Y);
-        assertThat(key.getD()).isEqualTo(ExampleKeyP256.D);
+        Assertions.assertThat(key.getCurve()).isEqualTo(Curve.P_256);
+        Assertions.assertThat(key.getX()).isEqualTo(ExampleKeyP256.X);
+        Assertions.assertThat(key.getY()).isEqualTo(ExampleKeyP256.Y);
+        Assertions.assertThat(key.getD()).isEqualTo(ExampleKeyP256.D);
 
-        assertThat(key.isPrivate()).isTrue();
+        Assertions.assertThat(key.isPrivate()).isTrue();
 
 
         String jwkString = key.toJSONObject().build().toString();
@@ -224,40 +219,40 @@ public class ECKeyTest {
         key = ECKey.parse(jwkString);
 
         // Test getters
-        assertThat(key.getKeyUse()).isEqualTo(KeyUse.SIGNATURE);
-        assertThat(key.getKeyOperations()).isNull();
-        assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.ES256);
-        assertThat(key.getKeyID()).isEqualTo("1");
-        assertThat(key.getKeyStore()).isNull();
+        Assertions.assertThat(key.getKeyUse()).isEqualTo(KeyUse.SIGNATURE);
+        Assertions.assertThat(key.getKeyOperations()).isNull();
+        Assertions.assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.ES256);
+        Assertions.assertThat(key.getKeyID()).isEqualTo("1");
+        Assertions.assertThat(key.getKeyStore()).isNull();
 
-        assertThat(key.getCurve()).isEqualTo(Curve.P_256);
-        assertThat(key.getX()).isEqualTo(ExampleKeyP256.X);
-        assertThat(key.getY()).isEqualTo(ExampleKeyP256.Y);
-        assertThat(key.getD()).isEqualTo(ExampleKeyP256.D);
+        Assertions.assertThat(key.getCurve()).isEqualTo(Curve.P_256);
+        Assertions.assertThat(key.getX()).isEqualTo(ExampleKeyP256.X);
+        Assertions.assertThat(key.getY()).isEqualTo(ExampleKeyP256.Y);
+        Assertions.assertThat(key.getD()).isEqualTo(ExampleKeyP256.D);
 
-        assertThat(key.isPrivate()).isTrue();
+        Assertions.assertThat(key.isPrivate()).isTrue();
 
 
         // Test conversion to public JWK
 
         key = key.toPublicJWK();
 
-        assertThat(key.getKeyUse()).isEqualTo(KeyUse.SIGNATURE);
-        assertThat(key.getKeyOperations()).isNull();
-        assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.ES256);
-        assertThat(key.getKeyID()).isEqualTo("1");
-        assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
-        assertThat(key.getX509CertSHA256Thumbprint().toString()).isEqualTo(x5t256.toString());
-        assertThat(key.getX509CertChain()).isNull();
-        assertThat(key.getParsedX509CertChain()).isNull();
-        assertThat(key.getKeyStore()).isNull();
+        Assertions.assertThat(key.getKeyUse()).isEqualTo(KeyUse.SIGNATURE);
+        Assertions.assertThat(key.getKeyOperations()).isNull();
+        Assertions.assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.ES256);
+        Assertions.assertThat(key.getKeyID()).isEqualTo("1");
+        Assertions.assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
+        Assertions.assertThat(key.getX509CertSHA256Thumbprint().toString()).isEqualTo(x5t256.toString());
+        Assertions.assertThat(key.getX509CertChain()).isNull();
+        Assertions.assertThat(key.getParsedX509CertChain()).isNull();
+        Assertions.assertThat(key.getKeyStore()).isNull();
 
-        assertThat(key.getCurve()).isEqualTo(Curve.P_256);
-        assertThat(key.getX()).isEqualTo(ExampleKeyP256.X);
-        assertThat(key.getY()).isEqualTo(ExampleKeyP256.Y);
-        assertThat(key.getD()).isNull();
+        Assertions.assertThat(key.getCurve()).isEqualTo(Curve.P_256);
+        Assertions.assertThat(key.getX()).isEqualTo(ExampleKeyP256.X);
+        Assertions.assertThat(key.getY()).isEqualTo(ExampleKeyP256.Y);
+        Assertions.assertThat(key.getD()).isNull();
 
-        assertThat(key.isPrivate()).isFalse();
+        Assertions.assertThat(key.isPrivate()).isFalse();
     }
 
     @Test
@@ -275,24 +270,24 @@ public class ECKeyTest {
                 use, ops, JWSAlgorithm.ES256, "1", x5u, x5t256, x5c, null);
 
         // Test getters
-        assertThat(key.getKeyUse()).isNull();
-        assertThat(key.getKeyOperations().contains(KeyOperation.SIGN)).isTrue();
-        assertThat(key.getKeyOperations().contains(KeyOperation.VERIFY)).isTrue();
-        assertThat(key.getKeyOperations().size()).isEqualTo(2);
-        assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.ES256);
-        assertThat(key.getKeyID()).isEqualTo("1");
-        assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
-        assertThat(key.getX509CertSHA256Thumbprint().toString()).isEqualTo(x5t256.toString());
-        assertThat(key.getX509CertChain()).isNull();
-        assertThat(key.getParsedX509CertChain()).isNull();
-        assertThat(key.getKeyStore()).isNull();
+        Assertions.assertThat(key.getKeyUse()).isNull();
+        Assertions.assertThat(key.getKeyOperations().contains(KeyOperation.SIGN)).isTrue();
+        Assertions.assertThat(key.getKeyOperations().contains(KeyOperation.VERIFY)).isTrue();
+        Assertions.assertThat(key.getKeyOperations().size()).isEqualTo(2);
+        Assertions.assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.ES256);
+        Assertions.assertThat(key.getKeyID()).isEqualTo("1");
+        Assertions.assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
+        Assertions.assertThat(key.getX509CertSHA256Thumbprint().toString()).isEqualTo(x5t256.toString());
+        Assertions.assertThat(key.getX509CertChain()).isNull();
+        Assertions.assertThat(key.getParsedX509CertChain()).isNull();
+        Assertions.assertThat(key.getKeyStore()).isNull();
 
-        assertThat(key.getCurve()).isEqualTo(Curve.P_256);
-        assertThat(key.getX()).isEqualTo(ExampleKeyP256.X);
-        assertThat(key.getY()).isEqualTo(ExampleKeyP256.Y);
-        assertThat(key.getD()).isEqualTo(ExampleKeyP256.D);
+        Assertions.assertThat(key.getCurve()).isEqualTo(Curve.P_256);
+        Assertions.assertThat(key.getX()).isEqualTo(ExampleKeyP256.X);
+        Assertions.assertThat(key.getY()).isEqualTo(ExampleKeyP256.Y);
+        Assertions.assertThat(key.getD()).isEqualTo(ExampleKeyP256.D);
 
-        assertThat(key.isPrivate()).isTrue();
+        Assertions.assertThat(key.isPrivate()).isTrue();
 
 
         String jwkString = key.toJSONObject().build().toString();
@@ -300,44 +295,44 @@ public class ECKeyTest {
         key = ECKey.parse(jwkString);
 
         // Test getters
-        assertThat(key.getKeyUse()).isNull();
-        assertThat(key.getKeyOperations().contains(KeyOperation.SIGN)).isTrue();
-        assertThat(key.getKeyOperations().contains(KeyOperation.VERIFY)).isTrue();
-        assertThat(key.getKeyOperations().size()).isEqualTo(2);
-        assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.ES256);
-        assertThat(key.getKeyID()).isEqualTo("1");
-        assertThat(key.getKeyStore()).isNull();
+        Assertions.assertThat(key.getKeyUse()).isNull();
+        Assertions.assertThat(key.getKeyOperations().contains(KeyOperation.SIGN)).isTrue();
+        Assertions.assertThat(key.getKeyOperations().contains(KeyOperation.VERIFY)).isTrue();
+        Assertions.assertThat(key.getKeyOperations().size()).isEqualTo(2);
+        Assertions.assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.ES256);
+        Assertions.assertThat(key.getKeyID()).isEqualTo("1");
+        Assertions.assertThat(key.getKeyStore()).isNull();
 
-        assertThat(key.getCurve()).isEqualTo(Curve.P_256);
-        assertThat(key.getX()).isEqualTo(ExampleKeyP256.X);
-        assertThat(key.getY()).isEqualTo(ExampleKeyP256.Y);
-        assertThat(key.getD()).isEqualTo(ExampleKeyP256.D);
+        Assertions.assertThat(key.getCurve()).isEqualTo(Curve.P_256);
+        Assertions.assertThat(key.getX()).isEqualTo(ExampleKeyP256.X);
+        Assertions.assertThat(key.getY()).isEqualTo(ExampleKeyP256.Y);
+        Assertions.assertThat(key.getD()).isEqualTo(ExampleKeyP256.D);
 
-        assertThat(key.isPrivate()).isTrue();
+        Assertions.assertThat(key.isPrivate()).isTrue();
 
 
         // Test conversion to public JWK
 
         key = key.toPublicJWK();
 
-        assertThat(key.getKeyUse()).isNull();
-        assertThat(key.getKeyOperations().contains(KeyOperation.SIGN)).isTrue();
-        assertThat(key.getKeyOperations().contains(KeyOperation.VERIFY)).isTrue();
-        assertThat(key.getKeyOperations().size()).isEqualTo(2);
-        assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.ES256);
-        assertThat(key.getKeyID()).isEqualTo("1");
-        assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
-        assertThat(key.getX509CertSHA256Thumbprint().toString()).isEqualTo(x5t256.toString());
-        assertThat(key.getX509CertChain()).isNull();
-        assertThat(key.getParsedX509CertChain()).isNull();
-        assertThat(key.getKeyStore()).isNull();
+        Assertions.assertThat(key.getKeyUse()).isNull();
+        Assertions.assertThat(key.getKeyOperations().contains(KeyOperation.SIGN)).isTrue();
+        Assertions.assertThat(key.getKeyOperations().contains(KeyOperation.VERIFY)).isTrue();
+        Assertions.assertThat(key.getKeyOperations().size()).isEqualTo(2);
+        Assertions.assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.ES256);
+        Assertions.assertThat(key.getKeyID()).isEqualTo("1");
+        Assertions.assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
+        Assertions.assertThat(key.getX509CertSHA256Thumbprint().toString()).isEqualTo(x5t256.toString());
+        Assertions.assertThat(key.getX509CertChain()).isNull();
+        Assertions.assertThat(key.getParsedX509CertChain()).isNull();
+        Assertions.assertThat(key.getKeyStore()).isNull();
 
-        assertThat(key.getCurve()).isEqualTo(Curve.P_256);
-        assertThat(key.getX()).isEqualTo(ExampleKeyP256.X);
-        assertThat(key.getY()).isEqualTo(ExampleKeyP256.Y);
-        assertThat(key.getD()).isNull();
+        Assertions.assertThat(key.getCurve()).isEqualTo(Curve.P_256);
+        Assertions.assertThat(key.getX()).isEqualTo(ExampleKeyP256.X);
+        Assertions.assertThat(key.getY()).isEqualTo(ExampleKeyP256.Y);
+        Assertions.assertThat(key.getD()).isNull();
 
-        assertThat(key.isPrivate()).isFalse();
+        Assertions.assertThat(key.isPrivate()).isFalse();
     }
 
     @Test
@@ -360,20 +355,20 @@ public class ECKeyTest {
                 .build();
 
         // Test getters
-        assertThat(key.getKeyUse()).isEqualTo(KeyUse.SIGNATURE);
-        assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.ES256);
-        assertThat(key.getKeyID()).isEqualTo("1");
-        assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
-        assertThat(key.getX509CertChain()).isNull();
-        assertThat(key.getParsedX509CertChain()).isNull();
-        assertThat(key.getKeyStore()).isEqualTo(keyStore);
+        Assertions.assertThat(key.getKeyUse()).isEqualTo(KeyUse.SIGNATURE);
+        Assertions.assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.ES256);
+        Assertions.assertThat(key.getKeyID()).isEqualTo("1");
+        Assertions.assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
+        Assertions.assertThat(key.getX509CertChain()).isNull();
+        Assertions.assertThat(key.getParsedX509CertChain()).isNull();
+        Assertions.assertThat(key.getKeyStore()).isEqualTo(keyStore);
 
-        assertThat(key.getCurve()).isEqualTo(Curve.P_256);
-        assertThat(key.getX()).isEqualTo(ExampleKeyP256.X);
-        assertThat(key.getY()).isEqualTo(ExampleKeyP256.Y);
-        assertThat(key.getD()).isEqualTo(ExampleKeyP256.D);
+        Assertions.assertThat(key.getCurve()).isEqualTo(Curve.P_256);
+        Assertions.assertThat(key.getX()).isEqualTo(ExampleKeyP256.X);
+        Assertions.assertThat(key.getY()).isEqualTo(ExampleKeyP256.Y);
+        Assertions.assertThat(key.getD()).isEqualTo(ExampleKeyP256.D);
 
-        assertThat(key.isPrivate()).isTrue();
+        Assertions.assertThat(key.isPrivate()).isTrue();
 
 
         String jwkString = key.toJSONObject().build().toString();
@@ -381,37 +376,37 @@ public class ECKeyTest {
         key = ECKey.parse(jwkString);
 
         // Test getters
-        assertThat(key.getKeyUse()).isEqualTo(KeyUse.SIGNATURE);
-        assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.ES256);
-        assertThat(key.getKeyID()).isEqualTo("1");
-        assertThat(key.getKeyStore()).isNull();
+        Assertions.assertThat(key.getKeyUse()).isEqualTo(KeyUse.SIGNATURE);
+        Assertions.assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.ES256);
+        Assertions.assertThat(key.getKeyID()).isEqualTo("1");
+        Assertions.assertThat(key.getKeyStore()).isNull();
 
-        assertThat(key.getCurve()).isEqualTo(Curve.P_256);
-        assertThat(key.getX()).isEqualTo(ExampleKeyP256.X);
-        assertThat(key.getY()).isEqualTo(ExampleKeyP256.Y);
-        assertThat(key.getD()).isEqualTo(ExampleKeyP256.D);
+        Assertions.assertThat(key.getCurve()).isEqualTo(Curve.P_256);
+        Assertions.assertThat(key.getX()).isEqualTo(ExampleKeyP256.X);
+        Assertions.assertThat(key.getY()).isEqualTo(ExampleKeyP256.Y);
+        Assertions.assertThat(key.getD()).isEqualTo(ExampleKeyP256.D);
 
-        assertThat(key.isPrivate()).isTrue();
+        Assertions.assertThat(key.isPrivate()).isTrue();
 
 
         // Test conversion to public JWK
 
         key = key.toPublicJWK();
 
-        assertThat(key.getKeyUse()).isEqualTo(KeyUse.SIGNATURE);
-        assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.ES256);
-        assertThat(key.getKeyID()).isEqualTo("1");
-        assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
-        assertThat(key.getX509CertChain()).isNull();
-        assertThat(key.getParsedX509CertChain()).isNull();
-        assertThat(key.getKeyStore()).isNull();
+        Assertions.assertThat(key.getKeyUse()).isEqualTo(KeyUse.SIGNATURE);
+        Assertions.assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.ES256);
+        Assertions.assertThat(key.getKeyID()).isEqualTo("1");
+        Assertions.assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
+        Assertions.assertThat(key.getX509CertChain()).isNull();
+        Assertions.assertThat(key.getParsedX509CertChain()).isNull();
+        Assertions.assertThat(key.getKeyStore()).isNull();
 
-        assertThat(key.getCurve()).isEqualTo(Curve.P_256);
-        assertThat(key.getX()).isEqualTo(ExampleKeyP256.X);
-        assertThat(key.getY()).isEqualTo(ExampleKeyP256.Y);
-        assertThat(key.getD()).isNull();
+        Assertions.assertThat(key.getCurve()).isEqualTo(Curve.P_256);
+        Assertions.assertThat(key.getX()).isEqualTo(ExampleKeyP256.X);
+        Assertions.assertThat(key.getY()).isEqualTo(ExampleKeyP256.Y);
+        Assertions.assertThat(key.getD()).isNull();
 
-        assertThat(key.isPrivate()).isFalse();
+        Assertions.assertThat(key.isPrivate()).isFalse();
     }
 
     @Test
@@ -437,20 +432,20 @@ public class ECKeyTest {
         key = new ECKey.Builder(key).build();
 
         // Test getters
-        assertThat(key.getKeyUse()).isEqualTo(KeyUse.SIGNATURE);
-        assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.ES256);
-        assertThat(key.getKeyID()).isEqualTo("1");
-        assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
-        assertThat(key.getX509CertChain()).isNull();
-        assertThat(key.getParsedX509CertChain()).isNull();
-        assertThat(key.getKeyStore()).isEqualTo(keyStore);
+        Assertions.assertThat(key.getKeyUse()).isEqualTo(KeyUse.SIGNATURE);
+        Assertions.assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.ES256);
+        Assertions.assertThat(key.getKeyID()).isEqualTo("1");
+        Assertions.assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
+        Assertions.assertThat(key.getX509CertChain()).isNull();
+        Assertions.assertThat(key.getParsedX509CertChain()).isNull();
+        Assertions.assertThat(key.getKeyStore()).isEqualTo(keyStore);
 
-        assertThat(key.getCurve()).isEqualTo(Curve.P_256);
-        assertThat(key.getX()).isEqualTo(ExampleKeyP256.X);
-        assertThat(key.getY()).isEqualTo(ExampleKeyP256.Y);
-        assertThat(key.getD()).isEqualTo(ExampleKeyP256.D);
+        Assertions.assertThat(key.getCurve()).isEqualTo(Curve.P_256);
+        Assertions.assertThat(key.getX()).isEqualTo(ExampleKeyP256.X);
+        Assertions.assertThat(key.getY()).isEqualTo(ExampleKeyP256.Y);
+        Assertions.assertThat(key.getD()).isEqualTo(ExampleKeyP256.D);
 
-        assertThat(key.isPrivate()).isTrue();
+        Assertions.assertThat(key.isPrivate()).isTrue();
     }
 
     @Test
@@ -464,23 +459,23 @@ public class ECKeyTest {
         KeyPair pair = key.toKeyPair();
 
         ECPublicKey pub = (ECPublicKey) pair.getPublic();
-        assertThat(pub.getParams().getCurve().getField().getFieldSize()).isEqualTo(256);
-        assertThat(pub.getW().getAffineX()).isEqualTo(ExampleKeyP256.X.decodeToBigInteger());
-        assertThat(pub.getW().getAffineY()).isEqualTo(ExampleKeyP256.Y.decodeToBigInteger());
+        Assertions.assertThat(pub.getParams().getCurve().getField().getFieldSize()).isEqualTo(256);
+        Assertions.assertThat(pub.getW().getAffineX()).isEqualTo(ExampleKeyP256.X.decodeToBigInteger());
+        Assertions.assertThat(pub.getW().getAffineY()).isEqualTo(ExampleKeyP256.Y.decodeToBigInteger());
 
         ECPrivateKey priv = (ECPrivateKey) pair.getPrivate();
-        assertThat(priv.getParams().getCurve().getField().getFieldSize()).isEqualTo(256);
-        assertThat(priv.getS()).isEqualTo(ExampleKeyP256.D.decodeToBigInteger());
+        Assertions.assertThat(priv.getParams().getCurve().getField().getFieldSize()).isEqualTo(256);
+        Assertions.assertThat(priv.getS()).isEqualTo(ExampleKeyP256.D.decodeToBigInteger());
 
         // Import
         key = new ECKey.Builder(Curve.P_256, pub).privateKey(priv).build();
-        assertThat(key.getCurve()).isEqualTo(Curve.P_256);
-        assertThat(key.getX()).isEqualTo(ExampleKeyP256.X);
-        assertThat(key.getY()).isEqualTo(ExampleKeyP256.Y);
-        assertThat(key.getD()).isEqualTo(ExampleKeyP256.D);
-        assertThat(ExampleKeyP256.D.decode().length).isEqualTo(32);
+        Assertions.assertThat(key.getCurve()).isEqualTo(Curve.P_256);
+        Assertions.assertThat(key.getX()).isEqualTo(ExampleKeyP256.X);
+        Assertions.assertThat(key.getY()).isEqualTo(ExampleKeyP256.Y);
+        Assertions.assertThat(key.getD()).isEqualTo(ExampleKeyP256.D);
+        Assertions.assertThat(ExampleKeyP256.D.decode().length).isEqualTo(32);
 
-        assertThat(key.isPrivate()).isTrue();
+        Assertions.assertThat(key.isPrivate()).isTrue();
     }
 
     @Test
@@ -492,17 +487,17 @@ public class ECKeyTest {
         KeyPair pair = key.toKeyPair();
 
         ECPublicKey pub = (ECPublicKey) pair.getPublic();
-        assertThat(pub.getParams().getCurve().getField().getFieldSize()).isEqualTo(256);
-        assertThat(pub.getW().getAffineX()).isEqualTo(ExampleKeyP256Alt.X.decodeToBigInteger());
-        assertThat(pub.getW().getAffineY()).isEqualTo(ExampleKeyP256Alt.Y.decodeToBigInteger());
+        Assertions.assertThat(pub.getParams().getCurve().getField().getFieldSize()).isEqualTo(256);
+        Assertions.assertThat(pub.getW().getAffineX()).isEqualTo(ExampleKeyP256Alt.X.decodeToBigInteger());
+        Assertions.assertThat(pub.getW().getAffineY()).isEqualTo(ExampleKeyP256Alt.Y.decodeToBigInteger());
 
         // Import
         key = new ECKey.Builder(ExampleKeyP256Alt.CRV, pub).build();
-        assertThat(key.getCurve()).isEqualTo(Curve.P_256);
-        assertThat(key.getX()).isEqualTo(ExampleKeyP256Alt.X);
-        assertThat(key.getY()).isEqualTo(ExampleKeyP256Alt.Y);
+        Assertions.assertThat(key.getCurve()).isEqualTo(Curve.P_256);
+        Assertions.assertThat(key.getX()).isEqualTo(ExampleKeyP256Alt.X);
+        Assertions.assertThat(key.getY()).isEqualTo(ExampleKeyP256Alt.Y);
 
-        assertThat(key.isPrivate()).isFalse();
+        Assertions.assertThat(key.isPrivate()).isFalse();
     }
 
     @Test
@@ -514,17 +509,17 @@ public class ECKeyTest {
         KeyPair pair = key.toKeyPair();
 
         ECPublicKey pub = (ECPublicKey) pair.getPublic();
-        assertThat(pub.getParams().getCurve().getField().getFieldSize()).isEqualTo(384);
-        assertThat(pub.getW().getAffineX()).isEqualTo(ExampleKeyP384Alt.X.decodeToBigInteger());
-        assertThat(pub.getW().getAffineY()).isEqualTo(ExampleKeyP384Alt.Y.decodeToBigInteger());
+        Assertions.assertThat(pub.getParams().getCurve().getField().getFieldSize()).isEqualTo(384);
+        Assertions.assertThat(pub.getW().getAffineX()).isEqualTo(ExampleKeyP384Alt.X.decodeToBigInteger());
+        Assertions.assertThat(pub.getW().getAffineY()).isEqualTo(ExampleKeyP384Alt.Y.decodeToBigInteger());
 
         // Import
         key = new ECKey.Builder(ExampleKeyP384Alt.CRV, pub).build();
-        assertThat(key.getCurve()).isEqualTo(Curve.P_384);
-        assertThat(key.getX()).isEqualTo(ExampleKeyP384Alt.X);
-        assertThat(key.getY()).isEqualTo(ExampleKeyP384Alt.Y);
+        Assertions.assertThat(key.getCurve()).isEqualTo(Curve.P_384);
+        Assertions.assertThat(key.getX()).isEqualTo(ExampleKeyP384Alt.X);
+        Assertions.assertThat(key.getY()).isEqualTo(ExampleKeyP384Alt.Y);
 
-        assertThat(key.isPrivate()).isFalse();
+        Assertions.assertThat(key.isPrivate()).isFalse();
     }
 
     @Test
@@ -536,17 +531,17 @@ public class ECKeyTest {
         KeyPair pair = key.toKeyPair();
 
         ECPublicKey pub = (ECPublicKey) pair.getPublic();
-        assertThat(pub.getParams().getCurve().getField().getFieldSize()).isEqualTo(521);
-        assertThat(pub.getW().getAffineX()).isEqualTo(ExampleKeyP521Alt.X.decodeToBigInteger());
-        assertThat(pub.getW().getAffineY()).isEqualTo(ExampleKeyP521Alt.Y.decodeToBigInteger());
+        Assertions.assertThat(pub.getParams().getCurve().getField().getFieldSize()).isEqualTo(521);
+        Assertions.assertThat(pub.getW().getAffineX()).isEqualTo(ExampleKeyP521Alt.X.decodeToBigInteger());
+        Assertions.assertThat(pub.getW().getAffineY()).isEqualTo(ExampleKeyP521Alt.Y.decodeToBigInteger());
 
         // Import
         key = new ECKey.Builder(ExampleKeyP521Alt.CRV, pub).build();
-        assertThat(key.getCurve()).isEqualTo(Curve.P_521);
-        assertThat(key.getX()).isEqualTo(ExampleKeyP521Alt.X);
-        assertThat(key.getY()).isEqualTo(ExampleKeyP521Alt.Y);
+        Assertions.assertThat(key.getCurve()).isEqualTo(Curve.P_521);
+        Assertions.assertThat(key.getX()).isEqualTo(ExampleKeyP521Alt.X);
+        Assertions.assertThat(key.getY()).isEqualTo(ExampleKeyP521Alt.Y);
 
-        assertThat(key.isPrivate()).isFalse();
+        Assertions.assertThat(key.isPrivate()).isFalse();
     }
 
     @Test
@@ -557,15 +552,15 @@ public class ECKeyTest {
         Set<KeyOperation> ops = new HashSet<>(Arrays.asList(KeyOperation.SIGN, KeyOperation.VERIFY));
 
         JWK jwk = new ECKey(ExampleKeyP256.CRV, ExampleKeyP256.X, ExampleKeyP256.Y, use, ops, null, null, null, null, null, null);
-        assertThat(jwk.getKeyUse()).isEqualTo(use);
-        assertThat(jwk.getKeyOperations()).isEqualTo(ops);
+        Assertions.assertThat(jwk.getKeyUse()).isEqualTo(use);
+        Assertions.assertThat(jwk.getKeyOperations()).isEqualTo(ops);
 
         jwk = new ECKey.Builder(ExampleKeyP256.CRV, ExampleKeyP256.X, ExampleKeyP256.Y)
                 .keyUse(use)
                 .keyOperations(ops)
                 .build();
-        assertThat(jwk.getKeyUse()).isEqualTo(use);
-        assertThat(jwk.getKeyOperations()).isEqualTo(ops);
+        Assertions.assertThat(jwk.getKeyUse()).isEqualTo(use);
+        Assertions.assertThat(jwk.getKeyOperations()).isEqualTo(ops);
     }
 
     @Test
@@ -581,7 +576,7 @@ public class ECKeyTest {
                     .keyOperations(ops)
                     .build();
         } catch (IllegalStateException e) {
-            assertThat(e.getMessage()).isEqualTo("The key use \"use\" and key options \"key_opts\" parameters are not consistent, see RFC 7517, section 4.3");
+            Assertions.assertThat(e.getMessage()).isEqualTo("The key use \"use\" and key options \"key_opts\" parameters are not consistent, see RFC 7517, section 4.3");
         }
     }
 
@@ -606,18 +601,18 @@ public class ECKeyTest {
 
         ECKey jwk = ECKey.parse(json);
 
-        assertThat(jwk.getKeyType()).isEqualTo(KeyType.EC);
-        assertThat(jwk.getKeyID()).isEqualTo("bilbo.baggins@hobbiton.example");
-        assertThat(jwk.getKeyUse()).isEqualTo(KeyUse.SIGNATURE);
-        assertThat(jwk.getCurve()).isEqualTo(Curve.P_521);
+        Assertions.assertThat(jwk.getKeyType()).isEqualTo(KeyType.EC);
+        Assertions.assertThat(jwk.getKeyID()).isEqualTo("bilbo.baggins@hobbiton.example");
+        Assertions.assertThat(jwk.getKeyUse()).isEqualTo(KeyUse.SIGNATURE);
+        Assertions.assertThat(jwk.getCurve()).isEqualTo(Curve.P_521);
 
-        assertThat(jwk.getX().toString()).isEqualTo("AHKZLLOsCOzz5cY97ewNUajB957y-C-U88c3v13nmGZx6sYl_oJXu9" +
+        Assertions.assertThat(jwk.getX().toString()).isEqualTo("AHKZLLOsCOzz5cY97ewNUajB957y-C-U88c3v13nmGZx6sYl_oJXu9" +
                 "A5RkTKqjqvjyekWF-7ytDyRXYgCF5cj0Kt");
 
-        assertThat(jwk.getY().toString()).isEqualTo("AdymlHvOiLxXkEhayXQnNCvDX4h9htZaCJN34kfmC6pV5OhQHiraVy" +
+        Assertions.assertThat(jwk.getY().toString()).isEqualTo("AdymlHvOiLxXkEhayXQnNCvDX4h9htZaCJN34kfmC6pV5OhQHiraVy" +
                 "SsUdaQkAgDPrwQrJmbnX9cwlGfP-HqHZR1");
 
-        assertThat(jwk.getD().toString()).isEqualTo("AAhRON2r9cqXX1hg-RoI6R1tX5p2rUAYdmpHZoC1XNM56KtscrX6zb" +
+        Assertions.assertThat(jwk.getD().toString()).isEqualTo("AAhRON2r9cqXX1hg-RoI6R1tX5p2rUAYdmpHZoC1XNM56KtscrX6zb" +
                 "KipQrCW9CGZH3T4ubpnoTKLDYJ_fF3_rJt");
 
         // Convert to Java EC key object
@@ -626,13 +621,13 @@ public class ECKeyTest {
 
         jwk = new ECKey.Builder(Curve.P_521, ecPublicKey).privateKey(ecPrivateKey).build();
 
-        assertThat(jwk.getX().toString()).isEqualTo("AHKZLLOsCOzz5cY97ewNUajB957y-C-U88c3v13nmGZx6sYl_oJXu9" +
+        Assertions.assertThat(jwk.getX().toString()).isEqualTo("AHKZLLOsCOzz5cY97ewNUajB957y-C-U88c3v13nmGZx6sYl_oJXu9" +
                 "A5RkTKqjqvjyekWF-7ytDyRXYgCF5cj0Kt");
 
-        assertThat(jwk.getY().toString()).isEqualTo("AdymlHvOiLxXkEhayXQnNCvDX4h9htZaCJN34kfmC6pV5OhQHiraVy" +
+        Assertions.assertThat(jwk.getY().toString()).isEqualTo("AdymlHvOiLxXkEhayXQnNCvDX4h9htZaCJN34kfmC6pV5OhQHiraVy" +
                 "SsUdaQkAgDPrwQrJmbnX9cwlGfP-HqHZR1");
 
-        assertThat(jwk.getD().toString()).isEqualTo("AAhRON2r9cqXX1hg-RoI6R1tX5p2rUAYdmpHZoC1XNM56KtscrX6zb" +
+        Assertions.assertThat(jwk.getD().toString()).isEqualTo("AAhRON2r9cqXX1hg-RoI6R1tX5p2rUAYdmpHZoC1XNM56KtscrX6zb" +
                 "KipQrCW9CGZH3T4ubpnoTKLDYJ_fF3_rJt");
     }
 
@@ -644,13 +639,13 @@ public class ECKeyTest {
 
         Base64URLValue thumbprint = ecKey.computeThumbprint();
 
-        assertThat(thumbprint.decode().length).isEqualTo(256 / 8);
+        Assertions.assertThat(thumbprint.decode().length).isEqualTo(256 / 8);
 
         String orderedJSON = "{\"crv\":\"P-256\",\"kty\":\"EC\",\"x\":\"MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4\",\"y\":\"4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM\"}";
 
         Base64URLValue expected = Base64URLValue.encode(MessageDigest.getInstance("SHA-256").digest(orderedJSON.getBytes(StandardCharsets.UTF_8)));
 
-        assertThat(thumbprint).isEqualTo(expected);
+        Assertions.assertThat(thumbprint).isEqualTo(expected);
     }
 
     @Test
@@ -660,7 +655,7 @@ public class ECKeyTest {
 
         Base64URLValue thumbprint = ecKey.computeThumbprint("SHA-1");
 
-        assertThat(thumbprint.decode().length).isEqualTo(160 / 8);
+        Assertions.assertThat(thumbprint.decode().length).isEqualTo(160 / 8);
     }
 
     @Test
@@ -673,7 +668,7 @@ public class ECKeyTest {
 
         Base64URLValue thumbprint = new Base64URLValue(ecKey.getKeyID());
 
-        assertThat(thumbprint.decode().length).isEqualTo(256 / 8);
+        Assertions.assertThat(thumbprint.decode().length).isEqualTo(256 / 8);
 
         JsonObjectBuilder builder = Json.createObjectBuilder();
         ecKey.getRequiredParams().forEach(builder::add);
@@ -682,7 +677,7 @@ public class ECKeyTest {
 
         Base64URLValue expected = Base64URLValue.encode(MessageDigest.getInstance("SHA-256").digest(orderedJSON.getBytes(StandardCharsets.UTF_8)));
 
-        assertThat(thumbprint).isEqualTo(expected);
+        Assertions.assertThat(thumbprint).isEqualTo(expected);
     }
 
     @Test
@@ -694,7 +689,7 @@ public class ECKeyTest {
 
         Base64URLValue thumbprint = new Base64URLValue(ecKey.getKeyID());
 
-        assertThat(thumbprint.decode().length).isEqualTo(160 / 8);
+        Assertions.assertThat(thumbprint.decode().length).isEqualTo(160 / 8);
     }
 
     @Test
@@ -709,7 +704,7 @@ public class ECKeyTest {
 
         ECKey ecKey = ECKey.parse(json);
 
-        assertThat(ecKey.computeThumbprint().toString()).isEqualTo("j4UYwo9wrtllSHaoLDJNh7MhVCL8t0t8cGPPzChpYDs");
+        Assertions.assertThat(ecKey.computeThumbprint().toString()).isEqualTo("j4UYwo9wrtllSHaoLDJNh7MhVCL8t0t8cGPPzChpYDs");
     }
 
     @Test
@@ -724,7 +719,7 @@ public class ECKeyTest {
 
         ECKey ecKey = ECKey.parse(json);
 
-        assertThat(ecKey.computeThumbprint().toString()).isEqualTo("vZtaWIw-zw95JNzzURg1YB7mWNLlm44YZDZzhrPNetM");
+        Assertions.assertThat(ecKey.computeThumbprint().toString()).isEqualTo("vZtaWIw-zw95JNzzURg1YB7mWNLlm44YZDZzhrPNetM");
     }
 
     @Test
@@ -739,7 +734,7 @@ public class ECKeyTest {
 
         ECKey ecKey = ECKey.parse(json);
 
-        assertThat(ecKey.computeThumbprint().toString()).isEqualTo("rz4Ohmpxg-UOWIWqWKHlOe0bHSjNUFlHW5vwG_M7qYg");
+        Assertions.assertThat(ecKey.computeThumbprint().toString()).isEqualTo("rz4Ohmpxg-UOWIWqWKHlOe0bHSjNUFlHW5vwG_M7qYg");
     }
 
     @Test
@@ -777,21 +772,21 @@ public class ECKeyTest {
                 .keyID("1")
                 .build();
 
-        assertThat(ecJWK.toPublicKey()).isNotNull();
-        assertThat(ecJWK.toPrivateKey()).isEqualTo(privateKey);
-        assertThat(ecJWK.isPrivate()).isTrue();
+        Assertions.assertThat(ecJWK.toPublicKey()).isNotNull();
+        Assertions.assertThat(ecJWK.toPrivateKey()).isEqualTo(privateKey);
+        Assertions.assertThat(ecJWK.isPrivate()).isTrue();
 
         KeyPair kpOut = ecJWK.toKeyPair();
-        assertThat(kpOut.getPublic()).isNotNull();
-        assertThat(kpOut.getPrivate()).isEqualTo(privateKey);
+        Assertions.assertThat(kpOut.getPublic()).isNotNull();
+        Assertions.assertThat(kpOut.getPrivate()).isEqualTo(privateKey);
 
         JsonObject json = ecJWK.toJSONObject().build();
-        assertThat(json.getString("kty")).isEqualTo("EC");
-        assertThat(json.getString("kid")).isEqualTo("1");
-        assertThat(json.getString("crv")).isEqualTo("P-256");
-        assertThat(json.get("x")).isNotNull();
-        assertThat(json.get("y")).isNotNull();
-        assertThat(json.size()).isEqualTo(5);
+        Assertions.assertThat(json.getString(JWKIdentifiers.KEY_TYPE)).isEqualTo("EC");
+        Assertions.assertThat(json.getString("kid")).isEqualTo("1");
+        Assertions.assertThat(json.getString("crv")).isEqualTo("P-256");
+        Assertions.assertThat(json.get("x")).isNotNull();
+        Assertions.assertThat(json.get("y")).isNotNull();
+        Assertions.assertThat(json.size()).isEqualTo(5);
     }
 
     @Test
@@ -806,13 +801,13 @@ public class ECKeyTest {
                 .x509CertChain(SampleCertificates.SAMPLE_X5C_EC)
                 .build();
 
-        assertThat(jwk.getX509CertChain().get(0)).isEqualTo(SampleCertificates.SAMPLE_X5C_EC.get(0));
+        Assertions.assertThat(jwk.getX509CertChain().get(0)).isEqualTo(SampleCertificates.SAMPLE_X5C_EC.get(0));
 
         String json = jwk.toJSONString();
 
         jwk = ECKey.parse(json);
 
-        assertThat(jwk.getX509CertChain().get(0)).isEqualTo(SampleCertificates.SAMPLE_X5C_EC.get(0));
+        Assertions.assertThat(jwk.getX509CertChain().get(0)).isEqualTo(SampleCertificates.SAMPLE_X5C_EC.get(0));
     }
 
     @Test
@@ -826,19 +821,18 @@ public class ECKeyTest {
                     .x509CertChain(SampleCertificates.SAMPLE_X5C_RSA)
                     .build();
         } catch (IllegalStateException e) {
-            assertThat(e.getMessage()).isEqualTo("The public subject key info of the first X.509 certificate in the chain must match the JWK type and public parameters");
+            Assertions.assertThat(e.getMessage()).isEqualTo("The public subject key info of the first X.509 certificate in the chain must match the JWK type and public parameters");
         }
     }
 
     @Test
     public void testX509CertificateChain_xAndYdontMatch() {
 
-        IllegalStateException e = Assertions.assertThrows(IllegalStateException.class, () ->
-                new ECKey.Builder(Curve.P_256, ExampleKeyP256.X, ExampleKeyP256.Y)
+        Assertions.assertThatThrownBy(() -> new ECKey.Builder(Curve.P_256, ExampleKeyP256.X, ExampleKeyP256.Y)
                         .x509CertChain(SampleCertificates.SAMPLE_X5C_EC)
-                        .build());
-
-        assertThat(e.getMessage()).isEqualTo("The public subject key info of the first X.509 certificate in the chain must match the JWK type and public parameters");
+                        .build())
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("The public subject key info of the first X.509 certificate in the chain must match the JWK type and public parameters");
     }
 
     @Test
@@ -848,17 +842,17 @@ public class ECKeyTest {
         MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
         String pemEncodedCert = IOUtil.readFileToString("src/test/resources/sample-certs/wikipedia.crt");
         X509Certificate cert = X509CertUtils.parse(pemEncodedCert);
-        assertThat(cert).isNotNull();
+        Assertions.assertThat(cert).isNotNull();
         ECKey ecKey = ECKey.parse(cert);
 
-        assertThat(ecKey.getKeyType()).isEqualTo(KeyType.EC);
-        assertThat(ecKey.getCurve()).isEqualTo(Curve.P_256);
-        assertThat(ecKey.getKeyUse()).isEqualTo(KeyUse.ENCRYPTION);
-        assertThat(ecKey.getKeyID()).isEqualTo(cert.getSerialNumber().toString(10));
-        assertThat(ecKey.getX509CertChain().size()).isEqualTo(1);
-        assertThat(ecKey.getX509CertSHA256Thumbprint()).isEqualTo(Base64URLValue.encode(sha256.digest(cert.getEncoded())));
-        assertThat(ecKey.getAlgorithm()).isNull();
-        assertThat(ecKey.getKeyOperations()).isNull();
+        Assertions.assertThat(ecKey.getKeyType()).isEqualTo(KeyType.EC);
+        Assertions.assertThat(ecKey.getCurve()).isEqualTo(Curve.P_256);
+        Assertions.assertThat(ecKey.getKeyUse()).isNull();
+        Assertions.assertThat(ecKey.getKeyID()).isEqualTo(cert.getSerialNumber().toString(10));
+        Assertions.assertThat(ecKey.getX509CertChain().size()).isEqualTo(1);
+        Assertions.assertThat(ecKey.getX509CertSHA256Thumbprint()).isEqualTo(Base64URLValue.encode(sha256.digest(cert.getEncoded())));
+        Assertions.assertThat(ecKey.getAlgorithm()).isNull();
+        Assertions.assertThat(ecKey.getKeyOperations()).isNull();
     }
 
     @Test
@@ -866,12 +860,11 @@ public class ECKeyTest {
 
         String pemEncodedCert = IOUtil.readFileToString("src/test/resources/sample-certs/ietf.crt");
         X509Certificate cert = X509CertUtils.parse(pemEncodedCert);
-        assertThat(cert).isNotNull();
+        Assertions.assertThat(cert).isNotNull();
 
-        JOSEException e = Assertions.assertThrows(JOSEException.class,
-                () -> ECKey.parse(cert));
-
-        assertThat(e.getMessage()).isEqualTo("The public key of the X.509 certificate is not EC");
+        Assertions.assertThatThrownBy(() -> ECKey.parse(cert))
+                .isInstanceOf(JOSEException.class)
+                .hasMessage("The public key of the X.509 certificate is not EC");
     }
 
     @Test
@@ -916,21 +909,19 @@ public class ECKeyTest {
 
         // Load
         ECKey ecKey = ECKey.load(keyStore, "1", "1234".toCharArray());
-        assertThat(ecKey).isNotNull();
-        assertThat(ecKey.getCurve()).isEqualTo(Curve.P_521);
-        assertThat(ecKey.getKeyUse()).isEqualTo(KeyUse.SIGNATURE);
-        assertThat(ecKey.getKeyID()).isEqualTo("1");
-        assertThat(ecKey.getX509CertChain().size()).isEqualTo(1);
-        assertThat(ecKey.getX509CertSHA256Thumbprint()).isNotNull();
-        assertThat(ecKey.isPrivate()).isTrue();
-        assertThat(ecKey.getKeyStore()).isEqualTo(keyStore);
+        Assertions.assertThat(ecKey).isNotNull();
+        Assertions.assertThat(ecKey.getCurve()).isEqualTo(Curve.P_521);
+        Assertions.assertThat(ecKey.getKeyUse()).isEqualTo(KeyUse.SIGNATURE);
+        Assertions.assertThat(ecKey.getKeyID()).isEqualTo("1");
+        Assertions.assertThat(ecKey.getX509CertChain().size()).isEqualTo(1);
+        Assertions.assertThat(ecKey.getX509CertSHA256Thumbprint()).isNotNull();
+        Assertions.assertThat(ecKey.isPrivate()).isTrue();
+        Assertions.assertThat(ecKey.getKeyStore()).isEqualTo(keyStore);
 
         // Try to load with bad pin
-        JOSEException e = Assertions.assertThrows(JOSEException.class,
-                () -> ECKey.load(keyStore, "1", "".toCharArray()));
-
-        assertThat(e.getMessage()).isEqualTo("Couldn't retrieve private EC key (bad pin?): Get Key failed: Given final block not properly padded. Such issues can arise if a bad key is used during decryption.");
-        assertThat(e.getCause()).isInstanceOf(UnrecoverableKeyException.class);
+        Assertions.assertThatThrownBy(() -> ECKey.load(keyStore, "1", "".toCharArray()))
+                .isInstanceOf(JOSEException.class)
+                .hasMessage("Couldn't retrieve private EC key (bad pin?): Get Key failed: Given final block not properly padded. Such issues can arise if a bad key is used during decryption.");
 
     }
 
@@ -949,14 +940,14 @@ public class ECKeyTest {
         keyStore.setCertificateEntry("1", cert);
 
         ECKey ecKey = ECKey.load(keyStore, "1", null);
-        assertThat(ecKey).isNotNull();
-        assertThat(ecKey.getCurve()).isEqualTo(Curve.P_256);
-        assertThat(ecKey.getKeyUse()).isEqualTo(KeyUse.ENCRYPTION);
-        assertThat(ecKey.getKeyID()).isEqualTo("1");
-        assertThat(ecKey.getX509CertChain().size()).isEqualTo(1);
-        assertThat(ecKey.getX509CertSHA256Thumbprint()).isNotNull();
-        assertThat(ecKey.isPrivate()).isFalse();
-        assertThat(ecKey.getKeyStore()).isEqualTo(keyStore);
+        Assertions.assertThat(ecKey).isNotNull();
+        Assertions.assertThat(ecKey.getCurve()).isEqualTo(Curve.P_256);
+        Assertions.assertThat(ecKey.getKeyUse()).isNull();
+        Assertions.assertThat(ecKey.getKeyID()).isEqualTo("1");
+        Assertions.assertThat(ecKey.getX509CertChain().size()).isEqualTo(1);
+        Assertions.assertThat(ecKey.getX509CertSHA256Thumbprint()).isNotNull();
+        Assertions.assertThat(ecKey.isPrivate()).isFalse();
+        Assertions.assertThat(ecKey.getKeyStore()).isEqualTo(keyStore);
     }
 
     @Test
@@ -973,9 +964,9 @@ public class ECKeyTest {
 
         keyStore.setCertificateEntry("1", cert);
 
-        JOSEException e = Assertions.assertThrows(JOSEException.class,
-                () -> ECKey.load(keyStore, "1", null));
-        assertThat(e.getMessage()).isEqualTo("Couldn't load EC JWK: The key algorithm is not EC");
+        Assertions.assertThatThrownBy(() -> ECKey.load(keyStore, "1", null))
+                .isInstanceOf(JOSEException.class)
+                .hasMessage("Couldn't load EC JWK: The key algorithm is not EC");
     }
 
     @Test
@@ -987,48 +978,50 @@ public class ECKeyTest {
         char[] password = "secret".toCharArray();
         keyStore.load(null, password);
 
-        assertThat(ECKey.load(keyStore, "1", null)).isNull();
+        Assertions.assertThat(ECKey.load(keyStore, "1", null)).isNull();
     }
 
     @Test
     // iss #217
     public void testEnsurePublicXYCoordinatesOnCurve_1() {
 
-        IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new ECKey(
-                        Curve.P_256,
-                        ExampleKeyP384Alt.X, // on diff curve
-                        ExampleKeyP384Alt.Y, // on diff curve
-                        KeyUse.SIGNATURE,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null));
-        assertThat(e.getMessage()).isEqualTo("Invalid EC JWK: The 'x' and 'y' public coordinates are not on the P-256 curve");
+        Assertions.assertThatThrownBy(
+                        () -> new ECKey(
+                                Curve.P_256,
+                                ExampleKeyP384Alt.X, // on diff curve
+                                ExampleKeyP384Alt.Y, // on diff curve
+                                KeyUse.SIGNATURE,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Invalid EC JWK: The 'x' and 'y' public coordinates are not on the P-256 curve");
     }
 
     @Test
     // iss #217
     public void testEnsurePublicXYCoordinatesOnCurve_2() {
 
-        IllegalArgumentException e2 = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new ECKey(
-                        Curve.P_256,
-                        ExampleKeyP384Alt.X, // on diff curve
-                        ExampleKeyP384Alt.Y, // on diff curve
-                        ExampleKeyP256.D,    // private D coordinate
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null));
-        assertThat(e2.getMessage()).isEqualTo("Invalid EC JWK: The 'x' and 'y' public coordinates are not on the P-256 curve");
+        Assertions.assertThatThrownBy(
+                        () -> new ECKey(
+                                Curve.P_256,
+                                ExampleKeyP384Alt.X, // on diff curve
+                                ExampleKeyP384Alt.Y, // on diff curve
+                                ExampleKeyP256.D,    // private D coordinate
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Invalid EC JWK: The 'x' and 'y' public coordinates are not on the P-256 curve");
     }
 
     @Test
@@ -1082,15 +1075,16 @@ public class ECKeyTest {
 
         // Default Sun provider
         KeyFactory keyFactory = KeyFactory.getInstance("EC");
-        RuntimeException e = Assertions.assertThrows(RuntimeException.class,
-                () -> keyFactory.generatePublic(publicKeySpec));
-        assertThat(e.getMessage()).isEqualTo("Point coordinates do not match field size");
+        Assertions.assertThatThrownBy(() -> keyFactory.generatePublic(publicKeySpec))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Point coordinates do not match field size");
 
         // BouncyCastle provider
         KeyFactory keyFactory2 = KeyFactory.getInstance("EC", BouncyCastleProviderSingleton.getInstance());
-        Exception e2 = Assertions.assertThrows(Exception.class,
-                () -> keyFactory2.generatePublic(publicKeySpec));
-        assertThat(e2.getCause().getMessage()).isEqualTo("x value invalid for SecP256R1FieldElement");
+        Assertions.assertThatThrownBy(
+                        () -> keyFactory2.generatePublic(publicKeySpec))
+                .isInstanceOf(Exception.class)
+                .hasMessage("invalid KeySpec: x value invalid for SecP256R1FieldElement");
     }
 
     @Test
@@ -1112,7 +1106,7 @@ public class ECKeyTest {
         //When
 
         //Then
-        assertThat(ecKeyB).isEqualTo(ecKeyA);
+        Assertions.assertThat(ecKeyB).isEqualTo(ecKeyA);
     }
 
     @Test
@@ -1144,7 +1138,7 @@ public class ECKeyTest {
         //When
 
         //Then
-        assertThat(ecKeyA).isNotEqualTo(ecKeyB);
+        Assertions.assertThat(ecKeyA).isNotEqualTo(ecKeyB);
     }
 
 
@@ -1153,15 +1147,17 @@ public class ECKeyTest {
         List<AtbashKey> keys = TestKeys.generateECKeys("kid");
         List<AtbashKey> publicKey = new AsymmetricPartKeyFilter(AsymmetricPart.PUBLIC).filter(keys);
         ECKey ecKey = new ECKey.Builder(Curve.P_256, publicKey.get(0)).build();
-        assertThat(ecKey).isNotNull();
+        Assertions.assertThat(ecKey).isNotNull();
     }
 
     @Test
     public void testBuilderWithAtbashKey_WrongType() {
         List<AtbashKey> keys = TestKeys.generateECKeys("kid");
         List<AtbashKey> publicKey = new AsymmetricPartKeyFilter(AsymmetricPart.PRIVATE).filter(keys);
-        KeyTypeException exception = Assertions.assertThrows(KeyTypeException.class, () -> new ECKey.Builder(Curve.P_256, publicKey.get(0)).build());
-        assertThat(exception.getMessage()).isEqualTo("PUBLIC key required for ECKey creation");
+        Assertions.assertThatThrownBy(
+                        () -> new ECKey.Builder(Curve.P_256, publicKey.get(0)).build())
+                .isInstanceOf(KeyTypeException.class)
+                .hasMessage("PUBLIC key required for ECKey creation");
 
     }
 
@@ -1169,8 +1165,63 @@ public class ECKeyTest {
     public void testBuilderWithAtbashKey_WrongKey() {
         List<AtbashKey> keys = TestKeys.generateRSAKeys("kid");
         List<AtbashKey> publicKey = new AsymmetricPartKeyFilter(AsymmetricPart.PUBLIC).filter(keys);
-        KeyTypeException exception = Assertions.assertThrows(KeyTypeException.class, () -> new ECKey.Builder(Curve.P_256, publicKey.get(0)).build());
-        assertThat(exception.getMessage()).isEqualTo("Unsupported KeyType RSA for ECKey creation");
+        Assertions.assertThatThrownBy(() -> new ECKey.Builder(Curve.P_256, publicKey.get(0)).build())
+                .isInstanceOf(KeyTypeException.class)
+                .hasMessage("Unsupported KeyType RSA for ECKey creation");
+
+    }
+
+    @Test
+    public void testParse_fromEmptyJSONObject() {
+
+        JsonObject jsonObject = Json.createObjectBuilder().build();
+        Assertions.assertThatThrownBy(() -> ECKey.parse(jsonObject))
+                .isInstanceOf(ParseException.class)
+                .hasMessage("The key type to parse must not be null");
+
+    }
+
+
+    @Test
+    public void testParse_missingCurve() {
+
+        JsonObject jsonObject = Json.createObjectBuilder()
+                .add(JWKIdentifiers.KEY_TYPE, "EC")
+                .add(JWKIdentifiers.X_COORD, "MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4")
+                .add(JWKIdentifiers.Y_COORD, "4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM")
+                .build();
+        Assertions.assertThatThrownBy(() -> ECKey.parse(jsonObject))
+                .isInstanceOf(ParseException.class)
+                .hasMessage("The cryptographic curve string must not be null or empty");
+
+    }
+
+    @Test
+    public void testParse_missingX() {
+
+        JsonObject jsonObject = Json.createObjectBuilder()
+                .add(JWKIdentifiers.KEY_TYPE, "EC")
+                .add(JWKIdentifiers.CURVE, "P-256")
+                .add(JWKIdentifiers.Y_COORD, "4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM")
+                .build();
+        Assertions.assertThatThrownBy(() -> ECKey.parse(jsonObject))
+                .isInstanceOf(ParseException.class)
+                .hasMessage("The 'x' coordinate must not be null");
+
+    }
+
+
+    @Test
+    public void testParse_missingY() {
+
+        JsonObject jsonObject = Json.createObjectBuilder()
+                .add(JWKIdentifiers.KEY_TYPE, "EC")
+                .add(JWKIdentifiers.CURVE, "P-256")
+                .add(JWKIdentifiers.X_COORD, "MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4")
+                .build();
+        Assertions.assertThatThrownBy(() -> ECKey.parse(jsonObject))
+                .isInstanceOf(ParseException.class)
+                .hasMessage("The 'y' coordinate must not be null");
 
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,10 @@ package be.atbash.ee.security.octopus.nimbus.jwt;
 
 import be.atbash.ee.security.octopus.nimbus.jose.Algorithm;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEObjectType;
+import be.atbash.ee.security.octopus.nimbus.jose.Payload;
 import be.atbash.ee.security.octopus.nimbus.jose.PlainHeader;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.Date;
@@ -49,7 +51,7 @@ public class PlainJWTTest {
     public void testHeaderAndClaimsSetConstructor()
             throws Exception {
 
-        PlainHeader header = new PlainHeader.Builder().parameter("exp", 1000L).build();
+        PlainHeader header = new PlainHeader.Builder().parameter(JWTClaimNames.EXPIRATION_TIME, 1000L).build();
 
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                 .subject("alice")
@@ -146,5 +148,21 @@ public class PlainJWTTest {
         PlainJWT jwt = new PlainJWT(new JWTClaimsSet.Builder().build());
         String jwtString = " " + jwt.serialize() + " ";
         PlainJWT.parse(jwtString);
+    }
+
+    @Test
+    public void testPayloadUpdated()
+            throws Exception {
+
+        PlainJWT jwt = new PlainJWT(new JWTClaimsSet.Builder()
+                .subject("before").build());
+
+        Assertions.assertThat(jwt.getJWTClaimsSet().getSubject()).isEqualTo("before");
+
+
+        jwt.setPayload(new Payload(new JWTClaimsSet.Builder()
+                .subject("after").build().toJSONObject()));
+
+        Assertions.assertThat(jwt.getJWTClaimsSet().getSubject()).isEqualTo("after");
     }
 }

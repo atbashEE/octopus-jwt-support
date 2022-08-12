@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,15 +19,28 @@ package be.atbash.ee.security.octopus.nimbus.util;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonString;
 import jakarta.json.JsonValue;
+import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.openssl.PEMParser;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 
 /**
  * X.509 certificate chain utilities.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
 public final class X509CertChainUtils {
@@ -104,6 +117,86 @@ public final class X509CertChainUtils {
         return out;
     }
 
+    /**
+     * Parses a X.509 certificate chain from the specified PEM-encoded
+     * representation. PEM-encoded objects that are not X.509 certificates
+     * are ignored.
+     *
+     * @param pemFile The PEM-encoded X.509 certificate chain file. Must
+     *                not be {@code null}.
+     * @return The X.509 certificate chain, empty list if no certificates
+     * are found.
+     * @throws IOException          On I/O exception.
+     * @throws CertificateException On a certificate exception.
+     */
+    public static List<X509Certificate> parse(File pemFile)
+            throws IOException, CertificateException {
+
+        String pemString = new String(Files.readAllBytes(pemFile.toPath()), StandardCharsets.UTF_8);
+        return parse(pemString);
+    }
+
+
+    /**
+     * Parses a X.509 certificate chain from the specified PEM-encoded
+     * representation. PEM-encoded objects that are not X.509 certificates
+     * are ignored.
+     *
+     * @param pemString The PEM-encoded X.509 certificate chain. Must not
+     *                  be {@code null}.
+     * @return The X.509 certificate chain, empty list if no certificates
+     * are found.
+     * @throws IOException          On I/O exception.
+     * @throws CertificateException On a certificate exception.
+     */
+    public static List<X509Certificate> parse(String pemString)
+            throws IOException, CertificateException {
+
+        Reader pemReader = new StringReader(pemString);
+        PEMParser parser = new PEMParser(pemReader);
+
+        List<X509Certificate> certChain = new LinkedList<>();
+
+        Object pemObject;
+        do {
+            pemObject = parser.readObject();
+
+            if (pemObject instanceof X509CertificateHolder) {
+
+                X509CertificateHolder certHolder = (X509CertificateHolder) pemObject;
+                byte[] derEncodedCert = certHolder.getEncoded();
+                certChain.add(X509CertUtils.parseWithException(derEncodedCert));
+
+            }
+
+        } while (pemObject != null);
+
+        return certChain;
+    }
+
+    /**
+     * Stores a X.509 certificate chain into the specified Java trust (key)
+     * store. The name (alias) for each certificate in the store is a
+     * generated UUID.
+     *
+     * @param trustStore The trust (key) store. Must be initialised and not
+     *                   {@code null}.
+     * @param certChain  The X.509 certificate chain. Must not be
+     *                   {@code null}.
+     * @throws KeyStoreException On a key store exception.
+     */
+    public static List<UUID> store(KeyStore trustStore, List<X509Certificate> certChain)
+            throws KeyStoreException {
+
+        List<UUID> aliases = new LinkedList<>();
+        for (X509Certificate cert : certChain) {
+            UUID alias = UUID.randomUUID();
+            trustStore.setCertificateEntry(alias.toString(), cert);
+            aliases.add(alias);
+
+        }
+        return aliases;
+    }
 
     /**
      * Prevents public instantiation.

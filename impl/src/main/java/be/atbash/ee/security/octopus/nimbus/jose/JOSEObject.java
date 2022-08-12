@@ -22,8 +22,8 @@ import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSObject;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.ee.security.octopus.nimbus.util.JSONObjectUtils;
-
 import jakarta.json.JsonObject;
+
 import java.io.Serializable;
 import java.text.ParseException;
 
@@ -31,7 +31,7 @@ import java.text.ParseException;
 /**
  * The base abstract class for unsecured (plain / {@code alg=none}), JSON Web
  * Signature (JWS) secured and JSON Web Encryption (JWE) secured objects.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
 public abstract class JOSEObject implements Serializable {
@@ -270,7 +270,7 @@ public abstract class JOSEObject implements Serializable {
         JsonObject jsonObject;
 
         try {
-            jsonObject = JSONObjectUtils.parse(parts[0].decodeToString());
+            jsonObject = JSONObjectUtils.parse(parts[0].decodeToString(), Header.MAX_HEADER_STRING_LENGTH);
 
         } catch (ParseException e) {
 

@@ -138,7 +138,7 @@ public class RSASSAVerifier extends RSASSAProvider implements JWSVerifier {
 
     public Set<String> getDeferredCriticalHeaderParams() {
 
-        return critPolicy.getProcessedCriticalHeaderParams();
+        return critPolicy.getDeferredCriticalHeaderParams();
     }
 
 

@@ -21,9 +21,9 @@ import be.atbash.ee.security.octopus.nimbus.jwt.SignedJWT;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSObject;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.ee.security.octopus.nimbus.util.JSONObjectUtils;
+import jakarta.json.JsonObject;
 import org.slf4j.MDC;
 
-import jakarta.json.JsonObject;
 import java.io.Serializable;
 import java.text.ParseException;
 
@@ -244,6 +244,7 @@ public final class Payload implements Serializable {
     public Payload(Base64URLValue base64URL) {
 
         if (base64URL == null) {
+            MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, "The token has no payload section");
             throw new IllegalArgumentException("The Base64URL-encoded object must not be null");
         }
 
@@ -353,7 +354,9 @@ public final class Payload implements Serializable {
             // Payload not a JSON object
             // These messages are in function of JWT validation by Atbash Runtime so have slightly narrow meaning of the provided parameters.
             // TODO According to some tests, the reason can be different than mentioned. But when handling a JWT, it should be OK. Double check!
-            MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, String.format("The payload of the token is not a valid JSON: %s", json));
+            int length = Math.min(json.length(), 200);
+            String continuation = length < json.length() ? "..." : "";
+            MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, String.format("The payload of the token is not a valid JSON: %s%s", json.substring(0, length), continuation));
 
             return null;
         }

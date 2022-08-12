@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,13 @@ package be.atbash.ee.security.octopus.nimbus.jwk;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.TestKeys;
 import be.atbash.ee.security.octopus.nimbus.SampleCertificates;
+import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.KeyTypeException;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.ee.security.octopus.nimbus.util.Base64Value;
-import org.junit.jupiter.api.Assertions;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import javax.crypto.KeyGenerator;
@@ -33,20 +34,19 @@ import javax.crypto.spec.SecretKeySpec;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
+import jakarta.json.JsonValue;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
-import java.security.UnrecoverableKeyException;
+import java.text.ParseException;
 import java.util.*;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 
 /**
  * Tests the Octet Sequence JWK class.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
 public class OctetSequenceKeyTest {
@@ -67,61 +67,61 @@ public class OctetSequenceKeyTest {
 
         OctetSequenceKey key = new OctetSequenceKey(k, null, ops, JWSAlgorithm.HS256, "1", x5u, x5t256, x5c, keyStore);
 
-        assertThat(key).isInstanceOf(SecretJWK.class);
+        Assertions.assertThat(key).isInstanceOf(SecretJWK.class);
 
-        assertThat(key.getKeyType()).isEqualTo(KeyType.OCT);
-        assertThat(key.getKeyUse()).isNull();
-        assertThat(key.getKeyOperations().contains(KeyOperation.SIGN)).isTrue();
-        assertThat(key.getKeyOperations().contains(KeyOperation.VERIFY)).isTrue();
-        assertThat(key.getKeyOperations().size()).isEqualTo(2);
-        assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.HS256);
-        assertThat(key.getKeyID()).isEqualTo("1");
-        assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
-        assertThat(key.getX509CertSHA256Thumbprint().toString()).isEqualTo(x5t256.toString());
-        assertThat(key.getX509CertChain().size()).isEqualTo(x5c.size());
-        assertThat(key.getKeyStore()).isEqualTo(keyStore);
+        Assertions.assertThat(key.getKeyType()).isEqualTo(KeyType.OCT);
+        Assertions.assertThat(key.getKeyUse()).isNull();
+        Assertions.assertThat(key.getKeyOperations().contains(KeyOperation.SIGN)).isTrue();
+        Assertions.assertThat(key.getKeyOperations().contains(KeyOperation.VERIFY)).isTrue();
+        Assertions.assertThat(key.getKeyOperations().size()).isEqualTo(2);
+        Assertions.assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.HS256);
+        Assertions.assertThat(key.getKeyID()).isEqualTo("1");
+        Assertions.assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
+        Assertions.assertThat(key.getX509CertSHA256Thumbprint().toString()).isEqualTo(x5t256.toString());
+        Assertions.assertThat(key.getX509CertChain().size()).isEqualTo(x5c.size());
+        Assertions.assertThat(key.getKeyStore()).isEqualTo(keyStore);
 
-        assertThat(key.getKeyValue()).isEqualTo(k);
+        Assertions.assertThat(key.getKeyValue()).isEqualTo(k);
 
         byte[] keyBytes = k.decode();
 
         for (int i = 0; i < keyBytes.length; i++) {
-            assertThat(key.toByteArray()[i]).isEqualTo(keyBytes[i]);
+            Assertions.assertThat(key.toByteArray()[i]).isEqualTo(keyBytes[i]);
         }
 
-        assertThat(key.toPublicJWK()).isNull();
+        Assertions.assertThat(key.toPublicJWK()).isNull();
 
-        assertThat(key.isPrivate()).isTrue();
+        Assertions.assertThat(key.isPrivate()).isTrue();
 
         String jwkString = key.toJSONObject().build().toString();
 
         key = OctetSequenceKey.parse(jwkString);
 
-        assertThat(key.getKeyType()).isEqualTo(KeyType.OCT);
-        assertThat(key.getKeyUse()).isNull();
-        assertThat(key.getKeyOperations().contains(KeyOperation.SIGN)).isTrue();
-        assertThat(key.getKeyOperations().contains(KeyOperation.VERIFY)).isTrue();
-        assertThat(key.getKeyOperations().size()).isEqualTo(2);
-        assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.HS256);
-        assertThat(key.getKeyID()).isEqualTo("1");
-        assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
-        assertThat(key.getX509CertSHA256Thumbprint().toString()).isEqualTo(x5t256.toString());
-        assertThat(key.getX509CertChain().size()).isEqualTo(x5c.size());
-        assertThat(key.getKeyStore()).isNull();
+        Assertions.assertThat(key.getKeyType()).isEqualTo(KeyType.OCT);
+        Assertions.assertThat(key.getKeyUse()).isNull();
+        Assertions.assertThat(key.getKeyOperations().contains(KeyOperation.SIGN)).isTrue();
+        Assertions.assertThat(key.getKeyOperations().contains(KeyOperation.VERIFY)).isTrue();
+        Assertions.assertThat(key.getKeyOperations().size()).isEqualTo(2);
+        Assertions.assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.HS256);
+        Assertions.assertThat(key.getKeyID()).isEqualTo("1");
+        Assertions.assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
+        Assertions.assertThat(key.getX509CertSHA256Thumbprint().toString()).isEqualTo(x5t256.toString());
+        Assertions.assertThat(key.getX509CertChain().size()).isEqualTo(x5c.size());
+        Assertions.assertThat(key.getKeyStore()).isNull();
 
-        assertThat(key.getKeyValue()).isEqualTo(k);
+        Assertions.assertThat(key.getKeyValue()).isEqualTo(k);
 
         keyBytes = k.decode();
 
         for (int i = 0; i < keyBytes.length; i++) {
 
-            assertThat(key.toByteArray()[i]).isEqualTo(keyBytes[i]);
+            Assertions.assertThat(key.toByteArray()[i]).isEqualTo(keyBytes[i]);
 
         }
 
-        assertThat(key.toPublicJWK()).isNull();
+        Assertions.assertThat(key.toPublicJWK()).isNull();
 
-        assertThat(key.isPrivate()).isTrue();
+        Assertions.assertThat(key.isPrivate()).isTrue();
     }
 
     @Test
@@ -135,54 +135,54 @@ public class OctetSequenceKeyTest {
 
         OctetSequenceKey key = new OctetSequenceKey(k, KeyUse.SIGNATURE, null, JWSAlgorithm.HS256, "1", x5u, x5t256, x5c, null);
 
-        assertThat(key.getKeyType()).isEqualTo(KeyType.OCT);
-        assertThat(key.getKeyUse()).isEqualTo(KeyUse.SIGNATURE);
-        assertThat(key.getKeyOperations()).isNull();
-        assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.HS256);
-        assertThat(key.getKeyID()).isEqualTo("1");
-        assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
-        assertThat(key.getX509CertSHA256Thumbprint().toString()).isEqualTo(x5t256.toString());
-        assertThat(key.getX509CertChain().size()).isEqualTo(x5c.size());
-        assertThat(key.getKeyStore()).isNull();
+        Assertions.assertThat(key.getKeyType()).isEqualTo(KeyType.OCT);
+        Assertions.assertThat(key.getKeyUse()).isEqualTo(KeyUse.SIGNATURE);
+        Assertions.assertThat(key.getKeyOperations()).isNull();
+        Assertions.assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.HS256);
+        Assertions.assertThat(key.getKeyID()).isEqualTo("1");
+        Assertions.assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
+        Assertions.assertThat(key.getX509CertSHA256Thumbprint().toString()).isEqualTo(x5t256.toString());
+        Assertions.assertThat(key.getX509CertChain().size()).isEqualTo(x5c.size());
+        Assertions.assertThat(key.getKeyStore()).isNull();
 
-        assertThat(key.getKeyValue()).isEqualTo(k);
+        Assertions.assertThat(key.getKeyValue()).isEqualTo(k);
 
         byte[] keyBytes = k.decode();
 
         for (int i = 0; i < keyBytes.length; i++) {
-            assertThat(key.toByteArray()[i]).isEqualTo(keyBytes[i]);
+            Assertions.assertThat(key.toByteArray()[i]).isEqualTo(keyBytes[i]);
         }
 
-        assertThat(key.toPublicJWK()).isNull();
+        Assertions.assertThat(key.toPublicJWK()).isNull();
 
-        assertThat(key.isPrivate()).isTrue();
+        Assertions.assertThat(key.isPrivate()).isTrue();
 
         String jwkString = key.toJSONObject().build().toString();
 
         key = OctetSequenceKey.parse(jwkString);
 
-        assertThat(key.getKeyType()).isEqualTo(KeyType.OCT);
-        assertThat(key.getKeyUse()).isEqualTo(KeyUse.SIGNATURE);
-        assertThat(key.getKeyOperations()).isNull();
-        assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.HS256);
-        assertThat(key.getKeyID()).isEqualTo("1");
-        assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
-        assertThat(key.getX509CertSHA256Thumbprint().toString()).isEqualTo(x5t256.toString());
-        assertThat(key.getX509CertChain().size()).isEqualTo(x5c.size());
+        Assertions.assertThat(key.getKeyType()).isEqualTo(KeyType.OCT);
+        Assertions.assertThat(key.getKeyUse()).isEqualTo(KeyUse.SIGNATURE);
+        Assertions.assertThat(key.getKeyOperations()).isNull();
+        Assertions.assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.HS256);
+        Assertions.assertThat(key.getKeyID()).isEqualTo("1");
+        Assertions.assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
+        Assertions.assertThat(key.getX509CertSHA256Thumbprint().toString()).isEqualTo(x5t256.toString());
+        Assertions.assertThat(key.getX509CertChain().size()).isEqualTo(x5c.size());
 
-        assertThat(key.getKeyValue()).isEqualTo(k);
+        Assertions.assertThat(key.getKeyValue()).isEqualTo(k);
 
         keyBytes = k.decode();
 
         for (int i = 0; i < keyBytes.length; i++) {
 
-            assertThat(key.toByteArray()[i]).isEqualTo(keyBytes[i]);
+            Assertions.assertThat(key.toByteArray()[i]).isEqualTo(keyBytes[i]);
 
         }
 
-        assertThat(key.toPublicJWK()).isNull();
+        Assertions.assertThat(key.toPublicJWK()).isNull();
 
-        assertThat(key.isPrivate()).isTrue();
+        Assertions.assertThat(key.isPrivate()).isTrue();
     }
 
     @Test
@@ -193,19 +193,20 @@ public class OctetSequenceKeyTest {
         Set<KeyOperation> ops = new HashSet<>(Arrays.asList(KeyOperation.SIGN, KeyOperation.VERIFY));
 
         JWK jwk = new OctetSequenceKey(new Base64URLValue("GawgguFyGrWKav7AX4VKUg"), use, ops, null, null, null, null, null, null);
-        assertThat(jwk.getKeyUse()).isEqualTo(use);
-        assertThat(jwk.getKeyOperations()).isEqualTo(ops);
+        Assertions.assertThat(jwk.getKeyUse()).isEqualTo(use);
+        Assertions.assertThat(jwk.getKeyOperations()).isEqualTo(ops);
     }
 
     @Test
     public void testRejectKeyUseNotConsistentWithOps() {
 
-        IllegalStateException e = Assertions.assertThrows(IllegalStateException.class,
-                () -> new OctetSequenceKey.Builder(new Base64URLValue("GawgguFyGrWKav7AX4VKUg"))
-                        .keyUse(KeyUse.SIGNATURE)
-                        .keyOperations(Collections.singleton(KeyOperation.ENCRYPT))
-                        .build());
-        assertThat(e.getMessage()).isEqualTo("The key use \"use\" and key options \"key_opts\" parameters are not consistent, see RFC 7517, section 4.3");
+        Assertions.assertThatThrownBy(
+                        () -> new OctetSequenceKey.Builder(new Base64URLValue("GawgguFyGrWKav7AX4VKUg"))
+                                .keyUse(KeyUse.SIGNATURE)
+                                .keyOperations(Collections.singleton(KeyOperation.ENCRYPT))
+                                .build())
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("The key use \"use\" and key options \"key_opts\" parameters are not consistent, see RFC 7517, section 4.3");
     }
 
     @Test
@@ -229,28 +230,28 @@ public class OctetSequenceKeyTest {
                 .keyStore(keyStore)
                 .build();
 
-        assertThat(key.getKeyType()).isEqualTo(KeyType.OCT);
-        assertThat(key.getKeyUse()).isNull();
-        assertThat(key.getKeyOperations().contains(KeyOperation.SIGN)).isTrue();
-        assertThat(key.getKeyOperations().contains(KeyOperation.VERIFY)).isTrue();
-        assertThat(key.getKeyOperations().size()).isEqualTo(2);
-        assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.HS256);
-        assertThat(key.getKeyID()).isEqualTo("1");
-        assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
-        assertThat(key.getX509CertChain().size()).isEqualTo(x5c.size());
-        assertThat(key.getKeyStore()).isEqualTo(keyStore);
+        Assertions.assertThat(key.getKeyType()).isEqualTo(KeyType.OCT);
+        Assertions.assertThat(key.getKeyUse()).isNull();
+        Assertions.assertThat(key.getKeyOperations().contains(KeyOperation.SIGN)).isTrue();
+        Assertions.assertThat(key.getKeyOperations().contains(KeyOperation.VERIFY)).isTrue();
+        Assertions.assertThat(key.getKeyOperations().size()).isEqualTo(2);
+        Assertions.assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.HS256);
+        Assertions.assertThat(key.getKeyID()).isEqualTo("1");
+        Assertions.assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
+        Assertions.assertThat(key.getX509CertChain().size()).isEqualTo(x5c.size());
+        Assertions.assertThat(key.getKeyStore()).isEqualTo(keyStore);
 
-        assertThat(key.getKeyValue()).isEqualTo(k);
+        Assertions.assertThat(key.getKeyValue()).isEqualTo(k);
 
         byte[] keyBytes = k.decode();
 
         for (int i = 0; i < keyBytes.length; i++) {
-            assertThat(key.toByteArray()[i]).isEqualTo(keyBytes[i]);
+            Assertions.assertThat(key.toByteArray()[i]).isEqualTo(keyBytes[i]);
         }
 
-        assertThat(key.toPublicJWK()).isNull();
+        Assertions.assertThat(key.toPublicJWK()).isNull();
 
-        assertThat(key.isPrivate()).isTrue();
+        Assertions.assertThat(key.isPrivate()).isTrue();
 
 
         String jwkString = key.toJSONObject().build().toString();
@@ -258,28 +259,28 @@ public class OctetSequenceKeyTest {
         key = OctetSequenceKey.parse(jwkString);
 
 
-        assertThat(key.getKeyType()).isEqualTo(KeyType.OCT);
-        assertThat(key.getKeyUse()).isNull();
-        assertThat(key.getKeyOperations().contains(KeyOperation.SIGN)).isTrue();
-        assertThat(key.getKeyOperations().contains(KeyOperation.VERIFY)).isTrue();
-        assertThat(key.getKeyOperations().size()).isEqualTo(2);
-        assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.HS256);
-        assertThat(key.getKeyID()).isEqualTo("1");
-        assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
-        assertThat(key.getX509CertChain().size()).isEqualTo(x5c.size());
-        assertThat(key.getKeyStore()).isNull();
+        Assertions.assertThat(key.getKeyType()).isEqualTo(KeyType.OCT);
+        Assertions.assertThat(key.getKeyUse()).isNull();
+        Assertions.assertThat(key.getKeyOperations().contains(KeyOperation.SIGN)).isTrue();
+        Assertions.assertThat(key.getKeyOperations().contains(KeyOperation.VERIFY)).isTrue();
+        Assertions.assertThat(key.getKeyOperations().size()).isEqualTo(2);
+        Assertions.assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.HS256);
+        Assertions.assertThat(key.getKeyID()).isEqualTo("1");
+        Assertions.assertThat(key.getX509CertURL().toString()).isEqualTo(x5u.toString());
+        Assertions.assertThat(key.getX509CertChain().size()).isEqualTo(x5c.size());
+        Assertions.assertThat(key.getKeyStore()).isNull();
 
-        assertThat(key.getKeyValue()).isEqualTo(k);
+        Assertions.assertThat(key.getKeyValue()).isEqualTo(k);
 
         keyBytes = k.decode();
 
         for (int i = 0; i < keyBytes.length; i++) {
-            assertThat(key.toByteArray()[i]).isEqualTo(keyBytes[i]);
+            Assertions.assertThat(key.toByteArray()[i]).isEqualTo(keyBytes[i]);
         }
 
-        assertThat(key.toPublicJWK()).isNull();
+        Assertions.assertThat(key.toPublicJWK()).isNull();
 
-        assertThat(key.isPrivate()).isTrue();
+        Assertions.assertThat(key.isPrivate()).isTrue();
     }
 
     @Test
@@ -290,7 +291,7 @@ public class OctetSequenceKeyTest {
 
         OctetSequenceKey oct = new OctetSequenceKey.Builder(key).build();
 
-        assertThat(oct.getKeyValue()).isEqualTo(Base64URLValue.encode(key));
+        Assertions.assertThat(oct.getKeyValue()).isEqualTo(Base64URLValue.encode(key));
     }
 
     @Test
@@ -302,8 +303,8 @@ public class OctetSequenceKeyTest {
         OctetSequenceKey oct = new OctetSequenceKey.Builder(new SecretKeySpec(key, "MAC")).keyUse(KeyUse.SIGNATURE).build();
 
         SecretKey secretKey = oct.toSecretKey();
-        assertThat(Arrays.equals(key, secretKey.getEncoded())).isTrue();
-        assertThat(secretKey.getAlgorithm()).isEqualTo("AES");  // Since Algorithm isn't preserved in the JWK
+        Assertions.assertThat(Arrays.equals(key, secretKey.getEncoded())).isTrue();
+        Assertions.assertThat(secretKey.getAlgorithm()).isEqualTo("AES");  // Since Algorithm isn't preserved in the JWK
     }
 
     @Test
@@ -321,11 +322,11 @@ public class OctetSequenceKeyTest {
 
         OctetSequenceKey jwk = OctetSequenceKey.parse(json);
 
-        assertThat(jwk.getKeyType()).isEqualTo(KeyType.OCT);
-        assertThat(jwk.getKeyID()).isEqualTo("018c0ae5-4d9b-471b-bfd6-eef314bc7037");
-        assertThat(jwk.getKeyUse()).isEqualTo(KeyUse.SIGNATURE);
+        Assertions.assertThat(jwk.getKeyType()).isEqualTo(KeyType.OCT);
+        Assertions.assertThat(jwk.getKeyID()).isEqualTo("018c0ae5-4d9b-471b-bfd6-eef314bc7037");
+        Assertions.assertThat(jwk.getKeyUse()).isEqualTo(KeyUse.SIGNATURE);
 
-        assertThat(jwk.getKeyValue().toString()).isEqualTo("hJtXIZ2uSN5kbQfbtTNWbpdmhkV8FJG-Onbc6mxCcYg");
+        Assertions.assertThat(jwk.getKeyValue().toString()).isEqualTo("hJtXIZ2uSN5kbQfbtTNWbpdmhkV8FJG-Onbc6mxCcYg");
     }
 
     @Test
@@ -344,12 +345,12 @@ public class OctetSequenceKeyTest {
 
         OctetSequenceKey jwk = OctetSequenceKey.parse(json);
 
-        assertThat(jwk.getKeyType()).isEqualTo(KeyType.OCT);
-        assertThat(jwk.getKeyID()).isEqualTo("77c7e2b8-6e13-45cf-8672-617b5b45243a");
-        assertThat(jwk.getKeyUse()).isEqualTo(KeyUse.ENCRYPTION);
-        assertThat(jwk.getAlgorithm()).isEqualTo(EncryptionMethod.A128GCM);
+        Assertions.assertThat(jwk.getKeyType()).isEqualTo(KeyType.OCT);
+        Assertions.assertThat(jwk.getKeyID()).isEqualTo("77c7e2b8-6e13-45cf-8672-617b5b45243a");
+        Assertions.assertThat(jwk.getKeyUse()).isEqualTo(KeyUse.ENCRYPTION);
+        Assertions.assertThat(jwk.getAlgorithm()).isEqualTo(EncryptionMethod.A128GCM);
 
-        assertThat(jwk.getKeyValue().toString()).isEqualTo("XctOhJAkA-pD9Lh7ZgW_2A");
+        Assertions.assertThat(jwk.getKeyValue().toString()).isEqualTo("XctOhJAkA-pD9Lh7ZgW_2A");
     }
 
     @Test
@@ -359,8 +360,8 @@ public class OctetSequenceKeyTest {
 
         OctetSequenceKey jwk = new OctetSequenceKey.Builder(k).build();
 
-        assertThat(Arrays.equals(k.decode(), jwk.toSecretKey().getEncoded())).isTrue();
-        assertThat(jwk.toSecretKey().getAlgorithm()).isEqualTo("AES");
+        Assertions.assertThat(Arrays.equals(k.decode(), jwk.toSecretKey().getEncoded())).isTrue();
+        Assertions.assertThat(jwk.toSecretKey().getAlgorithm()).isEqualTo("AES");
     }
 
     @Test
@@ -370,8 +371,8 @@ public class OctetSequenceKeyTest {
 
         OctetSequenceKey jwk = new OctetSequenceKey.Builder(k).build();
 
-        assertThat(Arrays.equals(k.decode(), jwk.toSecretKey().getEncoded())).isTrue();
-        assertThat(jwk.toSecretKey().getAlgorithm()).isEqualTo("AES");
+        Assertions.assertThat(Arrays.equals(k.decode(), jwk.toSecretKey().getEncoded())).isTrue();
+        Assertions.assertThat(jwk.toSecretKey().getAlgorithm()).isEqualTo("AES");
     }
 
     @Test
@@ -384,13 +385,13 @@ public class OctetSequenceKeyTest {
 
         Base64URLValue thumbprint = jwk.computeThumbprint();
 
-        assertThat(thumbprint.decode().length).isEqualTo(256 / 8);
+        Assertions.assertThat(thumbprint.decode().length).isEqualTo(256 / 8);
 
         String orderedJSON = "{\"k\":\"GawgguFyGrWKav7AX4VKUg\",\"kty\":\"oct\"}";
 
         Base64URLValue expected = Base64URLValue.encode(MessageDigest.getInstance("SHA-256").digest(orderedJSON.getBytes(StandardCharsets.UTF_8)));
 
-        assertThat(thumbprint).isEqualTo(expected);
+        Assertions.assertThat(thumbprint).isEqualTo(expected);
     }
 
     @Test
@@ -402,7 +403,7 @@ public class OctetSequenceKeyTest {
 
         Base64URLValue thumbprint = jwk.computeThumbprint("SHA-1");
 
-        assertThat(thumbprint.decode().length).isEqualTo(160 / 8);
+        Assertions.assertThat(thumbprint.decode().length).isEqualTo(160 / 8);
     }
 
     @Test
@@ -415,7 +416,7 @@ public class OctetSequenceKeyTest {
 
         Base64URLValue thumbprint = new Base64URLValue(jwk.getKeyID());
 
-        assertThat(thumbprint.decode().length).isEqualTo(256 / 8);
+        Assertions.assertThat(thumbprint.decode().length).isEqualTo(256 / 8);
 
         JsonObjectBuilder builder = Json.createObjectBuilder();
         jwk.getRequiredParams().forEach(builder::add);
@@ -424,7 +425,7 @@ public class OctetSequenceKeyTest {
 
         Base64URLValue expected = Base64URLValue.encode(MessageDigest.getInstance("SHA-256").digest(jsonObject.toString().getBytes(StandardCharsets.UTF_8)));
 
-        assertThat(thumbprint).isEqualTo(expected);
+        Assertions.assertThat(thumbprint).isEqualTo(expected);
     }
 
     @Test
@@ -436,7 +437,7 @@ public class OctetSequenceKeyTest {
 
         Base64URLValue thumbprint = new Base64URLValue(jwk.getKeyID());
 
-        assertThat(thumbprint.decode().length).isEqualTo(160 / 8);
+        Assertions.assertThat(thumbprint.decode().length).isEqualTo(160 / 8);
     }
 
 
@@ -450,7 +451,7 @@ public class OctetSequenceKeyTest {
 
         OctetSequenceKey jwk = OctetSequenceKey.parse(json);
 
-        assertThat(jwk.computeThumbprint().toString()).isEqualTo("7WWD36NF4WCpPaYtK47mM4o0a5CCeOt01JXSuMayv5g");
+        Assertions.assertThat(jwk.computeThumbprint().toString()).isEqualTo("7WWD36NF4WCpPaYtK47mM4o0a5CCeOt01JXSuMayv5g");
     }
 
     @Test
@@ -458,7 +459,7 @@ public class OctetSequenceKeyTest {
 
         byte[] keyMaterial = new byte[24];
         new SecureRandom().nextBytes(keyMaterial);
-        assertThat(new OctetSequenceKey.Builder(keyMaterial).build().size()).isEqualTo(24 * 8);
+        Assertions.assertThat(new OctetSequenceKey.Builder(keyMaterial).build().size()).isEqualTo(24 * 8);
     }
 
     @Test
@@ -477,10 +478,10 @@ public class OctetSequenceKeyTest {
         keyStore.setEntry("1", new KeyStore.SecretKeyEntry(secretKey), new KeyStore.PasswordProtection("1234".toCharArray()));
 
         OctetSequenceKey octJWK = OctetSequenceKey.load(keyStore, "1", "1234".toCharArray());
-        assertThat(octJWK).isNotNull();
-        assertThat(octJWK.getKeyID()).isEqualTo("1");
-        assertThat(Arrays.equals(secretKey.getEncoded(), octJWK.toByteArray())).isTrue();
-        assertThat(octJWK.getKeyStore()).isEqualTo(keyStore);
+        Assertions.assertThat(octJWK).isNotNull();
+        Assertions.assertThat(octJWK.getKeyID()).isEqualTo("1");
+        Assertions.assertThat(Arrays.equals(secretKey.getEncoded(), octJWK.toByteArray())).isTrue();
+        Assertions.assertThat(octJWK.getKeyStore()).isEqualTo(keyStore);
     }
 
     @Test
@@ -499,10 +500,10 @@ public class OctetSequenceKeyTest {
         keyStore.setEntry("1", new KeyStore.SecretKeyEntry(secretKey), new KeyStore.PasswordProtection("".toCharArray()));
 
         OctetSequenceKey octJWK = OctetSequenceKey.load(keyStore, "1", "".toCharArray());
-        assertThat(octJWK).isNotNull();
-        assertThat(octJWK.getKeyID()).isEqualTo("1");
-        assertThat(Arrays.equals(secretKey.getEncoded(), octJWK.toByteArray())).isTrue();
-        assertThat(octJWK.getKeyStore()).isEqualTo(keyStore);
+        Assertions.assertThat(octJWK).isNotNull();
+        Assertions.assertThat(octJWK.getKeyID()).isEqualTo("1");
+        Assertions.assertThat(Arrays.equals(secretKey.getEncoded(), octJWK.toByteArray())).isTrue();
+        Assertions.assertThat(octJWK.getKeyStore()).isEqualTo(keyStore);
     }
 
     @Test
@@ -514,7 +515,7 @@ public class OctetSequenceKeyTest {
         char[] password = "secret".toCharArray();
         keyStore.load(null, password);
 
-        assertThat(OctetSequenceKey.load(keyStore, "1", "1234".toCharArray())).isNull();
+        Assertions.assertThat(OctetSequenceKey.load(keyStore, "1", "1234".toCharArray())).isNull();
     }
 
     @Test
@@ -532,10 +533,10 @@ public class OctetSequenceKeyTest {
 
         keyStore.setEntry("1", new KeyStore.SecretKeyEntry(secretKey), new KeyStore.PasswordProtection("1234".toCharArray()));
 
-        Exception e = Assertions.assertThrows(Exception.class,
-                () -> OctetSequenceKey.load(keyStore, "1", "badpin".toCharArray()));
-        assertThat(e.getMessage()).contains("Couldn't retrieve secret key (bad pin?)");
-        assertThat(e.getCause()).isInstanceOf(UnrecoverableKeyException.class);
+        Assertions.assertThatThrownBy(
+                        () -> OctetSequenceKey.load(keyStore, "1", "badpin".toCharArray()))
+                .isInstanceOf(JOSEException.class)
+                .hasMessage("Couldn't retrieve secret key (bad pin?): Given final block not properly padded. Such issues can arise if a bad key is used during decryption.");
     }
 
     @Test
@@ -556,7 +557,7 @@ public class OctetSequenceKeyTest {
         //When
 
         //Then
-        assertThat(jwkB).isEqualTo(jwkA);
+        Assertions.assertThat(jwkB).isEqualTo(jwkA);
     }
 
     @Test
@@ -583,7 +584,7 @@ public class OctetSequenceKeyTest {
         //When
 
         //Then
-        assertThat(jwkA).isNotEqualTo(jwkB);
+        Assertions.assertThat(jwkA).isNotEqualTo(jwkB);
 
     }
 
@@ -592,16 +593,69 @@ public class OctetSequenceKeyTest {
         List<AtbashKey> keys = TestKeys.generateOCTKeys("kid");
 
         OctetSequenceKey key = new OctetSequenceKey.Builder(keys.get(0)).build();
-        assertThat(key).isNotNull();
+        Assertions.assertThat(key).isNotNull();
     }
 
     @Test
     public void testBuilderWithAtbashKey_WrongKey() {
         List<AtbashKey> keys = TestKeys.generateRSAKeys("kid");
-        KeyTypeException exception = Assertions.assertThrows(KeyTypeException.class, () -> new OctetSequenceKey.Builder(keys.get(0)).build());
-        assertThat(exception.getMessage()).isEqualTo("Unsupported KeyType RSA for OctetSequenceKey creation");
+        Assertions.assertThatThrownBy(
+                        () -> new OctetSequenceKey.Builder(keys.get(0)).build())
+                .isInstanceOf(KeyTypeException.class)
+                .hasMessage("Unsupported KeyType RSA for OctetSequenceKey creation");
 
     }
 
+    @Test
+    public void testParse_fromEmptyJSONObject() {
+
+        JsonObject jsonObject = Json.createObjectBuilder().build();
+
+        Assertions.assertThatThrownBy(() -> OctetSequenceKey.parse(jsonObject))
+                .isInstanceOf(ParseException.class)
+                .hasMessage("The key type to parse must not be null");
+
+    }
+
+    @Test
+    public void testParse_missingKty() {
+
+        JsonObject jsonObject = Json.createObjectBuilder()
+                .add(JWKIdentifiers.OCT_KEY_VALUE, "werewrwerewr")
+                .build();
+
+        Assertions.assertThatThrownBy(() -> OctetSequenceKey.parse(jsonObject))
+                .isInstanceOf(ParseException.class)
+                .hasMessage("The key type to parse must not be null");
+
+    }
+
+    @Test
+    public void testParse_missingK() {
+
+        JsonObject jsonObject = Json.createObjectBuilder()
+                .add(JWKIdentifiers.KEY_TYPE, "oct")
+                .build();
+
+        Assertions.assertThatThrownBy(() -> OctetSequenceKey.parse(jsonObject))
+                .isInstanceOf(ParseException.class)
+                .hasMessage("The key value must not be null");
+    }
+
+
+    @Test
+    public void testParse_nullK() {
+
+        JsonObject jsonObject = Json.createObjectBuilder()
+                .add(JWKIdentifiers.KEY_TYPE, "oct")
+                .add(JWKIdentifiers.OCT_KEY_VALUE, JsonValue.NULL)
+                .build();
+
+        Assertions.assertThatThrownBy(() -> OctetSequenceKey.parse(jsonObject))
+                .isInstanceOf(ParseException.class)
+                .hasMessage("The key value must not be null");
+
+
+    }
 
 }

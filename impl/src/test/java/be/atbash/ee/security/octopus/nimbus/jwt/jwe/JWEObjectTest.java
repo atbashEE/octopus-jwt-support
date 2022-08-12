@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,25 @@
 package be.atbash.ee.security.octopus.nimbus.jwt.jwe;
 
 
+import be.atbash.ee.security.octopus.keys.AtbashKey;
+import be.atbash.ee.security.octopus.keys.TestKeys;
+import be.atbash.ee.security.octopus.nimbus.jose.Header;
+import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
+import be.atbash.ee.security.octopus.nimbus.jose.Payload;
+import be.atbash.ee.security.octopus.nimbus.jose.crypto.DirectDecrypter;
+import be.atbash.ee.security.octopus.nimbus.jose.crypto.DirectEncrypter;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import javax.crypto.SecretKey;
+import java.text.ParseException;
+import java.util.List;
 
 
 /**
  * Tests JWE object methods.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
 public class JWEObjectTest {
@@ -46,16 +56,98 @@ public class JWEObjectTest {
                 thirdPart, fourthPart,
                 fifthPart);
 
-        assertThat(jwe.getHeader().toBase64URL()).isEqualTo(firstPart);
-        assertThat(jwe.getEncryptedKey()).isEqualTo(secondPart);
-        assertThat(jwe.getIV()).isEqualTo(thirdPart);
-        assertThat(jwe.getCipherText()).isEqualTo(fourthPart);
+        Assertions.assertThat(jwe.getHeader().toBase64URL()).isEqualTo(firstPart);
+        Assertions.assertThat(jwe.getEncryptedKey()).isEqualTo(secondPart);
+        Assertions.assertThat(jwe.getIV()).isEqualTo(thirdPart);
+        Assertions.assertThat(jwe.getCipherText()).isEqualTo(fourthPart);
 
-        assertThat(jwe.serialize()).isEqualTo(firstPart.toString() + ".abc.def.ghi.jkl");
-        assertThat(jwe.getParsedString()).isEqualTo(firstPart.toString() + ".abc.def.ghi.jkl");
+        Assertions.assertThat(jwe.serialize()).isEqualTo(firstPart.toString() + ".abc.def.ghi.jkl");
+        Assertions.assertThat(jwe.getParsedString()).isEqualTo(firstPart.toString() + ".abc.def.ghi.jkl");
 
-        assertThat(jwe.getState()).isEqualTo(JWEObject.State.ENCRYPTED);
+        Assertions.assertThat(jwe.getState()).isEqualTo(JWEObject.State.ENCRYPTED);
     }
 
+    @Test
+    public void testHeaderLengthJustBelowLimit() throws JOSEException, ParseException {
 
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < Header.MAX_HEADER_STRING_LENGTH - 40; i++) {
+            builder.append("a");
+        }
+
+        JWEHeader header = new JWEHeader.Builder(JWEAlgorithm.DIR, EncryptionMethod.A128GCM)
+                .parameter("data", builder.toString())
+                .build();
+
+        Assertions.assertThat(header.toBase64URL().decodeToString()).hasSizeLessThan(Header.MAX_HEADER_STRING_LENGTH);
+
+        JWEObject jweObject = new JWEObject(header, new Payload("example"));
+        List<AtbashKey> keys = TestKeys.generateOCTKeys("kid", 128);
+
+        jweObject.encrypt(new DirectEncrypter((SecretKey) keys.get(0).getKey()));
+
+        String jwe = jweObject.serialize();
+
+        jweObject = JWEObject.parse(jwe);
+        jweObject.decrypt(new DirectDecrypter((SecretKey) keys.get(0).getKey()));
+        Assertions.assertThat(jweObject.getPayload().toString()).isEqualTo(new Payload("example").toString());
+    }
+
+    @Test
+    public void testHeaderLengthLimit() throws JOSEException {
+
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < Header.MAX_HEADER_STRING_LENGTH; i++) {
+            builder.append("a");
+        }
+
+        JWEHeader header = new JWEHeader.Builder(JWEAlgorithm.DIR, EncryptionMethod.A128GCM)
+                .parameter("data", builder.toString())
+                .build();
+
+        Assertions.assertThat(header.toBase64URL().decodeToString()).hasSizeGreaterThan(Header.MAX_HEADER_STRING_LENGTH);
+
+        JWEObject jweObject = new JWEObject(header, new Payload("example"));
+
+        List<AtbashKey> keys = TestKeys.generateOCTKeys("kid", 128);
+        jweObject.encrypt(new DirectEncrypter((SecretKey) keys.get(0).getKey()));
+
+        String jwe = jweObject.serialize();
+
+        Assertions.assertThatThrownBy(
+                        () -> JWEObject.parse(jwe)
+                ).isInstanceOf(ParseException.class)
+                .hasMessage("Invalid JWE header: The parsed string is longer than the max accepted size of " +
+                        Header.MAX_HEADER_STRING_LENGTH +
+                        " characters");
+
+    }
+
+    @Test
+    public void testParseNestedJSONObjectInHeader() {
+
+        int recursions = 8000;
+
+        StringBuilder headerBuilder = new StringBuilder();
+
+        for (int i = 0; i < recursions; i++) {
+            headerBuilder.append("{\"\":");
+        }
+
+        String header = Base64URLValue.encode(headerBuilder.toString()).toString();
+        String encryptedKey = Base64URLValue.encode("123").toString();
+        String iv = Base64URLValue.encode("123").toString();
+        String cipherText = Base64URLValue.encode("123").toString();
+        String authTag = Base64URLValue.encode("123").toString();
+
+        String token = header + "." + encryptedKey + "." + iv + "." + cipherText + "." + authTag;
+
+        Assertions.assertThatThrownBy(
+                        () -> JWEObject.parse(token)
+                ).isInstanceOf(ParseException.class)
+                .hasMessage("Invalid JWE header: The parsed string is longer than the max accepted size of " +
+                        Header.MAX_HEADER_STRING_LENGTH +
+                        " characters");
+
+    }
 }

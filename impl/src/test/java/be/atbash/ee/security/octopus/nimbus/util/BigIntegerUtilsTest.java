@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,16 @@
 package be.atbash.ee.security.octopus.nimbus.util;
 
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigInteger;
 
-import static org.assertj.core.api.Assertions.assertThat;
 
 
 /**
  * Tests the big integer utility.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
 public class BigIntegerUtilsTest {
@@ -36,6 +36,49 @@ public class BigIntegerUtilsTest {
         byte[] a1 = BigIntegerUtils.toBytesUnsigned(new BigInteger("123456789A", 16));
         byte[] a2 = BigIntegerUtils.toBytesUnsigned(new BigInteger("F23456789A", 16));
 
-        assertThat(a2.length).isEqualTo(a1.length);
+        Assertions.assertThat(a2.length).isEqualTo(a1.length);
+    }
+
+    @Test
+    public void testBigIntegerConstructor_byteArray() {
+
+        BigInteger bigInteger = new BigInteger("123456789");
+
+        byte[] bytes = bigInteger.toByteArray();
+        Assertions.assertThat(bigInteger).isEqualTo(new BigInteger(1, bytes));
+
+        bytes = BigIntegerUtils.toBytesUnsigned(bigInteger);
+        Assertions.assertThat(bigInteger).isEqualTo(new BigInteger(1, bytes));
+
+    }
+
+    @Test
+    public void testBigIntegerConstructor_byteArray_leadingZeroPadded() {
+
+        BigInteger bigInteger = new BigInteger("123456789");
+
+        byte[] bytes = bigInteger.toByteArray();
+        byte[] bytesZeroPadded = ByteUtils.concat(new byte[1], bytes);
+        Assertions.assertThat(bigInteger).isEqualTo(new BigInteger(1, bytesZeroPadded));
+
+        bytes = BigIntegerUtils.toBytesUnsigned(bigInteger);
+        bytesZeroPadded = ByteUtils.concat(new byte[1], bytes);
+        Assertions.assertThat(bigInteger).isEqualTo(new BigInteger(1, bytesZeroPadded));
+    }
+
+    @Test
+    public void testBigIntegerConstructor_byteArray_leadingZeroPaddedMultiple() {
+
+        BigInteger bigInteger = new BigInteger("123456789");
+
+        int numZeroBytes = 10;
+
+        byte[] bytes = bigInteger.toByteArray();
+        byte[] bytesZeroPadded = ByteUtils.concat(new byte[numZeroBytes], bytes);
+        Assertions.assertThat(bigInteger).isEqualTo(new BigInteger(1, bytesZeroPadded));
+
+        bytes = BigIntegerUtils.toBytesUnsigned(bigInteger);
+        bytesZeroPadded = ByteUtils.concat(new byte[numZeroBytes], bytes);
+        Assertions.assertThat(bigInteger).isEqualTo(new BigInteger(1, bytesZeroPadded));
     }
 }

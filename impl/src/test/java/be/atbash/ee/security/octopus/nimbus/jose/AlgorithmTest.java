@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests the base Algorithm class.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
 public class AlgorithmTest {
@@ -92,7 +92,7 @@ public class AlgorithmTest {
     @Test
     public void noneAlgorithm() throws ParseException {
         JsonObjectBuilder builder = Json.createObjectBuilder();
-        builder.add("alg", Algorithm.NONE.getName());
+        builder.add(HeaderParameterNames.ALGORITHM, Algorithm.NONE.getName());
         JsonObject json = builder.build();
         Algorithm algorithm = Algorithm.parseAlgorithm(json);
         assertThat(algorithm).isEqualTo(Algorithm.NONE);
@@ -101,7 +101,7 @@ public class AlgorithmTest {
     @Test
     public void jwsAlgorithm() throws ParseException {
         JsonObjectBuilder builder = Json.createObjectBuilder();
-        builder.add("alg", JWSAlgorithm.HS256.getName());
+        builder.add(HeaderParameterNames.ALGORITHM, JWSAlgorithm.HS256.getName());
         JsonObject json = builder.build();
         Algorithm algorithm = Algorithm.parseAlgorithm(json);
         assertThat(algorithm).isEqualTo(JWSAlgorithm.HS256);
@@ -110,8 +110,8 @@ public class AlgorithmTest {
     @Test
     public void jweAlgorithm() throws ParseException {
         JsonObjectBuilder builder = Json.createObjectBuilder();
-        builder.add("alg", JWEAlgorithm.A256KW.getName());
-        builder.add("enc", EncryptionMethod.A256GCM.getName());
+        builder.add(HeaderParameterNames.ALGORITHM, JWEAlgorithm.A256KW.getName());
+        builder.add(HeaderParameterNames.ENCRYPTION_ALGORITHM, EncryptionMethod.A256GCM.getName());
         JsonObject json = builder.build();
         Algorithm algorithm = Algorithm.parseAlgorithm(json);
         assertThat(algorithm).isEqualTo(JWEAlgorithm.A256KW);

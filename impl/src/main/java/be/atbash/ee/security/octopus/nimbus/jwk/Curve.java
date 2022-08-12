@@ -67,8 +67,16 @@ public final class Curve implements Serializable {
 
 
     /**
-     * P-256K curve (secp256k1, OID = 1.3.132.0.10).
+     * secp256k1 curve (secp256k1, OID = 1.3.132.0.10).
      */
+    public static final Curve SECP256K1 = new Curve("secp256k1", "secp256k1", "1.3.132.0.10");
+
+    /**
+     * P-256K curve.
+     *
+     * @deprecated Use {@link #SECP256K1}.
+     */
+    @Deprecated
     public static final Curve P_256K = new Curve("P-256K", "secp256k1", "1.3.132.0.10");
 
 
@@ -248,7 +256,9 @@ public final class Curve implements Serializable {
         if (value.equals(P_256.getName())) {
             return P_256;
         } else if (value.equals(P_256K.getName())) {
-            return P_256K;
+            return SECP256K1;
+        } else if (value.equals(SECP256K1.getName())) {
+            return SECP256K1;
         } else if (value.equals(P_384.getName())) {
             return P_384;
         } else if (value.equals(P_521.getName())) {
@@ -263,8 +273,8 @@ public final class Curve implements Serializable {
             return X448;
         } else if (P_256.getStdName().equals(value) || "prime256v1".equals(value)) {
             return P_256;
-        } else if (P_256K.getStdName().equals(value)) {
-            return P_256K;
+        } else if (SECP256K1.getStdName().equals(value)) {
+            return SECP256K1;
         } else if (P_384.getStdName().equals(value)) {
             return P_384;
         } else if (P_521.getStdName().equals(value)) {
@@ -294,8 +304,8 @@ public final class Curve implements Serializable {
 
         if (P_256.getOID().equals(oid)) {
             return P_256;
-        } else if (P_256K.getOID().equals(oid)) {
-            return P_256K;
+        } else if (SECP256K1.getOID().equals(oid)) {
+            return SECP256K1;
         } else if (P_384.getOID().equals(oid)) {
             return P_384;
         } else if (P_521.getOID().equals(oid)) {
@@ -318,7 +328,7 @@ public final class Curve implements Serializable {
         if (JWSAlgorithm.ES256.equals(alg)) {
             return Collections.singleton(P_256);
         } else if (JWSAlgorithm.ES256K.equals(alg)) {
-            return Collections.singleton(P_256K);
+            return Collections.singleton(SECP256K1);
         } else if (JWSAlgorithm.ES384.equals(alg)) {
             return Collections.singleton(P_384);
         } else if (JWSAlgorithm.ES512.equals(alg)) {

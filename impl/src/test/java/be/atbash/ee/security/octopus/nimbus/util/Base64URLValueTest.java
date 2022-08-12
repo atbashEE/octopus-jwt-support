@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package be.atbash.ee.security.octopus.nimbus.util;
 
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigInteger;
@@ -26,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests the Base64URL class.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
 public class Base64URLValueTest {
@@ -92,6 +93,14 @@ public class Base64URLValueTest {
     public void testFromNull() {
 
         assertThat(Base64URLValue.from(null)).isNull();
+    }
+
+    @Test
+    public void testDecodeIllegalInput() {
+
+        Assertions.assertThatThrownBy(
+                        () -> new Base64URLValue("@.#$%").decode())
+                .isInstanceOf(InvalidBase64ValueException.class);
     }
 }
 

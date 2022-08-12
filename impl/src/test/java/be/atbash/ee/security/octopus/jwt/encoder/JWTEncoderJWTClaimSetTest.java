@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,9 @@ import be.atbash.ee.security.octopus.keys.ListKeyManager;
 import be.atbash.ee.security.octopus.keys.TestKeys;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.keys.selector.SelectorCriteria;
+import be.atbash.ee.security.octopus.nimbus.jose.HeaderParameterNames;
 import be.atbash.ee.security.octopus.nimbus.jwt.JWTClaimsSet;
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -74,7 +76,7 @@ public class JWTEncoderJWTClaimSetTest {
         Map<String, Object> header = getJson(jwtParts[0]);
 
         assertThat(header).hasSize(3);
-        assertThat(header).containsEntry("alg", "RS256");
+        assertThat(header).containsEntry(HeaderParameterNames.ALGORITHM, "RS256");
         assertThat(header).containsEntry("kid", "kid");
         assertThat(header).containsEntry("typ", "JWT");
 
@@ -97,6 +99,7 @@ public class JWTEncoderJWTClaimSetTest {
         JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWE)
                 .withSecretKeyForSigning(keyForSigning)
                 .withSecretKeyForEncryption(keyForEncryption)
+                .withJWEAlgorithm(JWEAlgorithm.RSA_OAEP_256)
                 .build();
 
         JWTEncoder encoder = new JWTEncoder();
@@ -108,10 +111,10 @@ public class JWTEncoderJWTClaimSetTest {
         Map<String, Object> header = getJson(jwtParts[0]);
 
         assertThat(header).hasSize(4);
-        assertThat(header).containsEntry("alg", "RSA-OAEP-256");
-        assertThat(header).containsEntry("kid", "encrypt");
-        assertThat(header).containsEntry("cty", "JWT");
-        assertThat(header).containsEntry("enc", "A256GCM");
+        assertThat(header).containsEntry(HeaderParameterNames.ALGORITHM, "RSA-OAEP-256");
+        assertThat(header).containsEntry(HeaderParameterNames.KEY_ID, "encrypt");
+        assertThat(header).containsEntry(HeaderParameterNames.CONTENT_TYPE, "JWT");
+        assertThat(header).containsEntry(HeaderParameterNames.ENCRYPTION_ALGORITHM, "A256GCM");
 
         // The rest is really not decipherable.
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,14 +21,16 @@ import be.atbash.ee.security.octopus.nimbus.jose.Payload;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSObject;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
-
+import be.atbash.ee.security.octopus.nimbus.util.JSONObjectUtils;
+import be.atbash.ee.security.octopus.util.JsonbUtil;
 import jakarta.json.JsonObject;
+
 import java.text.ParseException;
 
 
 /**
  * Signed JSON Web Token (JWT).
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
 public class SignedJWT extends JWSObject implements JWT {
@@ -36,6 +38,8 @@ public class SignedJWT extends JWSObject implements JWT {
 
     private static final long serialVersionUID = 1L;
 
+    // Cached JWTClaimsSet
+    private JWTClaimsSet claimsSet;
 
     /**
      * Creates a new to-be-signed JSON Web Token (JWT) with the specified
@@ -48,6 +52,7 @@ public class SignedJWT extends JWSObject implements JWT {
     public SignedJWT(JWSHeader header, JWTClaimsSet claimsSet) {
 
         super(header, new Payload(claimsSet.toJSONObject()));
+        this.claimsSet = claimsSet;
     }
 
 
@@ -75,15 +80,28 @@ public class SignedJWT extends JWSObject implements JWT {
     public JWTClaimsSet getJWTClaimsSet()
             throws ParseException {
 
+        if (claimsSet != null) {
+            return claimsSet;
+        }
+
         JsonObject json = getPayload().toJSONObject();
 
         if (json == null) {
             throw new ParseException("Payload of JWS object is not a valid JSON object", 0);
         }
 
-        return JWTClaimsSet.parse(json);
+        claimsSet = JWTClaimsSet.parse(json);
+        return claimsSet;
     }
 
+    @Override
+    protected void setPayload(Payload payload) {
+
+        // setPayload() changes the result of getJWTClaimsSet().
+        // set claimsSet = null and reparse payload again when called getJWTClaimsSet().
+        claimsSet = null;
+        super.setPayload(payload);
+    }
 
     /**
      * Parses a signed JSON Web Token (JWT) from the specified string in
@@ -104,5 +122,28 @@ public class SignedJWT extends JWSObject implements JWT {
         }
 
         return new SignedJWT(parts[0], parts[1], parts[2]);
+    }
+
+    /**
+     * Parses a signed JSON Web Token (JWT) from the specified string in
+     * compact format.
+     *
+     * @param value The string to parse. Must not be {@code null}.
+     * @return The signed JWT.
+     * @throws ParseException If the string couldn't be parsed to a valid
+     *                        signed JWT.
+     */
+    public static SignedJWT parse(JsonObject value)
+            throws ParseException {
+        Base64URLValue header = JSONObjectUtils.getBase64URL(value, "protected");
+        if (header == null) {
+            header = Base64URLValue.encode(JsonbUtil.getJsonb().toJson(value.getJsonObject("header")));
+        }
+
+        Base64URLValue payload = JSONObjectUtils.getBase64URL(value, "payload");
+        Base64URLValue signature = JSONObjectUtils.getBase64URL(value, "signature");
+
+
+        return new SignedJWT(header, payload, signature);
     }
 }

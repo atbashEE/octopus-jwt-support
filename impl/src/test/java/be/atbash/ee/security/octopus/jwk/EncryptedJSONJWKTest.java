@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package be.atbash.ee.security.octopus.jwk;
 
 import be.atbash.ee.security.octopus.exception.MissingPasswordException;
 import be.atbash.ee.security.octopus.nimbus.jose.Algorithm;
+import be.atbash.ee.security.octopus.nimbus.jwk.JWKIdentifiers;
 import be.atbash.ee.security.octopus.nimbus.jwk.OctetSequenceKey;
 import be.atbash.ee.security.octopus.util.EncryptionHelper;
 import org.junit.jupiter.api.Assertions;
@@ -58,7 +59,7 @@ public class EncryptedJSONJWKTest {
         JsonObject jsonObject = jsonb.fromJson(json, JsonObject.class);
 
         // Get the value of field enc, and decrypt it with the password
-        String encJson = EncryptionHelper.decode(jsonObject.getString("enc"), PASSWORD);
+        String encJson = EncryptionHelper.decode(jsonObject.getString(JWKIdentifiers.ENCRYPTION_ALGORITHM), PASSWORD);
 
         // decrypted value is a json again
         JsonObject secureJson = jsonb.fromJson(encJson, JsonObject.class);

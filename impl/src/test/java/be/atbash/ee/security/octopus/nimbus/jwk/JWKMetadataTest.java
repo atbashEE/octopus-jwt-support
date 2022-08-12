@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,14 @@
 package be.atbash.ee.security.octopus.nimbus.jwk;
 
 
-import org.junit.jupiter.api.Assertions;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import jakarta.json.Json;
+import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
+import jakarta.json.JsonValue;
 import java.text.ParseException;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class JWKMetadataTest {
@@ -33,10 +33,52 @@ public class JWKMetadataTest {
 
         JsonObjectBuilder builder = Json.createObjectBuilder();
 
-        builder.add("x5c", Json.createArrayBuilder().build()); // empty
+        builder.add(JWKIdentifiers.X_509_CERT_CHAIN, Json.createArrayBuilder().build()); // empty
 
-        ParseException e = Assertions.assertThrows(ParseException.class,
-                () -> JWKMetadata.parseX509CertChain(builder.build()));
-        assertThat(e.getMessage()).isEqualTo("The X.509 certificate chain \"x5c\" must not be empty");
+        Assertions.assertThatThrownBy(() -> JWKMetadata.parseX509CertChain(builder.build()))
+                .isInstanceOf(ParseException.class)
+                .hasMessage("The X.509 certificate chain \"" + JWKIdentifiers.X_509_CERT_CHAIN + "\" must not be empty");
+    }
+
+    @Test
+    public void testParseNoMembers()
+            throws ParseException {
+
+        JsonObject object = Json.createObjectBuilder().build();
+
+
+        Assertions.assertThat(JWKMetadata.parseKeyUse(object)).isNull();
+        Assertions.assertThat(JWKMetadata.parseKeyOperations(object)).isNull();
+        Assertions.assertThat(JWKMetadata.parseAlgorithm(object)).isNull();
+        Assertions.assertThat(JWKMetadata.parseKeyID(object)).isNull();
+        Assertions.assertThat(JWKMetadata.parseX509CertURL(object)).isNull();
+        Assertions.assertThat(JWKMetadata.parseX509CertSHA256Thumbprint(object)).isNull();
+        Assertions.assertThat(JWKMetadata.parseX509CertChain(object)).isNull();
+    }
+
+
+    @Test
+    public void testParseNullMembers()
+            throws ParseException {
+
+        JsonObject object = Json.createObjectBuilder()
+                .add(JWKIdentifiers.PUBLIC_KEY_USE, JsonValue.NULL)
+                .add(JWKIdentifiers.KEY_OPS, JsonValue.NULL)
+                .add(JWKIdentifiers.ALGORITHM, JsonValue.NULL)
+                .add(JWKIdentifiers.KEY_ID, JsonValue.NULL)
+                .add(JWKIdentifiers.X_509_URL, JsonValue.NULL)
+                .add(JWKIdentifiers.X_509_CERT_SHA_1_THUMBPRINT, JsonValue.NULL)
+                .add(JWKIdentifiers.X_509_CERT_SHA_256_THUMBPRINT, JsonValue.NULL)
+                .add(JWKIdentifiers.X_509_CERT_CHAIN, JsonValue.NULL)
+                .build();
+
+        Assertions.assertThat(JWKMetadata.parseKeyUse(object)).isNull();
+        Assertions.assertThat(JWKMetadata.parseKeyOperations(object)).isEmpty();
+        Assertions.assertThat(JWKMetadata.parseAlgorithm(object)).isNull();
+        Assertions.assertThat(JWKMetadata.parseKeyID(object)).isNull();
+        Assertions.assertThat(JWKMetadata.parseX509CertURL(object)).isNull();
+        Assertions.assertThat(JWKMetadata.parseX509CertSHA256Thumbprint(object)).isNull();
+        Assertions.assertThat(JWKMetadata.parseX509CertChain(object)).isNull();
+
     }
 }

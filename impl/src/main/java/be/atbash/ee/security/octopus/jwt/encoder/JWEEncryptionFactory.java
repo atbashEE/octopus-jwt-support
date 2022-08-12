@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package be.atbash.ee.security.octopus.jwt.encoder;
 import be.atbash.ee.security.octopus.exception.UnsupportedKeyLengthException;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersEncryption;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
+import be.atbash.ee.security.octopus.nimbus.jose.HeaderParameterNames;
 import be.atbash.ee.security.octopus.nimbus.jose.KeyLengthException;
 import be.atbash.ee.security.octopus.nimbus.jose.KeyTypeException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.AESEncrypter;
@@ -26,9 +27,9 @@ import be.atbash.ee.security.octopus.nimbus.jose.crypto.PasswordBasedEncrypter;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.RSAEncrypter;
 import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEEncrypter;
+import jakarta.enterprise.context.ApplicationScoped;
 
 import javax.crypto.SecretKey;
-import jakarta.enterprise.context.ApplicationScoped;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 
@@ -58,7 +59,7 @@ public class JWEEncryptionFactory {
         }
 
         if (KeyType.OCT.equals(parametersEncryption.getKeyType())) {
-            if (parametersEncryption.getHeaderValues().containsKey("p2s")) {
+            if (parametersEncryption.getHeaderValues().containsKey(HeaderParameterNames.PBES2_SALT_INPUT)) {
                 result = new PasswordBasedEncrypter((SecretKey) parametersEncryption.getKey());
             } else {
                 try {

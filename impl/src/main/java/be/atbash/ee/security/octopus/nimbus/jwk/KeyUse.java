@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,14 @@
 package be.atbash.ee.security.octopus.nimbus.jwk;
 
 
+import be.atbash.ee.security.octopus.nimbus.jose.HeaderParameterNames;
+
 import java.io.Serializable;
 import java.security.cert.X509Certificate;
 import java.text.ParseException;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 
 /**
@@ -40,17 +44,27 @@ public final class KeyUse implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * @see <a href="https://datatracker.ietf.org/doc/html/rfc7517#section-4.2">RFC 7517 "sig" (signature) Parameter Value</a>
+     */
+
+    public static final String SIGNATURE_USE = "sig";
+
+    /**
+     * @see <a href="https://datatracker.ietf.org/doc/html/rfc7517#section-4.2">RFC 7517 "enc" (encryption) Parameter Value</a>
+     */
+    public static final String ENCRYPTION_USE = HeaderParameterNames.ENCRYPTION_ALGORITHM;
 
     /**
      * Signature.
      */
-    public static final KeyUse SIGNATURE = new KeyUse("sig");
+    public static final KeyUse SIGNATURE = new KeyUse(SIGNATURE_USE);
 
 
     /**
      * Encryption.
      */
-    public static final KeyUse ENCRYPTION = new KeyUse("enc");
+    public static final KeyUse ENCRYPTION = new KeyUse(ENCRYPTION_USE);
 
 
     /**
@@ -167,33 +181,42 @@ public final class KeyUse implements Serializable {
             return null;
         }
 
-        // nonRepudiation
-        if (cert.getKeyUsage()[1]) {
-            return SIGNATURE;
+        Set<KeyUse> foundUses = new HashSet<>();
+
+        // https://datatracker.ietf.org/doc/html/rfc2459#section-4.2.1.3
+
+        // digitalSignature || nonRepudiation
+        if (cert.getKeyUsage()[0] || cert.getKeyUsage()[1]) {
+            foundUses.add(SIGNATURE);
         }
 
         // digitalSignature && keyEncipherment
         // (e.g. RSA TLS certificate for authenticated encryption)
         if (cert.getKeyUsage()[0] && cert.getKeyUsage()[2]) {
-            return KeyUse.ENCRYPTION;
+            foundUses.add(KeyUse.ENCRYPTION);
         }
 
         // digitalSignature && keyAgreement
         // (e.g. EC TLS certificate for authenticated encryption)
         if (cert.getKeyUsage()[0] && cert.getKeyUsage()[4]) {
-            return KeyUse.ENCRYPTION;
+            foundUses.add(KeyUse.ENCRYPTION);
         }
 
         // keyEncipherment || dataEncipherment || keyAgreement
         if (cert.getKeyUsage()[2] || cert.getKeyUsage()[3] || cert.getKeyUsage()[4]) {
-            return ENCRYPTION;
+            foundUses.add(ENCRYPTION);
         }
 
         // keyCertSign || cRLSign
         if (cert.getKeyUsage()[5] || cert.getKeyUsage()[6]) {
-            return SIGNATURE;
+            foundUses.add(SIGNATURE);
         }
 
-        return null;
+        if (foundUses.size() == 1) {
+            return foundUses.iterator().next();
+        } else {
+            // Cannot map cert usage to singular JWK use value
+            return null;
+        }
     }
 }

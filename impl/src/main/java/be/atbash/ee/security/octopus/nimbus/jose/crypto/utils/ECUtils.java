@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -114,10 +114,12 @@ public final class ECUtils {
     private static JWSAlgorithm resolveAlgorithm(Curve curve) {
 
         if (curve == null) {
-            throw new UnsupportedECCurveException("The EC key curve is not supported, must be P-256, P-384 or P-521");
+            throw new UnsupportedECCurveException("The EC key curve is not supported, must be P-256, secp256k1, P-384 or P-521");
         } else if (Curve.P_256.equals(curve)) {
             return JWSAlgorithm.ES256;
         } else if (Curve.P_256K.equals(curve)) {
+            return JWSAlgorithm.ES256K;
+        } else if (Curve.SECP256K1.equals(curve)) {
             return JWSAlgorithm.ES256K;
         } else if (Curve.P_384.equals(curve)) {
             return JWSAlgorithm.ES384;

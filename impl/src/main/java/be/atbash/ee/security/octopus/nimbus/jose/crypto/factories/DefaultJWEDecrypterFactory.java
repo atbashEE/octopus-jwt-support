@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import be.atbash.ee.security.octopus.nimbus.jose.KeyLengthException;
 import be.atbash.ee.security.octopus.nimbus.jose.KeyTypeException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.*;
 import be.atbash.ee.security.octopus.nimbus.jose.proc.JWEDecrypterFactory;
+import be.atbash.ee.security.octopus.nimbus.jwk.Curve;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEDecrypter;
@@ -28,8 +29,9 @@ import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEHeader;
 
 import javax.crypto.SecretKey;
 import java.security.Key;
-import java.security.interfaces.ECPrivateKey;
-import java.security.interfaces.RSAPrivateKey;
+import java.security.PrivateKey;
+import java.security.interfaces.ECKey;
+import java.security.interfaces.RSAKey;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -97,23 +99,25 @@ public class DefaultJWEDecrypterFactory implements JWEDecrypterFactory {
         if (RSADecrypter.SUPPORTED_ALGORITHMS.contains(header.getAlgorithm()) &&
                 RSADecrypter.SUPPORTED_ENCRYPTION_METHODS.contains(header.getEncryptionMethod())) {
 
-            if (!(key instanceof RSAPrivateKey)) {
-                throw new KeyTypeException(RSAPrivateKey.class);
+            if (!(key instanceof PrivateKey && key instanceof RSAKey)) {
+                throw new KeyTypeException(PrivateKey.class, RSAKey.class);
             }
 
-            RSAPrivateKey rsaPrivateKey = (RSAPrivateKey) key;
+            PrivateKey rsaPrivateKey = (PrivateKey) key;
 
             decrypter = new RSADecrypter(rsaPrivateKey);
 
         } else if (ECDHDecrypter.SUPPORTED_ALGORITHMS.contains(header.getAlgorithm()) &&
                 ECDHDecrypter.SUPPORTED_ENCRYPTION_METHODS.contains(header.getEncryptionMethod())) {
 
-            if (!(key instanceof ECPrivateKey)) {
-                throw new KeyTypeException(ECPrivateKey.class);
+            if (!(key instanceof PrivateKey && key instanceof ECKey)) {
+                throw new KeyTypeException(PrivateKey.class, ECKey.class);
             }
 
-            ECPrivateKey ecPrivateKey = (ECPrivateKey) key;
-            decrypter = new ECDHDecrypter(ecPrivateKey);
+            PrivateKey ecPrivateKey = (PrivateKey) key;
+            Curve curve = Curve.forECParameterSpec(((ECKey) key).getParams());
+
+            decrypter = new ECDHDecrypter(ecPrivateKey, null, curve);
 
         } else if (DirectDecrypter.SUPPORTED_ALGORITHMS.contains(header.getAlgorithm()) &&
                 DirectDecrypter.SUPPORTED_ENCRYPTION_METHODS.contains(header.getEncryptionMethod())) {

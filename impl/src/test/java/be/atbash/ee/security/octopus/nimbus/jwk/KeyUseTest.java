@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package be.atbash.ee.security.octopus.nimbus.jwk;
 
 
 import be.atbash.ee.security.octopus.nimbus.IOUtil;
+import be.atbash.ee.security.octopus.nimbus.jose.HeaderParameterNames;
 import be.atbash.ee.security.octopus.nimbus.util.X509CertUtils;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.cert.X509CertificateHolder;
@@ -38,7 +39,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests the key use enumeration.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
 public class KeyUseTest {
@@ -50,9 +51,9 @@ public class KeyUseTest {
         assertThat(KeyUse.SIGNATURE.getValue()).isEqualTo("sig");
         assertThat(KeyUse.SIGNATURE.toString()).isEqualTo("sig");
 
-        assertThat(KeyUse.ENCRYPTION.identifier()).isEqualTo("enc");
-        assertThat(KeyUse.ENCRYPTION.getValue()).isEqualTo("enc");
-        assertThat(KeyUse.ENCRYPTION.toString()).isEqualTo("enc");
+        assertThat(KeyUse.ENCRYPTION.identifier()).isEqualTo(HeaderParameterNames.ENCRYPTION_ALGORITHM);
+        assertThat(KeyUse.ENCRYPTION.getValue()).isEqualTo(HeaderParameterNames.ENCRYPTION_ALGORITHM);
+        assertThat(KeyUse.ENCRYPTION.toString()).isEqualTo(HeaderParameterNames.ENCRYPTION_ALGORITHM);
     }
 
     @Test
@@ -73,7 +74,7 @@ public class KeyUseTest {
             throws ParseException {
 
         assertThat(KeyUse.parse("sig")).isEqualTo(KeyUse.SIGNATURE);
-        assertThat(KeyUse.parse("enc")).isEqualTo(KeyUse.ENCRYPTION);
+        assertThat(KeyUse.parse(HeaderParameterNames.ENCRYPTION_ALGORITHM)).isEqualTo(KeyUse.ENCRYPTION);
     }
 
     @Test
@@ -107,7 +108,7 @@ public class KeyUseTest {
         String pemEncodedCert = IOUtil.readFileToString("src/test/resources/sample-certs/ietf.crt");
         X509Certificate x509Cert = X509CertUtils.parse(pemEncodedCert);
         assertThat(x509Cert).isNotNull();
-        assertThat(KeyUse.from(x509Cert)).isEqualTo(KeyUse.ENCRYPTION);
+        assertThat(KeyUse.from(x509Cert)).isNull();
     }
 
     @Test
@@ -116,7 +117,7 @@ public class KeyUseTest {
         String pemEncodedCert = IOUtil.readFileToString("src/test/resources/sample-certs/wikipedia.crt");
         X509Certificate x509Cert = X509CertUtils.parse(pemEncodedCert);
         assertThat(x509Cert).isNotNull();
-        assertThat(KeyUse.from(x509Cert)).isEqualTo(KeyUse.ENCRYPTION);
+        assertThat(KeyUse.from(x509Cert)).isNull();
     }
 
     @Test

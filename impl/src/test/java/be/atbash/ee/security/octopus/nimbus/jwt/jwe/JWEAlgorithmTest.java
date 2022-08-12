@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests the JWS Algorithm class.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
 public class JWEAlgorithmTest {
@@ -31,6 +31,7 @@ public class JWEAlgorithmTest {
     public void testParse() {
 
         assertThat(JWEAlgorithm.RSA_OAEP_256).isEqualTo(JWEAlgorithm.parse("RSA-OAEP-256"));
+        assertThat(JWEAlgorithm.RSA_OAEP_512).isEqualTo(JWEAlgorithm.parse("RSA-OAEP-512"));
 
         assertThat(JWEAlgorithm.A128KW).isEqualTo(JWEAlgorithm.parse("A128KW"));
         assertThat(JWEAlgorithm.A192KW).isEqualTo(JWEAlgorithm.parse("A192KW"));
@@ -57,8 +58,8 @@ public class JWEAlgorithmTest {
     @Test
     public void testRSAFamily() {
 
-        assertThat(JWEAlgorithm.Family.RSA).contains(JWEAlgorithm.RSA_OAEP_256);
-        assertThat(JWEAlgorithm.Family.RSA).hasSize(1);
+        assertThat(JWEAlgorithm.Family.RSA).containsOnly(JWEAlgorithm.RSA_OAEP_256, JWEAlgorithm.RSA_OAEP_384, JWEAlgorithm.RSA_OAEP_512);
+        assertThat(JWEAlgorithm.Family.RSA).hasSize(3);
     }
 
     @Test

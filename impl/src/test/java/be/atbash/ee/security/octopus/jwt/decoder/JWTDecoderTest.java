@@ -28,17 +28,27 @@ import be.atbash.ee.security.octopus.keys.TestKeys;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.keys.selector.SelectorCriteria;
 import be.atbash.ee.security.octopus.keys.selector.TestKeySelector;
+import be.atbash.ee.security.octopus.keys.selector.filter.AsymmetricPartKeyFilter;
+import be.atbash.ee.security.octopus.nimbus.jose.Payload;
+import be.atbash.ee.security.octopus.nimbus.jose.crypto.RSASSASigner;
+import be.atbash.ee.security.octopus.nimbus.jose.proc.BadJOSEException;
+import be.atbash.ee.security.octopus.nimbus.jwt.JWTClaimNames;
 import be.atbash.ee.security.octopus.nimbus.jwt.JWTClaimsSet;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSObject;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSSigner;
+import be.atbash.ee.security.octopus.nimbus.jwt.util.DateUtils;
+import be.atbash.ee.security.octopus.nimbus.util.InvalidBase64ValueException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.MDC;
 
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 class JWTDecoderTest {
 
@@ -92,6 +102,21 @@ class JWTDecoderTest {
     }
 
     @Test
+    void decode_plainJWT_json() {
+        JsonObject jsonObject = Json.createObjectBuilder()
+                .add("protected", "eyJhbGciOiJub25lIn0")
+                .add("payload", "eyJzdWIiOiJhbGljZSJ9")
+                .build();
+
+        JWTData<Map> jwtData = decoder.decode(jsonObject, Map.class);
+
+        Assertions.assertThat(jwtData).isNotNull();
+        Map map = jwtData.getData();
+        Assertions.assertThat(map).hasSize(1);
+        Assertions.assertThat(map).containsEntry("sub", "alice");
+    }
+
+    @Test
     void decode_plainJWT_omittedDot() {
         String json = "eyJhbGciOiJub25lIn0.eyJzdWIiOiJhbGljZSJ9";  // Explicitly omitted the end . (But not recommended !)
         JWTData<Map> jwtData = decoder.decode(json, Map.class);
@@ -110,6 +135,24 @@ class JWTDecoderTest {
 
         Map<String, Object> claims = jwtClaimsSet.getClaims();
         Assertions.assertThat(claims).containsOnlyKeys("aud", "sub", "iss", "exp");
+
+    }
+
+    @Test
+    void decode_plainJWT_ClaimSet_json() {
+        JsonObject jsonObject = Json.createObjectBuilder()
+                .add("protected", "eyJhbGciOiJub25lIn0")
+                .add("payload", "eyJpc3MiOiJodHRwOi8vYXRiYXNoLmJlIiwiYXVkIjoic29tZUNsaWVudCIsInN1YiI6InRoZVN1YmplY3QiLCJleHAiOjE1NzkzNTgxODN9")
+                .build();
+
+        JWTData<JWTClaimsSet> jwtData = decoder.decode(jsonObject, JWTClaimsSet.class);
+
+        Assertions.assertThat(jwtData).isNotNull();
+        JWTClaimsSet jwtClaimsSet = jwtData.getData();
+
+        Map<String, Object> claims = jwtClaimsSet.getClaims();
+        Assertions.assertThat(claims).hasSize(4);
+        Assertions.assertThat(claims).containsKeys("aud", "sub", "iss", "exp");
 
     }
 
@@ -141,6 +184,44 @@ class JWTDecoderTest {
 
         ListKeyManager keyManager = new ListKeyManager(keys);
         Map<String, String> result = decoder.decode(json, HashMap.class, new TestKeySelector(keyManager), verifier).getData();
+
+        Assertions.assertThat(result.keySet()).containsOnlyOnce("value");
+    }
+
+    @Test
+    void decode_withVerifier_valid_json() {
+
+        List<AtbashKey> keys = TestKeys.generateRSAKeys("kid");
+        Map<String, String> headerValues = new HashMap<>();
+        headerValues.put("head1", "value1");
+        JWTParameters parameters = getJwtParameters(keys, headerValues);
+        JWTEncoder encoder = new JWTEncoder();
+        JWTClaimsSet claims = new JWTClaimsSet.Builder().claim("value", "123").build();
+
+
+        String json = encoder.encode(claims, parameters);
+        String[] parts = json.split("\\.");
+        JsonObject jsonObject = Json.createObjectBuilder()
+                .add("protected", parts[0])
+                .add("payload", parts[1])
+                .add("signature", parts[2])
+                .build();
+
+        JWTVerifier verifier = (header, jwtClaimsSet) -> {
+            boolean result = true;
+            if (!"value1".equals(header.getCustomParameter("head1"))) {
+                result = false;
+            }
+            if (!"123".equals(jwtClaimsSet.getClaim("value"))) {
+                result = false;
+            }
+
+
+            return result;
+        };
+
+        ListKeyManager keyManager = new ListKeyManager(keys);
+        Map<String, String> result = decoder.decode(jsonObject, HashMap.class, new TestKeySelector(keyManager), verifier).getData();
 
         Assertions.assertThat(result.keySet()).containsOnlyOnce("value");
     }
@@ -302,5 +383,76 @@ class JWTDecoderTest {
                 .hasMessage("Unable to determine the encoding of the data");
 
         Assertions.assertThat(MDC.get(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON)).isEqualTo("Unable to determine the encoding of the provided token");
+    }
+
+    @Test
+    void decode_unencodedPayload_failsBase64Decode() {
+
+        List<AtbashKey> keys = TestKeys.generateRSAKeys("kid", 2048);
+        List<AtbashKey> privateKeys = new AsymmetricPartKeyFilter(AsymmetricPart.PRIVATE).filter(keys);
+
+        Assertions.assertThat(privateKeys).hasSize(1);
+        JWSSigner signer = new RSASSASigner(privateKeys.get(0));
+
+        Map<String, Object> criticalParameters = new HashMap<>();
+        criticalParameters.put(JWTClaimNames.ISSUER, "https://issuer.example.com");
+        criticalParameters.put(JWTClaimNames.ISSUED_AT, DateUtils.toSecondsSinceEpoch(new Date()));
+
+        Payload payload = new Payload("{\"key\":\"value\"}");
+
+        JWSObject jwsObject = new JWSObject(
+                new JWSHeader.Builder(JWSAlgorithm.RS256)
+                        .base64URLEncodePayload(false)
+                        .keyID("kid")
+                        .criticalParams(criticalParameters.keySet())
+                        .parameters(criticalParameters)
+                        .build(),
+                payload);
+
+        jwsObject.sign(signer);
+
+        String data = jwsObject.serialize(false);
+
+        ListKeyManager keyManager = new ListKeyManager(keys);
+
+        Assertions.assertThatThrownBy(() -> decoder.decode(data, JWTClaimsSet.class, new TestKeySelector(keyManager)))
+                .isInstanceOf(InvalidBase64ValueException.class);
+
+    }
+
+    @Test
+    void decode_unencodedPayload() {
+
+        List<AtbashKey> keys = TestKeys.generateRSAKeys("kid", 2048);
+        List<AtbashKey> privateKeys = new AsymmetricPartKeyFilter(AsymmetricPart.PRIVATE).filter(keys);
+
+        Assertions.assertThat(privateKeys).hasSize(1);
+        JWSSigner signer = new RSASSASigner(privateKeys.get(0));
+
+        Map<String, Object> criticalParameters = new HashMap<>();
+        criticalParameters.put(JWTClaimNames.ISSUER, "https://issuer.example.com");
+        criticalParameters.put(JWTClaimNames.ISSUED_AT, DateUtils.toSecondsSinceEpoch(new Date()));
+
+        Payload payload = new Payload("test1234");
+
+        JWSObject jwsObject = new JWSObject(
+                new JWSHeader.Builder(JWSAlgorithm.RS256)
+                        .base64URLEncodePayload(false)
+                        .keyID("kid")
+                        .criticalParams(criticalParameters.keySet())
+                        .parameters(criticalParameters)
+                        .build(),
+                payload);
+
+        jwsObject.sign(signer);
+
+        String data = jwsObject.serialize(false);
+
+        ListKeyManager keyManager = new ListKeyManager(keys);
+
+        Assertions.assertThatThrownBy(() -> decoder.decode(data, JWTClaimsSet.class, new TestKeySelector(keyManager)))
+                .isInstanceOf(BadJOSEException.class)
+                .hasMessage("Unencoded payload not allowed");
+
     }
 }

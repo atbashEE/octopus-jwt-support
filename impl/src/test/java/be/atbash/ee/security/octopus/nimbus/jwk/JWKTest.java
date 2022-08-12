@@ -19,19 +19,23 @@ package be.atbash.ee.security.octopus.nimbus.jwk;
 import be.atbash.ee.security.octopus.nimbus.IOUtil;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.util.X509CertUtils;
+import org.assertj.core.api.Assertions;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import jakarta.json.Json;
 import java.math.BigInteger;
-import java.security.*;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.KeyStore;
+import java.security.SecureRandom;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPrivateKey;
@@ -42,13 +46,10 @@ import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Date;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.fail;
-
 
 /**
  * Tests the base JWK class.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
 public class JWKTest {
@@ -56,26 +57,26 @@ public class JWKTest {
     @Test
     public void testMIMEType() {
 
-        assertThat(JWK.MIME_TYPE).isEqualTo("application/jwk+json; charset=UTF-8");
+        Assertions.assertThat(JWK.MIME_TYPE).isEqualTo("application/jwk+json; charset=UTF-8");
     }
 
 
     private void validateJWKFromX509Cert(JWK jwk, KeyType expectedKeyType) {
 
-        assertThat(jwk.getKeyType()).isEqualTo(expectedKeyType);
-        assertThat(jwk.getAlgorithm()).isNull();
-        assertThat(jwk.getKeyUse()).isEqualTo(KeyUse.ENCRYPTION);
-        assertThat(jwk.getKeyOperations()).isNull();
-        assertThat(jwk.getX509CertChain().size()).isEqualTo(1);
-        assertThat(jwk.getX509CertSHA256Thumbprint()).isNotNull();
-        assertThat(jwk.isPrivate()).isFalse();
+        Assertions.assertThat(jwk.getKeyType()).isEqualTo(expectedKeyType);
+        Assertions.assertThat(jwk.getAlgorithm()).isNull();
+        Assertions.assertThat(jwk.getKeyUse()).isNull();
+        Assertions.assertThat(jwk.getKeyOperations()).isNull();
+        Assertions.assertThat(jwk.getX509CertChain().size()).isEqualTo(1);
+        Assertions.assertThat(jwk.getX509CertSHA256Thumbprint()).isNotNull();
+        Assertions.assertThat(jwk.isPrivate()).isFalse();
 
         if (KeyType.RSA.equals(expectedKeyType)) {
-            assertThat(jwk instanceof RSAKey).isTrue();
+            Assertions.assertThat(jwk instanceof RSAKey).isTrue();
         } else if (KeyType.EC.equals(expectedKeyType)) {
-            assertThat(jwk instanceof ECKey).isTrue();
+            Assertions.assertThat(jwk instanceof ECKey).isTrue();
         } else {
-            fail();
+            Assertions.fail("Unknown KeyType");
         }
     }
 
@@ -84,7 +85,7 @@ public class JWKTest {
 
         String pemEncodedCert = IOUtil.readFileToString("src/test/resources/sample-certs/ietf.crt");
         X509Certificate cert = X509CertUtils.parse(pemEncodedCert);
-        assertThat(cert).isNotNull();
+        Assertions.assertThat(cert).isNotNull();
         JWK jwk = JWK.parse(cert);
         validateJWKFromX509Cert(jwk, KeyType.RSA);
     }
@@ -94,10 +95,10 @@ public class JWKTest {
 
         String pemEncodedCert = IOUtil.readFileToString("src/test/resources/sample-certs/wikipedia.crt");
         X509Certificate cert = X509CertUtils.parse(pemEncodedCert);
-        assertThat(cert).isNotNull();
+        Assertions.assertThat(cert).isNotNull();
         JWK jwk = JWK.parse(cert);
         validateJWKFromX509Cert(jwk, KeyType.EC);
-        assertThat(((ECKey) jwk).getCurve()).isEqualTo(Curve.P_256);
+        Assertions.assertThat(((ECKey) jwk).getCurve()).isEqualTo(Curve.P_256);
     }
 
     @Test
@@ -114,7 +115,7 @@ public class JWKTest {
         String pemEncodedCert = IOUtil.readFileToString("src/test/resources/sample-certs/wikipedia.crt");
         JWK jwk = JWK.parseFromPEMEncodedX509Cert(pemEncodedCert);
         validateJWKFromX509Cert(jwk, KeyType.EC);
-        assertThat(((ECKey) jwk).getCurve()).isEqualTo(Curve.P_256);
+        Assertions.assertThat(((ECKey) jwk).getCurve()).isEqualTo(Curve.P_256);
     }
 
     @Test
@@ -159,18 +160,18 @@ public class JWKTest {
 
         // Load
         RSAKey rsaKey = (RSAKey) JWK.load(keyStore, "1", "1234".toCharArray());
-        assertThat(rsaKey).isNotNull();
-        assertThat(rsaKey.getKeyUse()).isEqualTo(KeyUse.SIGNATURE);
-        assertThat(rsaKey.getKeyID()).isEqualTo("1");
-        assertThat(rsaKey.getX509CertChain().size()).isEqualTo(1);
-        assertThat(rsaKey.getX509CertSHA256Thumbprint()).isNotNull();
-        assertThat(rsaKey.isPrivate()).isTrue();
+        Assertions.assertThat(rsaKey).isNotNull();
+        Assertions.assertThat(rsaKey.getKeyUse()).isEqualTo(KeyUse.SIGNATURE);
+        Assertions.assertThat(rsaKey.getKeyID()).isEqualTo("1");
+        Assertions.assertThat(rsaKey.getX509CertChain().size()).isEqualTo(1);
+        Assertions.assertThat(rsaKey.getX509CertSHA256Thumbprint()).isNotNull();
+        Assertions.assertThat(rsaKey.isPrivate()).isTrue();
 
         // Try to load with bad pin
-        JOSEException e = Assertions.assertThrows(JOSEException.class,
-                () -> JWK.load(keyStore, "1", "".toCharArray()));
-        assertThat(e.getMessage()).isEqualTo("Couldn't retrieve private RSA key (bad pin?): Get Key failed: Given final block not properly padded. Such issues can arise if a bad key is used during decryption.");
-        assertThat(e.getCause() instanceof UnrecoverableKeyException).isTrue();
+        Assertions.assertThatThrownBy(
+                        () -> JWK.load(keyStore, "1", "".toCharArray()))
+                .isInstanceOf(JOSEException.class)
+                .hasMessage("Couldn't retrieve private RSA key (bad pin?): Get Key failed: Given final block not properly padded. Such issues can arise if a bad key is used during decryption.");
     }
 
     @Test
@@ -215,19 +216,19 @@ public class JWKTest {
 
         // Load
         ECKey ecKey = (ECKey) JWK.load(keyStore, "1", "1234".toCharArray());
-        assertThat(ecKey).isNotNull();
-        assertThat(ecKey.getCurve()).isEqualTo(Curve.P_521);
-        assertThat(ecKey.getKeyUse()).isEqualTo(KeyUse.SIGNATURE);
-        assertThat(ecKey.getKeyID()).isEqualTo("1");
-        assertThat(ecKey.getX509CertChain().size()).isEqualTo(1);
-        assertThat(ecKey.getX509CertSHA256Thumbprint()).isNotNull();
-        assertThat(ecKey.isPrivate()).isTrue();
+        Assertions.assertThat(ecKey).isNotNull();
+        Assertions.assertThat(ecKey.getCurve()).isEqualTo(Curve.P_521);
+        Assertions.assertThat(ecKey.getKeyUse()).isEqualTo(KeyUse.SIGNATURE);
+        Assertions.assertThat(ecKey.getKeyID()).isEqualTo("1");
+        Assertions.assertThat(ecKey.getX509CertChain().size()).isEqualTo(1);
+        Assertions.assertThat(ecKey.getX509CertSHA256Thumbprint()).isNotNull();
+        Assertions.assertThat(ecKey.isPrivate()).isTrue();
 
         // Try to load with bad pin
-        JOSEException e = Assertions.assertThrows(JOSEException.class,
-                () -> JWK.load(keyStore, "1", "".toCharArray()));
-        assertThat(e.getMessage()).isEqualTo("Couldn't retrieve private EC key (bad pin?): Get Key failed: Given final block not properly padded. Such issues can arise if a bad key is used during decryption.");
-        assertThat(e.getCause() instanceof UnrecoverableKeyException).isTrue();
+        Assertions.assertThatThrownBy(
+                        () -> JWK.load(keyStore, "1", "".toCharArray()))
+                .isInstanceOf(JOSEException.class)
+                .hasMessage("Couldn't retrieve private EC key (bad pin?): Get Key failed: Given final block not properly padded. Such issues can arise if a bad key is used during decryption.");
     }
 
     @Test
@@ -246,9 +247,9 @@ public class JWKTest {
         keyStore.setEntry("1", new KeyStore.SecretKeyEntry(secretKey), new KeyStore.PasswordProtection("1234".toCharArray()));
 
         OctetSequenceKey octJWK = (OctetSequenceKey) JWK.load(keyStore, "1", "1234".toCharArray());
-        assertThat(octJWK).isNotNull();
-        assertThat(octJWK.getKeyID()).isEqualTo("1");
-        assertThat(Arrays.equals(secretKey.getEncoded(), octJWK.toByteArray())).isTrue();
+        Assertions.assertThat(octJWK).isNotNull();
+        Assertions.assertThat(octJWK.getKeyID()).isEqualTo("1");
+        Assertions.assertThat(Arrays.equals(secretKey.getEncoded(), octJWK.toByteArray())).isTrue();
     }
 
     @Test
@@ -260,7 +261,7 @@ public class JWKTest {
         char[] password = "secret".toCharArray();
         keyStore.load(null, password);
 
-        assertThat(JWK.load(keyStore, "no-such-key-id", "".toCharArray())).isNull();
+        Assertions.assertThat(JWK.load(keyStore, "no-such-key-id", "".toCharArray())).isNull();
     }
 
     @Test
@@ -270,26 +271,41 @@ public class JWKTest {
         String json = "{\"kty\":\"OKP\",\"crv\":\"X448\",\"kid\":\"Dave\",\"x\":\"PreoKbDNIPW8_AtZm2_sz22kYnEHvbDU80W0MCfYuXL8PjT7QjKhPKcG3LV67D2uB73BxnvzNgk\"}";
 
         JWK jwk = JWK.parse(json);
-        assertThat(jwk.getKeyType()).isEqualTo(KeyType.OKP);
+        Assertions.assertThat(jwk.getKeyType()).isEqualTo(KeyType.OKP);
 
         OctetKeyPair okp = (OctetKeyPair) jwk;
 
-        assertThat(okp.getCurve()).isEqualTo(Curve.X448);
-        assertThat(okp.getX().toString()).isEqualTo("PreoKbDNIPW8_AtZm2_sz22kYnEHvbDU80W0MCfYuXL8PjT7QjKhPKcG3LV67D2uB73BxnvzNgk");
-        assertThat(okp.getKeyID()).isEqualTo("Dave");
-        assertThat(okp.isPrivate()).isFalse();
+        Assertions.assertThat(okp.getCurve()).isEqualTo(Curve.X448);
+        Assertions.assertThat(okp.getX().toString()).isEqualTo("PreoKbDNIPW8_AtZm2_sz22kYnEHvbDU80W0MCfYuXL8PjT7QjKhPKcG3LV67D2uB73BxnvzNgk");
+        Assertions.assertThat(okp.getKeyID()).isEqualTo("Dave");
+        Assertions.assertThat(okp.isPrivate()).isFalse();
     }
 
     @Test
     public void testParseJsonNotJWK() throws ParseException {
         String json = "{\"crv\":\"X448\",\"kid\":\"Dave\",\"x\":\"PreoKbDNIPW8_AtZm2_sz22kYnEHvbDU80W0MCfYuXL8PjT7QjKhPKcG3LV67D2uB73BxnvzNgk\"}";
-        JWK jwk = JWK.parse(json);
-        assertThat(jwk).isNull();
+        Assertions.assertThatThrownBy(
+                        () -> JWK.parse(json))
+                .isInstanceOf(ParseException.class)
+                .hasMessage("Missing key type 'kty' parameter");
     }
 
     @Test
-    public void testParseJsonNotJSON()  {
+    public void testParseJsonNotJSON() {
         String json = "ThisIsJustSomeRandomText";
-        Assertions.assertThrows(ParseException.class, () -> JWK.parse(json));
+        Assertions.assertThatThrownBy(
+                        () -> JWK.parse(json))
+                .isInstanceOf(ParseException.class);
+
     }
+
+    @Test
+    public void testParseMissingKty() {
+
+        Assertions.assertThatThrownBy(
+                        () -> JWK.parse(Json.createObjectBuilder().build()))
+                .isInstanceOf(ParseException.class)
+                .hasMessage("Missing key type 'kty' parameter");
+    }
+
 }

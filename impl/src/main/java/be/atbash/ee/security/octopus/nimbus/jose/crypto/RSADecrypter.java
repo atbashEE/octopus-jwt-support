@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package be.atbash.ee.security.octopus.nimbus.jose.crypto;
 
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.*;
+import be.atbash.ee.security.octopus.nimbus.jwk.JWKIdentifiers;
 import be.atbash.ee.security.octopus.nimbus.jwk.RSAKey;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEDecrypter;
@@ -46,6 +47,8 @@ import java.util.Set;
  *
  * <ul>
  *     <li>{@link JWEAlgorithm#RSA_OAEP_256}
+ *     <li>{@link JWEAlgorithm#RSA_OAEP_384}
+ *     <li>{@link JWEAlgorithm#RSA_OAEP_512}
  * </ul>
  *
  * <p>Supports the following content encryption algorithms:
@@ -146,7 +149,7 @@ public class RSADecrypter extends RSACryptoProvider implements JWEDecrypter {
                         Set<String> defCritHeaders,
                         boolean allowWeakKey) {
 
-        if (!privateKey.getAlgorithm().equalsIgnoreCase("RSA")) {
+        if (!privateKey.getAlgorithm().equalsIgnoreCase(JWKIdentifiers.RSA_KEY_TYPE)) {
             throw new IllegalArgumentException("The private key algorithm must be RSA");
         }
 
@@ -215,16 +218,7 @@ public class RSADecrypter extends RSACryptoProvider implements JWEDecrypter {
         // Derive the content encryption key
         JWEAlgorithm alg = header.getAlgorithm();
 
-        SecretKey cek;
-
-        if (alg.equals(JWEAlgorithm.RSA_OAEP_256)) {
-
-            cek = RSA_OAEP_256.decryptCEK(privateKey, encryptedKey.decode());
-
-        } else {
-
-            throw new JOSEException(AlgorithmSupportMessage.unsupportedJWEAlgorithm(alg, SUPPORTED_ALGORITHMS));
-        }
+        SecretKey cek = RSA_OAEP_2.decryptCEK(privateKey, encryptedKey.decode(), alg);
 
         return ContentCryptoProvider.decrypt(header, iv, cipherText, authTag, cek);
     }

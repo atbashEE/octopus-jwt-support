@@ -22,8 +22,8 @@ import java.util.*;
 /**
  * JWK {@code use} and {@code key_ops} consistency rules.
  *
- * <p>See https://tools.ietf.org/html/rfc7517#section-4.3
- *
+ * <p>See <a href="https://tools.ietf.org/html/rfc7517#section-4.3">rfc7517#section-4.3</a>
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
 class KeyUseAndOpsConsistency {
@@ -67,6 +67,6 @@ class KeyUseAndOpsConsistency {
             return true;
         }
 
-        return MAP.get(use).containsAll(ops);
+        return !MAP.containsKey(use) || MAP.get(use).containsAll(ops);
     }
 }

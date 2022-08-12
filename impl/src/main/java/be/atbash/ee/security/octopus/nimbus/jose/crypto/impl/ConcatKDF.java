@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * Concatenation Key Derivation Function (KDF). This class is thread-safe.
  *
  * <p>See NIST.800-56A.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
 public class ConcatKDF {
@@ -170,6 +170,58 @@ public class ConcatKDF {
         return ByteUtils.concat(algID, partyUInfo, partyVInfo, suppPubInfo, suppPrivInfo);
     }
 
+    /**
+     * Derives a key from the specified inputs.
+     *
+     * @param sharedSecret The shared secret. Must not be {@code null}.
+     * @param keyLength    The length of the key to derive, in bits.
+     * @param algID        The algorithm identifier, {@code null} if not
+     *                     specified.
+     * @param partyUInfo   The partyUInfo, {@code null} if not specified.
+     * @param partyVInfo   The partyVInfo {@code null} if not specified.
+     * @param suppPubInfo  The suppPubInfo, {@code null} if not specified.
+     * @param suppPrivInfo The suppPrivInfo, {@code null} if not specified.
+     * @return The derived key, with algorithm set to "AES".
+     * @throws JOSEException If the key derivation failed.
+     */
+    public SecretKey deriveKey(SecretKey sharedSecret,
+                               int keyLength,
+                               byte[] algID,
+                               byte[] partyUInfo,
+                               byte[] partyVInfo,
+                               byte[] suppPubInfo,
+                               byte[] suppPrivInfo,
+                               byte[] tag)
+            throws JOSEException {
+
+        final byte[] otherInfo = composeOtherInfo(algID, partyUInfo, partyVInfo, suppPubInfo, suppPrivInfo, tag);
+
+        return deriveKey(sharedSecret, keyLength, otherInfo);
+    }
+
+
+    /**
+     * Composes the other info as {@code algID || partyUInfo || partyVInfo
+     * || suppPubInfo || suppPrivInfo || tag}.
+     *
+     * @param algID        The algorithm identifier, {@code null} if not
+     *                     specified.
+     * @param partyUInfo   The partyUInfo, {@code null} if not specified.
+     * @param partyVInfo   The partyVInfo {@code null} if not specified.
+     * @param suppPubInfo  The suppPubInfo, {@code null} if not specified.
+     * @param suppPrivInfo The suppPrivInfo, {@code null} if not specified.
+     * @param tag          The cctag, {@code null} if not specified.
+     * @return The resulting other info.
+     */
+    public static byte[] composeOtherInfo(byte[] algID,
+                                          byte[] partyUInfo,
+                                          byte[] partyVInfo,
+                                          byte[] suppPubInfo,
+                                          byte[] suppPrivInfo,
+                                          byte[] tag) {
+
+        return ByteUtils.concat(algID, partyUInfo, partyVInfo, suppPubInfo, suppPrivInfo, tag);
+    }
 
     /**
      * Returns a message digest instance for the configured

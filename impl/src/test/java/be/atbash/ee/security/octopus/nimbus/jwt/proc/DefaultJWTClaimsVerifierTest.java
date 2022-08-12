@@ -19,14 +19,15 @@ import be.atbash.config.test.TestConfig;
 import be.atbash.ee.security.octopus.jwt.JWTValidationConstant;
 import be.atbash.ee.security.octopus.jwt.decoder.JWTVerifier;
 import be.atbash.ee.security.octopus.nimbus.jwt.JWTClaimsSet;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
 import be.atbash.util.TestReflectionUtils;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.MDC;
 
 import java.util.Date;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class DefaultJWTClaimsVerifierTest {
 
@@ -41,7 +42,7 @@ public class DefaultJWTClaimsVerifierTest {
     public void testDefaultConstructor() throws NoSuchFieldException {
 
         DefaultJWTClaimsVerifier verifier = new DefaultJWTClaimsVerifier();
-        assertThat((Integer) TestReflectionUtils.getValueOf(verifier, "maxClockSkew")).isEqualTo(60);
+        Assertions.assertThat((Integer) TestReflectionUtils.getValueOf(verifier, "maxClockSkew")).isEqualTo(60);
 
     }
 
@@ -51,8 +52,8 @@ public class DefaultJWTClaimsVerifierTest {
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder().build();
         JWTVerifier verifier = new DefaultJWTClaimsVerifier();
         boolean valid = verifier.verify(null, claimsSet);
-        assertThat(valid).isTrue();
-        assertThat(MDC.getCopyOfContextMap()).isEmpty();
+        Assertions.assertThat(valid).isTrue();
+        Assertions.assertThat(MDC.getCopyOfContextMap()).isEmpty();
     }
 
     @Test
@@ -65,8 +66,8 @@ public class DefaultJWTClaimsVerifierTest {
                 .build();
         JWTVerifier verifier = new DefaultJWTClaimsVerifier();
         boolean valid = verifier.verify(null, claimsSet);
-        assertThat(valid).isTrue();
-        assertThat(MDC.getCopyOfContextMap()).isEmpty();
+        Assertions.assertThat(valid).isTrue();
+        Assertions.assertThat(MDC.getCopyOfContextMap()).isEmpty();
     }
 
     @Test
@@ -80,10 +81,10 @@ public class DefaultJWTClaimsVerifierTest {
         JWTVerifier verifier = new DefaultJWTClaimsVerifier();
 
         boolean valid = verifier.verify(null, claimsSet);
-        assertThat(valid).isFalse();
+        Assertions.assertThat(valid).isFalse();
 
         String message = MDC.get(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON);
-        assertThat(message).startsWith("The token was expired (exp = ");
+        Assertions.assertThat(message).startsWith("The token was expired (exp = ");
 
     }
 
@@ -97,8 +98,8 @@ public class DefaultJWTClaimsVerifierTest {
                 .build();
         JWTVerifier verifier = new DefaultJWTClaimsVerifier();
         boolean valid = verifier.verify(null, claimsSet);
-        assertThat(valid).isTrue();
-        assertThat(MDC.getCopyOfContextMap()).isEmpty();
+        Assertions.assertThat(valid).isTrue();
+        Assertions.assertThat(MDC.getCopyOfContextMap()).isEmpty();
     }
 
     @Test
@@ -112,10 +113,10 @@ public class DefaultJWTClaimsVerifierTest {
         JWTVerifier verifier = new DefaultJWTClaimsVerifier();
 
         boolean valid = verifier.verify(null, claimsSet);
-        assertThat(valid).isFalse();
+        Assertions.assertThat(valid).isFalse();
 
         String message = MDC.get(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON);
-        assertThat(message).startsWith("The token should not be used (nbf = ");
+        Assertions.assertThat(message).startsWith("The token should not be used (nbf = ");
 
     }
 
@@ -131,8 +132,8 @@ public class DefaultJWTClaimsVerifierTest {
                 .build();
         JWTVerifier verifier = new DefaultJWTClaimsVerifier();
         boolean valid = verifier.verify(null, claimsSet);
-        assertThat(valid).isTrue();
-        assertThat(MDC.getCopyOfContextMap()).isEmpty();
+        Assertions.assertThat(valid).isTrue();
+        Assertions.assertThat(MDC.getCopyOfContextMap()).isEmpty();
     }
 
 
@@ -146,8 +147,8 @@ public class DefaultJWTClaimsVerifierTest {
         JWTVerifier verifier = new DefaultJWTClaimsVerifier();
         JWTClaimsSet claimSet = new JWTClaimsSet.Builder().expirationTime(thirtySecondsAgo).build();
         boolean valid = verifier.verify(null, claimSet);
-        assertThat(valid).isTrue();
-        assertThat(MDC.getCopyOfContextMap()).isEmpty();
+        Assertions.assertThat(valid).isTrue();
+        Assertions.assertThat(MDC.getCopyOfContextMap()).isEmpty();
     }
 
     @Test
@@ -161,8 +162,8 @@ public class DefaultJWTClaimsVerifierTest {
         JWTVerifier verifier = new DefaultJWTClaimsVerifier();
 
         boolean valid = verifier.verify(null, claimSet);
-        assertThat(valid).isTrue();
-        assertThat(MDC.getCopyOfContextMap()).isEmpty();
+        Assertions.assertThat(valid).isTrue();
+        Assertions.assertThat(MDC.getCopyOfContextMap()).isEmpty();
 
     }
 
@@ -172,7 +173,19 @@ public class DefaultJWTClaimsVerifierTest {
 
         DefaultJWTClaimsVerifier verifier = new DefaultJWTClaimsVerifier();
 
-        assertThat((Integer) TestReflectionUtils.getValueOf(verifier, "maxClockSkew")).isEqualTo(120);
+        Assertions.assertThat((Integer) TestReflectionUtils.getValueOf(verifier, "maxClockSkew")).isEqualTo(120);
     }
 
+    @Test
+    public void testUnencodedPayload() {
+        DefaultJWTClaimsVerifier verifier = new DefaultJWTClaimsVerifier();
+        JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.parse("RS256"))
+                .base64URLEncodePayload(false)
+                .build();
+        boolean verify = verifier.verify(header, new JWTClaimsSet.Builder().build());
+        Assertions.assertThat(verify).isFalse();
+        String message = MDC.get(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON);
+        Assertions.assertThat(message).startsWith("The token has a payload that is not encoded (b64=false)");
+
+    }
 }

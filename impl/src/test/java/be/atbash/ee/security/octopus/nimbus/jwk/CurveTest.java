@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,9 +36,9 @@ public class CurveTest {
         assertThat(Curve.P_256.getStdName()).isEqualTo("secp256r1");
         assertThat(Curve.P_256.getOID()).isEqualTo("1.2.840.10045.3.1.7");
 
-        assertThat(Curve.P_256K.getName()).isEqualTo("P-256K");
-        assertThat(Curve.P_256K.getStdName()).isEqualTo("secp256k1");
-        assertThat(Curve.P_256K.getOID()).isEqualTo("1.3.132.0.10");
+        assertThat(Curve.SECP256K1.getName()).isEqualTo("secp256k1");
+        assertThat(Curve.SECP256K1.getStdName()).isEqualTo("secp256k1");
+        assertThat(Curve.SECP256K1.getOID()).isEqualTo("1.3.132.0.10");
 
         assertThat(Curve.P_384.getName()).isEqualTo("P-384");
         assertThat(Curve.P_384.getStdName()).isEqualTo("secp384r1");
@@ -80,9 +80,9 @@ public class CurveTest {
         assertThat(ecParameterSpec).isNotNull();
         assertThat(Curve.forECParameterSpec(ecParameterSpec)).isEqualTo(Curve.P_256);
 
-        ecParameterSpec = Curve.P_256K.toECParameterSpec();
+        ecParameterSpec = Curve.SECP256K1.toECParameterSpec();
         assertThat(ecParameterSpec).isNotNull();
-        assertThat(Curve.forECParameterSpec(ecParameterSpec)).isEqualTo(Curve.P_256K);
+        assertThat(Curve.forECParameterSpec(ecParameterSpec)).isEqualTo(Curve.SECP256K1);
 
         ecParameterSpec = Curve.P_384.toECParameterSpec();
         assertThat(ecParameterSpec).isNotNull();
@@ -105,7 +105,7 @@ public class CurveTest {
         assertThat(Curve.parse("secp256r1")).isEqualTo(Curve.P_256);
         assertThat(Curve.parse("prime256v1")).isEqualTo(Curve.P_256);
 
-        assertThat(Curve.parse("secp256k1")).isEqualTo(Curve.P_256K);
+        assertThat(Curve.parse("secp256k1")).isEqualTo(Curve.SECP256K1);
 
         assertThat(Curve.parse("secp384r1")).isEqualTo(Curve.P_384);
 
@@ -124,7 +124,7 @@ public class CurveTest {
     public void testCurveForOID() {
 
         assertThat(Curve.forOID(Curve.P_256.getOID())).isEqualTo(Curve.P_256);
-        assertThat(Curve.forOID(Curve.P_256K.getOID())).isEqualTo(Curve.P_256K);
+        assertThat(Curve.forOID(Curve.SECP256K1.getOID())).isEqualTo(Curve.SECP256K1);
         assertThat(Curve.forOID(Curve.P_384.getOID())).isEqualTo(Curve.P_384);
         assertThat(Curve.forOID(Curve.P_521.getOID())).isEqualTo(Curve.P_521);
     }
@@ -134,7 +134,7 @@ public class CurveTest {
     public void testCurveForJWSAlgorithm() {
 
         assertThat(Curve.forJWSAlgorithm(JWSAlgorithm.ES256)).isEqualTo(Collections.singleton(Curve.P_256));
-        assertThat(Curve.forJWSAlgorithm(JWSAlgorithm.ES256K)).isEqualTo(Collections.singleton(Curve.P_256K));
+        assertThat(Curve.forJWSAlgorithm(JWSAlgorithm.ES256K)).isEqualTo(Collections.singleton(Curve.SECP256K1));
         assertThat(Curve.forJWSAlgorithm(JWSAlgorithm.ES384)).isEqualTo(Collections.singleton(Curve.P_384));
         assertThat(Curve.forJWSAlgorithm(JWSAlgorithm.ES512)).isEqualTo(Collections.singleton(Curve.P_521));
         assertThat(Curve.forJWSAlgorithm(JWSAlgorithm.EdDSA)).isEqualTo(new HashSet<>(Arrays.asList(Curve.Ed25519, Curve.Ed448)));

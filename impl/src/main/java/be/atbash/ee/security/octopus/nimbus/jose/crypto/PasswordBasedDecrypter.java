@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,7 +56,7 @@ import java.util.Set;
  *     <li>{@link EncryptionMethod#A192GCM}
  *     <li>{@link EncryptionMethod#A256GCM}
  * </ul>
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
 public class PasswordBasedDecrypter extends PasswordBasedCryptoProvider implements JWEDecrypter {
@@ -72,13 +72,12 @@ public class PasswordBasedDecrypter extends PasswordBasedCryptoProvider implemen
      * Creates a new password-based decrypter.
      *
      * @param secretKey The Key to use for the encryption
-     *                 {@code null}.
+     *                  {@code null}.
      */
     public PasswordBasedDecrypter(SecretKey secretKey) {
 
         super(secretKey);
     }
-
 
     public Set<String> getProcessedCriticalHeaderParams() {
 

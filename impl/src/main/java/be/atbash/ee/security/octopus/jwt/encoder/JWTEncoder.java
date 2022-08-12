@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,7 @@ import be.atbash.ee.security.octopus.jwt.parameter.JWTParameters;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersEncryption;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersPlain;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersSigning;
-import be.atbash.ee.security.octopus.nimbus.jose.JOSEObjectType;
-import be.atbash.ee.security.octopus.nimbus.jose.KeyTypeException;
-import be.atbash.ee.security.octopus.nimbus.jose.Payload;
-import be.atbash.ee.security.octopus.nimbus.jose.PlainHeader;
+import be.atbash.ee.security.octopus.nimbus.jose.*;
 import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import be.atbash.ee.security.octopus.nimbus.jwt.JWTClaimsSet;
 import be.atbash.ee.security.octopus.nimbus.jwt.PlainJWT;
@@ -38,11 +35,11 @@ import be.atbash.ee.security.octopus.nimbus.util.JSONObjectUtils;
 import be.atbash.ee.security.octopus.util.JsonbUtil;
 import be.atbash.util.PublicAPI;
 import be.atbash.util.exception.AtbashUnexpectedException;
-
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.json.JsonObject;
 import jakarta.json.bind.Jsonb;
+
 import java.text.ParseException;
 
 /**
@@ -71,13 +68,17 @@ public class JWTEncoder {
                 result = createJSONString(data);
                 break;
             case PLAIN:
-                result = createPlainJWT(data, (JWTParametersPlain) parameters);
+                PlainJWT plainJWT = createPlainJWT(data, (JWTParametersPlain) parameters);
+                result = plainJWT.serialize();
                 break;
             case JWS:
-                result = createSignedJWT(data, (JWTParametersSigning) parameters);
+                JWSObject jwtObject = createJWTObject(data, (JWTParametersSigning) parameters);
+                result = jwtObject.serialize();
                 break;
             case JWE:
-                result = createEncryptedJWE(data, (JWTParametersEncryption) parameters);
+                JWEObject jwe = createEncryptedJWE(data, (JWTParametersEncryption) parameters);
+                // Serialise to JWE compact form
+                result = jwe.serialize();
                 break;
             default:
                 throw new IllegalArgumentException(String.format("JWTEncoding not supported %s", parameters.getEncoding()));
@@ -86,7 +87,41 @@ public class JWTEncoder {
 
     }
 
-    private String createPlainJWT(Object data, JWTParametersPlain parameters) {
+    /**
+     * Serialize to the Flattened JWS JSON Serialization.
+     *
+     * @param data       The content that must be 'wrapped' into JWS/JWE.
+     * @param parameters Determines the parameters for the creation.
+     * @return the Flattened JWS JSON Serialization.
+     */
+    public JsonObject encodeAsJson(Object data, JWTParameters parameters) {
+        checkDependencies();
+
+        JsonObject result;
+
+        switch (parameters.getEncoding()) {
+            case NONE:
+                throw new UnsupportedOperationException("Encoding NONE is not supported to JWT JSON Serialization format");
+            case PLAIN:
+                PlainJWT plainJWT = createPlainJWT(data, (JWTParametersPlain) parameters);
+                result = plainJWT.serializeToJson();
+                break;
+            case JWS:
+                JWSObject jwtObject = createJWTObject(data, (JWTParametersSigning) parameters);
+                result = jwtObject.serializeToJson();
+                break;
+            case JWE:
+                JWEObject encryptedJWE = createEncryptedJWE(data, (JWTParametersEncryption) parameters);
+                result = encryptedJWE.serializeToJson();
+                break;
+            default:
+                throw new IllegalArgumentException(String.format("JWTEncoding not supported %s", parameters.getEncoding()));
+        }
+        return result;
+
+    }
+
+    private PlainJWT createPlainJWT(Object data, JWTParametersPlain parameters) {
         PlainHeader header = new PlainHeader.Builder().parameters(parameters.getHeaderValues()).build();
 
         PlainJWT plainJWT;
@@ -95,16 +130,16 @@ public class JWTEncoder {
         } else {
             String payload = createJSONString(data);
             try {
-                plainJWT = new PlainJWT(header, JSONObjectUtils.parse(payload));
+                plainJWT = new PlainJWT(header, JSONObjectUtils.parse(payload, Header.MAX_HEADER_STRING_LENGTH));
             } catch (ParseException e) {
                 throw new AtbashUnexpectedException(String.format("JSON string can't be parsed which is unexpected \n%s\n%s", payload, e.getMessage()));
             }
         }
 
-        return plainJWT.serialize();
+        return plainJWT;
     }
 
-    private String createEncryptedJWE(Object data, JWTParametersEncryption parameters) {
+    private JWEObject createEncryptedJWE(Object data, JWTParametersEncryption parameters) {
 
         JWEAlgorithm jweAlgorithm = parameters.getJweAlgorithm();
         if (jweAlgorithm == null) {
@@ -120,19 +155,18 @@ public class JWTEncoder {
                         .parameters(parameters.getHeaderValues())
                         .contentType("JWT") // required to signal nested JWT
                         .build(),
-                new Payload(createSignedJWT(data, parameters.getParametersSigning())));
+                new Payload(createJWTObject(data, parameters.getParametersSigning()).serialize()));
 
         // Perform encryption
         jweObject.encrypt(encryptionFactory.createEncryptor(parameters));
 
-        // Serialise to JWE compact form
-        return jweObject.serialize();
+        return jweObject;
     }
 
     private JWEAlgorithm defineDefaultJWEAlgorithm(JWTParametersEncryption parameters) {
         JWEAlgorithm result = null;
         if (parameters.getKeyType() == KeyType.RSA) {
-            result = JWEAlgorithm.RSA_OAEP_256;  // Only supported one, no configuration required
+            result = jwtSupportConfiguration.getDefaultJWEAlgorithmRSA();
         }
         if (parameters.getKeyType() == KeyType.EC) {
             result = jwtSupportConfiguration.getDefaultJWEAlgorithmEC();
@@ -142,11 +176,6 @@ public class JWTEncoder {
             result = jwtSupportConfiguration.getDefaultJWEAlgorithmOCT();
         }
         return result;
-    }
-
-    private String createSignedJWT(Object data, JWTParametersSigning parameters) {
-        JWSObject jwsObject = createJWTObject(data, parameters);
-        return jwsObject.serialize();
     }
 
     private JWSObject createJWTObject(Object data, JWTParametersSigning parameters) {

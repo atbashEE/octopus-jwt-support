@@ -34,11 +34,11 @@ import be.atbash.ee.security.octopus.util.PeriodUtil;
 import be.atbash.util.StringUtils;
 import be.atbash.util.reflection.CDICheck;
 import be.atbash.util.reflection.ClassUtils;
+import jakarta.enterprise.context.ApplicationScoped;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.enterprise.context.ApplicationScoped;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -199,6 +199,17 @@ public class JwtSupportConfiguration extends AbstractConfiguration implements Mo
             throw new ConfigurationException(String.format("Clock skew value must be positive, parameter 'jwt.clock.skew.secs' is %s", result));
         }
         return result;
+    }
+
+    @ConfigProperty
+    public JWEAlgorithm getDefaultJWEAlgorithmRSA() {
+        String configValue = getOptionalValue("jwt.jwe.algorithm.default.RSA", "RSA-OAEP-256", String.class);
+        JWEAlgorithm jweAlgorithm = JWEAlgorithm.parse(configValue);
+        if (!JWEAlgorithm.Family.RSA.contains(jweAlgorithm)) {
+
+            throw new ConfigurationException("The default JWE Algorithm defined in parameter 'jwt.jwe.algorithm.default.RSA' is not valid ");
+        }
+        return jweAlgorithm;
     }
 
     @ConfigProperty

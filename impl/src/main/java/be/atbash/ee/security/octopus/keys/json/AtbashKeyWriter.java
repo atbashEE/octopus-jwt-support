@@ -18,10 +18,11 @@ package be.atbash.ee.security.octopus.keys.json;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.writer.KeyEncoderParameters;
 import be.atbash.ee.security.octopus.keys.writer.KeyWriterFactory;
-
+import be.atbash.ee.security.octopus.nimbus.jose.HeaderParameterNames;
 import jakarta.json.bind.serializer.JsonbSerializer;
 import jakarta.json.bind.serializer.SerializationContext;
 import jakarta.json.stream.JsonGenerator;
+
 import java.util.Base64;
 
 public class AtbashKeyWriter implements JsonbSerializer<AtbashKey> {
@@ -40,7 +41,7 @@ public class AtbashKeyWriter implements JsonbSerializer<AtbashKey> {
         byte[] bytes = keyWriterFactory.writeKeyAsJWK(atbashKey, parameters);
 
         jsonGenerator.writeStartObject()
-                .writeKey("kid").write(atbashKey.getKeyId())
+                .writeKey(HeaderParameterNames.KEY_ID).write(atbashKey.getKeyId())
                 .writeKey("key").write(Base64.getUrlEncoder().withoutPadding().encodeToString(bytes))
                 .writeEnd();
 

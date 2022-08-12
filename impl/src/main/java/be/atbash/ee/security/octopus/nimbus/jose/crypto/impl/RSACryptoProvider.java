@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,8 +30,10 @@ import java.util.Set;
  * {@link JWEObject JWE objects}.
  *
  * <p>Supports the following key management algorithms:
- *
+ * <ul>
  *     <li>{@link JWEAlgorithm#RSA_OAEP_256}
+ *     <li>{@link JWEAlgorithm#RSA_OAEP_384}
+ *     <li>{@link JWEAlgorithm#RSA_OAEP_512}
  * </ul>
  *
  * <p>Supports the following content encryption algorithms:
@@ -65,6 +67,8 @@ public abstract class RSACryptoProvider extends BaseJWEProvider {
     static {
         Set<JWEAlgorithm> algs = new LinkedHashSet<>();
         algs.add(JWEAlgorithm.RSA_OAEP_256);
+        algs.add(JWEAlgorithm.RSA_OAEP_384);
+        algs.add(JWEAlgorithm.RSA_OAEP_512);
         SUPPORTED_ALGORITHMS = Collections.unmodifiableSet(algs);
     }
 

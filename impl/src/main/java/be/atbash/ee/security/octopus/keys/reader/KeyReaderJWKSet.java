@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,15 +18,17 @@ package be.atbash.ee.security.octopus.keys.reader;
 import be.atbash.ee.security.octopus.exception.ResourceNotFoundException;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup;
+import be.atbash.ee.security.octopus.nimbus.jwk.JWKIdentifiers;
+import be.atbash.ee.security.octopus.nimbus.util.JSONObjectUtils;
 import be.atbash.ee.security.octopus.util.JsonbUtil;
 import be.atbash.util.exception.AtbashUnexpectedException;
 import be.atbash.util.resource.ResourceUtil;
-
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbException;
 import jakarta.json.stream.JsonParsingException;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
@@ -75,21 +77,21 @@ public class KeyReaderJWKSet extends KeyReaderJWK {
             return result;
         }
 
-        if (!jsonObject.containsKey("keys")) {
+        if (!jsonObject.containsKey(JWKIdentifiers.KEYS)) {
             // If it is not a jwkSet JSON
             return result;
         }
 
-        JsonArray keys = jsonObject.getJsonArray("keys");
+        JsonArray keys = jsonObject.getJsonArray(JWKIdentifiers.KEYS);
         try {
             Set<String> kids = new HashSet<>();
             for (Object key : keys) {
                 if (!(key instanceof JsonObject)) {
-                    throw new InvalidJWKSetFormatException("The \"keys\" JSON array must contain JSON objects only");
+                    throw new InvalidJWKSetFormatException("The '" + JWKIdentifiers.KEYS + "' JSON array must contain JSON objects only");
                 }
 
                 JsonObject jwkJson = (JsonObject) key;
-                String kid = jwkJson.getString("kid");
+                String kid = JSONObjectUtils.getString(jwkJson, JWKIdentifiers.KEY_ID);
                 if (kids.contains(kid)) {
                     throw new InvalidJWKSetFormatException(String.format("The kid '%s' was found multiple times in the resource '%s'", kid, path));
                 }

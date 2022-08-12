@@ -48,7 +48,7 @@ class JWTClaimsSetTest {
     @Test
     void issuer_wrongValue() {
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
-                .claim("iss", 123L)
+                .claim(JWTClaimNames.ISSUER, 123L)
                 .build();
 
         Assertions.assertThat(claimsSet.getIssuer()).isNull();
@@ -72,7 +72,7 @@ class JWTClaimsSetTest {
     @Test
     void subject_wrongValue() {
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
-                .claim("sub", 123L)
+                .claim(JWTClaimNames.SUBJECT, 123L)
                 .build();
 
         Assertions.assertThat(claimsSet.getSubject()).isNull();
@@ -157,7 +157,7 @@ class JWTClaimsSetTest {
     @Test
     void audience_wrongValue() {
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
-                .claim("aud", 123L)
+                .claim(JWTClaimNames.AUDIENCE, 123L)
                 .build();
 
         Assertions.assertThat(claimsSet.getAudience()).isEmpty();
@@ -209,7 +209,7 @@ class JWTClaimsSetTest {
     void expirationTime_wrongValue() {
 
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
-                .claim("exp", "JUnit")
+                .claim(JWTClaimNames.EXPIRATION_TIME, "JUnit")
                 .build();
 
         Assertions.assertThat(claimsSet.getExpirationTime()).isNull();
@@ -233,7 +233,7 @@ class JWTClaimsSetTest {
     void notBeforeTime_wrongValue() {
 
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
-                .claim("nbf", "JUnit")
+                .claim(JWTClaimNames.NOT_BEFORE, "JUnit")
                 .build();
 
         Assertions.assertThat(claimsSet.getNotBeforeTime()).isNull();
@@ -485,7 +485,7 @@ class JWTClaimsSetTest {
         JsonBuilderFactory factory = Json.createBuilderFactory(config);
         JsonObject value = factory.createObjectBuilder()
                 .add("key", "value")
-                .add("sub", factory.createObjectBuilder()
+                .add(JWTClaimNames.SUBJECT, factory.createObjectBuilder()
                         .add("project", "Atbash")
                         .build())
                 .build();
@@ -575,14 +575,14 @@ class JWTClaimsSetTest {
         Map<String, ?> config = new HashMap<>();
         JsonBuilderFactory factory = Json.createBuilderFactory(config);
         Map<String, Object> data = new HashMap<>();
-        data.put("iss", "issuer");
-        data.put("sub", "subject");
-        data.put("aud", "aud1,aud2");
-        data.put("jti", "theId");
+        data.put(JWTClaimNames.ISSUER, "issuer");
+        data.put(JWTClaimNames.SUBJECT, "subject");
+        data.put(JWTClaimNames.AUDIENCE, "aud1,aud2");
+        data.put(JWTClaimNames.JWT_ID, "theId");
 
-        data.put("iat", asDateValue(now));
-        data.put("exp", asDateValue(exp));
-        data.put("nbf", asDateValue(notBefore));
+        data.put(JWTClaimNames.ISSUED_AT, asDateValue(now));
+        data.put(JWTClaimNames.EXPIRATION_TIME, asDateValue(exp));
+        data.put(JWTClaimNames.NOT_BEFORE, asDateValue(notBefore));
         data.put("custom", "JUnit");
 
         JsonObject jsonObject = factory.createObjectBuilder(data).build();

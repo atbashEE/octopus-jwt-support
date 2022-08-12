@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,20 +16,21 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto.impl;
 
 
+import be.atbash.ee.security.octopus.nimbus.jose.HeaderParameterNames;
+import be.atbash.ee.security.octopus.nimbus.jwt.JWTClaimNames;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 
 /**
  * Tests the critical parameters checker.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
 public class CriticalHeaderParamsDeferralTest {
@@ -39,8 +40,8 @@ public class CriticalHeaderParamsDeferralTest {
 
         CriticalHeaderParamsDeferral checker = new CriticalHeaderParamsDeferral();
 
-        assertThat(checker.getProcessedCriticalHeaderParams()).isEmpty();
-        assertThat(checker.getDeferredCriticalHeaderParams()).isEmpty();
+        Assertions.assertThat(checker.getProcessedCriticalHeaderParams()).containsOnly("b64");
+        Assertions.assertThat(checker.getDeferredCriticalHeaderParams()).isEmpty();
     }
 
     @Test
@@ -50,9 +51,22 @@ public class CriticalHeaderParamsDeferralTest {
 
         checker.setDeferredCriticalHeaderParams(new HashSet<>(Arrays.asList("exp", "hs")));
 
-        assertThat(checker.getDeferredCriticalHeaderParams()).contains("exp");
-        assertThat(checker.getDeferredCriticalHeaderParams()).contains("hs");
-        assertThat(checker.getDeferredCriticalHeaderParams()).hasSize(2);
+        Assertions.assertThat(checker.getDeferredCriticalHeaderParams()).contains("exp");
+        Assertions.assertThat(checker.getDeferredCriticalHeaderParams()).contains("hs");
+        Assertions.assertThat(checker.getDeferredCriticalHeaderParams()).hasSize(2);
+    }
+
+    @Test
+    public void testPassB64Header() {
+
+        CriticalHeaderParamsDeferral checker = new CriticalHeaderParamsDeferral();
+
+        JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.RS256)
+                .base64URLEncodePayload(true)
+                .criticalParams(Collections.singleton(HeaderParameterNames.BASE64_URL_ENCODE_PAYLOAD))
+                .build();
+
+        Assertions.assertThat(checker.headerPasses(header)).isTrue();
     }
 
     @Test
@@ -62,7 +76,7 @@ public class CriticalHeaderParamsDeferralTest {
 
         JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.RS256).keyID("1").build();
 
-        assertThat(checker.headerPasses(header)).isTrue();
+        Assertions.assertThat(checker.headerPasses(header)).isTrue();
     }
 
     @Test
@@ -73,11 +87,11 @@ public class CriticalHeaderParamsDeferralTest {
 
         JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.RS256).
                 keyID("1").
-                parameter("exp", "2014-04-24").
+                parameter(JWTClaimNames.EXPIRATION_TIME, "2014-04-24").
                 criticalParams(new HashSet<>(Collections.singletonList("exp"))).
                 build();
 
-        assertThat(checker.headerPasses(header)).isTrue();
+        Assertions.assertThat(checker.headerPasses(header)).isTrue();
     }
 
     @Test
@@ -87,10 +101,10 @@ public class CriticalHeaderParamsDeferralTest {
 
         JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.RS256).
                 keyID("1").
-                parameter("exp", "2014-04-24").
+                parameter(JWTClaimNames.EXPIRATION_TIME, "2014-04-24").
                 criticalParams(new HashSet<>(Collections.singletonList("exp"))).
                 build();
 
-        assertThat(checker.headerPasses(header)).isFalse();
+        Assertions.assertThat(checker.headerPasses(header)).isFalse();
     }
 }

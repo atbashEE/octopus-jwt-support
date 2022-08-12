@@ -21,6 +21,21 @@ User manual for Atbash JWT Support.
 . Identify the `SecretKey` through the class `KeyFamilyUtil`.
 . The reason for a Failed JWT token verification (signature, verifier, ...) can be found within MDC of SLF4J with key `JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON`.
 . Possibility to recreate the `SecureRandom` or developer can provide (implement the interface `SecureRandomProvider`) the instance that is retrieved by `JCASupportConfiguration.getSecureRandom`.
+. Do not allow un-encoded payload for JWT ( https://datatracker.ietf.org/doc/html/rfc7797#section-7[RFC-7797, Section 7])
+. Define constants for Spec based values; see `HeaderParameterNames`, `JWKIdentifiers`, and `JWTClaimNames` (defined as PublicAPI)
+. Support for the flattened JWS JSON Serialization syntax (besides the compact String serialisation).
+Added method to `JWTEncoder` and `JWTDecoder` to support this.
+. Validations on Signatures using EC Curves to capture the CVE-2022-21449 (https://nvd.nist.gov/vuln/detail/cve-2022-21449)
+. Important changes / new features from Nimbus Jose library (since JWT Support classes are based on the Nimbus Jose classes)
+* Limit size of parsed headers (plain, JWS, ...) to 20 000 characters.
+(JWTDecoder throws an InvalidJWTException)
+* Support for RSA-OAEP-384 and RSA-OAEP-512.
+* EC Curve _P-256K_ renamed to _SECP256K1_
+* `X509CertChainUtils.parse` method for File (and String)
+* `X509CertChainUtils.store` method to add certificates to Java KeyStore.
+* _b64_ header parameter is now supported (no longer use header.parameter to specify this value)
+* Improved detection off missing values
+* Updates KeyUse.from(X509Certificate) to return null when the certificate public key use doesn't map to a single JWK use value.
 
 === Jakarta version
 
@@ -127,6 +142,11 @@ Use the Object _data_ as JWT payload, signed with a HMAC
 
 In the above example, the JWT has a custom header.
 
+Instead of creating a String, you can also create a JSON object using (flattened JWS JSON Serialization syntax https://datatracker.ietf.org/doc/html/rfc7515#section-7.2.2)
+
+----
+    JsonObject json = jwtEncoder.encodeAsJson(data, parameters);
+----
 
 Instead of injecting the Encoder, it is also possible to instantiate the encoder directly.
 
@@ -171,6 +191,8 @@ See also https://github.com/rdebusscher/atbash-key-server for a Key management s
 
 MPBearerTokenVerifier -> Optional verifier for validating the JWT.
 
+You can now also provide a JSONObject with the flattened JWS JSON Serialization syntax to use the 'token'.
+
 TODO : Describe the default verifications.
 
 == Additional verification
@@ -183,11 +205,11 @@ The interface has the following verification method:
 ----
 
 The header parameter has the header, either the header for the JWS (signed JWT) or the JWE (encrypted JWT).
-The jwtClaimsSet parameter contains the payload of the JWT. The claims value are still in basic format, so if there is an converter defined, it is not yet applied.
+The jwtClaimsSet parameter contains the payload of the JWT.The claims value are still in basic format, so if there is an converter defined, it is not yet applied.
 
 == Validate jku
 
-The `RemoteKeyManager` retrieves the JWKSet from the JKU values defined in the header of a signed/encrypted JWT. However, allowing any URI in this header is a serious security issue as anyone can create a JWT and point to an endpoint he controls.
+The `RemoteKeyManager` retrieves the JWKSet from the JKU values defined in the header of a signed/encrypted JWT.However, allowing any URI in this header is a serious security issue as anyone can create a JWT and point to an endpoint he controls.
 There, these URIs needs to be approved.
 
 Create an instance of `RemoteJWKSetURIValidator` and implement the is valid method.

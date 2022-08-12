@@ -21,6 +21,7 @@ import be.atbash.ee.security.octopus.jwt.JWTValidationConstant;
 import be.atbash.ee.security.octopus.jwt.decoder.JWTVerifier;
 import be.atbash.ee.security.octopus.nimbus.jwt.CommonJWTHeader;
 import be.atbash.ee.security.octopus.nimbus.jwt.JWTClaimsSet;
+import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
 import be.atbash.ee.security.octopus.nimbus.jwt.util.DateUtils;
 import org.slf4j.MDC;
 
@@ -84,6 +85,12 @@ public class DefaultJWTClaimsVerifier implements JWTVerifier {
                 MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, String.format("The token should not be used (nbf = %s)", nbf));
                 return false;
             }
+        }
+
+        if (header instanceof JWSHeader && !((JWSHeader) header).isBase64URLEncodePayload()) {
+            MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, "The token has a payload that is not encoded (b64=false)");
+            return false;
+
         }
         return true;
     }

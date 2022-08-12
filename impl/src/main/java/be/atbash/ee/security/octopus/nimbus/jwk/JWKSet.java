@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ package be.atbash.ee.security.octopus.nimbus.jwk;
 
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.nimbus.util.JSONObjectUtils;
-
 import jakarta.json.*;
+
 import java.io.Serializable;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -283,7 +283,7 @@ public class JWKSet implements Serializable {
             }
         }
 
-        result.add("keys", keysArray);
+        result.add(JWKIdentifiers.KEYS, keysArray);
 
         return result.build();
     }
@@ -329,10 +329,10 @@ public class JWKSet implements Serializable {
     public static JWKSet parse(JsonObject json)
             throws ParseException {
 
-        JsonArray keyArray = json.getJsonArray("keys");
+        JsonArray keyArray = json.getJsonArray(JWKIdentifiers.KEYS);
 
         if (keyArray == null) {
-            throw new ParseException("Missing required \"keys\" member", 0);
+            throw new ParseException("Missing required \"" + JWKIdentifiers.KEYS + "\" member", 0);
         }
 
         List<JWK> keys = new LinkedList<>();
@@ -346,7 +346,10 @@ public class JWKSet implements Serializable {
             JsonObject keyJSON = (JsonObject) keyArray.get(i);
 
             try {
-                keys.add(JWK.parse(keyJSON));
+                JWK parse = JWK.parse(keyJSON);
+                if (parse != null) {
+                    keys.add(parse);
+                }
 
             } catch (ParseException e) {
 
@@ -358,7 +361,7 @@ public class JWKSet implements Serializable {
         Map<String, Object> additionalMembers = new HashMap<>();
         for (Map.Entry<String, JsonValue> entry : json.entrySet()) {
 
-            if (entry.getKey() == null || entry.getKey().equals("keys")) {
+            if (entry.getKey() == null || entry.getKey().equals(JWKIdentifiers.KEYS)) {
                 continue;
             }
 

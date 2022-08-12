@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,9 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto;
 
 
-import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
-import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.AlgorithmSupportMessage;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.ContentCryptoProvider;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.RSACryptoProvider;
-import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.RSA_OAEP_256;
+import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.RSA_OAEP_2;
 import be.atbash.ee.security.octopus.nimbus.jwk.RSAKey;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.*;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
@@ -47,6 +45,8 @@ import java.security.interfaces.RSAPublicKey;
  *
  * <ul>
  *     <li>{@link JWEAlgorithm#RSA_OAEP_256}
+ *     <li>{@link JWEAlgorithm#RSA_OAEP_384}
+ *     <li>{@link JWEAlgorithm#RSA_OAEP_512}*
  * </ul>
  *
  * <p>Supports the following content encryption algorithms:
@@ -162,15 +162,10 @@ public class RSAEncrypter extends RSACryptoProvider implements JWEEncrypter {
 
         Base64URLValue encryptedKey; // The second JWE part
 
-        if (alg.equals(JWEAlgorithm.RSA_OAEP_256)) {
 
-            // Encrypt the cek (used to encrypt the clearText) with the RSA public key.
-            encryptedKey = Base64URLValue.encode(RSA_OAEP_256.encryptCEK(publicKey, cek));
+        // Encrypt the cek (used to encrypt the clearText) with the RSA public key.
+        encryptedKey = Base64URLValue.encode(RSA_OAEP_2.encryptCEK(publicKey, cek, alg));
 
-        } else {
-
-            throw new JOSEException(AlgorithmSupportMessage.unsupportedJWEAlgorithm(alg, SUPPORTED_ALGORITHMS));
-        }
 
         // Define All JWE Parts
         return ContentCryptoProvider.encrypt(header, clearText, cek, encryptedKey);

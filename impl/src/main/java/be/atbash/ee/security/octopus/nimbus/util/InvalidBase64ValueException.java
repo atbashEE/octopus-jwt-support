@@ -13,21 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.ee.security.octopus.jwt;
+package be.atbash.ee.security.octopus.nimbus.util;
 
-import be.atbash.util.exception.AtbashException;
+import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 
-/**
- *
- */
-
-public class InvalidJWTException extends AtbashException {
-
-    public InvalidJWTException(String message) {
+public class InvalidBase64ValueException extends JOSEException {
+    public InvalidBase64ValueException(String message) {
         super(message);
-    }
-
-    public InvalidJWTException(String message, Throwable cause) {
-        super(message, cause);
     }
 }

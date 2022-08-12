@@ -23,6 +23,7 @@ import be.atbash.ee.security.octopus.keys.generator.RSAGenerationParameters;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.keys.selector.filter.AsymmetricPartKeyFilter;
 import be.atbash.ee.security.octopus.keys.writer.KeyEncoderParameters;
+import be.atbash.ee.security.octopus.nimbus.jwk.JWKIdentifiers;
 import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import be.atbash.ee.security.octopus.nimbus.util.KeyUtils;
 import be.atbash.util.exception.AtbashUnexpectedException;
@@ -123,10 +124,10 @@ public class KeyStoreEncoder implements KeyEncoder {
     private String getCertificateSignatureAlgorithm(KeyType keyType) {
         String result;
         switch (keyType.getValue()) {
-            case "RSA":
+            case JWKIdentifiers.RSA_KEY_TYPE:
                 result = configuration.getCertificateSignatureAlgorithmRSA();
                 break;
-            case "EC":
+            case JWKIdentifiers.ELLIPTIC_CURVE_KEY_TYPE:
                 result = configuration.getCertificateSignatureAlgorithmEC();
                 break;
             default:
@@ -138,10 +139,10 @@ public class KeyStoreEncoder implements KeyEncoder {
     private PrivateKey createSigningKey(KeyType keyType) {
         PrivateKey result;
         switch (keyType.getValue()) {
-            case "RSA":
+            case JWKIdentifiers.RSA_KEY_TYPE:
                 result = createSigningKeyRSA();
                 break;
-            case "EC":
+            case JWKIdentifiers.ELLIPTIC_CURVE_KEY_TYPE:
                 result = createSigningKeyEC();
                 break;
             default:

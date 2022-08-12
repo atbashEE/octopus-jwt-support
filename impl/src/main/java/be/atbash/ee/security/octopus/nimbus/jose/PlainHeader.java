@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ package be.atbash.ee.security.octopus.nimbus.jose;
 
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.ee.security.octopus.nimbus.util.JSONObjectUtils;
-
 import jakarta.json.JsonObject;
+
 import java.text.ParseException;
 import java.util.*;
 
@@ -351,18 +351,16 @@ public final class PlainHeader extends Header {
         // Parse optional + custom parameters
         for (String name : jsonObject.keySet()) {
 
-            if ("alg".equals(name)) {
+            if (HeaderParameterNames.ALGORITHM.equals(name)) {
                 // skip
-            } else if ("typ".equals(name)) {
-                if (JSONObjectUtils.hasValue(jsonObject, name)) {
-                    String typValue = jsonObject.getString(name);
-                    if (typValue != null) {
-                        header = header.type(new JOSEObjectType(typValue));
-                    }
+            } else if (HeaderParameterNames.TYPE.equals(name)) {
+                String typValue = JSONObjectUtils.getString(jsonObject, name);
+                if (typValue != null) {
+                    header = header.type(new JOSEObjectType(typValue));
                 }
-            } else if ("cty".equals(name)) {
-                header = header.contentType(jsonObject.getString(name));
-            } else if ("crit".equals(name)) {
+            } else if (HeaderParameterNames.CONTENT_TYPE.equals(name)) {
+                header = header.contentType(JSONObjectUtils.getString(jsonObject, name));
+            } else if (HeaderParameterNames.CRITICAL.equals(name)) {
                 List<String> critValues = JSONObjectUtils.getStringList(jsonObject, name);
                 if (critValues != null) {
                     header = header.criticalParams(new HashSet<>(critValues));
@@ -407,7 +405,7 @@ public final class PlainHeader extends Header {
                                     Base64URLValue parsedBase64URL)
             throws ParseException {
 
-        return parse(JSONObjectUtils.parse(jsonString), parsedBase64URL);
+        return parse(JSONObjectUtils.parse(jsonString, Header.MAX_HEADER_STRING_LENGTH), parsedBase64URL);
     }
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 
 import java.security.Key;
+import java.util.Arrays;
 
 public class KeyTypeException extends JOSEException {
 
@@ -53,4 +54,16 @@ public class KeyTypeException extends JOSEException {
         super(String.format("Invalid key: Must be an instance of %s", expectedKeyClass));
     }
 
+    /**
+     * Creates a new key type exception.
+     *
+     * @param expectedKeyInterface The expected key interfaces. Should not
+     *                             be {@code null}.
+     * @param additionalInterfaces Additional interfaces the key is required to implement.
+     */
+    public KeyTypeException(Class<? extends Key> expectedKeyInterface, Class<?>... additionalInterfaces) {
+
+        super(String.format("Invalid key: Must be an instance of %s and implement all of the following interfaces %s",
+                expectedKeyInterface, Arrays.toString(additionalInterfaces)));
+    }
 }

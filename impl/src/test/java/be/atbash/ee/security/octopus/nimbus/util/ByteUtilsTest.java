@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,12 @@
 package be.atbash.ee.security.octopus.nimbus.util;
 
 
-import org.junit.jupiter.api.Assertions;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import java.util.Arrays;
 
 
 /**
@@ -39,7 +38,7 @@ public class ByteUtilsTest {
 
         byte[] out = ByteUtils.concat(a1, a2);
 
-        assertThat(out).containsExactly((byte) 1, (byte) 2, (byte) 3, (byte) 4);
+        Assertions.assertThat(out).containsExactly((byte) 1, (byte) 2, (byte) 3, (byte) 4);
     }
 
     @Test
@@ -51,7 +50,7 @@ public class ByteUtilsTest {
 
         byte[] out = ByteUtils.concat(a1, a2, a3);
 
-        assertThat(out).containsExactly((byte) 1, (byte) 2, (byte) 3, (byte) 4);
+        Assertions.assertThat(out).containsExactly((byte) 1, (byte) 2, (byte) 3, (byte) 4);
     }
 
     @Test
@@ -65,44 +64,61 @@ public class ByteUtilsTest {
 
         byte[] concat = ByteUtils.concat(firstHalf, secondHalf);
 
-        assertThat(Base64URLValue.encode(hash)).isEqualTo(Base64URLValue.encode(concat));
+        Assertions.assertThat(Base64URLValue.encode(hash)).isEqualTo(Base64URLValue.encode(concat));
     }
 
     @Test
     public void testSafeBitLength_OK() {
 
-        assertThat(ByteUtils.bitLength(1)).isEqualTo(8);
-        assertThat(ByteUtils.bitLength(2)).isEqualTo(16);
-        assertThat(ByteUtils.bitLength(4)).isEqualTo(32);
-        assertThat(ByteUtils.bitLength(8)).isEqualTo(64);
+        Assertions.assertThat(ByteUtils.bitLength(1)).isEqualTo(8);
+        Assertions.assertThat(ByteUtils.bitLength(2)).isEqualTo(16);
+        Assertions.assertThat(ByteUtils.bitLength(4)).isEqualTo(32);
+        Assertions.assertThat(ByteUtils.bitLength(8)).isEqualTo(64);
     }
 
     @Test
     public void testSafeBitLength_IntegerOverflow() {
 
-        IntegerOverflowException e = Assertions.assertThrows(IntegerOverflowException.class,
-                () -> ByteUtils.safeBitLength(Integer.MAX_VALUE));
-
-
-        assertThat(e.getMessage()).isEqualTo("Integer overflow");
+        Assertions.assertThatThrownBy(
+                        () -> ByteUtils.safeBitLength(Integer.MAX_VALUE))
+                .isInstanceOf(IntegerOverflowException.class)
+                .hasMessage("Integer overflow");
 
     }
 
     @Test
     public void testArraySafeBitLength_OK() {
 
-        assertThat(ByteUtils.bitLength(new byte[1])).isEqualTo(8);
-        assertThat(ByteUtils.bitLength(new byte[2])).isEqualTo(16);
-        assertThat(ByteUtils.bitLength(new byte[4])).isEqualTo(32);
-        assertThat(ByteUtils.bitLength(new byte[8])).isEqualTo(64);
+        Assertions.assertThat(ByteUtils.bitLength(new byte[1])).isEqualTo(8);
+        Assertions.assertThat(ByteUtils.bitLength(new byte[2])).isEqualTo(16);
+        Assertions.assertThat(ByteUtils.bitLength(new byte[4])).isEqualTo(32);
+        Assertions.assertThat(ByteUtils.bitLength(new byte[8])).isEqualTo(64);
     }
 
     @Test
     public void testArraySafeBitLength_IntegerOverflow() {
 
-        IntegerOverflowException e = Assertions.assertThrows(IntegerOverflowException.class,
-                () -> ByteUtils.safeBitLength(new byte[Integer.MAX_VALUE / 8 + 1]));
-        assertThat(e.getMessage()).isEqualTo("Integer overflow");
+        Assertions.assertThatThrownBy(
+                        () -> ByteUtils.safeBitLength(new byte[Integer.MAX_VALUE / 8 + 1]))
+                .isInstanceOf(IntegerOverflowException.class)
+                .hasMessage("Integer overflow");
 
+    }
+
+    @Test
+    public void testConcatSignatureAllZeroes() {
+
+        Assertions.assertThat(ByteUtils.isZeroFilled(new byte[64])).isTrue();
+
+        byte[] array = new byte[64];
+        Arrays.fill(array, Byte.MAX_VALUE);
+        Assertions.assertThat(ByteUtils.isZeroFilled(array)).isFalse();
+
+        array = new byte[64];
+        array[63] = 1;
+        Assertions.assertThat(ByteUtils.isZeroFilled(array)).isFalse();
+
+        Assertions.assertThatThrownBy(() -> ByteUtils.isZeroFilled(null))
+                .isInstanceOf(NullPointerException.class);
     }
 }

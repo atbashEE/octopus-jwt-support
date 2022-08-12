@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 
 /**
  * JSON object helper methods for parsing and typed retrieval of member values.
- *
+ * <p></p>
  * Based on code by Vladimir Dzhuvinov
  */
 @PublicAPI
@@ -40,16 +40,64 @@ public final class JSONObjectUtils {
 
 
     /**
-     * Parses a JSON object.
+     * Parses a JSON object with the option to limit the input string size.
      *
-     * <p>Specific JSON string to JsonObject by JSONB.
+     * <p>Specific JSON to Java entity mapping (as per JSON Smart):
      *
-     * @param value The JSON object string to parse. Must not be {@code null}.
+     * <ul>
+     *     <li>JSON true|false map to {@code java.lang.Boolean}.
+     *     <li>JSON numbers map to {@code java.lang.Number}.
+     *         <ul>
+     *             <li>JSON integer numbers map to {@code long}.
+     *             <li>JSON fraction numbers map to {@code double}.
+     *         </ul>
+     *     <li>JSON strings map to {@code java.lang.String}.
+     *     <li>JSON arrays map to {@code java.util.List<Object>}.
+     *     <li>JSON objects map to {@code java.util.Map<String,Object>}.
+     * </ul>
+     *
+     * @param value The JSON object string to parse. Must not be
+     *              {@code null}.
      * @return The JSON object.
      * @throws ParseException If the string cannot be parsed to a valid JSON
      *                        object.
      */
-    public static JsonObject parse(String value) throws ParseException {
+    public static JsonObject parse(String value)
+            throws ParseException {
+        return parse(value, -1);
+    }
+
+    /**
+     * Parses a JSON object with the option to limit the input string size.
+     *
+     * <p>Specific JSON to Java entity mapping (as per JSON Smart):
+     *
+     * <ul>
+     *     <li>JSON true|false map to {@code java.lang.Boolean}.
+     *     <li>JSON numbers map to {@code java.lang.Number}.
+     *         <ul>
+     *             <li>JSON integer numbers map to {@code long}.
+     *             <li>JSON fraction numbers map to {@code double}.
+     *         </ul>
+     *     <li>JSON strings map to {@code java.lang.String}.
+     *     <li>JSON arrays map to {@code java.util.List<Object>}.
+     *     <li>JSON objects map to {@code java.util.Map<String,Object>}.
+     * </ul>
+     *
+     * @param value     The JSON object string to parse. Must not be
+     *                  {@code null}.
+     * @param sizeLimit The max allowed size of the string to parse. A
+     *                  negative integer means no limit.
+     * @return The JSON object.
+     * @throws ParseException If the string cannot be parsed to a valid JSON
+     *                        object.
+     */
+    public static JsonObject parse(String value, int sizeLimit)
+            throws ParseException {
+
+        if (sizeLimit >= 0 && value.length() > sizeLimit) {
+            throw new ParseException("The parsed string is longer than the max accepted size of " + sizeLimit + " characters", 0);
+        }
 
         JsonObject result;
 
@@ -60,9 +108,10 @@ public final class JSONObjectUtils {
 
 
         } catch (JsonbException e) {
-
             throw new ParseException("Invalid JSON: " + e.getMessage(), 0);
-        } catch (Exception e) {
+        } catch (StackOverflowError e) {
+            throw new ParseException("Excessive JSON object and / or array nesting", 0);
+        } catch (Throwable e) {
             throw new ParseException("Unexpected exception: " + e.getMessage(), 0);
         }
 
@@ -85,22 +134,19 @@ public final class JSONObjectUtils {
     public static URI getURI(JsonObject jsonObject, String key)
             throws ParseException {
 
-        if (JSONObjectUtils.hasValue(jsonObject, key)) {
-            String value = jsonObject.getString(key);
+        String value = getString(jsonObject, key);
 
-            if (value == null) {
-                return null;
-            }
-
-            try {
-                return new URI(value);
-
-            } catch (URISyntaxException e) {
-
-                throw new ParseException(e.getMessage(), 0);
-            }
+        if (value == null) {
+            return null;
         }
-        return null;
+
+        try {
+            return new URI(value);
+
+        } catch (URISyntaxException e) {
+
+            throw new ParseException(e.getMessage(), 0);
+        }
     }
 
     /**
@@ -117,7 +163,7 @@ public final class JSONObjectUtils {
 
         URI uri = getURI(jsonObject, key);
         if (uri == null) {
-            throw new ParseException(String.format("Missing JSON object member with key \"%s\"", key), 0);
+            throw new ParseException(String.format("Missing JSON object member with key '%s'", key), 0);
         }
         return uri;
     }
@@ -268,7 +314,7 @@ public final class JSONObjectUtils {
                 double dvalue = ((Number) entryValue).doubleValue();
                 builder.add(entry.getKey(), dvalue);
             } else if (entryValue instanceof Boolean) {
-                boolean flag = ((Boolean) entryValue).booleanValue();
+                boolean flag = (Boolean) entryValue;
                 builder.add(entry.getKey(), flag);
             } else if (entryValue instanceof String) {
                 builder.add(entry.getKey(), entryValue.toString());
@@ -362,10 +408,10 @@ public final class JSONObjectUtils {
     public static <T extends Enum<T>> T getEnum(JsonObject jsonObject,
                                                 String key,
                                                 Class<T> enumClass) {
-        if (!hasValue(jsonObject, key)) {
+        String value = getString(jsonObject, key);
+        if (value == null || value.trim().isEmpty()) {
             return null;
         }
-        String value = jsonObject.getString(key);
 
         for (T en : enumClass.getEnumConstants()) {
 
@@ -374,7 +420,7 @@ public final class JSONObjectUtils {
             }
         }
 
-        throw new IncorrectJsonValueException(String.format("Unexpected value of JSON object member with key \"%s\" for enum %s", key, enumClass.toString()));
+        throw new IncorrectJsonValueException(String.format("Unexpected value of JSON object member with key '%s' for enum %s", key, enumClass));
     }
 
     /**
@@ -418,6 +464,59 @@ public final class JSONObjectUtils {
         return Arrays.stream(StringUtils.split(tempValue)).map(String::trim).collect(Collectors.toList());
     }
 
+    /**
+     * Gets a string member of a JSON object as {@link Base64URLValue}.
+     *
+     * @param jsonObject The JSON object. Must not be {@code null}.
+     * @param key        The JSON object member key. Must not be {@code null}.
+     * @return The JSON object member value as Base64URLValue, may be {@code null}.
+     */
+    public static Base64URLValue getBase64URL(JsonObject jsonObject, String key) {
+
+        if (!jsonObject.containsKey(key)) {
+            return null;
+        }
+
+        Base64URLValue result = null;
+        JsonValue.ValueType valueType = jsonObject.get(key).getValueType();
+        switch (valueType) {
+            case NULL:
+                // result null is fine.
+                break;
+            case STRING:
+                String value = jsonObject.getString(key);
+
+                if (value == null) {
+                    return null;
+                }
+
+                result = new Base64URLValue(value);
+                break;
+
+            case ARRAY:
+            case OBJECT:
+            case NUMBER:
+            case TRUE:
+            case FALSE:
+                throw new IncorrectJsonValueException(String.format("the type of %s must be String or NULL", key));
+        }
+        return result;
+    }
+
+    /**
+     * Returns the String value of the Json member. If not available or member is not a String Json Type, returns null.
+     *
+     * @param jsonObject The JSON object. Must not be {@code null}.
+     * @param key        The JSON object member key. Must not be {@code null}.
+     * @return The JSON object member value as String, may be {@code null}.
+     */
+    public static String getString(JsonObject jsonObject, String key) {
+        String result = null;
+        if (jsonObject.containsKey(key) && jsonObject.get(key).getValueType() == JsonValue.ValueType.STRING) {
+            result = jsonObject.getString(key);
+        }
+        return result;
+    }
 
     /**
      * Prevents public instantiation.

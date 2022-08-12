@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,10 @@ import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.ee.security.octopus.nimbus.util.JSONObjectUtils;
-
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
+
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.Collections;
@@ -41,13 +41,21 @@ import java.util.Set;
  *
  * <p>The header may also include {@link #getCustomParameters custom
  * parameters}; these will be serialised and parsed along the registered ones.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
 public abstract class Header implements Serializable {
 
 
     private static final long serialVersionUID = 1L;
+
+    /**
+     * The max allowed string length when parsing a JOSE header (after the
+     * BASE64URL decoding). 20K chars should be sufficient to accommodate
+     * JOSE headers with an X.509 certificate chain in the {@code x5c}
+     * header parameter.
+     */
+    public static final int MAX_HEADER_STRING_LENGTH = 20_000;
 
 
     /**
@@ -115,15 +123,15 @@ public abstract class Header implements Serializable {
                      Map<String, Object> parameters,
                      Base64URLValue parsedBase64URL) {
 
-        this.alg = HeaderParameterType.getParameterValue("alg", alg, parameters);
+        this.alg = HeaderParameterType.getParameterValue(HeaderParameterNames.ALGORITHM, alg, parameters);
         if (this.alg == null) {
-            throw new IllegalArgumentException("The algorithm \"alg\" header parameter must not be null");
+            throw new IllegalArgumentException("The algorithm \"" + HeaderParameterNames.ALGORITHM + "\" header parameter must not be null");
         }
 
-        this.typ = HeaderParameterType.getParameterValue("typ", typ, parameters);
-        this.cty = HeaderParameterType.getParameterValue("cty", cty, parameters);
+        this.typ = HeaderParameterType.getParameterValue(HeaderParameterNames.TYPE, typ, parameters);
+        this.cty = HeaderParameterType.getParameterValue(HeaderParameterNames.CONTENT_TYPE, cty, parameters);
 
-        Set<String> temp = HeaderParameterType.getParameterValue("crit", crit, parameters);
+        Set<String> temp = HeaderParameterType.getParameterValue(HeaderParameterNames.CRITICAL, crit, parameters);
         if (temp != null) {
             // Copy and make unmodifiable
             this.crit = Collections.unmodifiableSet(new HashSet<>(temp));
@@ -246,18 +254,18 @@ public abstract class Header implements Serializable {
         Set<String> includedParameters =
                 new HashSet<>(getCustomParameters().keySet());
 
-        includedParameters.add("alg");
+        includedParameters.add(HeaderParameterNames.ALGORITHM);
 
         if (getType() != null) {
-            includedParameters.add("typ");
+            includedParameters.add(HeaderParameterNames.TYPE);
         }
 
         if (getContentType() != null) {
-            includedParameters.add("cty");
+            includedParameters.add(HeaderParameterNames.CONTENT_TYPE);
         }
 
         if (getCriticalParams() != null && !getCriticalParams().isEmpty()) {
-            includedParameters.add("crit");
+            includedParameters.add(HeaderParameterNames.CRITICAL);
         }
 
         return includedParameters;
@@ -279,18 +287,18 @@ public abstract class Header implements Serializable {
         customParameters.forEach((key, value) -> JSONObjectUtils.addValue(result, key, value));
 
         // Alg is always defined
-        result.add("alg", alg.toString());
+        result.add(HeaderParameterNames.ALGORITHM, alg.toString());
 
         if (typ != null) {
-            result.add("typ", typ.toString());
+            result.add(HeaderParameterNames.TYPE, typ.toString());
         }
 
         if (cty != null) {
-            result.add("cty", cty);
+            result.add(HeaderParameterNames.CONTENT_TYPE, cty);
         }
 
         if (crit != null && !crit.isEmpty()) {
-            result.add("crit", Json.createArrayBuilder(crit));
+            result.add(HeaderParameterNames.CRITICAL, Json.createArrayBuilder(crit));
         }
 
         return result;
@@ -423,7 +431,7 @@ public abstract class Header implements Serializable {
                                Base64URLValue parsedBase64URL)
             throws ParseException {
 
-        JsonObject jsonObject = JSONObjectUtils.parse(jsonString);
+        JsonObject jsonObject = JSONObjectUtils.parse(jsonString, MAX_HEADER_STRING_LENGTH);
 
         return parse(jsonObject, parsedBase64URL);
     }

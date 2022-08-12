@@ -23,8 +23,8 @@ import be.atbash.ee.security.octopus.nimbus.jose.Algorithm;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.KeyTypeException;
 import be.atbash.ee.security.octopus.nimbus.util.*;
-
 import jakarta.json.*;
+
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.net.URI;
@@ -125,8 +125,8 @@ import java.util.*;
  *
  * <p>See RFC 3447.
  *
- * <p>See http://en.wikipedia.org/wiki/RSA_%28algorithm%29
- *
+ * <p>See <a href="https://en.wikipedia.org/wiki/RSA_%28algorithm%29">RSA algorithm (wikipedia)</a>
+ * <p>
  * Based on code by Vladimir Dzhuvinov, Justin Richer and  Cedric Staub
  */
 public final class RSAKey extends JWK implements AsymmetricJWK {
@@ -558,7 +558,7 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
                 return privateKey((RSAPrivateKey) priv);
             }
 
-            if (!"RSA".equalsIgnoreCase(priv.getAlgorithm())) {
+            if (!JWKIdentifiers.RSA_KEY_TYPE.equalsIgnoreCase(priv.getAlgorithm())) {
                 throw new IllegalArgumentException("The private key algorithm must be RSA");
             }
 
@@ -817,9 +817,9 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
 
             // Put mandatory params in sorted order
             LinkedHashMap<String, String> requiredParams = new LinkedHashMap<>();
-            requiredParams.put("e", e.toString());
-            requiredParams.put("kty", KeyType.RSA.getValue());
-            requiredParams.put("n", n.toString());
+            requiredParams.put(JWKIdentifiers.EXPONENT, e.toString());
+            requiredParams.put(JWKIdentifiers.KEY_TYPE, KeyType.RSA.getValue());
+            requiredParams.put(JWKIdentifiers.MODULUS, n.toString());
             kid = ThumbprintUtils.compute(hashAlg, requiredParams).toString();
             return this;
         }
@@ -1623,7 +1623,7 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
         RSAPublicKeySpec spec = new RSAPublicKeySpec(modulus, exponent);
 
         try {
-            KeyFactory factory = KeyFactory.getInstance("RSA");
+            KeyFactory factory = KeyFactory.getInstance(JWKIdentifiers.RSA_KEY_TYPE);
 
             return (RSAPublicKey) factory.generatePublic(spec);
 
@@ -1706,7 +1706,7 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
         }
 
         try {
-            KeyFactory factory = KeyFactory.getInstance("RSA");
+            KeyFactory factory = KeyFactory.getInstance(JWKIdentifiers.RSA_KEY_TYPE);
 
             return (RSAPrivateKey) factory.generatePrivate(spec);
 
@@ -1774,9 +1774,9 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
 
         // Put mandatory params in sorted order
         LinkedHashMap<String, String> requiredParams = new LinkedHashMap<>();
-        requiredParams.put("e", e.toString());
-        requiredParams.put("kty", getKeyType().getValue());
-        requiredParams.put("n", n.toString());
+        requiredParams.put(JWKIdentifiers.EXPONENT, e.toString());
+        requiredParams.put(JWKIdentifiers.KEY_TYPE, getKeyType().getValue());
+        requiredParams.put(JWKIdentifiers.MODULUS, n.toString());
         return requiredParams;
     }
 
@@ -1822,25 +1822,25 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
         JsonObjectBuilder result = super.toJSONObject();
 
         // Append public RSA key specific attributes
-        result.add("n", n.toString());
-        result.add("e", e.toString());
+        result.add(JWKIdentifiers.MODULUS, n.toString());
+        result.add(JWKIdentifiers.EXPONENT, e.toString());
         if (d != null) {
-            result.add("d", d.toString());
+            result.add(JWKIdentifiers.PRIVATE_EXPONENT, d.toString());
         }
         if (p != null) {
-            result.add("p", p.toString());
+            result.add(JWKIdentifiers.FIRST_PRIME_FACTOR, p.toString());
         }
         if (q != null) {
-            result.add("q", q.toString());
+            result.add(JWKIdentifiers.SECOND_PRIME_FACTOR, q.toString());
         }
         if (dp != null) {
-            result.add("dp", dp.toString());
+            result.add(JWKIdentifiers.FIRST_FACTOR_CRT_EXPONENT, dp.toString());
         }
         if (dq != null) {
-            result.add("dq", dq.toString());
+            result.add(JWKIdentifiers.SECOND_FACTOR_CRT_EXPONENT, dq.toString());
         }
         if (qi != null) {
-            result.add("qi", qi.toString());
+            result.add(JWKIdentifiers.FIRST_CRT_COEFFICIENT, qi.toString());
         }
         if (oth != null && !oth.isEmpty()) {
 
@@ -1849,14 +1849,14 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
             for (OtherPrimesInfo other : oth) {
 
                 JsonObjectBuilder otherObject = Json.createObjectBuilder()
-                        .add("r", other.r.toString())
-                        .add("d", other.d.toString())
-                        .add("t", other.t.toString());
+                        .add(JWKIdentifiers.PRIME_FACTOR, other.r.toString())
+                        .add(JWKIdentifiers.PRIVATE_EXPONENT, other.d.toString())
+                        .add(JWKIdentifiers.FACTOR_CRT_COEFFICIENT, other.t.toString());
 
                 otherArray.add(otherObject);
             }
 
-            result.add("oth", otherArray);
+            result.add(JWKIdentifiers.OTHER_PRIMES, otherArray);
         }
 
         return result;
@@ -1892,50 +1892,41 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
     public static RSAKey parse(JsonObject jsonObject)
             throws ParseException {
 
-        // Parse the mandatory public key parameters first
-        Base64URLValue n = new Base64URLValue(jsonObject.getString("n"));
-        Base64URLValue e = new Base64URLValue(jsonObject.getString("e"));
-
         // Check key type
-        KeyType kty = KeyType.parse(jsonObject.getString("kty"));
+        KeyType kty = KeyType.parse(JSONObjectUtils.getString(jsonObject, JWKIdentifiers.KEY_TYPE));
         if (kty != KeyType.RSA) {
-            throw new ParseException("The key type \"kty\" must be RSA", 0);
+            throw new ParseException("The key type \"" + JWKIdentifiers.KEY_TYPE + "\" must be RSA", 0);
         }
+
+
+        // Parse the mandatory public key parameters first
+        Base64URLValue n = JSONObjectUtils.getBase64URL(jsonObject, JWKIdentifiers.MODULUS);
+        if (n == null) {
+            throw new ParseException("The modules \"" + JWKIdentifiers.MODULUS + "\" value must not be null", 0);
+        }
+        Base64URLValue e = JSONObjectUtils.getBase64URL(jsonObject, JWKIdentifiers.EXPONENT);
+        if (e == null) {
+            throw new ParseException("The exp \"" + JWKIdentifiers.EXPONENT + "\" value must not be null", 0);
+        }
+
 
         // Parse the optional private key parameters
 
         // 1st private representation
-        Base64URLValue d = null;
-        if (jsonObject.containsKey("d")) {
-            d = new Base64URLValue(jsonObject.getString("d"));
-        }
+        Base64URLValue d = JSONObjectUtils.getBase64URL(jsonObject, JWKIdentifiers.PRIVATE_EXPONENT);
 
         // 2nd private (CRT) representation
-        Base64URLValue p = null;
-        if (jsonObject.containsKey("p")) {
-            p = new Base64URLValue(jsonObject.getString("p"));
-        }
-        Base64URLValue q = null;
-        if (jsonObject.containsKey("q")) {
-            q = new Base64URLValue(jsonObject.getString("q"));
-        }
-        Base64URLValue dp = null;
-        if (jsonObject.containsKey("dp")) {
-            dp = new Base64URLValue(jsonObject.getString("dp"));
-        }
-        Base64URLValue dq = null;
-        if (jsonObject.containsKey("dq")) {
-            dq = new Base64URLValue(jsonObject.getString("dq"));
-        }
-        Base64URLValue qi = null;
-        if (jsonObject.containsKey("qi")) {
-            qi = new Base64URLValue(jsonObject.getString("qi"));
-        }
+        Base64URLValue p = JSONObjectUtils.getBase64URL(jsonObject, JWKIdentifiers.FIRST_PRIME_FACTOR);
+        Base64URLValue q = JSONObjectUtils.getBase64URL(jsonObject, JWKIdentifiers.SECOND_PRIME_FACTOR);
+        Base64URLValue dp = JSONObjectUtils.getBase64URL(jsonObject, JWKIdentifiers.FIRST_FACTOR_CRT_EXPONENT);
+        Base64URLValue dq = JSONObjectUtils.getBase64URL(jsonObject, JWKIdentifiers.SECOND_FACTOR_CRT_EXPONENT);
+        Base64URLValue qi = JSONObjectUtils.getBase64URL(jsonObject, JWKIdentifiers.FIRST_CRT_COEFFICIENT);
+
 
         List<OtherPrimesInfo> oth = null;
-        if (jsonObject.containsKey("oth")) {
+        if (jsonObject.containsKey(JWKIdentifiers.OTHER_PRIMES) && jsonObject.get(JWKIdentifiers.OTHER_PRIMES).getValueType() == JsonValue.ValueType.ARRAY) {
 
-            JsonArray arr = jsonObject.getJsonArray("oth");
+            JsonArray arr = jsonObject.getJsonArray(JWKIdentifiers.OTHER_PRIMES);
             oth = new ArrayList<>(arr.size());
 
             for (Object o : arr) {
@@ -1943,9 +1934,9 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
                 if (o instanceof JsonObject) {
                     JsonObject otherJson = (JsonObject) o;
 
-                    Base64URLValue r = new Base64URLValue(otherJson.getString("r"));
-                    Base64URLValue odq = new Base64URLValue(otherJson.getString("dq"));
-                    Base64URLValue t = new Base64URLValue(otherJson.getString("t"));
+                    Base64URLValue r = JSONObjectUtils.getBase64URL(otherJson, JWKIdentifiers.PRIME_FACTOR);
+                    Base64URLValue odq = JSONObjectUtils.getBase64URL(otherJson, "dq");
+                    Base64URLValue t = JSONObjectUtils.getBase64URL(otherJson, JWKIdentifiers.FACTOR_CRT_COEFFICIENT);
 
                     OtherPrimesInfo prime = new OtherPrimesInfo(r, odq, t);
                     oth.add(prime);
@@ -2063,7 +2054,7 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
             return new RSAKey.Builder(rsaJWK)
                     .privateKey((RSAPrivateKey) key)
                     .build();
-        } else if (key instanceof PrivateKey && "RSA".equalsIgnoreCase(key.getAlgorithm())) {
+        } else if (key instanceof PrivateKey && JWKIdentifiers.RSA_KEY_TYPE.equalsIgnoreCase(key.getAlgorithm())) {
             // PKCS#11 store
             return new RSAKey.Builder(rsaJWK)
                     .privateKey((PrivateKey) key)

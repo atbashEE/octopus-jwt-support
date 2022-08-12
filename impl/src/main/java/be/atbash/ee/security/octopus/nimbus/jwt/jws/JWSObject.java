@@ -21,6 +21,8 @@ import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEObject;
 import be.atbash.ee.security.octopus.nimbus.jose.Payload;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
 import org.slf4j.MDC;
 
 import java.text.ParseException;
@@ -30,7 +32,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * JSON Web Signature (JWS) secured object. This class is thread-safe.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
 public class JWSObject extends JOSEObject {
@@ -73,11 +75,6 @@ public class JWSObject extends JOSEObject {
     /**
      * The signing input for this JWS object.
      *
-     * <p>Format:
-     *
-     * <pre>
-     * [header-base64url].[payload-base64url]
-     * </pre>
      */
     private final String signingInputString;
 
@@ -118,16 +115,21 @@ public class JWSObject extends JOSEObject {
 
         setPayload(payload);
 
+        signingInputString = composeSigningInput();
+        // FIXME start
+        /*
         if (header.getCustomParameter("b64") == null || (Boolean) header.getCustomParameter("b64")) {
             signingInputString = composeSigningInput(header.toBase64URL(), payload.toBase64URL());
         } else {
             signingInputString = header.toBase64URL().toString() + '.' + payload.toString();
         }
+
+         */
+        // end
         signature = null;
 
         state = State.UNSIGNED;
     }
-
 
     /**
      * Creates a new signed JSON Web Signature (JWS) object with the
@@ -144,39 +146,54 @@ public class JWSObject extends JOSEObject {
      */
     public JWSObject(Base64URLValue firstPart, Base64URLValue secondPart, Base64URLValue thirdPart)
             throws ParseException {
+        this(firstPart, new Payload(secondPart), thirdPart);
+    }
+
+    /*
+     * Creates a new signed JSON Web Signature (JWS) object with the
+     * specified serialised parts and payload which can be optionally
+     * unencoded (RFC 7797). The state will be {@link State#SIGNED signed}.
+     *
+     * @param firstPart The first part, corresponding to the JWS header.
+     *                  Must not be {@code null}.
+     * @param payload   The payload. Must not be {@code null}.
+     * @param thirdPart The third part, corresponding to the signature.
+     *                  Must not be {@code null}.
+     *
+     * @throws ParseException If parsing of the serialised parts failed.
+     */
+    public JWSObject(Base64URLValue firstPart, Payload payload, Base64URLValue thirdPart)
+            throws ParseException {
 
         if (firstPart == null) {
             MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, "The token has no header");
             throw new IllegalArgumentException("The first part must not be null");
         }
-
         try {
             this.header = JWSHeader.parse(firstPart);
-
         } catch (ParseException e) {
             MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, "The token has an invalid header");
             throw new ParseException("Invalid JWS header: " + e.getMessage(), 0);
         }
 
-        if (secondPart == null) {
+        if (payload == null) {
             MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, "The token has no payload section");
-            throw new IllegalArgumentException("The second part must not be null");
+            throw new IllegalArgumentException("The payload (second part) must not be null");
         }
+        setPayload(payload);
 
-        setPayload(new Payload(secondPart));
-
-        signingInputString = composeSigningInput(firstPart, secondPart);
+        signingInputString = composeSigningInput();
 
         if (thirdPart == null) {
             MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, "The token has no signature section");
             throw new IllegalArgumentException("The third part must not be null");
         }
-
         signature = thirdPart;
-
         state = State.SIGNED; // but signature not verified yet!
 
-        setParsedParts(firstPart, secondPart, thirdPart);
+
+        setParsedParts(firstPart, payload.toBase64URL(), thirdPart);
+
     }
 
 
@@ -188,23 +205,17 @@ public class JWSObject extends JOSEObject {
 
 
     /**
-     * Composes the signing input for the specified JWS object parts.
+     * Composes the signing input string from the header and payload.
      *
-     * <p>Format:
-     *
-     * <pre>
-     * [header-base64url].[payload-base64url]
-     * </pre>
-     *
-     * @param firstPart  The first part, corresponding to the JWS header.
-     *                   Must not be {@code null}.
-     * @param secondPart The second part, corresponding to the payload.
-     *                   Must not be {@code null}.
      * @return The signing input string.
      */
-    private static String composeSigningInput(Base64URLValue firstPart, Base64URLValue secondPart) {
+    private String composeSigningInput() {
 
-        return firstPart.toString() + '.' + secondPart.toString();
+        if (header.isBase64URLEncodePayload()) {
+            return getHeader().toBase64URL().toString() + '.' + getPayload().toBase64URL().toString();
+        } else {
+            return getHeader().toBase64URL().toString() + '.' + getPayload().toString();
+        }
     }
 
 
@@ -382,6 +393,20 @@ public class JWSObject extends JOSEObject {
         }
 
         return signingInputString + '.' + signature.toString();
+    }
+
+    /**
+     * Serialize to the Flattened JWS JSON Serialization.
+     *
+     * @return JsonObject with serialized content of JWS.
+     */
+    public JsonObject serializeToJson() {
+        return Json.createObjectBuilder()
+                .add("header", getHeader().toJSONObject().build())
+                .add("protected", getHeader().toBase64URL().toString())
+                .add("payload", getPayload().toBase64URL().toString())
+                .add("signature", getSignature().toString())
+                .build();
     }
 
     /**

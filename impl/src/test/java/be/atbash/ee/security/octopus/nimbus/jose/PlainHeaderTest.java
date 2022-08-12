@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package be.atbash.ee.security.octopus.nimbus.jose;
 
 
+import be.atbash.ee.security.octopus.nimbus.jwk.JWKIdentifiers;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import org.junit.jupiter.api.Test;
 
@@ -33,7 +34,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests plain header parsing and serialisation.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
 public class PlainHeaderTest {
@@ -171,8 +172,8 @@ public class PlainHeaderTest {
     public void testBuilderWithCustomParams() {
 
         Map<String, Object> customParams = new HashMap<>();
-        customParams.put("x", "1");
-        customParams.put("y", "2");
+        customParams.put(JWKIdentifiers.X_COORD, "1");
+        customParams.put(JWKIdentifiers.Y_COORD, "2");
 
         PlainHeader header = new PlainHeader.Builder().
                 parameters(customParams).
@@ -190,8 +191,8 @@ public class PlainHeaderTest {
 
         JsonObjectBuilder builder = Json.createObjectBuilder();
 
-        builder.add("alg", Algorithm.NONE.getName());
-        builder.addNull("typ");
+        builder.add(HeaderParameterNames.ALGORITHM, Algorithm.NONE.getName());
+        builder.addNull(HeaderParameterNames.TYPE);
         JsonObject jsonObject = builder.build();
         assertThat(jsonObject).hasSize(2);
 
@@ -206,8 +207,8 @@ public class PlainHeaderTest {
 
         JsonObjectBuilder builder = Json.createObjectBuilder();
 
-        builder.add("alg", Algorithm.NONE.getName());
-        builder.addNull("typ");
+        builder.add(HeaderParameterNames.ALGORITHM, Algorithm.NONE.getName());
+        builder.addNull(HeaderParameterNames.TYPE);
         JsonObject jsonObject = builder.build();
         assertThat(jsonObject).hasSize(2);
 

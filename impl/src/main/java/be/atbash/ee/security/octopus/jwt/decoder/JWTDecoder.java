@@ -29,10 +29,11 @@ import be.atbash.ee.security.octopus.util.JsonbUtil;
 import be.atbash.util.PublicAPI;
 import be.atbash.util.StringUtils;
 import be.atbash.util.exception.AtbashIllegalActionException;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.json.JsonObject;
+import jakarta.json.bind.Jsonb;
 import org.slf4j.MDC;
 
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.json.bind.Jsonb;
 import java.text.ParseException;
 import java.util.Iterator;
 import java.util.ServiceLoader;
@@ -95,7 +96,7 @@ public class JWTDecoder {
         } catch (ParseException e) {
             // These messages are in function of JWT validation by Atbash Runtime so have slightly narrow meaning of the provided parameters.
             MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, "The structure of the provided token was not valid");
-            throw new InvalidJWTException("Invalid JWT structure");
+            throw new InvalidJWTException("Invalid JWT structure", e);
         }
         return result;
     }
@@ -103,62 +104,21 @@ public class JWTDecoder {
     private <T> JWTData<T> readPlainJWT(String data, Class<T> classType) throws ParseException {
         PlainJWT plainJWT = PlainJWT.parse(data);
 
-        MetaJWTData metaJWTData = new MetaJWTData(null, plainJWT.getHeader().getCustomParameters());
-
-
-        JWTClaimsSet jwtClaimsSet = plainJWT.getJWTClaimsSet();
-        if (classType.equals(JWTClaimsSet.class)) {
-            return new JWTData<>((T) jwtClaimsSet, metaJWTData);
-        }
-        return readJSONString(jwtClaimsSet.toJSONObject().toString(), classType, metaJWTData);
+        return handlePlainJWT(plainJWT, classType);
     }
 
     private <T> JWTData<T> readEncryptedJWT(String data, KeySelector keySelector, Class<T> classType, JWTVerifier verifier) throws ParseException {
 
         EncryptedJWT encryptedJWT = EncryptedJWT.parse(data);
 
-        String keyID = encryptedJWT.getHeader().getKeyID();
-
-        JWTProcessor processor = getJwtProcessor();
-        processor.setJWSKeySelector(keySelector);
-        processor.setJWEKeySelector(keySelector);
-        JWTClaimsSet jwtClaimsSet = processor.process(encryptedJWT);
-
-        if (verifier != null) {
-            if (!verifier.verify(encryptedJWT.getHeader(), jwtClaimsSet)) {
-                throw new InvalidJWTException("JWT verification failed");
-            }
-        }
-
-        MetaJWTData metaJWTData = new MetaJWTData(keyID, encryptedJWT.getHeader().getCustomParameters());
-
-        if (classType.equals(JWTClaimsSet.class)) {
-            return new JWTData<>((T) jwtClaimsSet, metaJWTData);
-        }
-        return readJSONString(jwtClaimsSet.toJSONObject().toString(), classType, metaJWTData);
+        return handleEncryptedJWT(encryptedJWT, keySelector, classType, verifier);
 
     }
 
     private <T> JWTData<T> readSignedJWT(String data, KeySelector keySelector, Class<T> classType, JWTVerifier verifier) throws ParseException {
         SignedJWT signedJWT = SignedJWT.parse(data);
 
-        JWTProcessor processor = getJwtProcessor();
-        processor.setJWSKeySelector(keySelector);
-        JWTClaimsSet jwtClaimsSet = processor.process(signedJWT);
-
-        if (verifier != null) {
-            if (!verifier.verify(signedJWT.getHeader(), signedJWT.getJWTClaimsSet())) {
-                throw new InvalidJWTException("JWT verification failed");
-            }
-        }
-
-        String keyID = signedJWT.getHeader().getKeyID();
-        MetaJWTData metaJWTData = new MetaJWTData(keyID, signedJWT.getHeader().getCustomParameters());
-
-        if (classType.equals(JWTClaimsSet.class)) {
-            return new JWTData<>((T) jwtClaimsSet, metaJWTData);
-        }
-        return readJSONString(signedJWT.getPayload().toString(), classType, metaJWTData);
+        return handleSignedJWT(signedJWT, keySelector, classType, verifier);
     }
 
     private <T> JWTData<T> readJSONString(String data, Class<T> classType) {
@@ -207,6 +167,142 @@ public class JWTDecoder {
             }
         }
         return result;
+    }
+
+    public <T> JWTData<T> decode(JsonObject data, Class<T> classType) {
+        return decode(data, classType, null, null);
+    }
+
+    public <T> JWTData<T> decode(JsonObject data, Class<T> classType, KeySelector keySelector) {
+        return decode(data, classType, keySelector, null);
+    }
+
+    public <T> JWTData<T> decode(JsonObject data, Class<T> classType, JWTVerifier verifier) {
+        return decode(data, classType, null, verifier);
+    }
+
+    public <T> JWTData<T> decode(JsonObject data, Class<T> classType, KeySelector keySelector, JWTVerifier verifier) {
+        JWTEncoding encoding = determineEncoding(data);
+        if (encoding == null) {
+            throw new IllegalArgumentException("Unable to determine the encoding of the data");
+        }
+
+        JWTData<T> result;
+        try {
+            switch (encoding) {
+
+                case PLAIN:
+                    result = readPlainJWT(data, classType);
+                    break;
+                case JWS:
+                    if (keySelector == null) {
+                        throw new AtbashIllegalActionException("(OCT-DEV-101) keySelector required for decoding a JWT encoded value");
+                    }
+                    result = readSignedJWT(data, keySelector, classType, verifier);
+                    break;
+                case JWE:
+                    if (keySelector == null) {
+                        throw new AtbashIllegalActionException("(OCT-DEV-101) keySelector required for decoding a JWE encoded value");
+                    }
+                    result = readEncryptedJWT(data, keySelector, classType, verifier);
+                    break;
+                default:
+                    throw new IllegalArgumentException(String.format("JWTEncoding not supported %s", encoding));
+            }
+        } catch (ParseException e) {
+            throw new InvalidJWTException("Invalid JWT structure", e);
+        }
+        return result;
+    }
+
+    private JWTEncoding determineEncoding(JsonObject data) {
+        if (data == null) {
+            return null;
+        }
+        if (!(data.containsKey("header") || data.containsKey("protected")) && !data.containsKey("payload")) {
+            // payload and (header or protected) is required
+            return null;
+        }
+        JWTEncoding result = JWTEncoding.PLAIN;
+        if (data.containsKey("signature")) {
+            result = JWTEncoding.JWS;
+        }
+        if (data.containsKey("encrypted_key") && data.containsKey("iv") && data.containsKey("ciphertext") && data.containsKey("tag")) {
+            result = JWTEncoding.JWE;
+        }
+        return result;
+    }
+
+    private <T> JWTData<T> readPlainJWT(JsonObject data, Class<T> classType) throws ParseException {
+        PlainJWT plainJWT = PlainJWT.parse(data);
+
+        return handlePlainJWT(plainJWT, classType);
+    }
+
+    private <T> JWTData<T> handlePlainJWT(PlainJWT plainJWT, Class<T> classType) throws ParseException {
+        MetaJWTData metaJWTData = new MetaJWTData(null, plainJWT.getHeader().getCustomParameters());
+
+        JWTClaimsSet jwtClaimsSet = plainJWT.getJWTClaimsSet();
+        if (classType.equals(JWTClaimsSet.class)) {
+            return new JWTData<>((T) jwtClaimsSet, metaJWTData);
+        }
+        return readJSONString(jwtClaimsSet.toJSONObject().toString(), classType, metaJWTData);
+    }
+
+    private <T> JWTData<T> readSignedJWT(JsonObject data, KeySelector keySelector, Class<T> classType, JWTVerifier verifier) throws ParseException {
+        SignedJWT signedJWT = SignedJWT.parse(data);
+
+        return handleSignedJWT(signedJWT, keySelector, classType, verifier);
+    }
+
+    private <T> JWTData<T> handleSignedJWT(SignedJWT signedJWT, KeySelector keySelector, Class<T> classType, JWTVerifier verifier) throws ParseException {
+        JWTProcessor processor = getJwtProcessor();
+        processor.setJWSKeySelector(keySelector);
+        JWTClaimsSet jwtClaimsSet = processor.process(signedJWT);
+
+        if (verifier != null) {
+            if (!verifier.verify(signedJWT.getHeader(), signedJWT.getJWTClaimsSet())) {
+                throw new InvalidJWTException("JWT verification failed");
+            }
+        }
+
+        String keyID = signedJWT.getHeader().getKeyID();
+        MetaJWTData metaJWTData = new MetaJWTData(keyID, signedJWT.getHeader().getCustomParameters());
+
+        if (classType.equals(JWTClaimsSet.class)) {
+            return new JWTData<>((T) jwtClaimsSet, metaJWTData);
+        }
+        return readJSONString(signedJWT.getPayload().toString(), classType, metaJWTData);
+    }
+
+    private <T> JWTData<T> readEncryptedJWT(JsonObject data, KeySelector keySelector, Class<T> classType, JWTVerifier verifier) throws ParseException {
+
+        EncryptedJWT encryptedJWT = EncryptedJWT.parse(data);
+
+        return handleEncryptedJWT(encryptedJWT, keySelector, classType, verifier);
+
+    }
+
+    private <T> JWTData<T> handleEncryptedJWT(EncryptedJWT encryptedJWT, KeySelector keySelector, Class<T> classType, JWTVerifier verifier) {
+        String keyID = encryptedJWT.getHeader().getKeyID();
+
+        JWTProcessor processor = getJwtProcessor();
+        processor.setJWSKeySelector(keySelector);
+        processor.setJWEKeySelector(keySelector);
+        JWTClaimsSet jwtClaimsSet = processor.process(encryptedJWT);
+
+        if (verifier != null) {
+            if (!verifier.verify(encryptedJWT.getHeader(), jwtClaimsSet)) {
+                throw new InvalidJWTException("JWT verification failed");
+            }
+        }
+
+        MetaJWTData metaJWTData = new MetaJWTData(keyID, encryptedJWT.getHeader().getCustomParameters());
+
+        if (classType.equals(JWTClaimsSet.class)) {
+            return new JWTData<>((T) jwtClaimsSet, metaJWTData);
+        }
+        return readJSONString(jwtClaimsSet.toJSONObject().toString(), classType, metaJWTData);
     }
 
     private synchronized JWTProcessor getJwtProcessor() {

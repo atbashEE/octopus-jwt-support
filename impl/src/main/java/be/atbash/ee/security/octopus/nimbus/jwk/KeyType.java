@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ import java.io.Serializable;
  * </ul>
  *
  * <p>Additional key types can be defined using the constructor.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov and Justin Richer
  */
 public final class KeyType implements Serializable {
@@ -51,19 +51,19 @@ public final class KeyType implements Serializable {
     /**
      * Elliptic Curve (DSS) key type (recommended).
      */
-    public static final KeyType EC = new KeyType("EC");
+    public static final KeyType EC = new KeyType(JWKIdentifiers.ELLIPTIC_CURVE_KEY_TYPE);
 
 
     /**
      * RSA (RFC 3447) key type (required).
      */
-    public static final KeyType RSA = new KeyType("RSA");
+    public static final KeyType RSA = new KeyType(JWKIdentifiers.RSA_KEY_TYPE);
 
 
     /**
      * Octet sequence key type (optional).
      */
-    public static final KeyType OCT = new KeyType("oct");
+    public static final KeyType OCT = new KeyType(JWKIdentifiers.OCTET_SEQUENCE_KEY_TYPE);
 
 
     /**
