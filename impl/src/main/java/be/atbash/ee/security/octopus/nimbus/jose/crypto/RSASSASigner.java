@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import be.atbash.ee.security.octopus.nimbus.jose.KeyTypeException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.RSAKeyUtils;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.RSASSA;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.RSASSAProvider;
+import be.atbash.ee.security.octopus.nimbus.jwk.JWKIdentifiers;
 import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
@@ -136,7 +137,7 @@ public class RSASSASigner extends RSASSAProvider implements JWSSigner {
      */
     public RSASSASigner(RSAPrivateKey privateKey, boolean allowWeakKey) {
 
-        if (!"RSA".equalsIgnoreCase(privateKey.getAlgorithm())) {
+        if (!JWKIdentifiers.RSA_KEY_TYPE.equalsIgnoreCase(privateKey.getAlgorithm())) {
             throw new IllegalArgumentException("The private key algorithm must be RSA");
         }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -337,9 +337,9 @@ public class OctetKeyPair extends JWK implements AsymmetricJWK, CurveBasedJWK {
 
             // Put mandatory params in sorted order
             LinkedHashMap<String, String> requiredParams = new LinkedHashMap<>();
-            requiredParams.put("crv", crv.toString());
-            requiredParams.put("kty", KeyType.OKP.getValue());
-            requiredParams.put("x", x.toString());
+            requiredParams.put(JWKIdentifiers.CURVE, crv.toString());
+            requiredParams.put(JWKIdentifiers.KEY_TYPE, KeyType.OKP.getValue());
+            requiredParams.put(JWKIdentifiers.X_COORD, x.toString());
             kid = ThumbprintUtils.compute(hashAlg, requiredParams).toString();
             return this;
         }
@@ -689,9 +689,9 @@ public class OctetKeyPair extends JWK implements AsymmetricJWK, CurveBasedJWK {
 
         // Put mandatory params in sorted order
         LinkedHashMap<String, String> requiredParams = new LinkedHashMap<>();
-        requiredParams.put("crv", crv.toString());
-        requiredParams.put("kty", getKeyType().getValue());
-        requiredParams.put("x", x.toString());
+        requiredParams.put(JWKIdentifiers.CURVE, crv.toString());
+        requiredParams.put(JWKIdentifiers.KEY_TYPE, getKeyType().getValue());
+        requiredParams.put(JWKIdentifiers.X_COORD, x.toString());
         return requiredParams;
     }
 
@@ -726,11 +726,11 @@ public class OctetKeyPair extends JWK implements AsymmetricJWK, CurveBasedJWK {
         JsonObjectBuilder result = super.toJSONObject();
 
         // Append OKP specific attributes
-        result.add("crv", crv.toString());
-        result.add("x", x.toString());
+        result.add(JWKIdentifiers.CURVE, crv.toString());
+        result.add(JWKIdentifiers.X_COORD, x.toString());
 
         if (d != null) {
-            result.add("d", d.toString());
+            result.add(JWKIdentifiers.D, d.toString());
         }
 
         return result;
@@ -773,10 +773,6 @@ public class OctetKeyPair extends JWK implements AsymmetricJWK, CurveBasedJWK {
     public static OctetKeyPair parse(JsonObject jsonObject)
             throws ParseException {
 
-        // Parse the mandatory parameters first
-        Curve crv = Curve.parse(jsonObject.getString("crv"));
-        Base64URLValue x = new Base64URLValue(jsonObject.getString("x"));
-
         // Check key type
         KeyType kty = JWKMetadata.parseKeyType(jsonObject);
 
@@ -784,12 +780,20 @@ public class OctetKeyPair extends JWK implements AsymmetricJWK, CurveBasedJWK {
             throw new ParseException("The key type \"kty\" must be OKP", 0);
         }
 
-        // Get optional private key
-        Base64URLValue d = null;
-        if (jsonObject.get("d") != null) {
-            d = new Base64URLValue(jsonObject.getString("d"));
+        // Parse the mandatory parameters first
+        String crvString = JSONObjectUtils.getString(jsonObject, JWKIdentifiers.CURVE);
+        if (crvString == null || crvString.trim().isEmpty()) {
+            throw new ParseException("The cryptographic curve string must not be null or empty", 0);
+        }
+        Curve crv = Curve.parse(crvString);
+
+        Base64URLValue x = JSONObjectUtils.getBase64URL(jsonObject, JWKIdentifiers.X_COORD);
+        if (x == null) {
+            throw new ParseException("The 'x' parameter must not be null", 0);
         }
 
+        // Get optional private key
+        Base64URLValue d = JSONObjectUtils.getBase64URL(jsonObject, JWKIdentifiers.D);
 
         try {
             if (d == null) {

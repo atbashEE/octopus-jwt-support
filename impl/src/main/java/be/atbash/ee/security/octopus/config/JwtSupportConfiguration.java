@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -199,6 +199,17 @@ public class JwtSupportConfiguration extends AbstractConfiguration implements Mo
             throw new ConfigurationException(String.format("Clock skew value must be positive, parameter 'jwt.clock.skew.secs' is %s", result));
         }
         return result;
+    }
+
+    @ConfigProperty
+    public JWEAlgorithm getDefaultJWEAlgorithmRSA() {
+        String configValue = getOptionalValue("jwt.jwe.algorithm.default.RSA", "RSA-OAEP-256", String.class);
+        JWEAlgorithm jweAlgorithm = JWEAlgorithm.parse(configValue);
+        if (!JWEAlgorithm.Family.RSA.contains(jweAlgorithm)) {
+
+            throw new ConfigurationException("The default JWE Algorithm defined in parameter 'jwt.jwe.algorithm.default.RSA' is not valid ");
+        }
+        return jweAlgorithm;
     }
 
     @ConfigProperty

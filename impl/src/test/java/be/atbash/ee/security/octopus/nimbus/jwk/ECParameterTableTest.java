@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests the EC parameter table.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
 public class ECParameterTableTest {
@@ -37,7 +37,7 @@ public class ECParameterTableTest {
     @Test
     public void testParametersAgainstBouncyCastle() {
 
-        for (Curve crv : Arrays.asList(Curve.P_256, Curve.P_256K, Curve.P_384, Curve.P_521)) {
+        for (Curve crv : Arrays.asList(Curve.P_256, Curve.SECP256K1, Curve.P_384, Curve.P_521)) {
 
             ECNamedCurveParameterSpec curveParams = ECNamedCurveTable.getParameterSpec(crv.getStdName());
 

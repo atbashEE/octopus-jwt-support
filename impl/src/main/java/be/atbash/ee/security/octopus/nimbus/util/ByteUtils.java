@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -158,7 +158,7 @@ public final class ByteUtils {
      *
      * @param inputStream The stream to read from
      * @return The byte array contained in the stream.
-     * @throws IOException
+     * @throws IOException When exception occurred during reading of the Stream.
      */
     public static byte[] readAllBytes(InputStream inputStream) throws IOException {
         final int bufLen = 4 * 0x400; // 4KB
@@ -174,5 +174,21 @@ public final class ByteUtils {
         } finally {
             inputStream.close();
         }
+    }
+
+    /**
+     * Returns {@code true} if the specified byte array is zero filled.
+     *
+     * @param byteArray the byte array. Must not be {@code null}.
+     * @return {@code true} if zero filled, else {@code false}.
+     */
+    public static boolean isZeroFilled(byte[] byteArray) {
+
+        for (final byte b : byteArray) {
+            if (b != 0) {
+                return false;
+            }
+        }
+        return true;
     }
 }

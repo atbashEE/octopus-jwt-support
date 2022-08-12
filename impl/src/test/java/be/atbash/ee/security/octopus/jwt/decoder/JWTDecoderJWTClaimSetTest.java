@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,12 +38,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class JWTDecoderJWTClaimSetTest {
 
-    private static final String KID_SIGN = "kid";
     private JWTClaimsSet jwtClaimsSet;
 
-    private JWTDecoder decoder = new JWTDecoder();
-
-    private JWTEncoder encoder = new JWTEncoder();
+    private final JWTEncoder encoder = new JWTEncoder();
 
     @BeforeEach
     public void setup() {
@@ -59,12 +56,12 @@ public class JWTDecoderJWTClaimSetTest {
     @Test
     public void encodeObject_jwt() {
         // Encode to JWT
-        List<AtbashKey> keys = TestKeys.generateRSAKeys(KID_SIGN);
+        List<AtbashKey> keys = TestKeys.generateRSAKeys("kid");
 
         String encoded = encoder.encode(jwtClaimsSet, getJwtParameters(keys));
 
         ListKeyManager keyManager = new ListKeyManager(keys);
-        SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PUBLIC).build();
+        SelectorCriteria criteria = SelectorCriteria.newBuilder().withId("kid").withAsymmetricPart(AsymmetricPart.PUBLIC).build();
         List<AtbashKey> publicList = keyManager.retrieveKeys(criteria);
 
         KeySelector keySelector = new SingleKeySelector(publicList.get(0));

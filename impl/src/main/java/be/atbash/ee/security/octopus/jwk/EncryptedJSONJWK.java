@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package be.atbash.ee.security.octopus.jwk;
 
 import be.atbash.ee.security.octopus.exception.MissingPasswordException;
 import be.atbash.ee.security.octopus.nimbus.jwk.JWK;
+import be.atbash.ee.security.octopus.nimbus.jwk.JWKIdentifiers;
 import be.atbash.ee.security.octopus.util.EncryptionHelper;
 import be.atbash.util.StringUtils;
 
@@ -34,7 +35,8 @@ import java.util.Map;
 
 public final class EncryptedJSONJWK {
 
-    private static final List<String> GENERAL_NAMES = Arrays.asList("kty", "use", "key_ops", "alg", "kid", "crv");
+    private static final List<String> GENERAL_NAMES = Arrays.asList(JWKIdentifiers.KEY_TYPE
+            , JWKIdentifiers.PUBLIC_KEY_USE, JWKIdentifiers.KEY_OPS, JWKIdentifiers.ALGORITHM, JWKIdentifiers.KEY_ID, JWKIdentifiers.CURVE);
 
     private EncryptedJSONJWK() {
     }
@@ -57,7 +59,7 @@ public final class EncryptedJSONJWK {
         }
 
         String json = sensitiveProperties.build().toString();
-        encryptedJWK.add("enc", EncryptionHelper.encode(json, password));
+        encryptedJWK.add(JWKIdentifiers.ENCRYPTION_ALGORITHM, EncryptionHelper.encode(json, password));
 
         return encryptedJWK.build().toString();
     }

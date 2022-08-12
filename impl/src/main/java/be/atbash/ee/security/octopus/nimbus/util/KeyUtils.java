@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package be.atbash.ee.security.octopus.nimbus.util;
 
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.bc.BouncyCastleProviderSingleton;
+import be.atbash.ee.security.octopus.nimbus.jwk.JWKIdentifiers;
 import be.atbash.util.exception.AtbashUnexpectedException;
 import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey;
 import org.bouncycastle.jce.ECNamedCurveTable;
@@ -37,7 +38,7 @@ import java.security.spec.RSAPublicKeySpec;
 
 /**
  * JCA key utilities.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
 public final class KeyUtils {
@@ -67,7 +68,7 @@ public final class KeyUtils {
             RSAPublicKeySpec publicKeySpec = new RSAPublicKeySpec(rsaPrivateCrtKey.getModulus(), rsaPrivateCrtKey.getPublicExponent());
             try {
 
-                KeyFactory keyFactory = KeyFactory.getInstance("RSA", BouncyCastleProviderSingleton.getInstance());
+                KeyFactory keyFactory = KeyFactory.getInstance(JWKIdentifiers.RSA_KEY_TYPE, BouncyCastleProviderSingleton.getInstance());
 
                 return keyFactory.generatePublic(publicKeySpec);
             } catch (Exception e) {
@@ -78,7 +79,7 @@ public final class KeyUtils {
             BCECPrivateKey bcecPrivateKey = (BCECPrivateKey) key;
             ECNamedCurveParameterSpec parameters = (ECNamedCurveParameterSpec) bcecPrivateKey.getParameters();
             try {
-                KeyFactory keyFactory = KeyFactory.getInstance("EC", BouncyCastleProviderSingleton.getInstance());
+                KeyFactory keyFactory = KeyFactory.getInstance(JWKIdentifiers.ELLIPTIC_CURVE_KEY_TYPE, BouncyCastleProviderSingleton.getInstance());
                 ECParameterSpec ecSpec = ECNamedCurveTable.getParameterSpec(parameters.getName());
 
                 ECPoint Q = ecSpec.getG().multiply(bcecPrivateKey.getD());

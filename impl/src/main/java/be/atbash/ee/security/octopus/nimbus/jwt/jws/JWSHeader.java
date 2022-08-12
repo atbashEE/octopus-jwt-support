@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,7 @@
 package be.atbash.ee.security.octopus.nimbus.jwt.jws;
 
 
-import be.atbash.ee.security.octopus.nimbus.jose.Algorithm;
-import be.atbash.ee.security.octopus.nimbus.jose.Header;
-import be.atbash.ee.security.octopus.nimbus.jose.JOSEObjectType;
-import be.atbash.ee.security.octopus.nimbus.jose.PlainHeader;
+import be.atbash.ee.security.octopus.nimbus.jose.*;
 import be.atbash.ee.security.octopus.nimbus.jwk.JWK;
 import be.atbash.ee.security.octopus.nimbus.jwt.CommonJWTHeader;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
@@ -28,6 +25,7 @@ import be.atbash.ee.security.octopus.nimbus.util.JSONObjectUtils;
 import be.atbash.ee.security.octopus.nimbus.util.X509CertChainUtils;
 
 import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 import java.net.URI;
 import java.text.ParseException;
 import java.util.*;
@@ -51,6 +49,7 @@ import java.util.*;
  *     <li>typ
  *     <li>cty
  *     <li>crit
+ *     <li>b64
  * </ul>
  *
  * <p>The header may also include {@link #getCustomParameters custom
@@ -113,13 +112,13 @@ public final class JWSHeader extends CommonJWTHeader {
 
 
         /**
-         * JWK Set URL.
+         * Public JWK Set URL.
          */
         private URI jku;
 
 
         /**
-         * JWK.
+         * Public JWK.
          */
         private JWK jwk;
 
@@ -147,6 +146,11 @@ public final class JWSHeader extends CommonJWTHeader {
          */
         private String kid;
 
+        /**
+         * Base64URL encoding of the payload, the default is
+         * {@code true} for standard JWS serialisation.
+         */
+        private boolean b64 = true;
 
         /**
          * Custom header parameters.
@@ -197,6 +201,7 @@ public final class JWSHeader extends CommonJWTHeader {
             x5t256 = jwsHeader.getX509CertSHA256Thumbprint();
             x5c = jwsHeader.getX509CertChain();
             kid = jwsHeader.getKeyID();
+            b64 = jwsHeader.isBase64URLEncodePayload();
             parameters = jwsHeader.getCustomParameters();
         }
 
@@ -259,13 +264,16 @@ public final class JWSHeader extends CommonJWTHeader {
 
 
         /**
-         * Sets the JSON Web Key (JWK) ({@code jwk}) parameter.
+         * Sets the public JSON Web Key (JWK) ({@code jwk}) parameter.
          *
          * @param jwk The JSON Web Key (JWK) ({@code jwk}) parameter,
          *            {@code null} if not specified.
          * @return This builder.
          */
         public Builder jwk(JWK jwk) {
+            if (jwk != null && jwk.isPrivate()) {
+                throw new IllegalArgumentException("The JWK must be public");
+            }
 
             this.jwk = jwk;
             return this;
@@ -329,6 +337,19 @@ public final class JWSHeader extends CommonJWTHeader {
             return this;
         }
 
+        /**
+         * Sets the Base64URL encode payload ({@code b64}) parameter.
+         *
+         * @param b64 {@code true} to Base64URL encode the payload
+         *            for standard JWS serialisation, {@code false} for
+         *            unencoded payload (RFC 7797).
+         * @return This builder.
+         */
+        public Builder base64URLEncodePayload(boolean b64) {
+
+            this.b64 = b64;
+            return this;
+        }
 
         /**
          * Sets a custom (non-registered) parameter.
@@ -343,6 +364,11 @@ public final class JWSHeader extends CommonJWTHeader {
          */
         public Builder parameter(String name, Object value) {
 
+            if (HeaderParameterNames.BASE64_URL_ENCODE_PAYLOAD.equals(name)) {
+                // Backwards compatibility since b64 is now supported parameter.
+                base64URLEncodePayload(Boolean.parseBoolean(value.toString()));
+                return this;
+            }
             if (parameters == null) {
                 parameters = new HashMap<>();
             }
@@ -394,7 +420,7 @@ public final class JWSHeader extends CommonJWTHeader {
 
             return new JWSHeader(
                     alg, typ, cty, crit,
-                    jku, jwk, x5u, x5t256, x5c, kid,
+                    jku, jwk, x5u, x5t256, x5c, kid, b64,
                     parameters, parsedBase64URL);
         }
     }
@@ -411,7 +437,7 @@ public final class JWSHeader extends CommonJWTHeader {
      */
     public JWSHeader(JWSAlgorithm alg) {
 
-        this(alg, null, null, null, null, null, null, null, null, null, null, null);
+        this(alg, null, null, null, null, null, null, null, null, null, true, null, null);
     }
 
 
@@ -443,6 +469,9 @@ public final class JWSHeader extends CommonJWTHeader {
      *                        parameter, {@code null} if not specified.
      * @param kid             The key ID ({@code kid}) parameter,
      *                        {@code null} if not specified.
+     * @param b64             {@code true} to Base64URL encode the payload
+     *                        for standard JWS serialisation, {@code false}
+     *                        for unencoded payload (RFC 7797).
      * @param parameters      The custom parameters, empty map or
      *                        {@code null} if none.
      * @param parsedBase64URL The parsed Base64URL, {@code null} if the
@@ -458,6 +487,7 @@ public final class JWSHeader extends CommonJWTHeader {
                      Base64URLValue x5t256,
                      List<Base64Value> x5c,
                      String kid,
+                     boolean b64,
                      Map<String, Object> parameters,
                      Base64URLValue parsedBase64URL) {
 
@@ -466,8 +496,15 @@ public final class JWSHeader extends CommonJWTHeader {
         if (alg.getName().equals(Algorithm.NONE.getName())) {
             throw new IllegalArgumentException("The JWS algorithm \"alg\" cannot be \"none\"");
         }
+
+        this.b64 = b64;
     }
 
+    /**
+     * Base64URL encoding of the payload, {@code true} for standard JWS
+     * serialisation, {@code false} for unencoded payload (RFC 7797).
+     */
+    private final boolean b64;
 
     /**
      * Deep copy constructor.
@@ -487,6 +524,7 @@ public final class JWSHeader extends CommonJWTHeader {
                 jwsHeader.getX509CertSHA256Thumbprint(),
                 jwsHeader.getX509CertChain(),
                 jwsHeader.getKeyID(),
+                jwsHeader.isBase64URLEncodePayload(),
                 jwsHeader.getCustomParameters(),
                 jwsHeader.getParsedBase64URL()
         );
@@ -516,6 +554,18 @@ public final class JWSHeader extends CommonJWTHeader {
     public JWSAlgorithm getAlgorithm() {
 
         return (JWSAlgorithm) super.getAlgorithm();
+    }
+
+    /**
+     * Returns the Base64URL-encode payload ({@code b64}) parameter.
+     *
+     * @return {@code true} to Base64URL encode the payload for standard
+     * JWS serialisation, {@code false} for unencoded payload (RFC
+     * 7797).
+     */
+    public boolean isBase64URLEncodePayload() {
+
+        return b64;
     }
 
 
@@ -562,41 +612,44 @@ public final class JWSHeader extends CommonJWTHeader {
         // Parse optional + custom parameters
         for (final String name : jsonObject.keySet()) {
 
-            if ("alg".equals(name)) {
+            if (HeaderParameterNames.ALGORITHM.equals(name)) {
                 // skip
-            } else if ("typ".equals(name)) {
-                if (JSONObjectUtils.hasValue(jsonObject, name)) {
-                    String typValue = jsonObject.getString(name);
-                    if (typValue != null) {
-                        header = header.type(new JOSEObjectType(typValue));
-                    }
+            } else if (HeaderParameterNames.TYPE.equals(name)) {
+                String typValue = JSONObjectUtils.getString(jsonObject, name);
+
+                if (typValue != null) {
+                    header = header.type(new JOSEObjectType(typValue));
                 }
-            } else if ("cty".equals(name)) {
-                if (JSONObjectUtils.hasValue(jsonObject, name)) {
-                    header = header.contentType(jsonObject.getString(name));
-                }
-            } else if ("crit".equals(name)) {
+
+            } else if (HeaderParameterNames.CONTENT_TYPE.equals(name)) {
+                header = header.contentType(JSONObjectUtils.getString(jsonObject, name));
+
+            } else if (HeaderParameterNames.CRITICAL.equals(name)) {
                 List<String> critValues = JSONObjectUtils.getStringList(jsonObject, name);
                 if (critValues != null) {
                     header = header.criticalParams(new HashSet<>(critValues));
                 }
-            } else if ("jku".equals(name)) {
+            } else if (HeaderParameterNames.JWK_SET_URL.equals(name)) {
                 header = header.jwkURL(JSONObjectUtils.getURI(jsonObject, name));
-            } else if ("jwk".equals(name)) {
+            } else if (HeaderParameterNames.JSON_WEB_KEY.equals(name)) {
                 if (JSONObjectUtils.hasValue(jsonObject, name)) {
                     JsonObject jwkObject = jsonObject.getJsonObject(name);
                     if (jwkObject != null) {
-                        header = header.jwk(JWK.parse(jwkObject));
+                        JWK jwk = JWK.parse(jwkObject);
+                        if (jwk != null && jwk.isPrivate()) {
+                            throw new IllegalArgumentException("Non-public key in jwk header parameter");
+                        }
+                        header = header.jwk(jwk);
                     }
                 }
-            } else if ("x5u".equals(name)) {
+            } else if (HeaderParameterNames.X_509_URL.equals(name)) {
                 header = header.x509CertURL(JSONObjectUtils.getURI(jsonObject, name));
-            } else if ("x5t#S256".equals(name)) {
-                header = header.x509CertSHA256Thumbprint(Base64URLValue.from(jsonObject.getString(name)));
-            } else if ("x5c".equals(name)) {
+            } else if (HeaderParameterNames.X_509_CERT_SHA_256_THUMBPRINT.equals(name)) {
+                header = header.x509CertSHA256Thumbprint(JSONObjectUtils.getBase64URL(jsonObject, name));
+            } else if (HeaderParameterNames.X_509_CERT_CHAIN.equals(name)) {
                 header = header.x509CertChain(X509CertChainUtils.toBase64List(jsonObject.getJsonArray(name)));
-            } else if ("kid".equals(name)) {
-                header = header.keyID(jsonObject.getString(name));
+            } else if (HeaderParameterNames.KEY_ID.equals(name)) {
+                header = header.keyID(JSONObjectUtils.getString(jsonObject, name));
             } else {
                 header = header.parameter(name, JSONObjectUtils.getJsonValueAsObject(jsonObject.get(name)));
             }
@@ -637,7 +690,7 @@ public final class JWSHeader extends CommonJWTHeader {
                                   Base64URLValue parsedBase64URL)
             throws ParseException {
 
-        return parse(JSONObjectUtils.parse(jsonString), parsedBase64URL);
+        return parse(JSONObjectUtils.parse(jsonString, Header.MAX_HEADER_STRING_LENGTH), parsedBase64URL);
     }
 
 
@@ -653,5 +706,23 @@ public final class JWSHeader extends CommonJWTHeader {
             throws ParseException {
 
         return parse(base64URL.decodeToString(), base64URL);
+    }
+
+    @Override
+    public Set<String> getIncludedParameters() {
+        Set<String> includedParams = super.getIncludedParameters();
+        if (!isBase64URLEncodePayload()) {
+            includedParams.add(HeaderParameterNames.BASE64_URL_ENCODE_PAYLOAD);
+        }
+        return includedParams;
+    }
+
+    @Override
+    public JsonObjectBuilder toJSONObject() {
+        JsonObjectBuilder result = super.toJSONObject();
+        if (!isBase64URLEncodePayload()) {
+            result.add(HeaderParameterNames.BASE64_URL_ENCODE_PAYLOAD, false);
+        }
+        return result;
     }
 }

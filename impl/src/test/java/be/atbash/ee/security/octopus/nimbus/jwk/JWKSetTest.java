@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,16 +17,23 @@ package be.atbash.ee.security.octopus.nimbus.jwk;
 
 
 import be.atbash.ee.security.octopus.keys.AtbashKey;
+import be.atbash.ee.security.octopus.keys.AtbashKeyPair;
 import be.atbash.ee.security.octopus.keys.TestKeys;
+import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
+import be.atbash.ee.security.octopus.keys.selector.filter.AsymmetricPartKeyFilter;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
-import org.junit.jupiter.api.Assertions;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import javax.json.Json;
+import javax.json.JsonArray;
 import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.PrivateKey;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPrivateKey;
@@ -35,12 +42,10 @@ import java.security.spec.ECParameterSpec;
 import java.text.ParseException;
 import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 
 /**
  * Tests JSON Web Key (JWK) set parsing and serialisation.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov and Vedran Pavic
  */
 public class JWKSetTest {
@@ -52,17 +57,17 @@ public class JWKSetTest {
 
         JWKSet jwkSet = new JWKSet();
 
-        assertThat(jwkSet.getKeys().isEmpty()).isTrue();
-        assertThat(jwkSet.getAdditionalMembers().isEmpty()).isTrue();
+        Assertions.assertThat(jwkSet.getKeys().isEmpty()).isTrue();
+        Assertions.assertThat(jwkSet.getAdditionalMembers().isEmpty()).isTrue();
 
         String json = jwkSet.toJSONObject().toString();
 
-        assertThat(json).isEqualTo("{\"keys\":[]}");
+        Assertions.assertThat(json).isEqualTo("{\"keys\":[]}");
 
         jwkSet = JWKSet.parse(json);
 
-        assertThat(jwkSet.getKeys().isEmpty()).isTrue();
-        assertThat(jwkSet.getAdditionalMembers().isEmpty()).isTrue();
+        Assertions.assertThat(jwkSet.getKeys().isEmpty()).isTrue();
+        Assertions.assertThat(jwkSet.getAdditionalMembers().isEmpty()).isTrue();
     }
 
     @Test
@@ -97,39 +102,39 @@ public class JWKSetTest {
 
 
         List<JWK> keyList = keySet.getKeys();
-        assertThat(keyList.size()).isEqualTo(2);
+        Assertions.assertThat(keyList.size()).isEqualTo(2);
 
 
         // Check first EC key
         JWK key = keyList.get(0);
 
-        assertThat(key).isInstanceOf(ECKey.class);
-        assertThat(key.getKeyID()).isEqualTo("1");
-        assertThat(key.getKeyUse()).isEqualTo(KeyUse.ENCRYPTION);
+        Assertions.assertThat(key).isInstanceOf(ECKey.class);
+        Assertions.assertThat(key.getKeyID()).isEqualTo("1");
+        Assertions.assertThat(key.getKeyUse()).isEqualTo(KeyUse.ENCRYPTION);
 
         ECKey ecKey = (ECKey) key;
-        assertThat(ecKey.getCurve()).isEqualTo(Curve.P_256);
-        assertThat(ecKey.getX().toString()).isEqualTo("MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4");
-        assertThat(ecKey.getY().toString()).isEqualTo("4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM");
-        assertThat(key.isPrivate()).isFalse();
+        Assertions.assertThat(ecKey.getCurve()).isEqualTo(Curve.P_256);
+        Assertions.assertThat(ecKey.getX().toString()).isEqualTo("MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4");
+        Assertions.assertThat(ecKey.getY().toString()).isEqualTo("4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM");
+        Assertions.assertThat(key.isPrivate()).isFalse();
 
 
         // Check second RSA key
         key = keyList.get(1);
-        assertThat(key).isInstanceOf(RSAKey.class);
-        assertThat(key.getKeyID()).isEqualTo("2011-04-29");
-        assertThat(key.getKeyUse()).isNull();
-        assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.RS256);
+        Assertions.assertThat(key).isInstanceOf(RSAKey.class);
+        Assertions.assertThat(key.getKeyID()).isEqualTo("2011-04-29");
+        Assertions.assertThat(key.getKeyUse()).isNull();
+        Assertions.assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.RS256);
 
         RSAKey rsaKey = (RSAKey) key;
-        assertThat(rsaKey.getModulus().toString()).isEqualTo("0vx7agoebGcQSuuPiLJXZptN9nndrQmbXEps2aiAFbWhM78LhWx" +
+        Assertions.assertThat(rsaKey.getModulus().toString()).isEqualTo("0vx7agoebGcQSuuPiLJXZptN9nndrQmbXEps2aiAFbWhM78LhWx" +
                 "4cbbfAAtVT86zwu1RK7aPFFxuhDR1L6tSoc_BJECPebWKRXjBZCiFV4n3oknjhMs" +
                 "tn64tZ_2W-5JsGY4Hc5n9yBXArwl93lqt7_RN5w6Cf0h4QyQ5v-65YGjQR0_FDW2" +
                 "QvzqY368QQMicAtaSqzs8KJZgnYb9c7d0zgdAZHzu6qMQvRL5hajrn1n91CbOpbI" +
                 "SD08qNLyrdkt-bFTWhAI4vMQFh6WeZu0fM4lFd2NcRwr3XPksINHaQ-G_xBniIqb" +
                 "w0Ls1jF44-csFCur-kEgU8awapJzKnqDKgw");
-        assertThat(rsaKey.getPublicExponent().toString()).isEqualTo("AQAB");
-        assertThat(key.isPrivate()).isFalse();
+        Assertions.assertThat(rsaKey.getPublicExponent().toString()).isEqualTo("AQAB");
+        Assertions.assertThat(key.isPrivate()).isFalse();
     }
 
     @Test
@@ -159,39 +164,39 @@ public class JWKSetTest {
         additionalMembers.put("setID", "xyz123");
 
         JWKSet keySet = new JWKSet(Arrays.asList(ecKey, rsaKey), additionalMembers);
-        assertThat(keySet.getKeys().size()).isEqualTo(2);
-        assertThat(keySet.getAdditionalMembers().size()).isEqualTo(1);
+        Assertions.assertThat(keySet.getKeys().size()).isEqualTo(2);
+        Assertions.assertThat(keySet.getAdditionalMembers().size()).isEqualTo(1);
 
         String jwkSet = keySet.toString();
 
         keySet = JWKSet.parse(jwkSet);
 
-        assertThat(keySet.getKeys().size()).isEqualTo(2);
+        Assertions.assertThat(keySet.getKeys().size()).isEqualTo(2);
 
         // Check first EC key
         ECKey ecKeyOut = (ECKey) keySet.getKeys().get(0);
-        assertThat(ecKeyOut).isNotNull();
-        assertThat(ecKeyOut.getCurve()).isEqualTo(Curve.P_256);
-        assertThat(ecKeyOut.getX()).isEqualTo(ecKey.getX());
-        assertThat(ecKeyOut.getY()).isEqualTo(ecKey.getY());
-        assertThat(ecKeyOut.getKeyUse()).isEqualTo(KeyUse.ENCRYPTION);
-        assertThat(ecKeyOut.getKeyOperations()).isNull();
-        assertThat(ecKeyOut.getAlgorithm()).isEqualTo(JWEAlgorithm.ECDH_ES);
-        assertThat(ecKeyOut.getKeyID()).isEqualTo("1234");
+        Assertions.assertThat(ecKeyOut).isNotNull();
+        Assertions.assertThat(ecKeyOut.getCurve()).isEqualTo(Curve.P_256);
+        Assertions.assertThat(ecKeyOut.getX()).isEqualTo(ecKey.getX());
+        Assertions.assertThat(ecKeyOut.getY()).isEqualTo(ecKey.getY());
+        Assertions.assertThat(ecKeyOut.getKeyUse()).isEqualTo(KeyUse.ENCRYPTION);
+        Assertions.assertThat(ecKeyOut.getKeyOperations()).isNull();
+        Assertions.assertThat(ecKeyOut.getAlgorithm()).isEqualTo(JWEAlgorithm.ECDH_ES);
+        Assertions.assertThat(ecKeyOut.getKeyID()).isEqualTo("1234");
 
         // Check second RSA key
         RSAKey rsaKeyOut = (RSAKey) keySet.getKeys().get(1);
-        assertThat(rsaKeyOut).isNotNull();
-        assertThat(rsaKeyOut.getModulus().toString()).isEqualTo("abc");
-        assertThat(rsaKeyOut.getPublicExponent().toString()).isEqualTo("def");
-        assertThat(rsaKeyOut.getKeyUse()).isEqualTo(KeyUse.SIGNATURE);
-        assertThat(rsaKeyOut.getKeyOperations()).isNull();
-        assertThat(rsaKeyOut.getAlgorithm()).isEqualTo(JWSAlgorithm.RS256);
-        assertThat(rsaKeyOut.getKeyID()).isEqualTo("5678");
+        Assertions.assertThat(rsaKeyOut).isNotNull();
+        Assertions.assertThat(rsaKeyOut.getModulus().toString()).isEqualTo("abc");
+        Assertions.assertThat(rsaKeyOut.getPublicExponent().toString()).isEqualTo("def");
+        Assertions.assertThat(rsaKeyOut.getKeyUse()).isEqualTo(KeyUse.SIGNATURE);
+        Assertions.assertThat(rsaKeyOut.getKeyOperations()).isNull();
+        Assertions.assertThat(rsaKeyOut.getAlgorithm()).isEqualTo(JWSAlgorithm.RS256);
+        Assertions.assertThat(rsaKeyOut.getKeyID()).isEqualTo("5678");
 
         // Check additional JWKSet members
-        assertThat(keySet.getAdditionalMembers().size()).isEqualTo(1);
-        assertThat((String) keySet.getAdditionalMembers().get("setID")).isEqualTo("xyz123");
+        Assertions.assertThat(keySet.getAdditionalMembers().size()).isEqualTo(1);
+        Assertions.assertThat((String) keySet.getAdditionalMembers().get("setID")).isEqualTo("xyz123");
     }
 
     @Test
@@ -215,30 +220,30 @@ public class JWKSetTest {
 
 
         List<JWK> keyList = keySet.getKeys();
-        assertThat(keyList.size()).isEqualTo(2);
+        Assertions.assertThat(keyList.size()).isEqualTo(2);
 
         // First OCT key
         JWK key = keyList.get(0);
-        assertThat(key).isInstanceOf(OctetSequenceKey.class);
-        assertThat(key.getKeyType()).isEqualTo(KeyType.OCT);
-        assertThat(key.getKeyUse()).isNull();
-        assertThat(key.getAlgorithm()).isEqualTo(JWEAlgorithm.A128KW);
-        assertThat(key.getKeyID()).isNull();
-        assertThat(((OctetSequenceKey) key).getKeyValue()).isEqualTo(new Base64URLValue("GawgguFyGrWKav7AX4VKUg"));
+        Assertions.assertThat(key).isInstanceOf(OctetSequenceKey.class);
+        Assertions.assertThat(key.getKeyType()).isEqualTo(KeyType.OCT);
+        Assertions.assertThat(key.getKeyUse()).isNull();
+        Assertions.assertThat(key.getAlgorithm()).isEqualTo(JWEAlgorithm.A128KW);
+        Assertions.assertThat(key.getKeyID()).isNull();
+        Assertions.assertThat(((OctetSequenceKey) key).getKeyValue()).isEqualTo(new Base64URLValue("GawgguFyGrWKav7AX4VKUg"));
 
         // Second OCT key
         key = keyList.get(1);
-        assertThat(key).isInstanceOf(OctetSequenceKey.class);
-        assertThat(key.getKeyType()).isEqualTo(KeyType.OCT);
-        assertThat(key.getKeyUse()).isNull();
-        assertThat(key.getKeyOperations()).isNull();
-        assertThat(key.getAlgorithm()).isNull();
-        assertThat(key.getKeyID()).isEqualTo("HMAC key used in JWS A.1 example");
-        assertThat(((OctetSequenceKey) key).getKeyValue()).isEqualTo(new Base64URLValue("AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow"));
+        Assertions.assertThat(key).isInstanceOf(OctetSequenceKey.class);
+        Assertions.assertThat(key.getKeyType()).isEqualTo(KeyType.OCT);
+        Assertions.assertThat(key.getKeyUse()).isNull();
+        Assertions.assertThat(key.getKeyOperations()).isNull();
+        Assertions.assertThat(key.getAlgorithm()).isNull();
+        Assertions.assertThat(key.getKeyID()).isEqualTo("HMAC key used in JWS A.1 example");
+        Assertions.assertThat(((OctetSequenceKey) key).getKeyValue()).isEqualTo(new Base64URLValue("AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow"));
     }
 
     @Test
-    public void testParsePrivateJWKSet() {
+    public void testParsePrivateJWKSet() throws ParseException {
 
         // The string is from the JPSK spec
         String json = "{\"keys\":" +
@@ -286,89 +291,88 @@ public class JWKSetTest {
                 "}";
 
 
-        Assertions.assertDoesNotThrow(() -> {
-            JWKSet keySet = null;
-            keySet = JWKSet.parse(json);
+        JWKSet keySet;
+        keySet = JWKSet.parse(json);
 
 
-            List<JWK> keyList = keySet.getKeys();
-            assertThat(keyList.size()).isEqualTo(2);
+        List<JWK> keyList = keySet.getKeys();
+        Assertions.assertThat(keyList.size()).isEqualTo(2);
 
 
-            // Check EC key
-            JWK key = keyList.get(0);
-            assertThat(key).isInstanceOf(ECKey.class);
-            assertThat(key.getKeyUse()).isEqualTo(KeyUse.ENCRYPTION);
-            assertThat(key.getAlgorithm()).isNull();
-            assertThat(key.getKeyID()).isEqualTo("1");
+        // Check EC key
+        JWK key = keyList.get(0);
+        Assertions.assertThat(key).isInstanceOf(ECKey.class);
+        Assertions.assertThat(key.getKeyUse()).isEqualTo(KeyUse.ENCRYPTION);
+        Assertions.assertThat(key.getAlgorithm()).isNull();
+        Assertions.assertThat(key.getKeyID()).isEqualTo("1");
 
-            ECKey ecKey = (ECKey) key;
+        ECKey ecKey = (ECKey) key;
 
-            assertThat(ecKey.getCurve()).isEqualTo(Curve.P_256);
-            assertThat(ecKey.getX().toString()).isEqualTo("MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4");
-            assertThat(ecKey.getY().toString()).isEqualTo("4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM");
-            assertThat(ecKey.getD().toString()).isEqualTo("870MB6gfuTJ4HtUnUvYMyJpr5eUZNP4Bk43bVdj3eAE");
+        Assertions.assertThat(ecKey.getCurve()).isEqualTo(Curve.P_256);
+        Assertions.assertThat(ecKey.getX().toString()).isEqualTo("MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4");
+        Assertions.assertThat(ecKey.getY().toString()).isEqualTo("4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM");
+        Assertions.assertThat(ecKey.getD().toString()).isEqualTo("870MB6gfuTJ4HtUnUvYMyJpr5eUZNP4Bk43bVdj3eAE");
 
-            assertThat(ecKey.toPublicJWK().getD()).isNull();
-
-
-            // Check RSA key
-            key = keyList.get(1);
-            assertThat(key).isInstanceOf(RSAKey.class);
-            assertThat(key.getKeyUse()).isNull();
-            assertThat(key.getKeyOperations()).isNull();
-            assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.RS256);
-            assertThat(key.getKeyID()).isEqualTo("2011-04-29");
-
-            RSAKey rsaKey = (RSAKey) key;
-
-            assertThat(rsaKey.getModulus().toString()).isEqualTo("0vx7agoebGcQSuuPiLJXZptN9nndrQmbXEps2aiAFbWhM78LhWx" +
-                    "4cbbfAAtVT86zwu1RK7aPFFxuhDR1L6tSoc_BJECPebWKRXjBZCiFV4n3oknjhMs" +
-                    "tn64tZ_2W-5JsGY4Hc5n9yBXArwl93lqt7_RN5w6Cf0h4QyQ5v-65YGjQR0_FDW2" +
-                    "QvzqY368QQMicAtaSqzs8KJZgnYb9c7d0zgdAZHzu6qMQvRL5hajrn1n91CbOpbI" +
-                    "SD08qNLyrdkt-bFTWhAI4vMQFh6WeZu0fM4lFd2NcRwr3XPksINHaQ-G_xBniIqb" +
-                    "w0Ls1jF44-csFCur-kEgU8awapJzKnqDKgw");
-
-            assertThat(rsaKey.getPublicExponent().toString()).isEqualTo("AQAB");
+        Assertions.assertThat(ecKey.toPublicJWK().getD()).isNull();
 
 
-            assertThat(rsaKey.getPrivateExponent().toString()).isEqualTo("X4cTteJY_gn4FYPsXB8rdXix5vwsg1FLN5E3EaG6RJoVH-HLLKD9" +
-                    "M7dx5oo7GURknchnrRweUkC7hT5fJLM0WbFAKNLWY2vv7B6NqXSzUvxT0_YSfqij" +
-                    "wp3RTzlBaCxWp4doFk5N2o8Gy_nHNKroADIkJ46pRUohsXywbReAdYaMwFs9tv8d" +
-                    "_cPVY3i07a3t8MN6TNwm0dSawm9v47UiCl3Sk5ZiG7xojPLu4sbg1U2jx4IBTNBz" +
-                    "nbJSzFHK66jT8bgkuqsk0GjskDJk19Z4qwjwbsnn4j2WBii3RL-Us2lGVkY8fkFz" +
-                    "me1z0HbIkfz0Y6mqnOYtqc0X4jfcKoAC8Q");
+        // Check RSA key
+        key = keyList.get(1);
+        Assertions.assertThat(key).isInstanceOf(RSAKey.class);
+        Assertions.assertThat(key.getKeyUse()).isNull();
+        Assertions.assertThat(key.getKeyOperations()).isNull();
+        Assertions.assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.RS256);
+        Assertions.assertThat(key.getKeyID()).isEqualTo("2011-04-29");
 
-            assertThat(rsaKey.getFirstPrimeFactor().toString()).isEqualTo("83i-7IvMGXoMXCskv73TKr8637FiO7Z27zv8oj6pbWUQyLPQBQxtPV" +
-                    "nwD20R-60eTDmD2ujnMt5PoqMrm8RfmNhVWDtjjMmCMjOpSXicFHj7XOuVIYQyqV" +
-                    "WlWEh6dN36GVZYk93N8Bc9vY41xy8B9RzzOGVQzXvNEvn7O0nVbfs");
+        RSAKey rsaKey = (RSAKey) key;
 
-            assertThat(rsaKey.getSecondPrimeFactor().toString()).isEqualTo("3dfOR9cuYq-0S-mkFLzgItgMEfFzB2q3hWehMuG0oCuqnb3vobLyum" +
-                    "qjVZQO1dIrdwgTnCdpYzBcOfW5r370AFXjiWft_NGEiovonizhKpo9VVS78TzFgx" +
-                    "kIdrecRezsZ-1kYd_s1qDbxtkDEgfAITAG9LUnADun4vIcb6yelxk");
+        Assertions.assertThat(rsaKey.getModulus().toString()).isEqualTo("0vx7agoebGcQSuuPiLJXZptN9nndrQmbXEps2aiAFbWhM78LhWx" +
+                "4cbbfAAtVT86zwu1RK7aPFFxuhDR1L6tSoc_BJECPebWKRXjBZCiFV4n3oknjhMs" +
+                "tn64tZ_2W-5JsGY4Hc5n9yBXArwl93lqt7_RN5w6Cf0h4QyQ5v-65YGjQR0_FDW2" +
+                "QvzqY368QQMicAtaSqzs8KJZgnYb9c7d0zgdAZHzu6qMQvRL5hajrn1n91CbOpbI" +
+                "SD08qNLyrdkt-bFTWhAI4vMQFh6WeZu0fM4lFd2NcRwr3XPksINHaQ-G_xBniIqb" +
+                "w0Ls1jF44-csFCur-kEgU8awapJzKnqDKgw");
 
-            assertThat(rsaKey.getFirstFactorCRTExponent().toString()).isEqualTo("G4sPXkc6Ya9y8oJW9_ILj4xuppu0lzi_H7VTkS8xj5SdX3coE0oim" +
-                    "YwxIi2emTAue0UOa5dpgFGyBJ4c8tQ2VF402XRugKDTP8akYhFo5tAA77Qe_Nmtu" +
-                    "YZc3C3m3I24G2GvR5sSDxUyAN2zq8Lfn9EUms6rY3Ob8YeiKkTiBj0");
+        Assertions.assertThat(rsaKey.getPublicExponent().toString()).isEqualTo("AQAB");
 
-            assertThat(rsaKey.getSecondFactorCRTExponent().toString()).isEqualTo("s9lAH9fggBsoFR8Oac2R_E2gw282rT2kGOAhvIllETE1efrA6huUU" +
-                    "vMfBcMpn8lqeW6vzznYY5SSQF7pMdC_agI3nG8Ibp1BUb0JUiraRNqUfLhcQb_d9" +
-                    "GF4Dh7e74WbRsobRonujTYN1xCaP6TO61jvWrX-L18txXw494Q_cgk");
 
-            assertThat(rsaKey.getFirstCRTCoefficient().toString()).isEqualTo("GyM_p6JrXySiz1toFgKbWV-JdI3jQ4ypu9rbMWx3rQJBfmt0FoYzg" +
-                    "UIZEVFEcOqwemRN81zoDAaa-Bk0KWNGDjJHZDdDmFhW3AN7lI-puxk_mHZGJ11rx" +
-                    "yR8O55XLSe3SPmRfKwZI6yU24ZxvQKFYItdldUKGzO6Ia6zTKhAVRU");
+        Assertions.assertThat(rsaKey.getPrivateExponent().toString()).isEqualTo("X4cTteJY_gn4FYPsXB8rdXix5vwsg1FLN5E3EaG6RJoVH-HLLKD9" +
+                "M7dx5oo7GURknchnrRweUkC7hT5fJLM0WbFAKNLWY2vv7B6NqXSzUvxT0_YSfqij" +
+                "wp3RTzlBaCxWp4doFk5N2o8Gy_nHNKroADIkJ46pRUohsXywbReAdYaMwFs9tv8d" +
+                "_cPVY3i07a3t8MN6TNwm0dSawm9v47UiCl3Sk5ZiG7xojPLu4sbg1U2jx4IBTNBz" +
+                "nbJSzFHK66jT8bgkuqsk0GjskDJk19Z4qwjwbsnn4j2WBii3RL-Us2lGVkY8fkFz" +
+                "me1z0HbIkfz0Y6mqnOYtqc0X4jfcKoAC8Q");
 
-            assertThat(rsaKey.getOtherPrimes().isEmpty()).isTrue();
+        Assertions.assertThat(rsaKey.getFirstPrimeFactor().toString()).isEqualTo("83i-7IvMGXoMXCskv73TKr8637FiO7Z27zv8oj6pbWUQyLPQBQxtPV" +
+                "nwD20R-60eTDmD2ujnMt5PoqMrm8RfmNhVWDtjjMmCMjOpSXicFHj7XOuVIYQyqV" +
+                "WlWEh6dN36GVZYk93N8Bc9vY41xy8B9RzzOGVQzXvNEvn7O0nVbfs");
 
-            assertThat(rsaKey.toPublicJWK().getPrivateExponent()).isNull();
-            assertThat(rsaKey.toPublicJWK().getFirstPrimeFactor()).isNull();
-            assertThat(rsaKey.toPublicJWK().getSecondPrimeFactor()).isNull();
-            assertThat(rsaKey.toPublicJWK().getFirstFactorCRTExponent()).isNull();
-            assertThat(rsaKey.toPublicJWK().getSecondFactorCRTExponent()).isNull();
-            assertThat(rsaKey.toPublicJWK().getFirstCRTCoefficient()).isNull();
-            assertThat(rsaKey.toPublicJWK().getOtherPrimes().isEmpty()).isTrue();
-        });
+        Assertions.assertThat(rsaKey.getSecondPrimeFactor().toString()).isEqualTo("3dfOR9cuYq-0S-mkFLzgItgMEfFzB2q3hWehMuG0oCuqnb3vobLyum" +
+                "qjVZQO1dIrdwgTnCdpYzBcOfW5r370AFXjiWft_NGEiovonizhKpo9VVS78TzFgx" +
+                "kIdrecRezsZ-1kYd_s1qDbxtkDEgfAITAG9LUnADun4vIcb6yelxk");
+
+        Assertions.assertThat(rsaKey.getFirstFactorCRTExponent().toString()).isEqualTo("G4sPXkc6Ya9y8oJW9_ILj4xuppu0lzi_H7VTkS8xj5SdX3coE0oim" +
+                "YwxIi2emTAue0UOa5dpgFGyBJ4c8tQ2VF402XRugKDTP8akYhFo5tAA77Qe_Nmtu" +
+                "YZc3C3m3I24G2GvR5sSDxUyAN2zq8Lfn9EUms6rY3Ob8YeiKkTiBj0");
+
+        Assertions.assertThat(rsaKey.getSecondFactorCRTExponent().toString()).isEqualTo("s9lAH9fggBsoFR8Oac2R_E2gw282rT2kGOAhvIllETE1efrA6huUU" +
+                "vMfBcMpn8lqeW6vzznYY5SSQF7pMdC_agI3nG8Ibp1BUb0JUiraRNqUfLhcQb_d9" +
+                "GF4Dh7e74WbRsobRonujTYN1xCaP6TO61jvWrX-L18txXw494Q_cgk");
+
+        Assertions.assertThat(rsaKey.getFirstCRTCoefficient().toString()).isEqualTo("GyM_p6JrXySiz1toFgKbWV-JdI3jQ4ypu9rbMWx3rQJBfmt0FoYzg" +
+                "UIZEVFEcOqwemRN81zoDAaa-Bk0KWNGDjJHZDdDmFhW3AN7lI-puxk_mHZGJ11rx" +
+                "yR8O55XLSe3SPmRfKwZI6yU24ZxvQKFYItdldUKGzO6Ia6zTKhAVRU");
+
+        Assertions.assertThat(rsaKey.getOtherPrimes().isEmpty()).isTrue();
+
+        Assertions.assertThat(rsaKey.toPublicJWK().getPrivateExponent()).isNull();
+        Assertions.assertThat(rsaKey.toPublicJWK().getFirstPrimeFactor()).isNull();
+        Assertions.assertThat(rsaKey.toPublicJWK().getSecondPrimeFactor()).isNull();
+        Assertions.assertThat(rsaKey.toPublicJWK().getFirstFactorCRTExponent()).isNull();
+        Assertions.assertThat(rsaKey.toPublicJWK().getSecondFactorCRTExponent()).isNull();
+        Assertions.assertThat(rsaKey.toPublicJWK().getFirstCRTCoefficient()).isNull();
+        Assertions.assertThat(rsaKey.toPublicJWK().getOtherPrimes().isEmpty()).isTrue();
+
     }
 
     @Test
@@ -425,7 +429,7 @@ public class JWKSetTest {
 
 
         List<JWK> keyList = keySet.getKeys();
-        assertThat(keyList.size()).isEqualTo(2);
+        Assertions.assertThat(keyList.size()).isEqualTo(2);
 
         boolean publicParamsOnly = true;
 
@@ -436,40 +440,40 @@ public class JWKSetTest {
         keySet = JWKSet.parse(json);
 
         keyList = keySet.getKeys();
-        assertThat(keyList.size()).isEqualTo(2);
+        Assertions.assertThat(keyList.size()).isEqualTo(2);
 
         // Check first EC key
         JWK key = keyList.get(0);
 
-        assertThat(key).isInstanceOf(ECKey.class);
-        assertThat(key.getKeyID()).isEqualTo("1");
-        assertThat(key.getKeyUse()).isEqualTo(KeyUse.ENCRYPTION);
-        assertThat(key.getKeyOperations()).isNull();
+        Assertions.assertThat(key).isInstanceOf(ECKey.class);
+        Assertions.assertThat(key.getKeyID()).isEqualTo("1");
+        Assertions.assertThat(key.getKeyUse()).isEqualTo(KeyUse.ENCRYPTION);
+        Assertions.assertThat(key.getKeyOperations()).isNull();
 
         ECKey ecKey = (ECKey) key;
-        assertThat(ecKey.getCurve()).isEqualTo(Curve.P_256);
-        assertThat(ecKey.getX().toString()).isEqualTo("MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4");
-        assertThat(ecKey.getY().toString()).isEqualTo("4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM");
-        assertThat(key.isPrivate()).isFalse();
+        Assertions.assertThat(ecKey.getCurve()).isEqualTo(Curve.P_256);
+        Assertions.assertThat(ecKey.getX().toString()).isEqualTo("MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4");
+        Assertions.assertThat(ecKey.getY().toString()).isEqualTo("4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM");
+        Assertions.assertThat(key.isPrivate()).isFalse();
 
 
         // Check second RSA key
         key = keyList.get(1);
-        assertThat(key).isInstanceOf(RSAKey.class);
-        assertThat(key.getKeyID()).isEqualTo("2011-04-29");
-        assertThat(key.getKeyUse()).isNull();
-        assertThat(key.getKeyOperations()).isNull();
-        assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.RS256);
+        Assertions.assertThat(key).isInstanceOf(RSAKey.class);
+        Assertions.assertThat(key.getKeyID()).isEqualTo("2011-04-29");
+        Assertions.assertThat(key.getKeyUse()).isNull();
+        Assertions.assertThat(key.getKeyOperations()).isNull();
+        Assertions.assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.RS256);
 
         RSAKey rsaKey = (RSAKey) key;
-        assertThat(rsaKey.getModulus().toString()).isEqualTo("0vx7agoebGcQSuuPiLJXZptN9nndrQmbXEps2aiAFbWhM78LhWx" +
+        Assertions.assertThat(rsaKey.getModulus().toString()).isEqualTo("0vx7agoebGcQSuuPiLJXZptN9nndrQmbXEps2aiAFbWhM78LhWx" +
                 "4cbbfAAtVT86zwu1RK7aPFFxuhDR1L6tSoc_BJECPebWKRXjBZCiFV4n3oknjhMs" +
                 "tn64tZ_2W-5JsGY4Hc5n9yBXArwl93lqt7_RN5w6Cf0h4QyQ5v-65YGjQR0_FDW2" +
                 "QvzqY368QQMicAtaSqzs8KJZgnYb9c7d0zgdAZHzu6qMQvRL5hajrn1n91CbOpbI" +
                 "SD08qNLyrdkt-bFTWhAI4vMQFh6WeZu0fM4lFd2NcRwr3XPksINHaQ-G_xBniIqb" +
                 "w0Ls1jF44-csFCur-kEgU8awapJzKnqDKgw");
-        assertThat(rsaKey.getPublicExponent().toString()).isEqualTo("AQAB");
-        assertThat(key.isPrivate()).isFalse();
+        Assertions.assertThat(rsaKey.getPublicExponent().toString()).isEqualTo("AQAB");
+        Assertions.assertThat(key.isPrivate()).isFalse();
     }
 
     @Test
@@ -504,34 +508,34 @@ public class JWKSetTest {
         // Check first EC key
         JWK key = keySet.getKeyByKeyId("1");
 
-        assertThat(key).isInstanceOf(ECKey.class);
-        assertThat(key.getKeyID()).isEqualTo("1");
-        assertThat(key.getKeyUse()).isEqualTo(KeyUse.ENCRYPTION);
+        Assertions.assertThat(key).isInstanceOf(ECKey.class);
+        Assertions.assertThat(key.getKeyID()).isEqualTo("1");
+        Assertions.assertThat(key.getKeyUse()).isEqualTo(KeyUse.ENCRYPTION);
 
         ECKey ecKey = (ECKey) key;
-        assertThat(ecKey.getCurve()).isEqualTo(Curve.P_256);
-        assertThat(ecKey.getX().toString()).isEqualTo("MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4");
-        assertThat(ecKey.getY().toString()).isEqualTo("4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM");
-        assertThat(key.isPrivate()).isFalse();
+        Assertions.assertThat(ecKey.getCurve()).isEqualTo(Curve.P_256);
+        Assertions.assertThat(ecKey.getX().toString()).isEqualTo("MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4");
+        Assertions.assertThat(ecKey.getY().toString()).isEqualTo("4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM");
+        Assertions.assertThat(key.isPrivate()).isFalse();
 
 
         // Check second RSA key
         key = keySet.getKeyByKeyId("2011-04-29");
-        assertThat(key).isInstanceOf(RSAKey.class);
-        assertThat(key.getKeyID()).isEqualTo("2011-04-29");
-        assertThat(key.getKeyUse()).isNull();
-        assertThat(key.getKeyOperations()).isNull();
-        assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.RS256);
+        Assertions.assertThat(key).isInstanceOf(RSAKey.class);
+        Assertions.assertThat(key.getKeyID()).isEqualTo("2011-04-29");
+        Assertions.assertThat(key.getKeyUse()).isNull();
+        Assertions.assertThat(key.getKeyOperations()).isNull();
+        Assertions.assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.RS256);
 
         RSAKey rsaKey = (RSAKey) key;
-        assertThat(rsaKey.getModulus().toString()).isEqualTo("0vx7agoebGcQSuuPiLJXZptN9nndrQmbXEps2aiAFbWhM78LhWx" +
+        Assertions.assertThat(rsaKey.getModulus().toString()).isEqualTo("0vx7agoebGcQSuuPiLJXZptN9nndrQmbXEps2aiAFbWhM78LhWx" +
                 "4cbbfAAtVT86zwu1RK7aPFFxuhDR1L6tSoc_BJECPebWKRXjBZCiFV4n3oknjhMs" +
                 "tn64tZ_2W-5JsGY4Hc5n9yBXArwl93lqt7_RN5w6Cf0h4QyQ5v-65YGjQR0_FDW2" +
                 "QvzqY368QQMicAtaSqzs8KJZgnYb9c7d0zgdAZHzu6qMQvRL5hajrn1n91CbOpbI" +
                 "SD08qNLyrdkt-bFTWhAI4vMQFh6WeZu0fM4lFd2NcRwr3XPksINHaQ-G_xBniIqb" +
                 "w0Ls1jF44-csFCur-kEgU8awapJzKnqDKgw");
-        assertThat(rsaKey.getPublicExponent().toString()).isEqualTo("AQAB");
-        assertThat(key.isPrivate()).isFalse();
+        Assertions.assertThat(rsaKey.getPublicExponent().toString()).isEqualTo("AQAB");
+        Assertions.assertThat(key.isPrivate()).isFalse();
     }
 
     @Test
@@ -539,10 +543,10 @@ public class JWKSetTest {
             throws Exception {
 
         OctetSequenceKey oct1 = new OctetSequenceKey.Builder(new Base64URLValue("abc")).build();
-        assertThat(oct1.getKeyValue().toString()).isEqualTo("abc");
+        Assertions.assertThat(oct1.getKeyValue().toString()).isEqualTo("abc");
 
         OctetSequenceKey oct2 = new OctetSequenceKey.Builder(new Base64URLValue("def")).build();
-        assertThat(oct2.getKeyValue().toString()).isEqualTo("def");
+        Assertions.assertThat(oct2.getKeyValue().toString()).isEqualTo("def");
 
         List<JWK> keyList = new LinkedList<>();
         keyList.add(oct1);
@@ -555,17 +559,17 @@ public class JWKSetTest {
 
         JWKSet publicSet = JWKSet.parse(jsonObject.toString());
 
-        assertThat(publicSet.getKeys().size()).isEqualTo(0);
+        Assertions.assertThat(publicSet.getKeys().size()).isEqualTo(0);
     }
 
     @Test
     public void testOctJWKSetToPublic() {
 
         OctetSequenceKey oct1 = new OctetSequenceKey.Builder(new Base64URLValue("abc")).build();
-        assertThat(oct1.getKeyValue().toString()).isEqualTo("abc");
+        Assertions.assertThat(oct1.getKeyValue().toString()).isEqualTo("abc");
 
         OctetSequenceKey oct2 = new OctetSequenceKey.Builder(new Base64URLValue("def")).build();
-        assertThat(oct2.getKeyValue().toString()).isEqualTo("def");
+        Assertions.assertThat(oct2.getKeyValue().toString()).isEqualTo("def");
 
         List<JWK> keyList = new LinkedList<>();
         keyList.add(oct1);
@@ -575,13 +579,13 @@ public class JWKSetTest {
 
         JWKSet publicSet = privateSet.toPublicJWKSet();
 
-        assertThat(publicSet.getKeys().size()).isEqualTo(0);
+        Assertions.assertThat(publicSet.getKeys().size()).isEqualTo(0);
     }
 
     @Test
     public void testMIMEType() {
 
-        assertThat(JWKSet.MIME_TYPE).isEqualTo("application/jwk-set+json; charset=UTF-8");
+        Assertions.assertThat(JWKSet.MIME_TYPE).isEqualTo("application/jwk-set+json; charset=UTF-8");
     }
 
 	/*
@@ -949,7 +953,7 @@ public class JWKSetTest {
                     .keyID("5678")
                     .build());
         } catch (UnsupportedOperationException e) {
-            assertThat(e.getMessage()).isNull();
+            Assertions.assertThat(e.getMessage()).isNull();
         }
     }
 
@@ -961,37 +965,144 @@ public class JWKSetTest {
         try {
             jwkSet.getAdditionalMembers().put("key", "value");
         } catch (UnsupportedOperationException e) {
-            assertThat(e.getMessage()).isNull();
+            Assertions.assertThat(e.getMessage()).isNull();
         }
     }
 
     @Test
     public void testParse_missingKeysField() {
 
-        ParseException e = Assertions.assertThrows(ParseException.class,
-                () -> JWKSet.parse("{}"));
-        assertThat(e.getMessage()).isEqualTo("Missing required \"keys\" member");
+        Assertions.assertThatThrownBy(() -> JWKSet.parse("{}"))
+                .isInstanceOf(ParseException.class)
+                .hasMessage("Missing required \"keys\" member");
+
     }
 
     @Test
     public void getAtbashKeys() {
         List<AtbashKey> atbashKeys = TestKeys.generateRSAKeys("kid");
-        RSAPrivateKey privateKey = null;
-        RSAPublicKey publicKey = null;
-        for (AtbashKey atbashKey : atbashKeys) {
-            if (atbashKey.getKey() instanceof RSAPrivateKey) {
-                privateKey = (RSAPrivateKey) atbashKey.getKey();
-            }
-            if (atbashKey.getKey() instanceof RSAPublicKey) {
-                publicKey = (RSAPublicKey) atbashKey.getKey();
-            }
-        }
 
-        RSAKey rsaKey = new RSAKey(publicKey, privateKey, KeyUse.SIGNATURE, null, null, "kid", null, null, null, null);
+        KeyPair keyPair = new AtbashKeyPair(atbashKeys).getKeyPair();
+
+        RSAKey rsaKey = new RSAKey((RSAPublicKey) keyPair.getPublic(), keyPair.getPrivate(), KeyUse.SIGNATURE, null, null, "kid", null, null, null, null);
         JWKSet jwkSet = new JWKSet(rsaKey);
 
         List<AtbashKey> keys = jwkSet.getAtbashKeys();
 
-        assertThat(keys).hasSize(2);
+        Assertions.assertThat(keys).hasSize(2);
+    }
+
+    @Test
+    public void testNullJWKSetValues() throws Exception {
+
+        String s = "{" +
+                "\"keys\": [" +
+                "{" +
+                "\"additionalData\": {}," +
+                "\"alg\": null," +
+                "\"crv\": null," +
+                "\"d\": null," +
+                "\"dp\": null," +
+                "\"dq\": null," +
+                "\"e\": \"AQAB\"," +
+                "\"k\": null," +
+                "\"keyId\": \"yMPAp4MB5fMXz7U7kDdZpGK1-Ao069CgW01Car1Nky4\"," +
+                "\"keyOps\": []," +
+                "\"kid\": \"yMPAp4MB5fMXz7U7kDdZpGK1-Ao069CgW01Car1Nky4\"," +
+                "\"kty\": \"RSA\"," +
+                "\"n\": \"sgJ7pH6-SF4I7YSXJbEsdYvEknFej4cT0wNrVXty0gD9WyUdhiq8giTMDkKCRGBLEcAoJKDNAetsUtD6qTBPlS5aNmuvcqVpm2WHTov_YnpE3WT-0WMozVlfzdQEwgfQlllW-A0GUYT5SI1JQpAhU6jMJKyGdtpJJYFkMadmQo6Zc6eeHNFa-yliCV31K5FHHemH1CO6ufGmvg_LBlaA_MEp12GgPT3D3NmoGe_lCwCCwYAcLIqBgJppGKeFRx7xrfoH4UvyERtNJVyU5ck0hPeNlecXdfCwLczOCSFvh7GMV5U_7TyQakEbCfdwG3tF7rdL0-apZ1h1xhUMY24RAw\"," +
+                "\"oth\": null," +
+                "\"p\": null," +
+                "\"q\": null," +
+                "\"qi\": null," +
+                "\"use\": null," +
+                "\"x\": null," +
+                "\"x5t\": null," +
+                "\"x5tS256\": null," +
+                "\"x5u\": null," +
+                "\"y\": null," +
+                "\"keySize\": 2048," +
+                "\"hasPrivateKey\": false," +
+                "\"cryptoProviderFactory\": {" +
+                "\"cryptoProviderCache\": {}," +
+                "\"customCryptoProvider\": null," +
+                "\"cacheSignatureProviders\": false" +
+                "}" +
+                "}" +
+                "]" +
+                "}";
+
+
+        JWKSet keySet = JWKSet.parse(s);
+
+
+        List<JWK> keyList = keySet.getKeys();
+        Assertions.assertThat(keyList).hasSize(1);
+
+
+        // Check key
+        JWK key = keyList.get(0);
+
+        Assertions.assertThat(key).isInstanceOf(RSAKey.class);
+
+        Assertions.assertThat(key.getKeyID()).isEqualTo("yMPAp4MB5fMXz7U7kDdZpGK1-Ao069CgW01Car1Nky4");
+        Assertions.assertThat(key.getKeyUse()).isNull();
+        Assertions.assertThat(key.getParsedX509CertChain()).isNull();
+        Assertions.assertThat(key.getKeyStore()).isNull();
+        Assertions.assertThat(key.getX509CertChain()).isNull();
+        Assertions.assertThat(key.getAlgorithm()).isNull();
+
+        RSAKey rsaKey = (RSAKey) key;
+        Assertions.assertThat(rsaKey.getPublicExponent().toString()).isEqualTo("AQAB");
+        Assertions.assertThat(key.isPrivate()).isFalse();
+
+        Assertions.assertThat(rsaKey.toPublicKey()).isInstanceOf(RSAPublicKey.class);
+    }
+
+    @Test
+    public void testParseJSONObject_genericsDoesntMatch() {
+
+        JsonArray keys = Json.createArrayBuilder()
+                .add("illegal-item")
+                .build();
+        JsonObject jsonObject = Json.createObjectBuilder()
+                .add(JWKIdentifiers.KEYS, keys)
+                .build();
+
+        Assertions.assertThatThrownBy(
+                        () -> JWKSet.parse(jsonObject))
+                .isInstanceOf(ParseException.class)
+                .hasMessage("The \"keys\" JSON array must contain JSON objects only");
+    }
+
+    @Test
+    public void testParse_ignoreUnknownKeyType() throws ParseException {
+
+        List<AtbashKey> atbashKeys = TestKeys.generateRSAKeys("kid");
+        List<AtbashKey> privateKey = new AsymmetricPartKeyFilter(AsymmetricPart.PRIVATE).filter(atbashKeys);
+        List<AtbashKey> publicKey = new AsymmetricPartKeyFilter(AsymmetricPart.PUBLIC).filter(atbashKeys);
+
+        RSAKey rsaKey = new RSAKey.Builder((RSAPublicKey) publicKey.get(0).getKey())
+                .privateKey((PrivateKey) privateKey.get(0).getKey())
+                .keyID("kid")
+                .build();
+
+        JsonObjectBuilder rsa = rsaKey.toJSONObject();
+
+        JsonObject unknown = Json.createObjectBuilder()
+                .add(JWKIdentifiers.KEY_TYPE, "UNKNOWN")
+                .build();
+
+        JsonArray keys = Json.createArrayBuilder()
+                .add(rsa.build())
+                .add(unknown)
+                .build();
+
+        JsonObject input = Json.createObjectBuilder()
+                .add(JWKIdentifiers.KEYS, keys)
+                .build();
+
+        JWKSet jwkSet = JWKSet.parse(input);
+        Assertions.assertThat(jwkSet.getKeys()).hasSize(1);
     }
 }

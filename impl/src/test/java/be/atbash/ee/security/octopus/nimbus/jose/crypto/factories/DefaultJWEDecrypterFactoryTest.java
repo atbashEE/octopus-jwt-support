@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ public class DefaultJWEDecrypterFactoryTest {
 
     private static final String KID = "kidValue";
 
-    private DefaultJWEDecrypterFactory factory = new DefaultJWEDecrypterFactory();
+    private final DefaultJWEDecrypterFactory factory = new DefaultJWEDecrypterFactory();
 
     @Test
     public void testInterfaces() {
@@ -60,7 +60,7 @@ public class DefaultJWEDecrypterFactoryTest {
         assertThat(factory.supportedJWEAlgorithms()).containsAll(JWEAlgorithm.Family.AES_KW);
         assertThat(factory.supportedJWEAlgorithms()).contains(JWEAlgorithm.DIR);
 
-        assertThat(factory.supportedJWEAlgorithms()).hasSize(12);
+        assertThat(factory.supportedJWEAlgorithms()).hasSize(14);
     }
 
 
@@ -102,7 +102,7 @@ public class DefaultJWEDecrypterFactoryTest {
                 JWEHeader header = new JWEHeader.Builder(supportedAlgorithm, supportedEncryptionMethod).build();
                 KeyTypeException exception = Assertions.assertThrows(KeyTypeException.class, () -> factory.createJWEDecrypter(header, privateKeys.get(0).getKey()));
 
-                assertThat(exception.getMessage()).isEqualTo("Invalid key: Must be an instance of interface java.security.interfaces.RSAPrivateKey");
+                assertThat(exception.getMessage()).isEqualTo("Invalid key: Must be an instance of interface java.security.PrivateKey and implement all of the following interfaces [interface java.security.interfaces.RSAKey]");
             }
         }
     }
@@ -119,7 +119,7 @@ public class DefaultJWEDecrypterFactoryTest {
                 JWEHeader header = new JWEHeader.Builder(supportedAlgorithm, supportedEncryptionMethod).build();
                 KeyTypeException exception = Assertions.assertThrows(KeyTypeException.class, () -> factory.createJWEDecrypter(header, privateKeys.get(0).getKey()));
 
-                assertThat(exception.getMessage()).isEqualTo("Invalid key: Must be an instance of interface java.security.interfaces.RSAPrivateKey");
+                assertThat(exception.getMessage()).isEqualTo("Invalid key: Must be an instance of interface java.security.PrivateKey and implement all of the following interfaces [interface java.security.interfaces.RSAKey]");
             }
         }
     }
@@ -152,7 +152,7 @@ public class DefaultJWEDecrypterFactoryTest {
                 JWEHeader header = new JWEHeader.Builder(supportedAlgorithm, supportedEncryptionMethod).build();
                 KeyTypeException exception = Assertions.assertThrows(KeyTypeException.class, () -> factory.createJWEDecrypter(header, privateKeys.get(0).getKey()));
 
-                assertThat(exception.getMessage()).isEqualTo("Invalid key: Must be an instance of interface java.security.interfaces.ECPrivateKey");
+                assertThat(exception.getMessage()).isEqualTo("Invalid key: Must be an instance of interface java.security.PrivateKey and implement all of the following interfaces [interface java.security.interfaces.ECKey]");
             }
         }
     }
@@ -168,7 +168,7 @@ public class DefaultJWEDecrypterFactoryTest {
                 JWEHeader header = new JWEHeader.Builder(supportedAlgorithm, supportedEncryptionMethod).build();
                 KeyTypeException exception = Assertions.assertThrows(KeyTypeException.class, () -> factory.createJWEDecrypter(header, privateKeys.get(0).getKey()));
 
-                assertThat(exception.getMessage()).isEqualTo("Invalid key: Must be an instance of interface java.security.interfaces.ECPrivateKey");
+                assertThat(exception.getMessage()).isEqualTo("Invalid key: Must be an instance of interface java.security.PrivateKey and implement all of the following interfaces [interface java.security.interfaces.ECKey]");
             }
         }
     }

@@ -17,6 +17,7 @@ package be.atbash.ee.security.octopus.nimbus;
 
 import be.atbash.ee.security.octopus.nimbus.jose.Algorithm;
 import be.atbash.ee.security.octopus.nimbus.jose.CompressionAlgorithm;
+import be.atbash.ee.security.octopus.nimbus.jose.HeaderParameterNames;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEObjectType;
 import be.atbash.ee.security.octopus.nimbus.jwk.JWK;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod;
@@ -48,10 +49,10 @@ public class HeaderParameterType {
 
     static {
         List<HeaderParameterType> temp = new ArrayList<>();
-        temp.add(new HeaderParameterType("alg", Algorithm.class));
-        temp.add(new HeaderParameterType("typ", JOSEObjectType.class));
-        temp.add(new HeaderParameterType("cty", String.class));
-        temp.add(new HeaderParameterType("crit", Set.class));
+        temp.add(new HeaderParameterType(HeaderParameterNames.ALGORITHM, Algorithm.class));
+        temp.add(new HeaderParameterType(HeaderParameterNames.TYPE, JOSEObjectType.class));
+        temp.add(new HeaderParameterType(HeaderParameterNames.CONTENT_TYPE, String.class));
+        temp.add(new HeaderParameterType(HeaderParameterNames.CRITICAL, Set.class));
 
         HEADER_REGISTERED_PARAMETER_NAME = temp
                 .stream()
@@ -62,12 +63,12 @@ public class HeaderParameterType {
 
         temp.clear();
 
-        temp.add(new HeaderParameterType("jku", URI.class));
-        temp.add(new HeaderParameterType("jwk", JWK.class));
-        temp.add(new HeaderParameterType("x5u", URI.class));
+        temp.add(new HeaderParameterType(HeaderParameterNames.JWK_SET_URL, URI.class));
+        temp.add(new HeaderParameterType(HeaderParameterNames.JSON_WEB_KEY, JWK.class));
+        temp.add(new HeaderParameterType(HeaderParameterNames.X_509_URL, URI.class));
         temp.add(new HeaderParameterType("x5t256", Base64URLValue.class));
-        temp.add(new HeaderParameterType("x5c", List.class));
-        temp.add(new HeaderParameterType("kid", String.class));
+        temp.add(new HeaderParameterType(HeaderParameterNames.X_509_CERT_CHAIN, List.class));
+        temp.add(new HeaderParameterType(HeaderParameterNames.KEY_ID, String.class));
 
         COMMON_JWT_HEADER_REGISTERED_PARAMETER_NAME = temp
                 .stream()
@@ -78,15 +79,15 @@ public class HeaderParameterType {
 
         temp.clear();
 
-        temp.add(new HeaderParameterType("enc", EncryptionMethod.class));
-        temp.add(new HeaderParameterType("epk", JWK.class));
-        temp.add(new HeaderParameterType("zip", CompressionAlgorithm.class));
-        temp.add(new HeaderParameterType("apu", Base64URLValue.class));
-        temp.add(new HeaderParameterType("apv", Base64URLValue.class));
-        temp.add(new HeaderParameterType("p2s", Base64URLValue.class));
-        temp.add(new HeaderParameterType("p2c", Integer.class));
-        temp.add(new HeaderParameterType("iv", Base64URLValue.class));
-        temp.add(new HeaderParameterType("tag", Base64URLValue.class));
+        temp.add(new HeaderParameterType(HeaderParameterNames.ENCRYPTION_ALGORITHM, EncryptionMethod.class));
+        temp.add(new HeaderParameterType(HeaderParameterNames.EPHEMERAL_PUBLIC_KEY, JWK.class));
+        temp.add(new HeaderParameterType(HeaderParameterNames.COMPRESSION_ALGORITHM, CompressionAlgorithm.class));
+        temp.add(new HeaderParameterType(HeaderParameterNames.AGREEMENT_PARTY_U_INFO, Base64URLValue.class));
+        temp.add(new HeaderParameterType(HeaderParameterNames.AGREEMENT_PARTY_V_INFO, Base64URLValue.class));
+        temp.add(new HeaderParameterType(HeaderParameterNames.PBES2_SALT_INPUT, Base64URLValue.class));
+        temp.add(new HeaderParameterType(HeaderParameterNames.PBES2_COUNT, Integer.class));
+        temp.add(new HeaderParameterType(HeaderParameterNames.INITIALIZATION_VECTOR, Base64URLValue.class));
+        temp.add(new HeaderParameterType(HeaderParameterNames.AUTHENTICATION_TAG, Base64URLValue.class));
 
         JWE_HEADER_REGISTERED_PARAMETER_NAME = temp
                 .stream()

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package be.atbash.ee.security.octopus.nimbus.jwt;
 import be.atbash.ee.security.octopus.nimbus.HeaderParameterType;
 import be.atbash.ee.security.octopus.nimbus.jose.Algorithm;
 import be.atbash.ee.security.octopus.nimbus.jose.Header;
+import be.atbash.ee.security.octopus.nimbus.jose.HeaderParameterNames;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEObjectType;
 import be.atbash.ee.security.octopus.nimbus.jwk.JWK;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
@@ -145,12 +146,12 @@ abstract public class CommonJWTHeader extends Header {
 
         super(alg, typ, cty, crit, HeaderParameterType.filterOutRegisteredNames(parameters, REGISTERED_PARAMETER_NAMES), parsedBase64URL);
 
-        this.jku = HeaderParameterType.getParameterValue("jku", jku, parameters);
-        this.jwk = HeaderParameterType.getParameterValue("jwk", jwk, parameters);
-        this.x5u = HeaderParameterType.getParameterValue("x5u", x5u, parameters);
+        this.jku = HeaderParameterType.getParameterValue(HeaderParameterNames.JWK_SET_URL, jku, parameters);
+        this.jwk = HeaderParameterType.getParameterValue(HeaderParameterNames.JSON_WEB_KEY, jwk, parameters);
+        this.x5u = HeaderParameterType.getParameterValue(HeaderParameterNames.X_509_URL, x5u, parameters);
         this.x5t256 = HeaderParameterType.getParameterValue("x5t256", x5t256, parameters);
 
-        List<Base64Value> temp = HeaderParameterType.getParameterValue("x5c", x5c, parameters);
+        List<Base64Value> temp = HeaderParameterType.getParameterValue(HeaderParameterNames.X_509_CERT_CHAIN, x5c, parameters);
         if (temp != null) {
             // Copy and make unmodifiable
             this.x5c = Collections.unmodifiableList(new ArrayList<>(temp));
@@ -158,7 +159,7 @@ abstract public class CommonJWTHeader extends Header {
             this.x5c = null;
         }
 
-        this.kid = HeaderParameterType.getParameterValue("kid", kid, parameters);
+        this.kid = HeaderParameterType.getParameterValue(HeaderParameterNames.KEY_ID, kid, parameters);
     }
 
 
@@ -241,27 +242,27 @@ abstract public class CommonJWTHeader extends Header {
         Set<String> includedParameters = super.getIncludedParameters();
 
         if (jku != null) {
-            includedParameters.add("jku");
+            includedParameters.add(HeaderParameterNames.JWK_SET_URL);
         }
 
         if (jwk != null) {
-            includedParameters.add("jwk");
+            includedParameters.add(HeaderParameterNames.JSON_WEB_KEY);
         }
 
         if (x5u != null) {
-            includedParameters.add("x5u");
+            includedParameters.add(HeaderParameterNames.X_509_URL);
         }
 
         if (x5t256 != null) {
-            includedParameters.add("x5t#S256");
+            includedParameters.add(HeaderParameterNames.X_509_CERT_SHA_256_THUMBPRINT);
         }
 
         if (x5c != null && !x5c.isEmpty()) {
-            includedParameters.add("x5c");
+            includedParameters.add(HeaderParameterNames.X_509_CERT_CHAIN);
         }
 
         if (kid != null) {
-            includedParameters.add("kid");
+            includedParameters.add(HeaderParameterNames.KEY_ID);
         }
 
         return includedParameters;
@@ -274,19 +275,19 @@ abstract public class CommonJWTHeader extends Header {
         JsonObjectBuilder result = super.toJSONObject();
 
         if (jku != null) {
-            result.add("jku", jku.toString());
+            result.add(HeaderParameterNames.JWK_SET_URL, jku.toString());
         }
 
         if (jwk != null) {
-            result.add("jwk", jwk.toJSONObject());
+            result.add(HeaderParameterNames.JSON_WEB_KEY, jwk.toJSONObject());
         }
 
         if (x5u != null) {
-            result.add("x5u", x5u.toString());
+            result.add(HeaderParameterNames.X_509_URL, x5u.toString());
         }
 
         if (x5t256 != null) {
-            result.add("x5t#S256", x5t256.toString());
+            result.add(HeaderParameterNames.X_509_CERT_SHA_256_THUMBPRINT, x5t256.toString());
         }
 
         if (x5c != null && !x5c.isEmpty()) {
@@ -294,11 +295,11 @@ abstract public class CommonJWTHeader extends Header {
             for (Base64Value base64Value : x5c) {
                 x5cArray.add(base64Value.toString());
             }
-            result.add("x5c", x5cArray);
+            result.add(HeaderParameterNames.X_509_CERT_CHAIN, x5cArray);
         }
 
         if (kid != null) {
-            result.add("kid", kid);
+            result.add(HeaderParameterNames.KEY_ID, kid);
         }
 
         return result;

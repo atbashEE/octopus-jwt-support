@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import be.atbash.ee.security.octopus.config.JCASupportConfiguration;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.nimbus.jose.KeyTypeException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.bc.BouncyCastleProviderSingleton;
+import be.atbash.ee.security.octopus.nimbus.jwk.JWKIdentifiers;
 import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import be.atbash.util.PublicAPI;
 import be.atbash.util.exception.AtbashUnexpectedException;
@@ -70,7 +71,7 @@ public class KeyGenerator {
     private List<AtbashKey> generateRSAKeys(RSAGenerationParameters generationParameters) {
         try {
 
-            KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA", BouncyCastleProviderSingleton.getInstance());
+            KeyPairGenerator generator = KeyPairGenerator.getInstance(JWKIdentifiers.RSA_KEY_TYPE, BouncyCastleProviderSingleton.getInstance());
 
             generator.initialize(generationParameters.getKeySize(), JCASupportConfiguration.getInstance().getSecureRandom());
             KeyPair kp = generator.generateKeyPair();
@@ -114,7 +115,7 @@ public class KeyGenerator {
         try {
             ECParameterSpec ecSpec = ECNamedCurveTable.getParameterSpec(generationParameters.getCurveName());
 
-            KeyPairGenerator generator = KeyPairGenerator.getInstance("EC", BouncyCastleProviderSingleton.getInstance());
+            KeyPairGenerator generator = KeyPairGenerator.getInstance(JWKIdentifiers.ELLIPTIC_CURVE_KEY_TYPE, BouncyCastleProviderSingleton.getInstance());
 
             generator.initialize(ecSpec, JCASupportConfiguration.getInstance().getSecureRandom());
             KeyPair kp = generator.generateKeyPair();

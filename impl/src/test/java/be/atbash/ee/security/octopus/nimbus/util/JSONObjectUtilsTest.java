@@ -17,11 +17,15 @@ package be.atbash.ee.security.octopus.nimbus.util;
 
 
 import be.atbash.ee.security.octopus.jwt.JWTEncoding;
+import be.atbash.ee.security.octopus.nimbus.jose.HeaderParameterNames;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.data.Offset;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import javax.json.*;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.net.URI;
 import java.text.ParseException;
 import java.util.*;
@@ -370,6 +374,114 @@ class JSONObjectUtilsTest {
                 .build();
         List<String> list = JSONObjectUtils.getAsList(array);
         Assertions.assertThat(list).containsOnly("abc", "def");
+    }
+
+    @Test
+    public void testGetBase64URL() {
+
+        JsonObject object = Json.createObjectBuilder().add(HeaderParameterNames.X_509_CERT_SHA_1_THUMBPRINT, "abc").build();
+
+        Base64URLValue base64URL = JSONObjectUtils.getBase64URL(object, "x5t");
+        Assertions.assertThat(base64URL).isNotNull();
+        Assertions.assertThat(base64URL.toString()).isEqualTo("abc");
+
+    }
+
+
+    @Test
+    public void testGetBase64URL_null() {
+
+        JsonObject object = Json.createObjectBuilder().add(HeaderParameterNames.X_509_CERT_SHA_1_THUMBPRINT, JsonValue.NULL).build();
+        Base64URLValue base64URL = JSONObjectUtils.getBase64URL(object, "x5t");
+        Assertions.assertThat(base64URL).isNull();
+
+    }
+
+    @Test
+    public void testGetBase64URL_missing() {
+
+        JsonObject object = Json.createObjectBuilder().build();
+        Base64URLValue base64URL = JSONObjectUtils.getBase64URL(object, "x5t");
+        Assertions.assertThat(base64URL).isNull();
+    }
+
+    @Test
+    public void testParse_catchNumberFormatException() {
+
+        String json = "{\"key\":2e+}";
+        Assertions.assertThatThrownBy(
+                        () -> JSONObjectUtils.parse(json)
+                ).isInstanceOf(ParseException.class)
+                .hasMessage("Invalid JSON: Internal error: Unexpected char 125 at (line no=1, column no=11, offset=10)");
+    }
+
+    @Test
+    public void testParse_withSizeLimit() {
+
+        int sizeLimit = 100;
+
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < 101; i++) {
+            builder.append("a");
+        }
+        String value = builder.toString();
+        Assertions.assertThat(value).hasSizeGreaterThan(100);
+
+        Assertions.assertThatThrownBy(
+                        () -> JSONObjectUtils.parse(value, sizeLimit)
+                ).isInstanceOf(ParseException.class)
+                .hasMessage("The parsed string is longer than the max accepted size of 100 characters");
+
+    }
+
+    @Test
+    public void testParse_withNoSizeLimit() throws ParseException {
+
+        Map<String, Object> map = new HashMap<>();
+
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < 101; i++) {
+            builder.append("a");
+        }
+        String value = builder.toString();
+        Assertions.assertThat(value).hasSizeGreaterThan(100);
+
+        map.put("key", value);
+
+        String json = createJsonString(map);
+
+
+        JsonObject out = JSONObjectUtils.parse(json, -1);
+        Assertions.assertThat(out.keySet()).containsOnly("key");
+        Assertions.assertThat(out.getString("key")).isEqualTo(value);
+
+        out = JSONObjectUtils.parse(json);
+        Assertions.assertThat(out.keySet()).containsOnly("key");
+        Assertions.assertThat(out.getString("key")).isEqualTo(value);
+    }
+
+    private static String createJsonString(Map<String, Object> map) {
+        Writer stringWriter = new StringWriter();
+        JsonWriter jsonWriter = Json.createWriter(stringWriter);
+        jsonWriter.writeObject(JSONObjectUtils.mapToJsonObject(map));
+
+        return stringWriter.toString();
+    }
+
+    @Test
+    @Disabled // Works as expected from IDE but on commandline no stackoverflow after 8000
+    public void testParse_catchStackOverflowError() {
+
+        StringBuilder sb = new StringBuilder("{\"a\":");
+        for (int i = 0; i < 8000; i++) {
+            sb.append("[");
+        }
+
+        Assertions.assertThatThrownBy(
+                        () -> JSONObjectUtils.parse(sb.toString())
+                ).isInstanceOf(ParseException.class)
+                .hasMessage("Excessive JSON object and / or array nesting");
+
     }
 
     private static class Pojo {

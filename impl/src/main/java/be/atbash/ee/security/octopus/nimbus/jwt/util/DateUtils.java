@@ -19,7 +19,6 @@ package be.atbash.ee.security.octopus.nimbus.jwt.util;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.Date;
 
 
@@ -148,6 +147,28 @@ public class DateUtils {
         return new Date(date.getTime() - maxClockSkewSeconds * 1000L).before(reference);
     }
 
+    /**
+     * Checks if the specified date is within the specified reference,
+     * give or take the maximum accepted clock skew.
+     *
+     * @param date                The date to check. Must not be
+     *                            {@code null}.
+     * @param reference           The reference date (e.g. the current
+     *                            time). Must not be {@code null}.
+     * @param maxClockSkewSeconds The maximum acceptable clock skew of the
+     *                            date value to check, in seconds.
+     * @return {@code true} if the date is within the reference, give or
+     * take the maximum accepted clock skew, else {@code false}.
+     */
+    public static boolean isWithin(Date date,
+                                   Date reference,
+                                   long maxClockSkewSeconds) {
+
+        long minTime = reference.getTime() - maxClockSkewSeconds * 1000L;
+        long maxTime = reference.getTime() + maxClockSkewSeconds * 1000L;
+
+        return date.getTime() > minTime && date.getTime() < maxTime;
+    }
 
     /**
      * Prevents instantiation.

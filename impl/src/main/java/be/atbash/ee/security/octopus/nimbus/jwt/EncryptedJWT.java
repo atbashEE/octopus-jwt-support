@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@ import be.atbash.ee.security.octopus.nimbus.jose.Payload;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEHeader;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEObject;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
+import be.atbash.ee.security.octopus.nimbus.util.JSONObjectUtils;
+import be.atbash.ee.security.octopus.util.JsonbUtil;
 
 import javax.json.JsonObject;
 import java.text.ParseException;
@@ -28,7 +30,7 @@ import java.text.ParseException;
 
 /**
  * Encrypted JSON Web Token (JWT). This class is thread-safe.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
 public class EncryptedJWT extends JWEObject implements JWT {
@@ -36,6 +38,8 @@ public class EncryptedJWT extends JWEObject implements JWT {
 
     private static final long serialVersionUID = 1L;
 
+    // Cached JWTClaimsSet
+    private JWTClaimsSet claimsSet;
 
     /**
      * Creates a new to-be-encrypted JSON Web Token (JWT) with the specified
@@ -48,6 +52,7 @@ public class EncryptedJWT extends JWEObject implements JWT {
     public EncryptedJWT(JWEHeader header, JWTClaimsSet claimsSet) {
 
         super(header, new Payload(claimsSet.toJSONObject()));
+        this.claimsSet = claimsSet;
     }
 
 
@@ -83,6 +88,10 @@ public class EncryptedJWT extends JWEObject implements JWT {
     public JWTClaimsSet getJWTClaimsSet()
             throws ParseException {
 
+        if (claimsSet != null) {
+            return claimsSet;
+        }
+
         Payload payload = getPayload();
 
         if (payload == null) {
@@ -95,9 +104,18 @@ public class EncryptedJWT extends JWEObject implements JWT {
             throw new ParseException("Payload of JWE object is not a valid JSON object", 0);
         }
 
-        return JWTClaimsSet.parse(json);
+        claimsSet = JWTClaimsSet.parse(json);
+        return claimsSet;
     }
 
+    @Override
+    protected void setPayload(Payload payload) {
+
+        // setPayload() changes the result of getJWTClaimsSet().
+        // set claimsSet = null and reparse payload again when called getJWTClaimsSet().
+        claimsSet = null;
+        super.setPayload(payload);
+    }
 
     /**
      * Parses an encrypted JSON Web Token (JWT) from the specified string in
@@ -118,5 +136,30 @@ public class EncryptedJWT extends JWEObject implements JWT {
         }
 
         return new EncryptedJWT(parts[0], parts[1], parts[2], parts[3], parts[4]);
+    }
+
+    /**
+     * Parses an encrypted JSON Web Token (JWT) from the specified Json Format
+     *
+     * @param value The JsonObject to parse. Must not be {@code null}.
+     * @return The encrypted JWT.
+     * @throws ParseException If the JsonObject couldn't be parsed to a valid
+     *                        encrypted JWT.
+     */
+    public static EncryptedJWT parse(JsonObject value)
+            throws ParseException {
+
+        Base64URLValue header = JSONObjectUtils.getBase64URL(value, "protected");
+        if (header == null) {
+            header = Base64URLValue.encode(JsonbUtil.getJsonb().toJson(value.getJsonObject("header")));
+        }
+
+        Base64URLValue encryptedKey = JSONObjectUtils.getBase64URL(value, "encrypted_key");
+        Base64URLValue iv = JSONObjectUtils.getBase64URL(value, "iv");
+        Base64URLValue cipherText = JSONObjectUtils.getBase64URL(value, "ciphertext");
+        Base64URLValue tag = JSONObjectUtils.getBase64URL(value, "tag");
+
+
+        return new EncryptedJWT(header, encryptedKey, iv, cipherText, tag);
     }
 }

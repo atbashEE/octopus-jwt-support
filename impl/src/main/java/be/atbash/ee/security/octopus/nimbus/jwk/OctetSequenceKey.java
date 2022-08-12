@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -298,8 +298,8 @@ public final class OctetSequenceKey extends JWK implements SecretJWK {
 
             // Put mandatory params in sorted order
             LinkedHashMap<String, String> requiredParams = new LinkedHashMap<>();
-            requiredParams.put("k", k.toString());
-            requiredParams.put("kty", KeyType.OCT.getValue());
+            requiredParams.put(JWKIdentifiers.OCT_KEY_VALUE, k.toString());
+            requiredParams.put(JWKIdentifiers.KEY_TYPE, KeyType.OCT.getValue());
             kid = ThumbprintUtils.compute(hashAlg, requiredParams).toString();
             return this;
         }
@@ -458,8 +458,8 @@ public final class OctetSequenceKey extends JWK implements SecretJWK {
 
         // Put mandatory params in sorted order
         LinkedHashMap<String, String> requiredParams = new LinkedHashMap<>();
-        requiredParams.put("k", k.toString());
-        requiredParams.put("kty", getKeyType().toString());
+        requiredParams.put(JWKIdentifiers.OCT_KEY_VALUE, k.toString());
+        requiredParams.put(JWKIdentifiers.KEY_TYPE, getKeyType().toString());
         return requiredParams;
     }
 
@@ -507,7 +507,7 @@ public final class OctetSequenceKey extends JWK implements SecretJWK {
         JsonObjectBuilder result = super.toJSONObject();
 
         // Append key value
-        result.add("k", k.toString());
+        result.add(JWKIdentifiers.OCT_KEY_VALUE, k.toString());
 
         return result;
     }
@@ -542,15 +542,19 @@ public final class OctetSequenceKey extends JWK implements SecretJWK {
     public static OctetSequenceKey parse(JsonObject jsonObject)
             throws ParseException {
 
-        // Parse the mandatory parameters first
-        Base64URLValue k = new Base64URLValue(jsonObject.getString("k"));
-
         // Check key type
         KeyType kty = JWKMetadata.parseKeyType(jsonObject);
 
         if (kty != KeyType.OCT) {
 
             throw new ParseException("The key type \"kty\" must be oct", 0);
+        }
+
+        // Parse the mandatory parameters first
+        Base64URLValue k = JSONObjectUtils.getBase64URL(jsonObject, JWKIdentifiers.OCT_KEY_VALUE);
+
+        if (k == null) {
+            throw new ParseException("The key value must not be null", 0);
         }
 
         return new OctetSequenceKey(k,

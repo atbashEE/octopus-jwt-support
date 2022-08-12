@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,10 @@
 package be.atbash.ee.security.octopus.keys.json;
 
 import be.atbash.ee.security.octopus.keys.AtbashKey;
+import be.atbash.ee.security.octopus.nimbus.jose.HeaderParameterNames;
 import be.atbash.ee.security.octopus.nimbus.jose.KeyTypeException;
 import be.atbash.ee.security.octopus.nimbus.jwk.*;
+import be.atbash.ee.security.octopus.nimbus.util.JSONObjectUtils;
 import be.atbash.util.exception.AtbashUnexpectedException;
 
 import javax.json.JsonObject;
@@ -34,9 +36,10 @@ public class AtbashKeyReader implements JsonbDeserializer<AtbashKey> {
         JsonObject jsonObject = jsonParser.getObject();
 
         AtbashKey.AtbashKeyBuilder builder = new AtbashKey.AtbashKeyBuilder();
-        builder.withKeyId(jsonObject.getString("kid"));
+        builder.withKeyId(JSONObjectUtils.getString(jsonObject, HeaderParameterNames.KEY_ID));
 
-        String key = new String(Base64.getDecoder().decode(jsonObject.getString("key")));
+        String keyValue = JSONObjectUtils.getString(jsonObject, "key");
+        String key = new String(Base64.getDecoder().decode(keyValue));
 
         try {
             boolean handled = false;

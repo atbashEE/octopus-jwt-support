@@ -147,6 +147,13 @@ public class ECDSAVerifier extends ECDSAProvider implements JWSVerifier {
 
         byte[] jwsSignature = signature.decode();
 
+        // Prevent CVE-2022-21449 and similar attacks
+        try {
+            ECDSA.ensureLegalSignature(jwsSignature, alg);
+        } catch (JOSEException e) {
+            return false;
+        }
+
         byte[] derSignature;
 
         try {

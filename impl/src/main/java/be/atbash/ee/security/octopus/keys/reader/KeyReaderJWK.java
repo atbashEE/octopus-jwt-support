@@ -20,6 +20,7 @@ import be.atbash.ee.security.octopus.exception.ResourceNotFoundException;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLookup;
 import be.atbash.ee.security.octopus.nimbus.jwk.*;
+import be.atbash.ee.security.octopus.nimbus.util.JSONObjectUtils;
 import be.atbash.ee.security.octopus.util.EncryptionHelper;
 import be.atbash.ee.security.octopus.util.JsonbUtil;
 import be.atbash.util.exception.AtbashUnexpectedException;
@@ -115,7 +116,7 @@ public class KeyReaderJWK {
         }
 
         JWK jwk;
-        if (jwkJsonObject.get("enc") == null) {
+        if (jwkJsonObject.get(JWKIdentifiers.ENCRYPTION_ALGORITHM) == null) {
             // not encrypted
             jwk = JWK.parse(json);
 
@@ -123,8 +124,10 @@ public class KeyReaderJWK {
             if (passwordLookup == null) {
                 throw new MissingPasswordLookupException();
             }
-            char[] password = passwordLookup.getKeyPassword(path, jwkJsonObject.getString("kid"));
-            String decoded = EncryptionHelper.decode(jwkJsonObject.getString("enc"), password);
+            String kid = JSONObjectUtils.getString(jwkJsonObject, JWKIdentifiers.KEY_ID);
+            String enc = JSONObjectUtils.getString(jwkJsonObject, "enc");
+            char[] password = passwordLookup.getKeyPassword(path, kid);
+            String decoded = EncryptionHelper.decode(enc, password);
 
             JsonObject decodedJSON = jsonb.fromJson(decoded, JsonObject.class);
 

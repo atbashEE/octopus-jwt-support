@@ -80,7 +80,7 @@ import java.text.ParseException;
  * not-before (nbf) timestamps if these are present. The default JWT claims
  * verifier may be extended to perform additional checks, such as issuer and
  * subject acceptance.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
 public class DefaultJWTProcessor implements JWTProcessor {
@@ -223,6 +223,12 @@ public class DefaultJWTProcessor implements JWTProcessor {
             // These messages are in function of JWT validation by Atbash Runtime so have slightly narrow meaning of the provided parameters.
             MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, String.format("The provided token did not specify the correct 'JWT' typ in the header (header = %s)", signedJWT.getHeader().toString()));
             throw new BadJOSEException("JOSE header \"typ\" (type) \"" + objectType.getType() + "\" not allowed");
+        }
+
+        if (!signedJWT.getHeader().isBase64URLEncodePayload()) {
+            // These messages are in function of JWT validation by Atbash Runtime so have slightly narrow meaning of the provided parameters.
+            MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, "The provided token has an unencoded payload");
+            throw new BadJOSEException("Unencoded payload not allowed");
         }
 
         if (jwsKeySelector == null) {

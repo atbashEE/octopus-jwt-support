@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package be.atbash.ee.security.octopus.nimbus.jwt.jws;
 
 
+import be.atbash.ee.security.octopus.nimbus.jose.HeaderParameterNames;
 import be.atbash.ee.security.octopus.nimbus.jose.Payload;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.MACSigner;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.MACVerifier;
@@ -80,9 +81,9 @@ public class UnencodedJWSPayloadTest {
         Base64URLValue headerB64 = new Base64URLValue("eyJhbGciOiJIUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19");
         JWSHeader header = JWSHeader.parse(headerB64);
         assertThat(header.getAlgorithm()).isEqualTo(JWSAlgorithm.HS256);
-        assertThat((Boolean) header.getCustomParameter("b64")).isFalse();
+        assertThat(header.isBase64URLEncodePayload()).isFalse();
         Set<String> crit = header.getCriticalParams();
-        assertThat(crit.contains("b64")).isTrue();
+        assertThat(crit.contains(HeaderParameterNames.BASE64_URL_ENCODE_PAYLOAD)).isTrue();
         assertThat(crit).hasSize(1);
         assertThat(header.toJSONObject().build()).hasSize(3);
 
@@ -103,14 +104,14 @@ public class UnencodedJWSPayloadTest {
     }
 
     @Test
-    public void testNonBase64EncodedClaimsSet()
+    public void testNonBase64EncodedClaimsSet_deprecated()
             throws Exception {
         //Given
 
         //Create JWT
 
         JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.HS256)
-                .parameter("b64", false)
+                .parameter(HeaderParameterNames.BASE64_URL_ENCODE_PAYLOAD, false)  // Old usage
                 .build();
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                 .claim("foo", "bar")
@@ -124,7 +125,41 @@ public class UnencodedJWSPayloadTest {
         signedJWT = SignedJWT.parse(serializedJWT);
 
         //Then
-        assertThat((Boolean) header.getCustomParameter("b64")).isFalse();
+        assertThat((Boolean) header.isBase64URLEncodePayload()).isFalse();
+
+        JWSVerifier verifier = new MACVerifier(JWK, new HashSet<>(Collections.singletonList("b64")));
+        byte[] payloadBytes = claimsSet.toString().getBytes(StandardCharsets.UTF_8);
+        byte[] headerBytes = (header.toBase64URL().toString() + '.').getBytes(StandardCharsets.UTF_8);
+        byte[] signingInput = new byte[headerBytes.length + payloadBytes.length];
+        System.arraycopy(headerBytes, 0, signingInput, 0, headerBytes.length);
+        System.arraycopy(payloadBytes, 0, signingInput, headerBytes.length, payloadBytes.length);
+
+        assertThat(verifier.verify(header, signingInput, signedJWT.getSignature())).isTrue();
+    }
+
+    @Test
+    public void testNonBase64EncodedClaimsSet()
+            throws Exception {
+        //Given
+
+        //Create JWT
+
+        JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.HS256)
+                .base64URLEncodePayload(false)
+                .build();
+        JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
+                .claim("foo", "bar")
+                .build();
+
+        //When sign JWT
+        SignedJWT signedJWT = new SignedJWT(header, claimsSet);
+        JWSSigner signer = new MACSigner(JWK);
+        signedJWT.sign(signer);
+        String serializedJWT = signedJWT.serialize(true);
+        signedJWT = SignedJWT.parse(serializedJWT);
+
+        //Then
+        assertThat((Boolean) header.isBase64URLEncodePayload()).isFalse();
 
         JWSVerifier verifier = new MACVerifier(JWK, new HashSet<>(Collections.singletonList("b64")));
         byte[] payloadBytes = claimsSet.toString().getBytes(StandardCharsets.UTF_8);

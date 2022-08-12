@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,30 +15,32 @@
  */
 package be.atbash.ee.security.octopus.nimbus.jwt.jwe;
 
-import be.atbash.ee.security.octopus.nimbus.jose.CompressionAlgorithm;
-import be.atbash.ee.security.octopus.nimbus.jose.Header;
-import be.atbash.ee.security.octopus.nimbus.jose.JOSEObjectType;
+import be.atbash.ee.security.octopus.keys.AtbashKey;
+import be.atbash.ee.security.octopus.keys.Filters;
+import be.atbash.ee.security.octopus.keys.TestKeys;
+import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
+import be.atbash.ee.security.octopus.keys.selector.filter.AsymmetricPartKeyFilter;
+import be.atbash.ee.security.octopus.nimbus.jose.*;
+import be.atbash.ee.security.octopus.nimbus.jwk.JWKIdentifiers;
 import be.atbash.ee.security.octopus.nimbus.jwk.KeyUse;
-import be.atbash.ee.security.octopus.nimbus.jwk.OctetSequenceKey;
 import be.atbash.ee.security.octopus.nimbus.jwk.RSAKey;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.ee.security.octopus.nimbus.util.Base64Value;
-import org.junit.jupiter.api.Assertions;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 import java.net.URI;
+import java.security.interfaces.RSAPrivateKey;
 import java.text.ParseException;
 import java.util.*;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 
 /**
  * Tests JWE header parsing and serialisation.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
 public class JWEHeaderTest {
@@ -49,25 +51,25 @@ public class JWEHeaderTest {
 
         JWEHeader header = new JWEHeader(JWEAlgorithm.A128KW, EncryptionMethod.A128GCM);
 
-        assertThat(header.getAlgorithm()).isEqualTo(JWEAlgorithm.A128KW);
-        assertThat(header.getEncryptionMethod()).isEqualTo(EncryptionMethod.A128GCM);
-        assertThat(header.getJWKURL()).isNull();
-        assertThat(header.getJWK()).isNull();
-        assertThat(header.getX509CertURL()).isNull();
-        assertThat(header.getX509CertSHA256Thumbprint()).isNull();
-        assertThat(header.getX509CertChain()).isNull();
-        assertThat(header.getType()).isNull();
-        assertThat(header.getContentType()).isNull();
-        assertThat(header.getCriticalParams()).isNull();
-        assertThat(header.getEphemeralPublicKey()).isNull();
-        assertThat(header.getCompressionAlgorithm()).isNull();
-        assertThat(header.getAgreementPartyUInfo()).isNull();
-        assertThat(header.getAgreementPartyVInfo()).isNull();
-        assertThat(header.getPBES2Salt()).isNull();
-        assertThat(header.getIV()).isNull();
-        assertThat(header.getAuthTag()).isNull();
-        assertThat(header.getPBES2Count()).isEqualTo(0);
-        assertThat(header.getCustomParameters()).isEmpty();
+        Assertions.assertThat(header.getAlgorithm()).isEqualTo(JWEAlgorithm.A128KW);
+        Assertions.assertThat(header.getEncryptionMethod()).isEqualTo(EncryptionMethod.A128GCM);
+        Assertions.assertThat(header.getJWKURL()).isNull();
+        Assertions.assertThat(header.getJWK()).isNull();
+        Assertions.assertThat(header.getX509CertURL()).isNull();
+        Assertions.assertThat(header.getX509CertSHA256Thumbprint()).isNull();
+        Assertions.assertThat(header.getX509CertChain()).isNull();
+        Assertions.assertThat(header.getType()).isNull();
+        Assertions.assertThat(header.getContentType()).isNull();
+        Assertions.assertThat(header.getCriticalParams()).isNull();
+        Assertions.assertThat(header.getEphemeralPublicKey()).isNull();
+        Assertions.assertThat(header.getCompressionAlgorithm()).isNull();
+        Assertions.assertThat(header.getAgreementPartyUInfo()).isNull();
+        Assertions.assertThat(header.getAgreementPartyVInfo()).isNull();
+        Assertions.assertThat(header.getPBES2Salt()).isNull();
+        Assertions.assertThat(header.getIV()).isNull();
+        Assertions.assertThat(header.getAuthTag()).isNull();
+        Assertions.assertThat(header.getPBES2Count()).isEqualTo(0);
+        Assertions.assertThat(header.getCustomParameters()).isEmpty();
     }
 
     @Test
@@ -110,102 +112,102 @@ public class JWEHeaderTest {
         // Parse back
         header = JWEHeader.parse(base64URL);
 
-        assertThat(header.getAlgorithm()).isEqualTo(JWEAlgorithm.RSA_OAEP_256);
-        assertThat(header.getType()).isEqualTo(new JOSEObjectType("JWT"));
-        assertThat(header.getEncryptionMethod()).isEqualTo(EncryptionMethod.A256GCM);
-        assertThat(header.getCompressionAlgorithm()).isEqualTo(CompressionAlgorithm.DEF);
-        assertThat(header.getJWKURL()).isEqualTo(new URI("https://example.com/jku.json"));
-        assertThat(header.getKeyID()).isEqualTo("1234");
+        Assertions.assertThat(header.getAlgorithm()).isEqualTo(JWEAlgorithm.RSA_OAEP_256);
+        Assertions.assertThat(header.getType()).isEqualTo(new JOSEObjectType("JWT"));
+        Assertions.assertThat(header.getEncryptionMethod()).isEqualTo(EncryptionMethod.A256GCM);
+        Assertions.assertThat(header.getCompressionAlgorithm()).isEqualTo(CompressionAlgorithm.DEF);
+        Assertions.assertThat(header.getJWKURL()).isEqualTo(new URI("https://example.com/jku.json"));
+        Assertions.assertThat(header.getKeyID()).isEqualTo("1234");
 
         jwk = (RSAKey) header.getJWK();
-        assertThat(jwk).isNotNull();
-        assertThat(jwk.getModulus()).isEqualTo(new Base64URLValue("abc123"));
-        assertThat(jwk.getPublicExponent()).isEqualTo(new Base64URLValue("def456"));
-        assertThat(jwk.getKeyUse()).isEqualTo(KeyUse.ENCRYPTION);
-        assertThat(jwk.getAlgorithm()).isEqualTo(JWEAlgorithm.RSA_OAEP_256);
-        assertThat(jwk.getKeyID()).isEqualTo("1234");
+        Assertions.assertThat(jwk).isNotNull();
+        Assertions.assertThat(jwk.getModulus()).isEqualTo(new Base64URLValue("abc123"));
+        Assertions.assertThat(jwk.getPublicExponent()).isEqualTo(new Base64URLValue("def456"));
+        Assertions.assertThat(jwk.getKeyUse()).isEqualTo(KeyUse.ENCRYPTION);
+        Assertions.assertThat(jwk.getAlgorithm()).isEqualTo(JWEAlgorithm.RSA_OAEP_256);
+        Assertions.assertThat(jwk.getKeyID()).isEqualTo("1234");
 
-        assertThat(header.getX509CertURL()).isEqualTo(new URI("https://example/cert.b64"));
-        assertThat(header.getX509CertSHA256Thumbprint()).isEqualTo(new Base64URLValue("789asd"));
+        Assertions.assertThat(header.getX509CertURL()).isEqualTo(new URI("https://example/cert.b64"));
+        Assertions.assertThat(header.getX509CertSHA256Thumbprint()).isEqualTo(new Base64URLValue("789asd"));
 
         certChain = header.getX509CertChain();
-        assertThat(certChain.size()).isEqualTo(3);
-        assertThat(certChain.get(0)).isEqualTo(new Base64Value("asd"));
-        assertThat(certChain.get(1)).isEqualTo(new Base64Value("fgh"));
-        assertThat(certChain.get(2)).isEqualTo(new Base64Value("jkl"));
+        Assertions.assertThat(certChain.size()).isEqualTo(3);
+        Assertions.assertThat(certChain.get(0)).isEqualTo(new Base64Value("asd"));
+        Assertions.assertThat(certChain.get(1)).isEqualTo(new Base64Value("fgh"));
+        Assertions.assertThat(certChain.get(2)).isEqualTo(new Base64Value("jkl"));
 
-        assertThat(header.getAgreementPartyUInfo()).isEqualTo(new Base64URLValue("abc"));
-        assertThat(header.getAgreementPartyVInfo()).isEqualTo(new Base64URLValue("xyz"));
+        Assertions.assertThat(header.getAgreementPartyUInfo()).isEqualTo(new Base64URLValue("abc"));
+        Assertions.assertThat(header.getAgreementPartyVInfo()).isEqualTo(new Base64URLValue("xyz"));
 
-        assertThat(header.getPBES2Salt()).isEqualTo(new Base64URLValue("omg"));
-        assertThat(header.getPBES2Count()).isEqualTo(1000);
+        Assertions.assertThat(header.getPBES2Salt()).isEqualTo(new Base64URLValue("omg"));
+        Assertions.assertThat(header.getPBES2Count()).isEqualTo(1000);
 
-        assertThat(header.getIV()).isEqualTo(new Base64URLValue("101010"));
-        assertThat(header.getAuthTag()).isEqualTo(new Base64URLValue("202020"));
+        Assertions.assertThat(header.getIV()).isEqualTo(new Base64URLValue("101010"));
+        Assertions.assertThat(header.getAuthTag()).isEqualTo(new Base64URLValue("202020"));
 
-        assertThat(header.getCustomParameter("xCustom")).isEqualTo("+++");
-        assertThat(header.getCustomParameters().size()).isEqualTo(1);
+        Assertions.assertThat(header.getCustomParameter("xCustom")).isEqualTo("+++");
+        Assertions.assertThat(header.getCustomParameters().size()).isEqualTo(1);
 
-        assertThat(header.getParsedBase64URL()).isEqualTo(base64URL);
+        Assertions.assertThat(header.getParsedBase64URL()).isEqualTo(base64URL);
 
-        assertThat(header.getIncludedParameters()).contains("alg");
-        assertThat(header.getIncludedParameters()).contains("typ");
-        assertThat(header.getIncludedParameters()).contains("enc");
-        assertThat(header.getIncludedParameters()).contains("zip");
-        assertThat(header.getIncludedParameters()).contains("jku");
-        assertThat(header.getIncludedParameters()).contains("jwk");
-        assertThat(header.getIncludedParameters()).contains("kid");
-        assertThat(header.getIncludedParameters()).contains("x5u");
-        assertThat(header.getIncludedParameters()).contains("x5c");
-        assertThat(header.getIncludedParameters()).contains("apu");
-        assertThat(header.getIncludedParameters()).contains("apv");
-        assertThat(header.getIncludedParameters()).contains("p2s");
-        assertThat(header.getIncludedParameters()).contains("p2c");
-        assertThat(header.getIncludedParameters()).contains("iv");
-        assertThat(header.getIncludedParameters()).contains("tag");
-        assertThat(header.getIncludedParameters()).contains("xCustom");
-        assertThat(header.getIncludedParameters()).hasSize(17);
+        Assertions.assertThat(header.getIncludedParameters()).contains("alg");
+        Assertions.assertThat(header.getIncludedParameters()).contains("typ");
+        Assertions.assertThat(header.getIncludedParameters()).contains("enc");
+        Assertions.assertThat(header.getIncludedParameters()).contains("zip");
+        Assertions.assertThat(header.getIncludedParameters()).contains("jku");
+        Assertions.assertThat(header.getIncludedParameters()).contains("jwk");
+        Assertions.assertThat(header.getIncludedParameters()).contains("kid");
+        Assertions.assertThat(header.getIncludedParameters()).contains("x5u");
+        Assertions.assertThat(header.getIncludedParameters()).contains("x5c");
+        Assertions.assertThat(header.getIncludedParameters()).contains("apu");
+        Assertions.assertThat(header.getIncludedParameters()).contains("apv");
+        Assertions.assertThat(header.getIncludedParameters()).contains("p2s");
+        Assertions.assertThat(header.getIncludedParameters()).contains("p2c");
+        Assertions.assertThat(header.getIncludedParameters()).contains("iv");
+        Assertions.assertThat(header.getIncludedParameters()).contains("tag");
+        Assertions.assertThat(header.getIncludedParameters()).contains("xCustom");
+        Assertions.assertThat(header.getIncludedParameters()).hasSize(17);
 
         // Test copy constructor
         header = new JWEHeader(header);
 
-        assertThat(header.getAlgorithm()).isEqualTo(JWEAlgorithm.RSA_OAEP_256);
-        assertThat(header.getType()).isEqualTo(new JOSEObjectType("JWT"));
-        assertThat(header.getEncryptionMethod()).isEqualTo(EncryptionMethod.A256GCM);
-        assertThat(header.getCompressionAlgorithm()).isEqualTo(CompressionAlgorithm.DEF);
-        assertThat(header.getJWKURL()).isEqualTo(new URI("https://example.com/jku.json"));
-        assertThat(header.getKeyID()).isEqualTo("1234");
+        Assertions.assertThat(header.getAlgorithm()).isEqualTo(JWEAlgorithm.RSA_OAEP_256);
+        Assertions.assertThat(header.getType()).isEqualTo(new JOSEObjectType("JWT"));
+        Assertions.assertThat(header.getEncryptionMethod()).isEqualTo(EncryptionMethod.A256GCM);
+        Assertions.assertThat(header.getCompressionAlgorithm()).isEqualTo(CompressionAlgorithm.DEF);
+        Assertions.assertThat(header.getJWKURL()).isEqualTo(new URI("https://example.com/jku.json"));
+        Assertions.assertThat(header.getKeyID()).isEqualTo("1234");
 
         jwk = (RSAKey) header.getJWK();
-        assertThat(jwk).isNotNull();
-        assertThat(jwk.getModulus()).isEqualTo(new Base64URLValue("abc123"));
-        assertThat(jwk.getPublicExponent()).isEqualTo(new Base64URLValue("def456"));
-        assertThat(jwk.getKeyUse()).isEqualTo(KeyUse.ENCRYPTION);
-        assertThat(jwk.getAlgorithm()).isEqualTo(JWEAlgorithm.RSA_OAEP_256);
-        assertThat(jwk.getKeyID()).isEqualTo("1234");
+        Assertions.assertThat(jwk).isNotNull();
+        Assertions.assertThat(jwk.getModulus()).isEqualTo(new Base64URLValue("abc123"));
+        Assertions.assertThat(jwk.getPublicExponent()).isEqualTo(new Base64URLValue("def456"));
+        Assertions.assertThat(jwk.getKeyUse()).isEqualTo(KeyUse.ENCRYPTION);
+        Assertions.assertThat(jwk.getAlgorithm()).isEqualTo(JWEAlgorithm.RSA_OAEP_256);
+        Assertions.assertThat(jwk.getKeyID()).isEqualTo("1234");
 
-        assertThat(header.getX509CertURL()).isEqualTo(new URI("https://example/cert.b64"));
-        assertThat(header.getX509CertSHA256Thumbprint()).isEqualTo(new Base64URLValue("789asd"));
+        Assertions.assertThat(header.getX509CertURL()).isEqualTo(new URI("https://example/cert.b64"));
+        Assertions.assertThat(header.getX509CertSHA256Thumbprint()).isEqualTo(new Base64URLValue("789asd"));
 
         certChain = header.getX509CertChain();
-        assertThat(certChain.size()).isEqualTo(3);
-        assertThat(certChain.get(0)).isEqualTo(new Base64Value("asd"));
-        assertThat(certChain.get(1)).isEqualTo(new Base64Value("fgh"));
-        assertThat(certChain.get(2)).isEqualTo(new Base64Value("jkl"));
+        Assertions.assertThat(certChain.size()).isEqualTo(3);
+        Assertions.assertThat(certChain.get(0)).isEqualTo(new Base64Value("asd"));
+        Assertions.assertThat(certChain.get(1)).isEqualTo(new Base64Value("fgh"));
+        Assertions.assertThat(certChain.get(2)).isEqualTo(new Base64Value("jkl"));
 
-        assertThat(header.getAgreementPartyUInfo()).isEqualTo(new Base64URLValue("abc"));
-        assertThat(header.getAgreementPartyVInfo()).isEqualTo(new Base64URLValue("xyz"));
+        Assertions.assertThat(header.getAgreementPartyUInfo()).isEqualTo(new Base64URLValue("abc"));
+        Assertions.assertThat(header.getAgreementPartyVInfo()).isEqualTo(new Base64URLValue("xyz"));
 
-        assertThat(header.getPBES2Salt()).isEqualTo(new Base64URLValue("omg"));
-        assertThat(header.getPBES2Count()).isEqualTo(1000);
+        Assertions.assertThat(header.getPBES2Salt()).isEqualTo(new Base64URLValue("omg"));
+        Assertions.assertThat(header.getPBES2Count()).isEqualTo(1000);
 
-        assertThat(header.getIV()).isEqualTo(new Base64URLValue("101010"));
-        assertThat(header.getAuthTag()).isEqualTo(new Base64URLValue("202020"));
+        Assertions.assertThat(header.getIV()).isEqualTo(new Base64URLValue("101010"));
+        Assertions.assertThat(header.getAuthTag()).isEqualTo(new Base64URLValue("202020"));
 
-        assertThat(header.getCustomParameter("xCustom")).isEqualTo("+++");
-        assertThat(header.getCustomParameters().size()).isEqualTo(1);
+        Assertions.assertThat(header.getCustomParameter("xCustom")).isEqualTo("+++");
+        Assertions.assertThat(header.getCustomParameters().size()).isEqualTo(1);
 
-        assertThat(header.getParsedBase64URL()).isEqualTo(base64URL);
+        Assertions.assertThat(header.getParsedBase64URL()).isEqualTo(base64URL);
     }
 
     @Test
@@ -226,20 +228,20 @@ public class JWEHeaderTest {
 
 
         Map<String, Object> parameters = new HashMap<>();
-        parameters.put("typ", new JOSEObjectType("JWT"));
-        parameters.put("zip", CompressionAlgorithm.DEF);
-        parameters.put("jku", new URI("https://example.com/jku.json"));
-        parameters.put("jwk", jwk);
-        parameters.put("x5u", new URI("https://example/cert.b64"));
+        parameters.put(HeaderParameterNames.TYPE, new JOSEObjectType("JWT"));
+        parameters.put(HeaderParameterNames.COMPRESSION_ALGORITHM, CompressionAlgorithm.DEF);
+        parameters.put(HeaderParameterNames.JWK_SET_URL, new URI("https://example.com/jku.json"));
+        parameters.put(HeaderParameterNames.JSON_WEB_KEY, jwk);
+        parameters.put(HeaderParameterNames.X_509_URL, new URI("https://example/cert.b64"));
         parameters.put("x5t256", new Base64URLValue("789asd"));
-        parameters.put("x5c", certChain);
-        parameters.put("kid", "1234");
-        parameters.put("apu", new Base64URLValue("abc"));
-        parameters.put("apv", new Base64URLValue("xyz"));
-        parameters.put("p2s", new Base64URLValue("omg"));
-        parameters.put("p2c", 1000);
-        parameters.put("iv", new Base64URLValue("101010"));
-        parameters.put("tag", new Base64URLValue("202020"));
+        parameters.put(HeaderParameterNames.X_509_CERT_CHAIN, certChain);
+        parameters.put(HeaderParameterNames.KEY_ID, "1234");
+        parameters.put(HeaderParameterNames.AGREEMENT_PARTY_U_INFO, new Base64URLValue("abc"));
+        parameters.put(HeaderParameterNames.AGREEMENT_PARTY_V_INFO, new Base64URLValue("xyz"));
+        parameters.put(HeaderParameterNames.PBES2_SALT_INPUT, new Base64URLValue("omg"));
+        parameters.put(HeaderParameterNames.PBES2_COUNT, 1000);
+        parameters.put(HeaderParameterNames.INITIALIZATION_VECTOR, new Base64URLValue("101010"));
+        parameters.put(HeaderParameterNames.AUTHENTICATION_TAG, new Base64URLValue("202020"));
         parameters.put("xCustom", "+++");
 
         JWEHeader header = new JWEHeader.Builder(JWEAlgorithm.RSA_OAEP_256, EncryptionMethod.A256GCM).
@@ -252,61 +254,61 @@ public class JWEHeaderTest {
         // Parse back
         header = JWEHeader.parse(base64URL);
 
-        assertThat(header.getAlgorithm()).isEqualTo(JWEAlgorithm.RSA_OAEP_256);
-        assertThat(header.getType()).isEqualTo(new JOSEObjectType("JWT"));
-        assertThat(header.getEncryptionMethod()).isEqualTo(EncryptionMethod.A256GCM);
-        assertThat(header.getCompressionAlgorithm()).isEqualTo(CompressionAlgorithm.DEF);
-        assertThat(header.getJWKURL()).isEqualTo(new URI("https://example.com/jku.json"));
-        assertThat(header.getKeyID()).isEqualTo("1234");
+        Assertions.assertThat(header.getAlgorithm()).isEqualTo(JWEAlgorithm.RSA_OAEP_256);
+        Assertions.assertThat(header.getType()).isEqualTo(new JOSEObjectType("JWT"));
+        Assertions.assertThat(header.getEncryptionMethod()).isEqualTo(EncryptionMethod.A256GCM);
+        Assertions.assertThat(header.getCompressionAlgorithm()).isEqualTo(CompressionAlgorithm.DEF);
+        Assertions.assertThat(header.getJWKURL()).isEqualTo(new URI("https://example.com/jku.json"));
+        Assertions.assertThat(header.getKeyID()).isEqualTo("1234");
 
         jwk = (RSAKey) header.getJWK();
-        assertThat(jwk).isNotNull();
-        assertThat(jwk.getModulus()).isEqualTo(new Base64URLValue("abc123"));
-        assertThat(jwk.getPublicExponent()).isEqualTo(new Base64URLValue("def456"));
-        assertThat(jwk.getKeyUse()).isEqualTo(KeyUse.ENCRYPTION);
-        assertThat(jwk.getAlgorithm()).isEqualTo(JWEAlgorithm.RSA_OAEP_256);
-        assertThat(jwk.getKeyID()).isEqualTo("1234");
+        Assertions.assertThat(jwk).isNotNull();
+        Assertions.assertThat(jwk.getModulus()).isEqualTo(new Base64URLValue("abc123"));
+        Assertions.assertThat(jwk.getPublicExponent()).isEqualTo(new Base64URLValue("def456"));
+        Assertions.assertThat(jwk.getKeyUse()).isEqualTo(KeyUse.ENCRYPTION);
+        Assertions.assertThat(jwk.getAlgorithm()).isEqualTo(JWEAlgorithm.RSA_OAEP_256);
+        Assertions.assertThat(jwk.getKeyID()).isEqualTo("1234");
 
-        assertThat(header.getX509CertURL()).isEqualTo(new URI("https://example/cert.b64"));
-        assertThat(header.getX509CertSHA256Thumbprint()).isEqualTo(new Base64URLValue("789asd"));
+        Assertions.assertThat(header.getX509CertURL()).isEqualTo(new URI("https://example/cert.b64"));
+        Assertions.assertThat(header.getX509CertSHA256Thumbprint()).isEqualTo(new Base64URLValue("789asd"));
 
         certChain = header.getX509CertChain();
-        assertThat(certChain.size()).isEqualTo(3);
-        assertThat(certChain.get(0)).isEqualTo(new Base64Value("asd"));
-        assertThat(certChain.get(1)).isEqualTo(new Base64Value("fgh"));
-        assertThat(certChain.get(2)).isEqualTo(new Base64Value("jkl"));
+        Assertions.assertThat(certChain.size()).isEqualTo(3);
+        Assertions.assertThat(certChain.get(0)).isEqualTo(new Base64Value("asd"));
+        Assertions.assertThat(certChain.get(1)).isEqualTo(new Base64Value("fgh"));
+        Assertions.assertThat(certChain.get(2)).isEqualTo(new Base64Value("jkl"));
 
-        assertThat(header.getAgreementPartyUInfo()).isEqualTo(new Base64URLValue("abc"));
-        assertThat(header.getAgreementPartyVInfo()).isEqualTo(new Base64URLValue("xyz"));
+        Assertions.assertThat(header.getAgreementPartyUInfo()).isEqualTo(new Base64URLValue("abc"));
+        Assertions.assertThat(header.getAgreementPartyVInfo()).isEqualTo(new Base64URLValue("xyz"));
 
-        assertThat(header.getPBES2Salt()).isEqualTo(new Base64URLValue("omg"));
-        assertThat(header.getPBES2Count()).isEqualTo(1000);
+        Assertions.assertThat(header.getPBES2Salt()).isEqualTo(new Base64URLValue("omg"));
+        Assertions.assertThat(header.getPBES2Count()).isEqualTo(1000);
 
-        assertThat(header.getIV()).isEqualTo(new Base64URLValue("101010"));
-        assertThat(header.getAuthTag()).isEqualTo(new Base64URLValue("202020"));
+        Assertions.assertThat(header.getIV()).isEqualTo(new Base64URLValue("101010"));
+        Assertions.assertThat(header.getAuthTag()).isEqualTo(new Base64URLValue("202020"));
 
-        assertThat(header.getCustomParameter("xCustom")).isEqualTo("+++");
-        assertThat(header.getCustomParameters().size()).isEqualTo(1);
+        Assertions.assertThat(header.getCustomParameter("xCustom")).isEqualTo("+++");
+        Assertions.assertThat(header.getCustomParameters().size()).isEqualTo(1);
 
-        assertThat(header.getParsedBase64URL()).isEqualTo(base64URL);
+        Assertions.assertThat(header.getParsedBase64URL()).isEqualTo(base64URL);
 
-        assertThat(header.getIncludedParameters()).contains("alg");
-        assertThat(header.getIncludedParameters()).contains("typ");
-        assertThat(header.getIncludedParameters()).contains("enc");
-        assertThat(header.getIncludedParameters()).contains("zip");
-        assertThat(header.getIncludedParameters()).contains("jku");
-        assertThat(header.getIncludedParameters()).contains("jwk");
-        assertThat(header.getIncludedParameters()).contains("kid");
-        assertThat(header.getIncludedParameters()).contains("x5u");
-        assertThat(header.getIncludedParameters()).contains("x5c");
-        assertThat(header.getIncludedParameters()).contains("apu");
-        assertThat(header.getIncludedParameters()).contains("apv");
-        assertThat(header.getIncludedParameters()).contains("p2s");
-        assertThat(header.getIncludedParameters()).contains("p2c");
-        assertThat(header.getIncludedParameters()).contains("iv");
-        assertThat(header.getIncludedParameters()).contains("tag");
-        assertThat(header.getIncludedParameters()).contains("xCustom");
-        assertThat(header.getIncludedParameters()).hasSize(17);
+        Assertions.assertThat(header.getIncludedParameters()).contains("alg");
+        Assertions.assertThat(header.getIncludedParameters()).contains("typ");
+        Assertions.assertThat(header.getIncludedParameters()).contains("enc");
+        Assertions.assertThat(header.getIncludedParameters()).contains("zip");
+        Assertions.assertThat(header.getIncludedParameters()).contains("jku");
+        Assertions.assertThat(header.getIncludedParameters()).contains("jwk");
+        Assertions.assertThat(header.getIncludedParameters()).contains("kid");
+        Assertions.assertThat(header.getIncludedParameters()).contains("x5u");
+        Assertions.assertThat(header.getIncludedParameters()).contains("x5c");
+        Assertions.assertThat(header.getIncludedParameters()).contains("apu");
+        Assertions.assertThat(header.getIncludedParameters()).contains("apv");
+        Assertions.assertThat(header.getIncludedParameters()).contains("p2s");
+        Assertions.assertThat(header.getIncludedParameters()).contains("p2c");
+        Assertions.assertThat(header.getIncludedParameters()).contains("iv");
+        Assertions.assertThat(header.getIncludedParameters()).contains("tag");
+        Assertions.assertThat(header.getIncludedParameters()).contains("xCustom");
+        Assertions.assertThat(header.getIncludedParameters()).hasSize(17);
     }
 
     @Test
@@ -322,7 +324,7 @@ public class JWEHeaderTest {
                 criticalParams(crit).
                 build();
 
-        assertThat(h.getCriticalParams().size()).isEqualTo(3);
+        Assertions.assertThat(h.getCriticalParams().size()).isEqualTo(3);
 
         Base64URLValue b64url = h.toBase64URL();
 
@@ -331,18 +333,19 @@ public class JWEHeaderTest {
 
         crit = h.getCriticalParams();
 
-        assertThat(crit).contains("iat");
-        assertThat(crit).contains("exp");
-        assertThat(crit).contains("nbf");
+        Assertions.assertThat(crit).contains("iat");
+        Assertions.assertThat(crit).contains("exp");
+        Assertions.assertThat(crit).contains("nbf");
 
-        assertThat(crit.size()).isEqualTo(3);
+        Assertions.assertThat(crit.size()).isEqualTo(3);
     }
 
     @Test
     public void testRejectNone() {
 
-        Assertions.assertThrows(IllegalArgumentException.class, () ->
-                new JWEHeader(new JWEAlgorithm("none"), EncryptionMethod.A128CBC_HS256));
+        Assertions.assertThatThrownBy(
+                        () -> new JWEHeader(new JWEAlgorithm("none"), EncryptionMethod.A128CBC_HS256))
+                .isInstanceOf(IllegalArgumentException.class);
 
     }
 
@@ -350,12 +353,17 @@ public class JWEHeaderTest {
     public void testBuilder()
             throws Exception {
 
+        List<AtbashKey> keys = TestKeys.generateRSAKeys("kid");
+
+        AtbashKey publicKey = Filters.findPublicKey(keys);
+        RSAKey jwk = new RSAKey.Builder(publicKey).build();
+
         JWEHeader h = new JWEHeader.Builder(JWEAlgorithm.A128KW, EncryptionMethod.A128GCM).
                 type(JOSEObjectType.JOSE).
                 contentType("application/json").
                 criticalParams(new HashSet<>(Arrays.asList("exp", "nbf"))).
                 jwkURL(new URI("http://example.com/jwk.json")).
-                jwk(new OctetSequenceKey.Builder(new Base64URLValue("xyz")).build()).
+                jwk(jwk).
                 x509CertURL(new URI("http://example.com/cert.pem")).
                 x509CertSHA256Thumbprint(new Base64URLValue("abc256")).
                 x509CertChain(Arrays.asList(new Base64Value("abc"), new Base64Value("def"))).
@@ -371,70 +379,70 @@ public class JWEHeaderTest {
                 parameter("nbf", 456).
                 build();
 
-        assertThat(h.getAlgorithm()).isEqualTo(JWEAlgorithm.A128KW);
-        assertThat(h.getEncryptionMethod()).isEqualTo(EncryptionMethod.A128GCM);
-        assertThat(h.getType()).isEqualTo(JOSEObjectType.JOSE);
-        assertThat(h.getContentType()).isEqualTo("application/json");
-        assertThat(h.getCriticalParams()).contains("exp");
-        assertThat(h.getCriticalParams()).contains("nbf");
-        assertThat(h.getCriticalParams().size()).isEqualTo(2);
-        assertThat(h.getJWKURL().toString()).isEqualTo("http://example.com/jwk.json");
-        assertThat(((OctetSequenceKey) h.getJWK()).getKeyValue().toString()).isEqualTo("xyz");
-        assertThat(h.getX509CertURL().toString()).isEqualTo("http://example.com/cert.pem");
-        assertThat(h.getX509CertSHA256Thumbprint().toString()).isEqualTo("abc256");
-        assertThat(h.getX509CertChain().get(0).toString()).isEqualTo("abc");
-        assertThat(h.getX509CertChain().get(1).toString()).isEqualTo("def");
-        assertThat(h.getX509CertChain().size()).isEqualTo(2);
-        assertThat(h.getKeyID()).isEqualTo("123");
-        assertThat(h.getCompressionAlgorithm()).isEqualTo(CompressionAlgorithm.DEF);
-        assertThat(h.getAgreementPartyUInfo().toString()).isEqualTo("qwe");
-        assertThat(h.getAgreementPartyVInfo().toString()).isEqualTo("rty");
-        assertThat(h.getPBES2Salt().toString()).isEqualTo("uiop");
-        assertThat(h.getPBES2Count()).isEqualTo(1000);
-        assertThat(h.getIV().toString()).isEqualTo("101010");
-        assertThat(h.getAuthTag().toString()).isEqualTo("202020");
-        assertThat(((Integer) h.getCustomParameter("exp")).intValue()).isEqualTo(123);
-        assertThat(((Integer) h.getCustomParameter("nbf")).intValue()).isEqualTo(456);
-        assertThat(h.getCustomParameters().size()).isEqualTo(2);
-        assertThat(h.getParsedBase64URL()).isNull();
+        Assertions.assertThat(h.getAlgorithm()).isEqualTo(JWEAlgorithm.A128KW);
+        Assertions.assertThat(h.getEncryptionMethod()).isEqualTo(EncryptionMethod.A128GCM);
+        Assertions.assertThat(h.getType()).isEqualTo(JOSEObjectType.JOSE);
+        Assertions.assertThat(h.getContentType()).isEqualTo("application/json");
+        Assertions.assertThat(h.getCriticalParams()).contains("exp");
+        Assertions.assertThat(h.getCriticalParams()).contains("nbf");
+        Assertions.assertThat(h.getCriticalParams().size()).isEqualTo(2);
+        Assertions.assertThat(h.getJWKURL().toString()).isEqualTo("http://example.com/jwk.json");
+        Assertions.assertThat(((RSAKey) h.getJWK()).toRSAPublicKey()).isEqualTo(publicKey.getKey());
+        Assertions.assertThat(h.getX509CertURL().toString()).isEqualTo("http://example.com/cert.pem");
+        Assertions.assertThat(h.getX509CertSHA256Thumbprint().toString()).isEqualTo("abc256");
+        Assertions.assertThat(h.getX509CertChain().get(0).toString()).isEqualTo("abc");
+        Assertions.assertThat(h.getX509CertChain().get(1).toString()).isEqualTo("def");
+        Assertions.assertThat(h.getX509CertChain().size()).isEqualTo(2);
+        Assertions.assertThat(h.getKeyID()).isEqualTo("123");
+        Assertions.assertThat(h.getCompressionAlgorithm()).isEqualTo(CompressionAlgorithm.DEF);
+        Assertions.assertThat(h.getAgreementPartyUInfo().toString()).isEqualTo("qwe");
+        Assertions.assertThat(h.getAgreementPartyVInfo().toString()).isEqualTo("rty");
+        Assertions.assertThat(h.getPBES2Salt().toString()).isEqualTo("uiop");
+        Assertions.assertThat(h.getPBES2Count()).isEqualTo(1000);
+        Assertions.assertThat(h.getIV().toString()).isEqualTo("101010");
+        Assertions.assertThat(h.getAuthTag().toString()).isEqualTo("202020");
+        Assertions.assertThat(((Integer) h.getCustomParameter("exp")).intValue()).isEqualTo(123);
+        Assertions.assertThat(((Integer) h.getCustomParameter("nbf")).intValue()).isEqualTo(456);
+        Assertions.assertThat(h.getCustomParameters().size()).isEqualTo(2);
+        Assertions.assertThat(h.getParsedBase64URL()).isNull();
 
-        assertThat(h.getIncludedParameters()).contains("alg");
-        assertThat(h.getIncludedParameters()).contains("enc");
-        assertThat(h.getIncludedParameters()).contains("typ");
-        assertThat(h.getIncludedParameters()).contains("cty");
-        assertThat(h.getIncludedParameters()).contains("crit");
-        assertThat(h.getIncludedParameters()).contains("jku");
-        assertThat(h.getIncludedParameters()).contains("jwk");
-        assertThat(h.getIncludedParameters()).contains("x5u");
-        assertThat(h.getIncludedParameters()).contains("x5t#S256");
-        assertThat(h.getIncludedParameters()).contains("x5c");
-        assertThat(h.getIncludedParameters()).contains("kid");
-        assertThat(h.getIncludedParameters()).contains("zip");
-        assertThat(h.getIncludedParameters()).contains("apu");
-        assertThat(h.getIncludedParameters()).contains("apv");
-        assertThat(h.getIncludedParameters()).contains("p2s");
-        assertThat(h.getIncludedParameters()).contains("p2c");
-        assertThat(h.getIncludedParameters()).contains("iv");
-        assertThat(h.getIncludedParameters()).contains("tag");
-        assertThat(h.getIncludedParameters()).contains("exp");
-        assertThat(h.getIncludedParameters()).contains("nbf");
-        assertThat(h.getIncludedParameters()).hasSize(20);
+        Assertions.assertThat(h.getIncludedParameters()).contains("alg");
+        Assertions.assertThat(h.getIncludedParameters()).contains("enc");
+        Assertions.assertThat(h.getIncludedParameters()).contains("typ");
+        Assertions.assertThat(h.getIncludedParameters()).contains("cty");
+        Assertions.assertThat(h.getIncludedParameters()).contains("crit");
+        Assertions.assertThat(h.getIncludedParameters()).contains("jku");
+        Assertions.assertThat(h.getIncludedParameters()).contains("jwk");
+        Assertions.assertThat(h.getIncludedParameters()).contains("x5u");
+        Assertions.assertThat(h.getIncludedParameters()).contains("x5t#S256");
+        Assertions.assertThat(h.getIncludedParameters()).contains("x5c");
+        Assertions.assertThat(h.getIncludedParameters()).contains("kid");
+        Assertions.assertThat(h.getIncludedParameters()).contains("zip");
+        Assertions.assertThat(h.getIncludedParameters()).contains("apu");
+        Assertions.assertThat(h.getIncludedParameters()).contains("apv");
+        Assertions.assertThat(h.getIncludedParameters()).contains("p2s");
+        Assertions.assertThat(h.getIncludedParameters()).contains("p2c");
+        Assertions.assertThat(h.getIncludedParameters()).contains("iv");
+        Assertions.assertThat(h.getIncludedParameters()).contains("tag");
+        Assertions.assertThat(h.getIncludedParameters()).contains("exp");
+        Assertions.assertThat(h.getIncludedParameters()).contains("nbf");
+        Assertions.assertThat(h.getIncludedParameters()).hasSize(20);
     }
 
     @Test
     public void testBuilderWithCustomParams() {
 
         Map<String, Object> customParams = new HashMap<>();
-        customParams.put("x", "1");
-        customParams.put("y", "2");
+        customParams.put(JWKIdentifiers.X_COORD, "1");
+        customParams.put(JWKIdentifiers.Y_COORD, "2");
 
         JWEHeader h = new JWEHeader.Builder(JWEAlgorithm.A128KW, EncryptionMethod.A128GCM).
                 parameters(customParams).
                 build();
 
-        assertThat(h.getCustomParameter("x")).isEqualTo("1");
-        assertThat(h.getCustomParameter("y")).isEqualTo("2");
-        assertThat(h.getCustomParameters().size()).isEqualTo(2);
+        Assertions.assertThat(h.getCustomParameter("x")).isEqualTo("1");
+        Assertions.assertThat(h.getCustomParameter("y")).isEqualTo("2");
+        Assertions.assertThat(h.getCustomParameters().size()).isEqualTo(2);
     }
 
     @Test
@@ -444,14 +452,14 @@ public class JWEHeaderTest {
 
         JsonObjectBuilder builder = Json.createObjectBuilder();
 
-        builder.add("alg", JWEAlgorithm.DIR.getName());
-        builder.add("enc", EncryptionMethod.A128GCM.getName());
-        builder.addNull("typ");
+        builder.add(HeaderParameterNames.ALGORITHM, JWEAlgorithm.DIR.getName());
+        builder.add(HeaderParameterNames.ENCRYPTION_ALGORITHM, EncryptionMethod.A128GCM.getName());
+        builder.addNull(HeaderParameterNames.TYPE);
         JsonObject jsonObject = builder.build();
-        assertThat(jsonObject).hasSize(3);
+        Assertions.assertThat(jsonObject).hasSize(3);
 
         Header header = JWEHeader.parse(jsonObject.toString());
-        assertThat(header.getType()).isNull();
+        Assertions.assertThat(header.getType()).isNull();
     }
 
     @Test
@@ -460,14 +468,14 @@ public class JWEHeaderTest {
             throws ParseException {
 
         JsonObjectBuilder builder = Json.createObjectBuilder();
-        builder.add("alg", JWEAlgorithm.DIR.getName());
-        builder.add("enc", EncryptionMethod.A128GCM.getName());
+        builder.add(HeaderParameterNames.ALGORITHM, JWEAlgorithm.DIR.getName());
+        builder.add(HeaderParameterNames.ENCRYPTION_ALGORITHM, EncryptionMethod.A128GCM.getName());
         builder.addNull("crit");
         JsonObject jsonObject = builder.build();
-        assertThat(jsonObject).hasSize(3);
+        Assertions.assertThat(jsonObject).hasSize(3);
 
         Header header = JWEHeader.parse(jsonObject);
-        assertThat(header.getCriticalParams()).isEmpty();
+        Assertions.assertThat(header.getCriticalParams()).isEmpty();
     }
 
     @Test
@@ -475,14 +483,14 @@ public class JWEHeaderTest {
             throws ParseException {
 
         JsonObjectBuilder builder = Json.createObjectBuilder();
-        builder.add("alg", JWEAlgorithm.DIR.getName());
-        builder.add("enc", EncryptionMethod.A128GCM.getName());
-        builder.addNull("jwk");
+        builder.add(HeaderParameterNames.ALGORITHM, JWEAlgorithm.DIR.getName());
+        builder.add(HeaderParameterNames.ENCRYPTION_ALGORITHM, EncryptionMethod.A128GCM.getName());
+        builder.addNull(HeaderParameterNames.JSON_WEB_KEY);
         JsonObject jsonObject = builder.build();
-        assertThat(jsonObject).hasSize(3);
+        Assertions.assertThat(jsonObject).hasSize(3);
 
         JWEHeader header = JWEHeader.parse(jsonObject);
-        assertThat(header.getJWK()).isNull();
+        Assertions.assertThat(header.getJWK()).isNull();
     }
 
     @Test
@@ -491,29 +499,29 @@ public class JWEHeaderTest {
 
         JsonObjectBuilder builder = Json.createObjectBuilder();
 
-        builder.add("alg", JWEAlgorithm.DIR.getName());
-        builder.add("enc", EncryptionMethod.A128GCM.getName());
-        builder.addNull("zip");
+        builder.add(HeaderParameterNames.ALGORITHM, JWEAlgorithm.DIR.getName());
+        builder.add(HeaderParameterNames.ENCRYPTION_ALGORITHM, EncryptionMethod.A128GCM.getName());
+        builder.addNull(HeaderParameterNames.COMPRESSION_ALGORITHM);
         JsonObject jsonObject = builder.build();
-        assertThat(jsonObject).hasSize(3);
+        Assertions.assertThat(jsonObject).hasSize(3);
 
         JWEHeader header = JWEHeader.parse(jsonObject.toString());
-        assertThat(header.getCompressionAlgorithm()).isNull();
+        Assertions.assertThat(header.getCompressionAlgorithm()).isNull();
     }
 
     @Test
     public void testFilterCustomClaims() {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("p2s", Base64URLValue.encode("something"));
-        claims.put("p2c", 1234);
+        claims.put(HeaderParameterNames.PBES2_SALT_INPUT, Base64URLValue.encode("something"));
+        claims.put(HeaderParameterNames.PBES2_COUNT, 1234);
         JWEHeader header = new JWEHeader.Builder(JWEAlgorithm.A128KW, EncryptionMethod.A128GCM)
                 .parameters(claims)
                 .build();
 
         // Test if values from Custom Claims are migrated to 'real' properties
-        assertThat(header.getPBES2Salt().decode()).isEqualTo("something".getBytes());
-        assertThat(header.getPBES2Count()).isEqualTo(1234);
-        assertThat(header.getCustomParameters()).isEmpty();
+        Assertions.assertThat(header.getPBES2Salt().decode()).isEqualTo("something".getBytes());
+        Assertions.assertThat(header.getPBES2Count()).isEqualTo(1234);
+        Assertions.assertThat(header.getCustomParameters()).isEmpty();
     }
 
 
@@ -521,39 +529,64 @@ public class JWEHeaderTest {
     public void customParam_supportSpecialCases() {
         Base64URLValue salt = Base64URLValue.encode("test");
         JWEHeader header = new JWEHeader.Builder(JWEAlgorithm.A128KW, EncryptionMethod.A128GCM)
-                .parameter("p2s", salt)
-                .parameter("p2c", 123)
+                .parameter(HeaderParameterNames.PBES2_SALT_INPUT, salt)
+                .parameter(HeaderParameterNames.PBES2_COUNT, 123)
                 .build();
 
-        assertThat(header.getCustomParameters()).isEmpty();  // They are all converted to the correct property
-        assertThat(header.getPBES2Count()).isEqualTo(123);
-        assertThat(header.getPBES2Salt().decode()).isEqualTo("test".getBytes());
+        Assertions.assertThat(header.getCustomParameters()).isEmpty();  // They are all converted to the correct property
+        Assertions.assertThat(header.getPBES2Count()).isEqualTo(123);
+        Assertions.assertThat(header.getPBES2Salt().decode()).isEqualTo("test".getBytes());
     }
 
     @Test
     public void customParam_specialCases_type1() {
 
-        IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class, () ->
-                new JWEHeader.Builder(JWEAlgorithm.A128KW, EncryptionMethod.A128GCM)
-                        .parameter("p2s", new Object())
-                        .build());
-
-        assertThat(exception.getMessage()).isEqualTo("The type of the parameter \"p2s\" must be Base64URLValue.");
+        Assertions.assertThatThrownBy(() ->
+                        new JWEHeader.Builder(JWEAlgorithm.A128KW, EncryptionMethod.A128GCM)
+                                .parameter(HeaderParameterNames.PBES2_SALT_INPUT, new Object())
+                                .build())
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("The type of the parameter \"" + HeaderParameterNames.PBES2_SALT_INPUT + "\" must be Base64URLValue.");
     }
 
     @Test
     public void customParam_specialCases_type2() {
 
-        IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class, () ->
-                new JWEHeader.Builder(JWEAlgorithm.A128KW, EncryptionMethod.A128GCM)
-                        .parameter("p2c", new Object())
-                        .build());
-
-        assertThat(exception.getMessage()).isEqualTo("The type of the parameter \"p2c\" must be Integer.");
+        Assertions.assertThatThrownBy(() ->
+                        new JWEHeader.Builder(JWEAlgorithm.A128KW, EncryptionMethod.A128GCM)
+                                .parameter(HeaderParameterNames.PBES2_COUNT, new Object())
+                                .build())
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("The type of the parameter \"" + HeaderParameterNames.PBES2_COUNT + "\" must be Integer.");
     }
 
     @Test
     public void getRegisteredParameterNames() {
-        assertThat(JWEHeader.getRegisteredParameterNames()).hasSize(19);
+        Assertions.assertThat(JWEHeader.getRegisteredParameterNames()).hasSize(19);
     }
+
+    @Test
+    public void testParseHeaderWithNonPublicJWK() throws JOSEException {
+
+        JWEHeader header = new JWEHeader(JWEAlgorithm.RSA_OAEP_256, EncryptionMethod.A128GCM);
+
+        JsonObjectBuilder jsonObjectBuilder = header.toJSONObject();
+
+        List<AtbashKey> keys = TestKeys.generateRSAKeys("kid", 2048);
+        List<AtbashKey> privateKey = new AsymmetricPartKeyFilter(AsymmetricPart.PRIVATE).filter(keys);
+        List<AtbashKey> publicKey = new AsymmetricPartKeyFilter(AsymmetricPart.PUBLIC).filter(keys);
+
+        RSAKey rsaKey = new RSAKey.Builder(publicKey.get(0))
+                .privateKey((RSAPrivateKey) privateKey.get(0).getKey())
+                .keyID("kid")
+                .build();
+
+        jsonObjectBuilder.add("jwk", rsaKey.toJSONObject().build());
+
+        Assertions.assertThatThrownBy(
+                        () -> JWEHeader.parse(jsonObjectBuilder.build()))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Non-public key in jwk header parameter");
+    }
+
 }

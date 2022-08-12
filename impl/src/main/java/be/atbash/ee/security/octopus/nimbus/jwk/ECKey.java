@@ -54,6 +54,7 @@ import java.util.*;
  * <ul>
  *     <li>{@link Curve#P_256 P-256}
  *     <li>{@link Curve#P_256K P-256K}
+ *     <li>{@link Curve#SECP256K1 SECP256K1}
  *     <li>{@link Curve#P_384 P-384}
  *     <li>{@link Curve#P_521 P-512}
  * </ul>
@@ -104,8 +105,8 @@ import java.util.*;
  * 	.build();
  * </pre>
  *
- * <p>See http://en.wikipedia.org/wiki/Elliptic_curve_cryptography
- *
+ * <p>See <a href="http://en.wikipedia.org/wiki/Elliptic_curve_cryptography">Elliptic curve cryptography (Wikipedia)</a>
+ * <p>
  * Based on code by Vladimir Dzhuvinov and Justin Richer
  */
 public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
@@ -118,7 +119,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
      * Supported EC curves.
      */
     public static final Set<Curve> SUPPORTED_CURVES = Collections.unmodifiableSet(
-            new HashSet<>(Arrays.asList(Curve.P_256, Curve.P_256K, Curve.P_384, Curve.P_521))
+            new HashSet<>(Arrays.asList(Curve.P_256, Curve.P_256K, Curve.SECP256K1, Curve.P_384, Curve.P_521))
     );
 
 
@@ -456,10 +457,10 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
 
             // Put mandatory params in sorted order
             LinkedHashMap<String, String> requiredParams = new LinkedHashMap<>();
-            requiredParams.put("crv", crv.toString());
-            requiredParams.put("kty", KeyType.EC.getValue());
-            requiredParams.put("x", x.toString());
-            requiredParams.put("y", y.toString());
+            requiredParams.put(JWKIdentifiers.CURVE, crv.toString());
+            requiredParams.put(JWKIdentifiers.KEY_TYPE, KeyType.EC.getValue());
+            requiredParams.put(JWKIdentifiers.X_COORD, x.toString());
+            requiredParams.put(JWKIdentifiers.Y_COORD, y.toString());
             kid = ThumbprintUtils.compute(hashAlg, requiredParams).toString();
             return this;
         }
@@ -1008,7 +1009,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
         ECPublicKeySpec publicKeySpec = new ECPublicKeySpec(w, spec);
 
         try {
-            KeyFactory keyFactory = KeyFactory.getInstance("EC", BouncyCastleProviderSingleton.getInstance());
+            KeyFactory keyFactory = KeyFactory.getInstance(JWKIdentifiers.ELLIPTIC_CURVE_KEY_TYPE, BouncyCastleProviderSingleton.getInstance());
 
             return (ECPublicKey) keyFactory.generatePublic(publicKeySpec);
 
@@ -1041,7 +1042,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
         ECPrivateKeySpec privateKeySpec = new ECPrivateKeySpec(d.decodeToBigInteger(), spec);
 
         try {
-            KeyFactory keyFactory = KeyFactory.getInstance("EC", BouncyCastleProviderSingleton.getInstance());
+            KeyFactory keyFactory = KeyFactory.getInstance(JWKIdentifiers.ELLIPTIC_CURVE_KEY_TYPE, BouncyCastleProviderSingleton.getInstance());
 
             return (ECPrivateKey) keyFactory.generatePrivate(privateKeySpec);
 
@@ -1136,10 +1137,10 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
 
         // Put mandatory params in sorted order
         LinkedHashMap<String, String> requiredParams = new LinkedHashMap<>();
-        requiredParams.put("crv", crv.toString());
-        requiredParams.put("kty", getKeyType().getValue());
-        requiredParams.put("x", x.toString());
-        requiredParams.put("y", y.toString());
+        requiredParams.put(JWKIdentifiers.CURVE, crv.toString());
+        requiredParams.put(JWKIdentifiers.KEY_TYPE, getKeyType().getValue());
+        requiredParams.put(JWKIdentifiers.X_COORD, x.toString());
+        requiredParams.put(JWKIdentifiers.Y_COORD, y.toString());
         return requiredParams;
     }
 
@@ -1187,12 +1188,12 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
         JsonObjectBuilder result = super.toJSONObject();
 
         // Append EC specific attributes
-        result.add("crv", crv.toString());
-        result.add("x", x.toString());
-        result.add("y", y.toString());
+        result.add(JWKIdentifiers.CURVE, crv.toString());
+        result.add(JWKIdentifiers.X_COORD, x.toString());
+        result.add(JWKIdentifiers.Y_COORD, y.toString());
 
         if (d != null) {
-            result.add("d", d.toString());
+            result.add(JWKIdentifiers.ECC_PRIVATE_KEY, d.toString());
         }
 
         return result;
@@ -1228,11 +1229,6 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
     public static ECKey parse(JsonObject jsonObject)
             throws ParseException {
 
-        // Parse the mandatory parameters first
-        Curve crv = Curve.parse(jsonObject.getString("crv"));
-        Base64URLValue x = new Base64URLValue(jsonObject.getString("x"));
-        Base64URLValue y = new Base64URLValue(jsonObject.getString("y"));
-
         // Check key type
         KeyType kty = JWKMetadata.parseKeyType(jsonObject);
 
@@ -1240,12 +1236,25 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
             throw new ParseException("The key type \"kty\" must be EC", 0);
         }
 
-        // Get optional private key
-        Base64URLValue d = null;
-        if (jsonObject.get("d") != null) {
-            d = new Base64URLValue(jsonObject.getString("d"));
+        // Parse the mandatory parameters first
+        String crvValue = JSONObjectUtils.getString(jsonObject, JWKIdentifiers.CURVE);
+        if (crvValue == null) {
+            throw new ParseException("The cryptographic curve string must not be null or empty", 0);
+        }
+        Curve crv = Curve.parse(crvValue);
+
+        Base64URLValue x = JSONObjectUtils.getBase64URL(jsonObject, JWKIdentifiers.X_COORD);
+        if (x == null) {
+            throw new ParseException("The 'x' coordinate must not be null", 0);
         }
 
+        Base64URLValue y = JSONObjectUtils.getBase64URL(jsonObject, JWKIdentifiers.Y_COORD);
+        if (y == null) {
+            throw new ParseException("The 'y' coordinate must not be null", 0);
+        }
+
+        // Get optional private key
+        Base64URLValue d = JSONObjectUtils.getBase64URL(jsonObject, JWKIdentifiers.ECC_PRIVATE_KEY);
 
         try {
             if (d == null) {
@@ -1387,7 +1396,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
             return new ECKey.Builder(ecJWK)
                     .privateKey((ECPrivateKey) key)
                     .build();
-        } else if (key instanceof PrivateKey && "EC".equalsIgnoreCase(key.getAlgorithm())) {
+        } else if (key instanceof PrivateKey && JWKIdentifiers.ELLIPTIC_CURVE_KEY_TYPE.equalsIgnoreCase(key.getAlgorithm())) {
             // PKCS#11 store
             return new ECKey.Builder(ecJWK)
                     .privateKey((PrivateKey) key)

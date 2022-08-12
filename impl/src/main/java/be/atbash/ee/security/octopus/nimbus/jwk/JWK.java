@@ -411,10 +411,10 @@ public abstract class JWK implements Serializable {
 
         JsonObjectBuilder result = Json.createObjectBuilder();
 
-        result.add("kty", kty.getValue());
+        result.add(JWKIdentifiers.KEY_TYPE, kty.getValue());
 
         if (use != null) {
-            result.add("use", use.identifier());
+            result.add(JWKIdentifiers.PUBLIC_KEY_USE, use.identifier());
         }
 
         if (ops != null) {
@@ -425,23 +425,23 @@ public abstract class JWK implements Serializable {
                 opsValues.add(op.identifier());
             }
 
-            result.add("key_ops", opsValues);
+            result.add(JWKIdentifiers.KEY_OPS, opsValues);
         }
 
         if (alg != null) {
-            result.add("alg", alg.getName());
+            result.add(JWKIdentifiers.ALGORITHM, alg.getName());
         }
 
         if (kid != null) {
-            result.add("kid", kid);
+            result.add(JWKIdentifiers.KEY_ID, kid);
         }
 
         if (x5u != null) {
-            result.add("x5u", x5u.toString());
+            result.add(JWKIdentifiers.X_509_URL, x5u.toString());
         }
 
         if (x5t256 != null) {
-            result.add("x5t#S256", x5t256.toString());
+            result.add(JWKIdentifiers.X_509_CERT_SHA_256_THUMBPRINT, x5t256.toString());
         }
 
         if (x5c != null) {
@@ -450,7 +450,7 @@ public abstract class JWK implements Serializable {
             for (Base64Value base64 : x5c) {
                 stringValues.add(base64.toString());
             }
-            result.add("x5c", stringValues);
+            result.add(JWKIdentifiers.X_509_CERT_CHAIN, stringValues);
         }
 
         return result;
@@ -508,10 +508,10 @@ public abstract class JWK implements Serializable {
     public static JWK parse(JsonObject jsonObject)
             throws ParseException {
 
-        if (!jsonObject.containsKey("kty")) {
-            return null;
+        if (!jsonObject.containsKey(JWKIdentifiers.KEY_TYPE)) {
+            throw new ParseException("Missing key type '" + JWKIdentifiers.KEY_TYPE + "' parameter", 0);
         }
-        KeyType kty = KeyType.parse(jsonObject.getString("kty"));
+        KeyType kty = KeyType.parse(JSONObjectUtils.getString(jsonObject, JWKIdentifiers.KEY_TYPE));
 
         if (kty == KeyType.EC) {
 
@@ -530,8 +530,10 @@ public abstract class JWK implements Serializable {
             return OctetKeyPair.parse(jsonObject);
 
         } else {
+            // Ignore unknown key type
+            // https://tools.ietf.org/html/rfc7517#section-5
 
-            throw new ParseException("Unsupported key type \"kty\" parameter: " + kty, 0);
+            return null;
         }
     }
 
@@ -656,7 +658,6 @@ public abstract class JWK implements Serializable {
                 Objects.equals(x5u, jwk.x5u) &&
                 Objects.equals(x5t256, jwk.x5t256) &&
                 Objects.equals(x5c, jwk.x5c) &&
-                Objects.equals(parsedX5c, jwk.parsedX5c) &&
                 Objects.equals(keyStore, jwk.keyStore);
     }
 

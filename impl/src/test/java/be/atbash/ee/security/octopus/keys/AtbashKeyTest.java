@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -139,11 +139,21 @@ public class AtbashKeyTest {
 
     @Test
     public void EC_specification_P256K() {
+        // For the deprecated Curve.P256K
         List<AtbashKey> keys = TestKeys.generateECKeys("test", "P-256K");
         for (AtbashKey key : keys) {
-            assertThat(key.getSpecification()).isEqualTo("Curve name : P-256K");
+            assertThat(key.getSpecification()).isEqualTo("Curve name : secp256k1");
         }
     }
+
+    @Test
+    public void EC_specification_SECP256K1() {
+        List<AtbashKey> keys = TestKeys.generateECKeys("test", "secp256k1");
+        for (AtbashKey key : keys) {
+            assertThat(key.getSpecification()).isEqualTo("Curve name : secp256k1");
+        }
+    }
+
 
     @Test
     public void EC_specification_P384() {

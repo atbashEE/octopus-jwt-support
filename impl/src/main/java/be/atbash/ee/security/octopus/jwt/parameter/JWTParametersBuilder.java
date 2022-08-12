@@ -19,6 +19,7 @@ import be.atbash.ee.security.octopus.config.JCASupportConfiguration;
 import be.atbash.ee.security.octopus.config.JwtSupportConfiguration;
 import be.atbash.ee.security.octopus.jwt.JWTEncoding;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
+import be.atbash.ee.security.octopus.nimbus.jose.HeaderParameterNames;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.PasswordBasedEncrypter;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.PBKDF;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.PRFParams;
@@ -73,7 +74,7 @@ public final class JWTParametersBuilder {
 
     // Convenient way for withHeader("jku",url);
     public JWTParametersBuilder withJSONKeyURL(String url) {
-        return withHeader("jku", url);
+        return withHeader(HeaderParameterNames.JWK_SET_URL, url);
     }
 
     public JWTParametersBuilder withSecretKeyForSigning(AtbashKey key) {
@@ -155,8 +156,8 @@ public final class JWTParametersBuilder {
         PRFParams prfParams = PRFParams.resolve(jweAlgorithm);
         secretKeyEncryption = new AtbashKey(kid, PBKDF.deriveKey(password, salt, iterationCount, prfParams));
 
-        headerValues.put("p2s", Base64URLValue.encode(salt));
-        headerValues.put("p2c", iterationCount);
+        headerValues.put(HeaderParameterNames.PBES2_SALT_INPUT, Base64URLValue.encode(salt));
+        headerValues.put(HeaderParameterNames.PBES2_COUNT, iterationCount);
     }
 
     private void validateParameters() {

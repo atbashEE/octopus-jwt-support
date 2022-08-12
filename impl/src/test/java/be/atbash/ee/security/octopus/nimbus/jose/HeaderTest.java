@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,14 +22,17 @@ import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEHeader;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import java.text.ParseException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 
 /**
  * Tests the base JOSE header class.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
 public class HeaderTest {
@@ -78,6 +81,14 @@ public class HeaderTest {
 
         JWEHeader jweHeader = (JWEHeader) header;
         assertThat(jweHeader.getEncryptionMethod()).isEqualTo(EncryptionMethod.A128CBC_HS256);
+    }
+
+    @Test
+    public void testParseAlgorithm_nullAlg() {
+
+        Assertions.assertThatThrownBy(() -> Header.parse("{}"))
+                .isInstanceOf(ParseException.class)
+                .hasMessage("Missing 'alg' in JSON object");
     }
 
 }

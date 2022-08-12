@@ -18,6 +18,7 @@ package be.atbash.ee.security.octopus.nimbus.jose;
 
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
+import be.atbash.ee.security.octopus.nimbus.util.JSONObjectUtils;
 
 import javax.json.JsonObject;
 import java.io.Serializable;
@@ -137,17 +138,17 @@ public class Algorithm implements Serializable {
     public static Algorithm parseAlgorithm(JsonObject json)
             throws ParseException {
 
-        if (!json.containsKey("alg")) {
-            throw new ParseException("Missing \"alg\" in JSON object", 0);
+        if (!json.containsKey(HeaderParameterNames.ALGORITHM)) {
+            throw new ParseException("Missing '" + HeaderParameterNames.ALGORITHM + "' in JSON object", 0);
         }
 
-        String algName = json.getString("alg");
+        String algName = JSONObjectUtils.getString(json, HeaderParameterNames.ALGORITHM);
 
         // Infer algorithm type
         if (algName.equals(Algorithm.NONE.getName())) {
             // Plain
             return Algorithm.NONE;
-        } else if (json.containsKey("enc")) {
+        } else if (json.containsKey(HeaderParameterNames.ENCRYPTION_ALGORITHM)) {
             // JWE
             return JWEAlgorithm.parse(algName);
         } else {

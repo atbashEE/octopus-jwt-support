@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,12 +28,18 @@ import be.atbash.ee.security.octopus.keys.ListKeyManager;
 import be.atbash.ee.security.octopus.keys.TestKeys;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.keys.selector.SelectorCriteria;
+import be.atbash.ee.security.octopus.nimbus.jose.HeaderParameterNames;
 import be.atbash.ee.security.octopus.nimbus.jwt.JWT;
 import be.atbash.ee.security.octopus.nimbus.jwt.JWTClaimsSet;
 import be.atbash.ee.security.octopus.nimbus.jwt.JWTParser;
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
+import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
+import be.atbash.ee.security.octopus.util.JsonbUtil;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import javax.json.JsonObject;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.*;
@@ -83,7 +89,7 @@ public class JWTEncoderTest {
 
         Map<String, Object> header = getJson(jwtParts[0]);
         assertThat(header).hasSize(1);
-        assertThat(header).containsEntry("alg", "none");
+        assertThat(header).containsEntry(HeaderParameterNames.ALGORITHM, "none");
 
         Map<String, Object> content = getJson(jwtParts[1]);
         assertThat(content).hasSize(3);
@@ -92,6 +98,28 @@ public class JWTEncoderTest {
         List<String> list = (List<String>) content.get("myList");
         assertThat(list).containsOnly("permission1", "permission2");
         assertThat(content).containsEntry("value", "JUnit");
+
+    }
+
+    @Test
+    public void encodeObject_plain_json() {
+        // Encode a POJO to JWT but not signed. (JSON serialization
+
+        JWTParameters parameters = new JWTParametersPlain();
+
+        JWTEncoder encoder = new JWTEncoder();
+        JsonObject json = encoder.encodeAsJson(payload, parameters);
+
+        Assertions.assertThat(json.keySet()).containsOnly("header", "protected", "payload");
+
+        Base64URLValue headerBase64 = new Base64URLValue(json.getString("protected"));
+        JsonObject header = json.getJsonObject("header");
+
+        String headerJSON = JsonbUtil.getJsonb().toJson(header);
+        Assertions.assertThat(headerJSON).isEqualTo(headerBase64.decodeToString());
+
+        String encodedAsString = encoder.encode(payload, parameters);
+        Assertions.assertThat(encodedAsString).isEqualTo(json.getString("protected") + "." + json.getString("payload") + ".");
 
     }
 
@@ -117,7 +145,7 @@ public class JWTEncoderTest {
 
         Map<String, Object> header = getJson(jwtParts[0]);
         assertThat(header).hasSize(1);
-        assertThat(header).containsEntry("alg", "none");
+        assertThat(header).containsEntry(HeaderParameterNames.ALGORITHM, "none");
 
         Map<String, Object> content = getJson(jwtParts[1]);
         assertThat(content).hasSize(4);
@@ -144,7 +172,7 @@ public class JWTEncoderTest {
         Map<String, Object> header = getJson(jwtParts[0]);
 
         assertThat(header).hasSize(3);
-        assertThat(header).containsEntry("alg", "RS256");
+        assertThat(header).containsEntry(HeaderParameterNames.ALGORITHM, "RS256");
         assertThat(header).containsEntry("kid", "kid");
         assertThat(header).containsEntry("typ", "JWT");
 
@@ -155,6 +183,27 @@ public class JWTEncoderTest {
         List<String> list = (List<String>) content.get("myList");
         assertThat(list).containsOnly("permission1", "permission2");
         assertThat(content).containsEntry("value", "JUnit");
+    }
+
+    @Test
+    public void encodeObject_jwt_json() {
+        // Encode a POJO to JWT in JSON Format
+
+        JWTParameters parameters = getJwtParameters();
+
+        JWTEncoder encoder = new JWTEncoder();
+        JsonObject encoded = encoder.encodeAsJson(payload, parameters);
+
+        Assertions.assertThat(encoded.keySet()).containsOnly("header", "protected", "payload", "signature");
+
+        Base64URLValue headerBase64 = new Base64URLValue(encoded.getString("protected"));
+        JsonObject header = encoded.getJsonObject("header");
+
+        String headerJSON = JsonbUtil.getJsonb().toJson(header);
+        Assertions.assertThat(headerJSON).isEqualTo(headerBase64.decodeToString());
+
+        String encodedAsString = encoder.encode(payload, parameters);
+        Assertions.assertThat(encodedAsString).isEqualTo(encoded.getString("protected") + "." + encoded.getString("payload") + "." + encoded.getString("signature"));
     }
 
     private JWTParameters getJwtParameters() {
@@ -181,6 +230,7 @@ public class JWTEncoderTest {
         JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWE)
                 .withSecretKeyForSigning(keyForSigning)
                 .withSecretKeyForEncryption(keyForEncryption)
+                .withJWEAlgorithm(JWEAlgorithm.RSA_OAEP_256)
                 .build();
 
         JWTEncoder encoder = new JWTEncoder();
@@ -192,12 +242,41 @@ public class JWTEncoderTest {
         Map<String, Object> header = getJson(jwtParts[0]);
 
         assertThat(header).hasSize(4);
-        assertThat(header).containsEntry("alg", "RSA-OAEP-256");
-        assertThat(header).containsEntry("kid", "encrypt");
-        assertThat(header).containsEntry("cty", "JWT");
-        assertThat(header).containsEntry("enc", "A256GCM");
+        assertThat(header).containsEntry(HeaderParameterNames.ALGORITHM, "RSA-OAEP-256");
+        assertThat(header).containsEntry(HeaderParameterNames.KEY_ID, "encrypt");
+        assertThat(header).containsEntry(HeaderParameterNames.CONTENT_TYPE, "JWT");
+        assertThat(header).containsEntry(HeaderParameterNames.ENCRYPTION_ALGORITHM, "A256GCM");
 
         // The rest is really not decipherable.
+    }
+
+    @Test
+    public void encodeObject_jwe_json() {
+        // Encode a POJO to JWE JSON format
+
+        AtbashKey keyForSigning = createKeyForSigning();
+        AtbashKey keyForEncryption = createKeyForEncryption();
+
+        JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWE)
+                .withSecretKeyForSigning(keyForSigning)
+                .withSecretKeyForEncryption(keyForEncryption)
+                .withJWEAlgorithm(JWEAlgorithm.RSA_OAEP_256)
+                .build();
+
+        JWTEncoder encoder = new JWTEncoder();
+        JsonObject encoded = encoder.encodeAsJson(payload, parameters);
+
+        Assertions.assertThat(encoded.keySet()).containsOnly("header", "protected", "payload", "encrypted_key", "iv", "ciphertext", "tag");
+
+
+        Base64URLValue headerBase64 = new Base64URLValue(encoded.getString("protected"));
+        JsonObject header = encoded.getJsonObject("header");
+
+        String headerJSON = JsonbUtil.getJsonb().toJson(header);
+        Assertions.assertThat(headerJSON).isEqualTo(headerBase64.decodeToString());
+
+        // We cannot check if contents is ok since the IV is recreated each time and thus gives other values.
+
     }
 
     private AtbashKey createKeyForSigning() {
@@ -230,7 +309,7 @@ public class JWTEncoderTest {
     }
 
     @Test
-    public void encodeWithCustomerSerializer() throws ParseException {
+    public void encodeWithCustomSerializer() throws ParseException {
         JWTParameters parameters = getJwtParameters();
 
         JWTEncoder encoder = new JWTEncoder();

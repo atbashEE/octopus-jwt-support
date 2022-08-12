@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package be.atbash.ee.security.octopus.nimbus.jose.crypto.impl;
 
 
 import be.atbash.ee.security.octopus.nimbus.jose.Header;
+import be.atbash.ee.security.octopus.nimbus.jose.HeaderParameterNames;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEHeader;
 
@@ -26,7 +27,7 @@ import java.util.Set;
 
 /**
  * Critical ({@code crit}) header parameters deferral policy.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
 public class CriticalHeaderParamsDeferral {
@@ -42,11 +43,11 @@ public class CriticalHeaderParamsDeferral {
      * Returns the names of the critical ({@code crit}) header parameters
      * that are understood and processed.
      *
-     * @return Empty immutable set.
+     * @return immutable set with 'b64'.
      */
     public Set<String> getProcessedCriticalHeaderParams() {
 
-        return Collections.emptySet();
+        return Collections.singleton(HeaderParameterNames.BASE64_URL_ENCODE_PAYLOAD);
     }
 
 
@@ -94,14 +95,20 @@ public class CriticalHeaderParamsDeferral {
      */
     public boolean headerPasses(Header header) {
 
-        Set<String> crit = header.getCriticalParams();
-
-        if (crit == null || crit.isEmpty()) {
-            return true; // OK
+        if (header.getCriticalParams() == null) {
+            return true; // ok
         }
 
-        // Ensure all marked as deferred
-        return deferredParams != null && deferredParams.containsAll(crit);
+        for (String critParam : header.getCriticalParams()) {
+            if (getProcessedCriticalHeaderParams().contains(critParam)) {
+                continue;
+            }
+            if (getDeferredCriticalHeaderParams().contains(critParam)) {
+                continue;
+            }
+            return false;
+        }
+        return true;
     }
 
 

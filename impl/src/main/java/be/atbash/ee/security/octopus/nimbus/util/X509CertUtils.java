@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,15 +17,16 @@ package be.atbash.ee.security.octopus.nimbus.util;
 
 
 import java.io.ByteArrayInputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.security.*;
+import java.security.cert.Certificate;
 import java.security.cert.*;
 import java.util.Base64;
+import java.util.UUID;
 
 
 /**
  * X.509 certificate utilities.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
 public final class X509CertUtils {
@@ -220,6 +221,32 @@ public final class X509CertUtils {
         } catch (NoSuchAlgorithmException | CertificateEncodingException e) {
             return null;
         }
+    }
+
+    /**
+     * Stores a private key with its associated X.509 certificate in a
+     * Java key store. The name (alias) for the stored entry is given a
+     * random UUID.
+     *
+     * @param keyStore    The key store. Must be initialised and not
+     *                    {@code null}.
+     * @param privateKey  The private key. Must not be {@code null}.
+     * @param keyPassword The password to protect the private key, empty
+     *                    array for none. Must not be {@code null}.
+     * @param cert        The X.509 certificate, its public key and the
+     *                    private key should form a pair. Must not be
+     *                    {@code null}.
+     * @return The UUID for the stored entry.
+     */
+    public static UUID store(KeyStore keyStore,
+                             Key privateKey,
+                             char[] keyPassword,
+                             X509Certificate cert)
+            throws KeyStoreException {
+
+        UUID alias = UUID.randomUUID();
+        keyStore.setKeyEntry(alias.toString(), privateKey, keyPassword, new Certificate[]{cert});
+        return alias;
     }
 
     private X509CertUtils() {

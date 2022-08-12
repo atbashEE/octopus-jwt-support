@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,14 +21,17 @@ import be.atbash.ee.security.octopus.nimbus.jose.Payload;
 import be.atbash.ee.security.octopus.nimbus.jose.PlainHeader;
 import be.atbash.ee.security.octopus.nimbus.jose.PlainObject;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
+import be.atbash.ee.security.octopus.nimbus.util.JSONObjectUtils;
+import be.atbash.ee.security.octopus.util.JsonbUtil;
 
+import javax.json.Json;
 import javax.json.JsonObject;
 import java.text.ParseException;
 
 
 /**
  * Unsecured (plain) JSON Web Token (JWT).
- *
+ * <p>
  * Based on code by  Vladimir Dzhuvinov
  */
 public class PlainJWT extends PlainObject implements JWT {
@@ -36,6 +39,9 @@ public class PlainJWT extends PlainObject implements JWT {
 
     private static final long serialVersionUID = 1L;
 
+
+    // Cached JWTClaimsSet
+    private JWTClaimsSet claimsSet;
 
     /**
      * Creates a new unsecured (plain) JSON Web Token (JWT) with a default
@@ -47,6 +53,7 @@ public class PlainJWT extends PlainObject implements JWT {
     public PlainJWT(JWTClaimsSet claimsSet) {
 
         super(new Payload(claimsSet.toJSONObject()));
+        this.claimsSet = claimsSet;
     }
 
 
@@ -60,6 +67,7 @@ public class PlainJWT extends PlainObject implements JWT {
     public PlainJWT(PlainHeader header, JWTClaimsSet claimsSet) {
 
         super(header, new Payload(claimsSet.toJSONObject()));
+        this.claimsSet = claimsSet;
     }
 
 
@@ -87,6 +95,10 @@ public class PlainJWT extends PlainObject implements JWT {
     public JWTClaimsSet getJWTClaimsSet()
             throws ParseException {
 
+        if (claimsSet != null) {
+            return claimsSet;
+        }
+
         JsonObject json = getPayload().toJSONObject();
 
         if (json == null) {
@@ -94,9 +106,18 @@ public class PlainJWT extends PlainObject implements JWT {
             throw new ParseException("Payload of unsecured JOSE object is not a valid JSON object", 0);
         }
 
-        return JWTClaimsSet.parse(json);
+        claimsSet = JWTClaimsSet.parse(json);
+        return claimsSet;
     }
 
+    @Override
+    protected void setPayload(Payload payload) {
+
+        // setPayload() changes the result of getJWTClaimsSet().
+        // set claimsSet = null and reparse payload again when called getJWTClaimsSet().
+        claimsSet = null;
+        super.setPayload(payload);
+    }
 
     /**
      * Parses an unsecured (plain) JSON Web Token (JWT) from the specified
@@ -118,5 +139,36 @@ public class PlainJWT extends PlainObject implements JWT {
         }
 
         return new PlainJWT(parts[0], parts[1]);
+    }
+
+    /**
+     * Parses an unsecured (plain) JSON Web Token (JWT) from
+     * JSON Object.
+     *
+     * @param value The Json to parse. Must not be {@code null}.
+     * @return The unsecured JWT.
+     * @throws ParseException If the JsonObject couldn't be parsed to a valid
+     *                        unsecured JWT.
+     */
+    public static PlainJWT parse(JsonObject value)
+            throws ParseException {
+
+        Base64URLValue header = JSONObjectUtils.getBase64URL(value, "protected");
+        if (header == null) {
+            header = Base64URLValue.encode(JsonbUtil.getJsonb().toJson(value.getJsonObject("header")));
+        }
+
+        Base64URLValue payload = JSONObjectUtils.getBase64URL(value, "payload");
+
+        return new PlainJWT(header, payload);
+    }
+
+    @Override
+    public JsonObject serializeToJson() {
+        return Json.createObjectBuilder()
+                .add("header", getHeader().toJSONObject().build())
+                .add("protected", getHeader().toBase64URL().toString())
+                .add("payload", getPayload().toBase64URL().toString())
+                .build();
     }
 }

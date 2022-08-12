@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,25 @@
 package be.atbash.ee.security.octopus.nimbus.util;
 
 
+import be.atbash.ee.security.octopus.keys.AtbashKey;
+import be.atbash.ee.security.octopus.keys.reader.KeyReaderPEM;
+import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
+import be.atbash.ee.security.octopus.keys.selector.filter.AsymmetricPartKeyFilter;
 import be.atbash.ee.security.octopus.nimbus.IOUtil;
 import be.atbash.ee.security.octopus.nimbus.jwk.Curve;
+import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
+import org.assertj.core.api.Assertions;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.security.KeyStore;
 import java.security.MessageDigest;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import java.util.List;
+import java.util.UUID;
 
 
 /**
@@ -108,9 +114,9 @@ public class X509CertUtilsTest {
 
         X509Certificate cert = X509CertUtils.parse(PEM_CERT);
 
-        assertThat(cert.getType()).isEqualTo("X.509");
-        assertThat(cert.getSubjectX500Principal().getName()).isEqualTo("CN=connect2id.com,OU=Domain Control Validated");
-        assertThat(cert.getPublicKey()).isInstanceOf(RSAPublicKey.class);
+        Assertions.assertThat(cert.getType()).isEqualTo("X.509");
+        Assertions.assertThat(cert.getSubjectX500Principal().getName()).isEqualTo("CN=connect2id.com,OU=Domain Control Validated");
+        Assertions.assertThat(cert.getPublicKey()).isInstanceOf(RSAPublicKey.class);
     }
 
 
@@ -120,35 +126,34 @@ public class X509CertUtilsTest {
 
         X509Certificate cert = X509CertUtils.parseWithException(PEM_CERT);
 
-        assertThat(cert.getType()).isEqualTo("X.509");
-        assertThat(cert.getSubjectX500Principal().getName()).isEqualTo("CN=connect2id.com,OU=Domain Control Validated");
-        assertThat(cert.getPublicKey()).isInstanceOf(RSAPublicKey.class);
+        Assertions.assertThat(cert.getType()).isEqualTo("X.509");
+        Assertions.assertThat(cert.getSubjectX500Principal().getName()).isEqualTo("CN=connect2id.com,OU=Domain Control Validated");
+        Assertions.assertThat(cert.getPublicKey()).isInstanceOf(RSAPublicKey.class);
     }
 
     @Test
     public void testParsePEMWithException_noBeginMarker() {
 
-        CertificateException e = Assertions.assertThrows(CertificateException.class,
-                () -> X509CertUtils.parseWithException(PEM_CERT.replace("-----BEGIN CERTIFICATE-----", "")));
-        assertThat(e.getMessage()).isEqualTo("PEM begin marker not found");
-
+        Assertions.assertThatThrownBy(() -> X509CertUtils.parseWithException(PEM_CERT.replace("-----BEGIN CERTIFICATE-----", "")))
+                .isInstanceOf(CertificateException.class)
+                .hasMessage("PEM begin marker not found");
     }
 
     @Test
     public void testParsePEMWithException_noEndMarker() {
 
-        CertificateException e = Assertions.assertThrows(CertificateException.class,
-                () -> X509CertUtils.parseWithException(PEM_CERT.replace("-----END CERTIFICATE-----", "")));
-        assertThat(e.getMessage()).isEqualTo("PEM end marker not found");
+        Assertions.assertThatThrownBy(() -> X509CertUtils.parseWithException(PEM_CERT.replace("-----END CERTIFICATE-----", "")))
+                .isInstanceOf(CertificateException.class)
+                .hasMessage("PEM end marker not found");
 
     }
 
     @Test
     public void testParsePEMWithException_corruptedContent() {
 
-        CertificateException e = Assertions.assertThrows(CertificateException.class,
-                () -> X509CertUtils.parseWithException("-----BEGIN CERTIFICATE-----MIIFKjCCBBKgAwIBAgIIM1RIMykkp1AwDQYJKoZIhvcNAQELBQAwgbQxCzAJBgNV-----END CERTIFICATE-----"));
-        assertThat(e.getMessage()).isEqualTo("Could not parse certificate: java.io.IOException: Incomplete BER/DER data");
+        Assertions.assertThatThrownBy(() -> X509CertUtils.parseWithException("-----BEGIN CERTIFICATE-----MIIFKjCCBBKgAwIBAgIIM1RIMykkp1AwDQYJKoZIhvcNAQELBQAwgbQxCzAJBgNV-----END CERTIFICATE-----"))
+                .isInstanceOf(CertificateException.class)
+                .hasMessage("Could not parse certificate: java.io.IOException: Incomplete BER/DER data");
 
     }
 
@@ -157,9 +162,9 @@ public class X509CertUtilsTest {
 
         X509Certificate cert = X509CertUtils.parse(PEM_CERT_WITH_WHITESPACE);
 
-        assertThat(cert.getType()).isEqualTo("X.509");
-        assertThat(cert.getSubjectX500Principal().getName()).isEqualTo("CN=connect2id.com,OU=Domain Control Validated");
-        assertThat(cert.getPublicKey()).isInstanceOf(RSAPublicKey.class);
+        Assertions.assertThat(cert.getType()).isEqualTo("X.509");
+        Assertions.assertThat(cert.getSubjectX500Principal().getName()).isEqualTo("CN=connect2id.com,OU=Domain Control Validated");
+        Assertions.assertThat(cert.getPublicKey()).isInstanceOf(RSAPublicKey.class);
     }
 
     @Test
@@ -169,27 +174,27 @@ public class X509CertUtilsTest {
         String content = IOUtil.readFileToString("src/test/resources/sample-certs/wikipedia.crt");
 
         X509Certificate cert = X509CertUtils.parse(content);
-        assertThat(cert).isNotNull();
+        Assertions.assertThat(cert).isNotNull();
 
-        assertThat(cert.getPublicKey()).isInstanceOf(ECPublicKey.class);
+        Assertions.assertThat(cert.getPublicKey()).isInstanceOf(ECPublicKey.class);
 
         // For definition, see rfc2459, 4.2.1.3 Key Usage
-        assertThat(cert.getKeyUsage()[0]).withFailMessage("Digital signature").isTrue();
-        assertThat(cert.getKeyUsage()[1]).withFailMessage("Non repudiation").isFalse();
-        assertThat(cert.getKeyUsage()[2]).withFailMessage("Key encipherment").isFalse();
-        assertThat(cert.getKeyUsage()[3]).withFailMessage("Data encipherment").isFalse();
-        assertThat(cert.getKeyUsage()[4]).withFailMessage("Key agreement").isTrue();
-        assertThat(cert.getKeyUsage()[5]).withFailMessage("Key certificate signing").isFalse();
-        assertThat(cert.getKeyUsage()[6]).withFailMessage("CRL signing").isFalse();
-        assertThat(cert.getKeyUsage()[7]).withFailMessage("Decipher").isFalse();
-        assertThat(cert.getKeyUsage()[8]).withFailMessage("Encipher").isFalse();
+        Assertions.assertThat(cert.getKeyUsage()[0]).withFailMessage("Digital signature").isTrue();
+        Assertions.assertThat(cert.getKeyUsage()[1]).withFailMessage("Non repudiation").isFalse();
+        Assertions.assertThat(cert.getKeyUsage()[2]).withFailMessage("Key encipherment").isFalse();
+        Assertions.assertThat(cert.getKeyUsage()[3]).withFailMessage("Data encipherment").isFalse();
+        Assertions.assertThat(cert.getKeyUsage()[4]).withFailMessage("Key agreement").isTrue();
+        Assertions.assertThat(cert.getKeyUsage()[5]).withFailMessage("Key certificate signing").isFalse();
+        Assertions.assertThat(cert.getKeyUsage()[6]).withFailMessage("CRL signing").isFalse();
+        Assertions.assertThat(cert.getKeyUsage()[7]).withFailMessage("Decipher").isFalse();
+        Assertions.assertThat(cert.getKeyUsage()[8]).withFailMessage("Encipher").isFalse();
 
         JcaX509CertificateHolder certHolder = new JcaX509CertificateHolder(cert);
 
         String ecPubKeyAlg = "1.2.840.10045.2.1";
 
-        assertThat(certHolder.getSubjectPublicKeyInfo().getAlgorithm().getAlgorithm().getId()).isEqualTo(ecPubKeyAlg);
-        assertThat(certHolder.getSubjectPublicKeyInfo().getAlgorithm().getParameters().toString()).isEqualTo(Curve.P_256.getOID());
+        Assertions.assertThat(certHolder.getSubjectPublicKeyInfo().getAlgorithm().getAlgorithm().getId()).isEqualTo(ecPubKeyAlg);
+        Assertions.assertThat(certHolder.getSubjectPublicKeyInfo().getAlgorithm().getParameters().toString()).isEqualTo(Curve.P_256.getOID());
     }
 
     @Test
@@ -199,26 +204,26 @@ public class X509CertUtilsTest {
         String content = IOUtil.readFileToString("src/test/resources/sample-certs/ietf.crt");
 
         X509Certificate cert = X509CertUtils.parse(content);
-        assertThat(cert).isNotNull();
+        Assertions.assertThat(cert).isNotNull();
 
-        assertThat(cert.getPublicKey()).isInstanceOf(RSAPublicKey.class);
+        Assertions.assertThat(cert.getPublicKey()).isInstanceOf(RSAPublicKey.class);
 
         // For definition, see rfc2459, 4.2.1.3 Key Usage
-        assertThat(cert.getKeyUsage()[0]).withFailMessage("Digital signature").isTrue();
-        assertThat(cert.getKeyUsage()[1]).withFailMessage("Non repudiation").isFalse();
-        assertThat(cert.getKeyUsage()[2]).withFailMessage("Key encipherment").isTrue();
-        assertThat(cert.getKeyUsage()[3]).withFailMessage("Data encipherment").isFalse();
-        assertThat(cert.getKeyUsage()[4]).withFailMessage("Key agreement").isFalse();
-        assertThat(cert.getKeyUsage()[5]).withFailMessage("Key certificate signing").isFalse();
-        assertThat(cert.getKeyUsage()[6]).withFailMessage("CRL signing").isFalse();
-        assertThat(cert.getKeyUsage()[7]).withFailMessage("Decipher").isFalse();
-        assertThat(cert.getKeyUsage()[8]).withFailMessage("Encipher").isFalse();
+        Assertions.assertThat(cert.getKeyUsage()[0]).withFailMessage("Digital signature").isTrue();
+        Assertions.assertThat(cert.getKeyUsage()[1]).withFailMessage("Non repudiation").isFalse();
+        Assertions.assertThat(cert.getKeyUsage()[2]).withFailMessage("Key encipherment").isTrue();
+        Assertions.assertThat(cert.getKeyUsage()[3]).withFailMessage("Data encipherment").isFalse();
+        Assertions.assertThat(cert.getKeyUsage()[4]).withFailMessage("Key agreement").isFalse();
+        Assertions.assertThat(cert.getKeyUsage()[5]).withFailMessage("Key certificate signing").isFalse();
+        Assertions.assertThat(cert.getKeyUsage()[6]).withFailMessage("CRL signing").isFalse();
+        Assertions.assertThat(cert.getKeyUsage()[7]).withFailMessage("Decipher").isFalse();
+        Assertions.assertThat(cert.getKeyUsage()[8]).withFailMessage("Encipher").isFalse();
 
         JcaX509CertificateHolder certHolder = new JcaX509CertificateHolder(cert);
 
         String rsaPubKeyAlg = "1.2.840.113549.1.1.1";
-        assertThat(certHolder.getSubjectPublicKeyInfo().getAlgorithm().getAlgorithm().getId()).isEqualTo(rsaPubKeyAlg);
-        assertThat(certHolder.getSubjectPublicKeyInfo().getAlgorithm().getParameters().toString()).isEqualTo("NULL");
+        Assertions.assertThat(certHolder.getSubjectPublicKeyInfo().getAlgorithm().getAlgorithm().getId()).isEqualTo(rsaPubKeyAlg);
+        Assertions.assertThat(certHolder.getSubjectPublicKeyInfo().getAlgorithm().getParameters().toString()).isEqualTo("NULL");
     }
 
     @Test
@@ -229,11 +234,11 @@ public class X509CertUtilsTest {
 
         MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
         byte[] hash = sha256.digest(cert.getEncoded());
-        assertThat(ByteUtils.bitLength(hash)).isEqualTo(256);
+        Assertions.assertThat(ByteUtils.bitLength(hash)).isEqualTo(256);
 
         Base64URLValue thumbPrint = X509CertUtils.computeSHA256Thumbprint(cert);
 
-        assertThat(thumbPrint).isEqualTo(Base64URLValue.encode(hash));
+        Assertions.assertThat(thumbPrint).isEqualTo(Base64URLValue.encode(hash));
     }
 
     @Test
@@ -242,10 +247,10 @@ public class X509CertUtilsTest {
         X509Certificate cert = X509CertUtils.parse(PEM_CERT);
         String pemString = X509CertUtils.toPEMString(cert);
         String[] lines = pemString.split("\\n");
-        assertThat(lines[0]).isEqualTo("-----BEGIN CERTIFICATE-----");
-        assertThat(lines[2]).isEqualTo("-----END CERTIFICATE-----");
-        assertThat(lines.length).isEqualTo(3);
-        assertThat(X509CertUtils.parse(pemString).getSubjectDN()).isEqualTo(cert.getSubjectDN());
+        Assertions.assertThat(lines[0]).isEqualTo("-----BEGIN CERTIFICATE-----");
+        Assertions.assertThat(lines[2]).isEqualTo("-----END CERTIFICATE-----");
+        Assertions.assertThat(lines.length).isEqualTo(3);
+        Assertions.assertThat(X509CertUtils.parse(pemString).getSubjectDN()).isEqualTo(cert.getSubjectDN());
     }
 
     @Test
@@ -253,9 +258,90 @@ public class X509CertUtilsTest {
 
         X509Certificate cert = X509CertUtils.parse(PEM_CERT);
         String pemString = X509CertUtils.toPEMString(cert, false);
-        assertThat(pemString).isNotNull();
-        assertThat(pemString.indexOf("\n")).isEqualTo(-1);
-        assertThat(X509CertUtils.parse(pemString).getSubjectDN()).isEqualTo(cert.getSubjectDN());
+        Assertions.assertThat(pemString).isNotNull();
+        Assertions.assertThat(pemString.indexOf("\n")).isEqualTo(-1);
+        Assertions.assertThat(X509CertUtils.parse(pemString).getSubjectDN()).isEqualTo(cert.getSubjectDN());
     }
 
+    @Test
+    public void testStore_noPassword() throws Exception {
+
+        KeyReaderPEM keyReaderPEM = new KeyReaderPEM();
+
+        String content = IOUtil.readFileToString("src/test/resources/sample-pem-encoded-objects/ecprivkey.pem");
+        List<AtbashKey> keys = keyReaderPEM.parseContent(content);
+        Assertions.assertThat(keys).hasSize(2);
+        Assertions.assertThat(keys.get(0).getSecretKeyType().getKeyType()).isEqualTo(KeyType.EC);
+
+        AtbashKey ecPrivateKey = new AsymmetricPartKeyFilter(AsymmetricPart.PRIVATE).filter(keys).get(0);
+        AtbashKey ecPublicKey = new AsymmetricPartKeyFilter(AsymmetricPart.PUBLIC).filter(keys).get(0);
+
+        content = IOUtil.readFileToString("src/test/resources/sample-pem-encoded-objects/eccert.pem");
+        X509Certificate certificate = X509CertUtils.parse(content);
+
+        // Check if the loaded certificate has public key that matches with the EC key that was loaded
+        Assertions.assertThat(certificate).isNotNull();
+        Assertions.assertThat(ecPublicKey.getKey().getEncoded()).isEqualTo(certificate.getPublicKey().getEncoded());
+
+        // create KeyStore
+        KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+        keyStore.load(null);
+
+        // Store private key with certificate
+        UUID alias = X509CertUtils.store(keyStore, ecPrivateKey.getKey(), new char[]{0}, certificate);
+
+        Assertions.assertThat(alias).isNotNull();
+
+        // Get KeyStore entry
+        KeyStore.Entry en = keyStore.getEntry(alias.toString(), new KeyStore.PasswordProtection(new char[]{0}));
+        Assertions.assertThat(en).isInstanceOf(KeyStore.PrivateKeyEntry.class);
+
+        // Does the info match
+        KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) en;
+
+        Assertions.assertThat(ecPrivateKey.getKey().getEncoded()).isEqualTo(privateKeyEntry.getPrivateKey().getEncoded());
+        Assertions.assertThat(certificate.getEncoded()).isEqualTo(privateKeyEntry.getCertificate().getEncoded());
+
+    }
+
+    @Test
+    public void testStore_withPassword() throws Exception {
+
+        KeyReaderPEM keyReaderPEM = new KeyReaderPEM();
+
+        String content = IOUtil.readFileToString("src/test/resources/sample-pem-encoded-objects/ecprivkey.pem");
+        List<AtbashKey> keys = keyReaderPEM.parseContent(content);
+        Assertions.assertThat(keys).hasSize(2);
+        Assertions.assertThat(keys.get(0).getSecretKeyType().getKeyType()).isEqualTo(KeyType.EC);
+
+        AtbashKey ecPrivateKey = new AsymmetricPartKeyFilter(AsymmetricPart.PRIVATE).filter(keys).get(0);
+        AtbashKey ecPublicKey = new AsymmetricPartKeyFilter(AsymmetricPart.PUBLIC).filter(keys).get(0);
+
+        content = IOUtil.readFileToString("src/test/resources/sample-pem-encoded-objects/eccert.pem");
+        X509Certificate certificate = X509CertUtils.parse(content);
+
+        // Check if the loaded certificate has public key that matches with the EC key that was loaded
+        Assertions.assertThat(certificate).isNotNull();
+        Assertions.assertThat(ecPublicKey.getKey().getEncoded()).isEqualTo(certificate.getPublicKey().getEncoded());
+
+        // create KeyStore
+        KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+        keyStore.load(null);
+
+        // Store private key with certificate
+        String password = "secret";
+        UUID alias = X509CertUtils.store(keyStore, ecPrivateKey.getKey(), password.toCharArray(), certificate);
+
+        Assertions.assertThat(alias).isNotNull();
+
+        // Get KeyStore entry
+        KeyStore.Entry en = keyStore.getEntry(alias.toString(), new KeyStore.PasswordProtection(password.toCharArray()));
+        Assertions.assertThat(en).isInstanceOf(KeyStore.PrivateKeyEntry.class);
+
+        // Does the info match
+        KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) en;
+
+        Assertions.assertThat(ecPrivateKey.getKey().getEncoded()).isEqualTo(privateKeyEntry.getPrivateKey().getEncoded());
+        Assertions.assertThat(certificate.getEncoded()).isEqualTo(privateKeyEntry.getCertificate().getEncoded());
+    }
 }

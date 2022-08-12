@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,15 +18,21 @@ package be.atbash.ee.security.octopus.nimbus.jose.crypto.impl;
 
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.bc.BouncyCastleProviderSingleton;
+import be.atbash.ee.security.octopus.nimbus.jwk.Curve;
+import be.atbash.ee.security.octopus.nimbus.jwk.ECParameterTable;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
+import be.atbash.ee.security.octopus.nimbus.util.ByteUtils;
 
+import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.security.Signature;
+import java.security.spec.ECParameterSpec;
+import java.util.Set;
 
 
 /**
  * Elliptic Curve Digital Signature Algorithm (ECDSA) functions and utilities.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov and Aleksei Doroganov
  */
 public final class ECDSA {
@@ -128,15 +134,17 @@ public final class ECDSA {
         byte rLength = derSignature[offset + 1];
 
         int i;
-        for (i = rLength; (i > 0) && (derSignature[(offset + 2 + rLength) - i] == 0); i--) {
-            // do nothing
+        i = rLength;
+        while ((i > 0) && (derSignature[(offset + 2 + rLength) - i] == 0)) {
+            i--;
         }
 
         byte sLength = derSignature[offset + 2 + rLength + 1];
 
         int j;
-        for (j = sLength; (j > 0) && (derSignature[(offset + 2 + rLength + 2 + sLength) - j] == 0); j--) {
-            // do nothing
+        j = sLength;
+        while ((j > 0) && (derSignature[(offset + 2 + rLength + 2 + sLength) - j] == 0)) {
+            j--;
         }
 
         int rawLen = Math.max(i, j);
@@ -171,68 +179,149 @@ public final class ECDSA {
 
         // Adapted from org.apache.xml.security.algorithms.implementations.SignatureECDSA
 
-        int rawLen = jwsSignature.length / 2;
+        try {
+            int rawLen = jwsSignature.length / 2;
 
-        int i;
+            int i;
 
-        for (i = rawLen; (i > 0) && (jwsSignature[rawLen - i] == 0); i--) {
-            // do nothing
+            for (i = rawLen; (i > 0) && (jwsSignature[rawLen - i] == 0); i--) {
+                // do nothing
+            }
+
+            int j = i;
+
+            if (jwsSignature[rawLen - i] < 0) {
+                j += 1;
+            }
+
+            int k;
+
+            for (k = rawLen; (k > 0) && (jwsSignature[2 * rawLen - k] == 0); k--) {
+                // do nothing
+            }
+
+            int l = k;
+
+            if (jwsSignature[2 * rawLen - k] < 0) {
+                l += 1;
+            }
+
+            int len = 2 + j + 2 + l;
+
+            if (len > 255) {
+                throw new JOSEException("Invalid ECDSA signature format");
+            }
+
+            int offset;
+
+            byte[] derSignature;
+
+            if (len < 128) {
+                derSignature = new byte[2 + 2 + j + 2 + l];
+                offset = 1;
+            } else {
+                derSignature = new byte[3 + 2 + j + 2 + l];
+                derSignature[1] = (byte) 0x81;
+                offset = 2;
+            }
+
+            derSignature[0] = 48;
+            derSignature[offset++] = (byte) len;
+            derSignature[offset++] = 2;
+            derSignature[offset++] = (byte) j;
+
+            System.arraycopy(jwsSignature, rawLen - i, derSignature, (offset + j) - i, i);
+
+            offset += j;
+
+            derSignature[offset++] = 2;
+            derSignature[offset++] = (byte) l;
+
+            System.arraycopy(jwsSignature, 2 * rawLen - k, derSignature, (offset + l) - k, k);
+
+            return derSignature;
+        } catch (Exception e) {
+            // Watch for unchecked exceptions
+
+            if (e instanceof JOSEException) {
+                throw e;
+            }
+
+            throw new JOSEException(e.getMessage(), e);
         }
-
-        int j = i;
-
-        if (jwsSignature[rawLen - i] < 0) {
-            j += 1;
-        }
-
-        int k;
-
-        for (k = rawLen; (k > 0) && (jwsSignature[2 * rawLen - k] == 0); k--) {
-            // do nothing
-        }
-
-        int l = k;
-
-        if (jwsSignature[2 * rawLen - k] < 0) {
-            l += 1;
-        }
-
-        int len = 2 + j + 2 + l;
-
-        if (len > 255) {
-            throw new JOSEException("Invalid ECDSA signature format");
-        }
-
-        int offset;
-
-        byte[] derSignature;
-
-        if (len < 128) {
-            derSignature = new byte[2 + 2 + j + 2 + l];
-            offset = 1;
-        } else {
-            derSignature = new byte[3 + 2 + j + 2 + l];
-            derSignature[1] = (byte) 0x81;
-            offset = 2;
-        }
-
-        derSignature[0] = 48;
-        derSignature[offset++] = (byte) len;
-        derSignature[offset++] = 2;
-        derSignature[offset++] = (byte) j;
-
-        System.arraycopy(jwsSignature, rawLen - i, derSignature, (offset + j) - i, i);
-
-        offset += j;
-
-        derSignature[offset++] = 2;
-        derSignature[offset++] = (byte) l;
-
-        System.arraycopy(jwsSignature, 2 * rawLen - k, derSignature, (offset + l) - k, k);
-
-        return derSignature;
     }
 
+    /**
+     * Ensures the specified ECDSA signature is legal. Intended to prevent
+     * attacks on JCA implementations vulnerable to CVE-2022-21449 and
+     * similar bugs.
+     *
+     * @param jwsSignature The JWS signature. Must not be {@code null}.
+     * @param jwsAlg       The ECDSA JWS algorithm. Must not be
+     *                     {@code null}.
+     * @throws JOSEException If the signature is found to be illegal, or
+     *                       the JWS algorithm or curve are not supported.
+     */
+    public static void ensureLegalSignature(byte[] jwsSignature,
+                                            JWSAlgorithm jwsAlg)
+            throws JOSEException {
+
+        if (ByteUtils.isZeroFilled(jwsSignature)) {
+            // Quick check to make sure S and R are not both zero (CVE-2022-21449)
+            throw new JOSEException("Blank signature");
+        }
+
+        Set<Curve> matchingCurves = Curve.forJWSAlgorithm(jwsAlg);
+        if (matchingCurves.size() != 1) {
+            throw new JOSEException("Unsupported JWS algorithm: " + jwsAlg);
+        }
+
+        Curve curve = matchingCurves.iterator().next();
+
+        ECParameterSpec ecParameterSpec = ECParameterTable.get(curve);
+
+        if (ecParameterSpec == null) {
+            throw new JOSEException("Unsupported curve: " + curve);
+        }
+
+        int signatureLength = ECDSA.getSignatureByteArrayLength(jwsAlg);
+
+        if (ECDSA.getSignatureByteArrayLength(jwsAlg) != jwsSignature.length) {
+            // Quick format check, concatenation of R|S (may be padded
+            // to match lengths) in ESxxx signatures has fixed length
+            throw new JOSEException("Illegal signature length");
+        }
+
+        // Split the signature bytes in the middle
+        int valueLength = signatureLength / 2;
+
+        // Extract R
+        byte[] rBytes = ByteUtils.subArray(jwsSignature, 0, valueLength);
+        BigInteger rValue = new BigInteger(1, rBytes);
+
+        // Extract S
+        byte[] sBytes = ByteUtils.subArray(jwsSignature, valueLength, valueLength);
+        BigInteger sValue = new BigInteger(1, sBytes);
+
+        // Trivial zero check
+        if (sValue.equals(BigInteger.ZERO) || rValue.equals(BigInteger.ZERO)) {
+            throw new JOSEException("S and R must not be 0");
+        }
+
+        BigInteger N = ecParameterSpec.getOrder();
+
+        // R and S must not be greater than the curve order N
+        if (N.compareTo(rValue) < 1 || N.compareTo(sValue) < 1) {
+            throw new JOSEException("S and R must not exceed N");
+        }
+
+        // Extra paranoid check
+        if (rValue.mod(N).equals(BigInteger.ZERO) || sValue.mod(N).equals(BigInteger.ZERO)) {
+            throw new JOSEException("R or S mod N != 0 check failed");
+        }
+
+        // Signature deemed legal, can proceed to DER transcoding and verification now
+    }
 
     /**
      * Prevents public instantiation.

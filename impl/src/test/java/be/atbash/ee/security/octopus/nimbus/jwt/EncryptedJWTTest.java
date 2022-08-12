@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package be.atbash.ee.security.octopus.nimbus.jwt;
 
 
+import be.atbash.ee.security.octopus.nimbus.jose.Payload;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.DirectDecrypter;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.DirectEncrypter;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.RSADecrypter;
@@ -23,7 +24,7 @@ import be.atbash.ee.security.octopus.nimbus.jose.crypto.RSAEncrypter;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEHeader;
-import org.junit.jupiter.api.Assertions;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import javax.crypto.KeyGenerator;
@@ -38,8 +39,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 
 /**
@@ -142,7 +141,7 @@ public class EncryptedJWTTest {
 
 
     static {
-        Assertions.assertDoesNotThrow(() -> {
+        try {
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
 
             RSAPublicKeySpec publicKeySpec = new RSAPublicKeySpec(new BigInteger(1, mod), new BigInteger(1, exp));
@@ -151,7 +150,9 @@ public class EncryptedJWTTest {
             publicKey = (RSAPublicKey) keyFactory.generatePublic(publicKeySpec);
             privateKey = (RSAPrivateKey) keyFactory.generatePrivate(privateKeySpec);
 
-        });
+        } catch (Exception e) {
+            Assertions.fail(e.getMessage());
+        }
     }
 
     @Test
@@ -215,19 +216,19 @@ public class EncryptedJWTTest {
 
         // Retrieve JWT claims
 
-        assertThat(jwt.getJWTClaimsSet().getIssuer()).isEqualTo(iss);
+        Assertions.assertThat(jwt.getJWTClaimsSet().getIssuer()).isEqualTo(iss);
 
-        assertThat(jwt.getJWTClaimsSet().getSubject()).isEqualTo(sub);
+        Assertions.assertThat(jwt.getJWTClaimsSet().getSubject()).isEqualTo(sub);
 
-        assertThat(jwt.getJWTClaimsSet().getAudience().size()).isEqualTo(2);
+        Assertions.assertThat(jwt.getJWTClaimsSet().getAudience().size()).isEqualTo(2);
 
-        assertThat(jwt.getJWTClaimsSet().getExpirationTime()).isEqualTo(exp);
+        Assertions.assertThat(jwt.getJWTClaimsSet().getExpirationTime()).isEqualTo(exp);
 
-        assertThat(jwt.getJWTClaimsSet().getNotBeforeTime()).isEqualTo(nbf);
+        Assertions.assertThat(jwt.getJWTClaimsSet().getNotBeforeTime()).isEqualTo(nbf);
 
-        assertThat(jwt.getJWTClaimsSet().getIssueTime()).isEqualTo(iat);
+        Assertions.assertThat(jwt.getJWTClaimsSet().getIssueTime()).isEqualTo(iat);
 
-        assertThat(jwt.getJWTClaimsSet().getJWTID()).isEqualTo(jti);
+        Assertions.assertThat(jwt.getJWTClaimsSet().getJWTID()).isEqualTo(jti);
     }
 
     @Test
@@ -246,6 +247,21 @@ public class EncryptedJWTTest {
         jwt = EncryptedJWT.parse(jwtString);
 
         jwt.decrypt(new DirectDecrypter(key));
-        assertThat(jwt.getJWTClaimsSet().toJSONObject()).isEmpty();
+        Assertions.assertThat(jwt.getJWTClaimsSet().toJSONObject()).isEmpty();
+    }
+
+    @Test
+    public void testPayloadUpdated()
+            throws Exception {
+
+        EncryptedJWT jwt = new EncryptedJWT(new JWEHeader(JWEAlgorithm.DIR, EncryptionMethod.A128GCM), new JWTClaimsSet.Builder()
+                .subject("before").build());
+
+        Assertions.assertThat(jwt.getJWTClaimsSet().getSubject()).isEqualTo("before");
+
+        jwt.setPayload(new Payload(new JWTClaimsSet.Builder()
+                .subject("after").build().toJSONObject()));
+
+        Assertions.assertThat(jwt.getJWTClaimsSet().getSubject()).isEqualTo("after");
     }
 }

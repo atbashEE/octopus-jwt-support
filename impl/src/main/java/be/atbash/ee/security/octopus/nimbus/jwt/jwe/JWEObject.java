@@ -23,12 +23,14 @@ import be.atbash.ee.security.octopus.nimbus.jose.Payload;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import org.slf4j.MDC;
 
+import javax.json.Json;
+import javax.json.JsonObject;
 import java.text.ParseException;
 
 
 /**
  * JSON Web Encryption (JWE) secured object. This class is thread-safe.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
 public class JWEObject extends JOSEObject {
@@ -446,6 +448,23 @@ public class JWEObject extends JOSEObject {
         }
 
         return sb.toString();
+    }
+
+    /**
+     * Serialize to the Flattened JWS JSON Serialization.
+     *
+     * @return JsonObject with serialized content of JWS.
+     */
+    public JsonObject serializeToJson() {
+        return Json.createObjectBuilder()
+                .add("header", header.toJSONObject().build())
+                .add("protected", header.toBase64URL().toString())
+                .add("payload", getPayload().toBase64URL().toString())
+                .add("encrypted_key", encryptedKey.toString())
+                .add("iv", iv.toString())
+                .add("ciphertext", cipherText.toString())
+                .add("tag", authTag.toString())
+                .build();
     }
 
 

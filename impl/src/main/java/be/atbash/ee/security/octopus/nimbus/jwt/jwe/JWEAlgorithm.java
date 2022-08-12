@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,8 @@ import be.atbash.ee.security.octopus.nimbus.jose.AlgorithmFamily;
  *
  * <ul>
  *     <li>{@link #RSA_OAEP_256 RSA-OAEP-256}
+ *     <li>{@link #RSA_OAEP_384 RSA-OAEP-384}
+ *     <li>{@link #RSA_OAEP_512 RSA-OAEP-512}
  *     <li>{@link #A128KW}
  *     <li>{@link #A192KW}
  *     <li>{@link #A256KW}
@@ -41,7 +43,7 @@ import be.atbash.ee.security.octopus.nimbus.jose.AlgorithmFamily;
  * </ul>
  *
  * <p>Additional JWE algorithm names can be defined using the constructors.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
 public final class JWEAlgorithm extends Algorithm {
@@ -56,6 +58,19 @@ public final class JWEAlgorithm extends Algorithm {
      */
     public static final JWEAlgorithm RSA_OAEP_256 = new JWEAlgorithm("RSA-OAEP-256");
 
+    /**
+     * RSAES using Optimal Asymmetric Encryption Padding (OAEP) (RFC 3447),
+     * with the SHA-256 hash function and the MGF1 with SHA-256 mask
+     * generation function.
+     */
+    public static final JWEAlgorithm RSA_OAEP_384 = new JWEAlgorithm("RSA-OAEP-384");
+
+    /**
+     * RSAES using Optimal Asymmetric Encryption Padding (OAEP) (RFC 3447),
+     * with the SHA-512 hash function and the MGF1 with SHA-512 mask
+     * generation function.
+     */
+    public static final JWEAlgorithm RSA_OAEP_512 = new JWEAlgorithm("RSA-OAEP-512");
 
     /**
      * Advanced Encryption Standard (AES) Key Wrap Algorithm (RFC 3394)
@@ -174,7 +189,7 @@ public final class JWEAlgorithm extends Algorithm {
         /**
          * RSA key encryption.
          */
-        public static final Family RSA = new Family(RSA_OAEP_256);
+        public static final Family RSA = new Family(RSA_OAEP_256, RSA_OAEP_384, RSA_OAEP_512);
 
 
         /**
@@ -235,6 +250,10 @@ public final class JWEAlgorithm extends Algorithm {
 
         if (value.equals(RSA_OAEP_256.getName())) {
             return RSA_OAEP_256;
+        } else if (value.equals(RSA_OAEP_384.getName())) {
+            return RSA_OAEP_384;
+        } else if (value.equals(RSA_OAEP_512.getName())) {
+            return RSA_OAEP_512;
         } else if (value.equals(A128KW.getName())) {
             return A128KW;
         } else if (value.equals(A192KW.getName())) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,14 @@ package be.atbash.ee.security.octopus.nimbus.jwt;
 import be.atbash.ee.security.octopus.nimbus.jose.Header;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 
+import javax.json.JsonObject;
 import java.io.Serializable;
 import java.text.ParseException;
 
 
 /**
  * JSON Web Token (JWT) interface.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
 public interface JWT extends Serializable {
@@ -83,4 +84,11 @@ public interface JWT extends Serializable {
      *                               permits serialisation.
      */
     String serialize();
+
+    /**
+     * Serialize to the Flattened JWS/JWE JSON Serialization.
+     *
+     * @return JsonObject with serialized content of JWS/JWE.
+     */
+    JsonObject serializeToJson();
 }

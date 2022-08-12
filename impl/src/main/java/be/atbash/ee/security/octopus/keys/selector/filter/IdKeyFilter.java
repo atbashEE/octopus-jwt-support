@@ -21,7 +21,6 @@ import be.atbash.util.exception.AtbashIllegalActionException;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 /**

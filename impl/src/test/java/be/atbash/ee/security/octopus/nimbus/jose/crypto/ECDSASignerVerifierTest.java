@@ -15,7 +15,6 @@
  */
 package be.atbash.ee.security.octopus.nimbus.jose.crypto;
 
-import be.atbash.ee.security.octopus.jwt.JWTValidationConstant;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.Filters;
 import be.atbash.ee.security.octopus.keys.TestKeys;
