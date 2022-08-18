@@ -20,16 +20,14 @@ import be.atbash.ee.security.octopus.nimbus.jose.Algorithm;
 import be.atbash.ee.security.octopus.nimbus.jwk.JWKIdentifiers;
 import be.atbash.ee.security.octopus.nimbus.jwk.OctetSequenceKey;
 import be.atbash.ee.security.octopus.util.EncryptionHelper;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import jakarta.json.JsonObject;
 import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 import java.security.SecureRandom;
 import java.util.Base64;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  *
@@ -50,10 +48,10 @@ public class EncryptedJSONJWKTest {
 
         String json = EncryptedJSONJWK.encryptedOutput(jwk, PASSWORD);
         // Check all the fields
-        assertThat(json).contains("\"alg\":\"algo\"");
-        assertThat(json).contains("\"kty\":\"oct\"");
-        assertThat(json).contains("\"kid\":\"keyId\"");
-        assertThat(json).contains("\"enc\":\"");
+        Assertions.assertThat(json).contains("\"alg\":\"algo\"");
+        Assertions.assertThat(json).contains("\"kty\":\"oct\"");
+        Assertions.assertThat(json).contains("\"kid\":\"keyId\"");
+        Assertions.assertThat(json).contains("\"enc\":\"");
 
         Jsonb jsonb = JsonbBuilder.create();
         JsonObject jsonObject = jsonb.fromJson(json, JsonObject.class);
@@ -63,9 +61,9 @@ public class EncryptedJSONJWKTest {
 
         // decrypted value is a json again
         JsonObject secureJson = jsonb.fromJson(encJson, JsonObject.class);
-        assertThat(secureJson.keySet()).containsOnly("k");
+        Assertions.assertThat(secureJson.keySet()).containsOnly("k");
         // check if value is same as the byteArray we started with
-        assertThat(secureJson.getString("k")).isEqualTo(Base64.getUrlEncoder().withoutPadding().encodeToString(key));
+        Assertions.assertThat(secureJson.getString("k")).isEqualTo(Base64.getUrlEncoder().withoutPadding().encodeToString(key));
 
     }
 
@@ -78,8 +76,9 @@ public class EncryptedJSONJWKTest {
                 .keyID("keyId")
                 .build();
 
-        MissingPasswordException exception = Assertions.assertThrows(MissingPasswordException.class, () -> EncryptedJSONJWK.encryptedOutput(jwk, null));
-        assertThat(exception.getMessage()).isEqualTo("Password required for encryption/decryption");
+        Assertions.assertThatThrownBy(() -> EncryptedJSONJWK.encryptedOutput(jwk, null))
+                .isInstanceOf(MissingPasswordException.class)
+                .hasMessage("Password required for encryption/decryption");
 
     }
     @Test
@@ -91,8 +90,9 @@ public class EncryptedJSONJWKTest {
                 .keyID("keyId")
                 .build();
 
-        MissingPasswordException exception = Assertions.assertThrows(MissingPasswordException.class, () -> EncryptedJSONJWK.encryptedOutput(jwk, "  ".toCharArray()));
-        assertThat(exception.getMessage()).isEqualTo("Password required for encryption/decryption");
+        Assertions.assertThatThrownBy(() -> EncryptedJSONJWK.encryptedOutput(jwk, "  ".toCharArray()))
+                .isInstanceOf(MissingPasswordException.class)
+                .hasMessage("Password required for encryption/decryption");
 
     }
 }

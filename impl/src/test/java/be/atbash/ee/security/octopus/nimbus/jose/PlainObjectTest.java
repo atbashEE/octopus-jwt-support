@@ -21,8 +21,6 @@ import org.junit.jupiter.api.Test;
 
 import java.text.ParseException;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 
 /**
  * Tests plaintext JOSE object parsing and serialisation.
@@ -39,28 +37,28 @@ public class PlainObjectTest {
 
         PlainObject plain = new PlainObject(payload);
 
-        assertThat(plain.getHeader()).isNotNull();
-        assertThat(plain.getPayload().toString()).isEqualTo("Hello world!");
+        Assertions.assertThat(plain.getHeader()).isNotNull();
+        Assertions.assertThat(plain.getPayload().toString()).isEqualTo("Hello world!");
 
         PlainHeader header = plain.getHeader();
-        assertThat(header.getAlgorithm()).isEqualTo(Algorithm.NONE);
-        assertThat(header.getType()).isNull();
-        assertThat(header.getContentType()).isNull();
-        assertThat(header.getCustomParameters()).isEmpty();
+        Assertions.assertThat(header.getAlgorithm()).isEqualTo(Algorithm.NONE);
+        Assertions.assertThat(header.getType()).isNull();
+        Assertions.assertThat(header.getContentType()).isNull();
+        Assertions.assertThat(header.getCustomParameters()).isEmpty();
 
         String serializedJOSEObject = plain.serialize();
 
         plain = PlainObject.parse(serializedJOSEObject);
 
         header = plain.getHeader();
-        assertThat(header.getAlgorithm()).isEqualTo(Algorithm.NONE);
-        assertThat(header.getType()).isNull();
-        assertThat(header.getContentType()).isNull();
-        assertThat(header.getCustomParameters()).isEmpty();
+        Assertions.assertThat(header.getAlgorithm()).isEqualTo(Algorithm.NONE);
+        Assertions.assertThat(header.getType()).isNull();
+        Assertions.assertThat(header.getContentType()).isNull();
+        Assertions.assertThat(header.getCustomParameters()).isEmpty();
 
-        assertThat(plain.getPayload().toString()).isEqualTo("Hello world!");
+        Assertions.assertThat(plain.getPayload().toString()).isEqualTo("Hello world!");
 
-        assertThat(plain.getParsedString()).isEqualTo(serializedJOSEObject);
+        Assertions.assertThat(plain.getParsedString()).isEqualTo(serializedJOSEObject);
     }
 
     @Test

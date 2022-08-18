@@ -20,7 +20,6 @@ import be.atbash.ee.security.octopus.nimbus.jose.Header;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import jakarta.json.JsonObject;
 
-import java.io.Serializable;
 import java.text.ParseException;
 
 
@@ -29,7 +28,7 @@ import java.text.ParseException;
  * <p>
  * Based on code by Vladimir Dzhuvinov
  */
-public interface JWT extends Serializable {
+public interface JWT {
 
 
     /**

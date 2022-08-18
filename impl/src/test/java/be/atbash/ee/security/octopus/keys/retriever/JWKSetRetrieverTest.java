@@ -23,8 +23,8 @@ import be.atbash.ee.security.octopus.nimbus.jwk.JWKSet;
 import be.atbash.ee.security.octopus.nimbus.jwk.RSAKey;
 import be.atbash.util.TestReflectionUtils;
 import net.jadler.Jadler;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -32,8 +32,6 @@ import java.io.IOException;
 import java.net.*;
 import java.security.interfaces.RSAPublicKey;
 import java.util.concurrent.TimeUnit;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class JWKSetRetrieverTest {
@@ -43,10 +41,10 @@ public class JWKSetRetrieverTest {
 
         JWKSetRetriever resourceRetriever = new JWKSetRetriever();
 
-        assertThat((Integer) TestReflectionUtils.getValueOf(resourceRetriever, "connectTimeout")).isEqualTo(0);
-        assertThat((Integer) TestReflectionUtils.getValueOf(resourceRetriever, "readTimeout")).isEqualTo(0);
-        assertThat((Integer) TestReflectionUtils.getValueOf(resourceRetriever, "sizeLimit")).isEqualTo(0);
-        assertThat(resourceRetriever.getProxy()).isNull();
+        Assertions.assertThat((Integer) TestReflectionUtils.getValueOf(resourceRetriever, "connectTimeout")).isEqualTo(0);
+        Assertions.assertThat((Integer) TestReflectionUtils.getValueOf(resourceRetriever, "readTimeout")).isEqualTo(0);
+        Assertions.assertThat((Integer) TestReflectionUtils.getValueOf(resourceRetriever, "sizeLimit")).isEqualTo(0);
+        Assertions.assertThat(resourceRetriever.getProxy()).isNull();
     }
 
 
@@ -55,12 +53,12 @@ public class JWKSetRetrieverTest {
 
         JWKSetRetriever resourceRetriever = new JWKSetRetriever(100, 200, 300);
 
-        assertThat((Integer) TestReflectionUtils.getValueOf(resourceRetriever, "connectTimeout")).isEqualTo(100);
-        assertThat((Integer) TestReflectionUtils.getValueOf(resourceRetriever, "readTimeout")).isEqualTo(200);
-        assertThat((Integer) TestReflectionUtils.getValueOf(resourceRetriever, "sizeLimit")).isEqualTo(300);
+        Assertions.assertThat((Integer) TestReflectionUtils.getValueOf(resourceRetriever, "connectTimeout")).isEqualTo(100);
+        Assertions.assertThat((Integer) TestReflectionUtils.getValueOf(resourceRetriever, "readTimeout")).isEqualTo(200);
+        Assertions.assertThat((Integer) TestReflectionUtils.getValueOf(resourceRetriever, "sizeLimit")).isEqualTo(300);
 
         resourceRetriever.setProxy(Proxy.NO_PROXY);
-        assertThat(resourceRetriever.getProxy()).isEqualTo(Proxy.NO_PROXY);
+        Assertions.assertThat(resourceRetriever.getProxy()).isEqualTo(Proxy.NO_PROXY);
     }
 
 
@@ -68,9 +66,9 @@ public class JWKSetRetrieverTest {
     public void testTimeoutConstructor() throws NoSuchFieldException {
 
         JWKSetRetriever resourceRetriever = new JWKSetRetriever(100, 200);
-        assertThat((Integer) TestReflectionUtils.getValueOf(resourceRetriever, "connectTimeout")).isEqualTo(100);
-        assertThat((Integer) TestReflectionUtils.getValueOf(resourceRetriever, "readTimeout")).isEqualTo(200);
-        assertThat((Integer) TestReflectionUtils.getValueOf(resourceRetriever, "sizeLimit")).isEqualTo(0);
+        Assertions.assertThat((Integer) TestReflectionUtils.getValueOf(resourceRetriever, "connectTimeout")).isEqualTo(100);
+        Assertions.assertThat((Integer) TestReflectionUtils.getValueOf(resourceRetriever, "readTimeout")).isEqualTo(200);
+        Assertions.assertThat((Integer) TestReflectionUtils.getValueOf(resourceRetriever, "sizeLimit")).isEqualTo(0);
     }
 
     @BeforeEach
@@ -102,7 +100,7 @@ public class JWKSetRetrieverTest {
         JWKSet jwkSet = resourceRetriever.retrieveResource(new URL("http://localhost:" + Jadler.port() + "/c2id/jwks.json"));
 
         JWK data = jwkSet.getKeyByKeyId("kid");
-        assertThat(data.toJSONObject().build().toString()).isEqualTo(rsaKey.toJSONObject().build().toString());
+        Assertions.assertThat(data.toJSONObject().build().toString()).isEqualTo(rsaKey.toJSONObject().build().toString());
     }
 
 
@@ -126,7 +124,7 @@ public class JWKSetRetrieverTest {
             JWKSet jwkSet = resourceRetriever.retrieveResource(new URL("http://localhost:" + Jadler.port() + "/c2id/jwks.json"));
 
             JWK data = jwkSet.getKeyByKeyId("kid");
-            assertThat(data.toJSONObject().build().toString()).isEqualTo(rsaKey.toJSONObject().build().toString());
+            Assertions.assertThat(data.toJSONObject().build().toString()).isEqualTo(rsaKey.toJSONObject().build().toString());
         }
     }
 
@@ -147,7 +145,7 @@ public class JWKSetRetrieverTest {
         JWKSet jwkSet = resourceRetriever.retrieveResource(new URL("http://localhost:" + Jadler.port() + "/c2id/jwks.json"));
 
         JWK data = jwkSet.getKeyByKeyId("kid");
-        assertThat(data.toJSONObject().build().toString()).isEqualTo(rsaKey.toJSONObject().build().toString());
+        Assertions.assertThat(data.toJSONObject().build().toString()).isEqualTo(rsaKey.toJSONObject().build().toString());
     }
 
     @Test
@@ -170,7 +168,7 @@ public class JWKSetRetrieverTest {
 
         JWKSet jwkSet = resourceRetriever.retrieveResource(new URL("http://localhost:" + Jadler.port() + "/c2id/jwks.json"));
         JWK data = jwkSet.getKeyByKeyId("kid");
-        assertThat(data.toJSONObject().build().toString()).isEqualTo(rsaKey.toJSONObject().build().toString());
+        Assertions.assertThat(data.toJSONObject().build().toString()).isEqualTo(rsaKey.toJSONObject().build().toString());
     }
 
     @Test
@@ -192,7 +190,7 @@ public class JWKSetRetrieverTest {
         JWKSet jwkSet = resourceRetriever.retrieveResource(new URL("http://localhost:" + Jadler.port() + "/c2id/jwks.json"));
 
         JWK data = jwkSet.getKeyByKeyId("kid");
-        assertThat(data.toJSONObject().build().toString()).isEqualTo(rsaKey.toJSONObject().build().toString());
+        Assertions.assertThat(data.toJSONObject().build().toString()).isEqualTo(rsaKey.toJSONObject().build().toString());
     }
 
     @Test
@@ -213,7 +211,7 @@ public class JWKSetRetrieverTest {
         JWKSet jwkSet = resourceRetriever.retrieveResource(new URL("http://localhost:" + Jadler.port() + "/c2id/jwks.json"));
 
         JWK data = jwkSet.getKeyByKeyId("kid");
-        assertThat(data.toJSONObject().build().toString()).isEqualTo(rsaKey.toJSONObject().build().toString());
+        Assertions.assertThat(data.toJSONObject().build().toString()).isEqualTo(rsaKey.toJSONObject().build().toString());
     }
 
     @Test
@@ -226,8 +224,9 @@ public class JWKSetRetrieverTest {
         JWKSetRetriever resourceRetriever = new JWKSetRetriever(50, 0);
 
         URL url = new URL("http://localhost:" + port + "/c2id/jwks.json");
-        IOException e = Assertions.assertThrows(IOException.class, () -> resourceRetriever.retrieveResource(url));
-        assertThat(e.getMessage()).startsWith("Connection refused");
+        Assertions.assertThatThrownBy(() -> resourceRetriever.retrieveResource(url))
+                .isInstanceOf(IOException.class)
+                .hasMessageStartingWith("Connection refused");
 
     }
 
@@ -242,8 +241,9 @@ public class JWKSetRetrieverTest {
         resourceRetriever.setProxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress("localhost", proxyPort)));
 
         URL url = new URL("http://localhost:" + Jadler.port() + "/c2id/jwks.json");
-        IOException e = Assertions.assertThrows(IOException.class, () -> resourceRetriever.retrieveResource(url));
-        assertThat(e.getMessage()).startsWith("Connection refused");
+        Assertions.assertThatThrownBy(() -> resourceRetriever.retrieveResource(url))
+                .isInstanceOf(IOException.class)
+                .hasMessageStartingWith("Connection refused");
 
     }
 
@@ -265,8 +265,9 @@ public class JWKSetRetrieverTest {
         JWKSetRetriever resourceRetriever = new JWKSetRetriever(0, 50);
 
         URL url = new URL("http://localhost:" + Jadler.port() + "/c2id/jwks.json");
-        IOException e = Assertions.assertThrows(IOException.class, () -> resourceRetriever.retrieveResource(url));
-        assertThat(e.getMessage()).isEqualTo("Read timed out");
+        Assertions.assertThatThrownBy(() -> resourceRetriever.retrieveResource(url))
+                .isInstanceOf(IOException.class)
+                .hasMessage("Read timed out");
 
     }
 
@@ -289,10 +290,11 @@ public class JWKSetRetrieverTest {
 
         URL url = new URL("http://localhost:" + Jadler.port() + "/c2id/jwks.json");
 
-        IOException e = Assertions.assertThrows(IOException.class, () -> resourceRetriever.retrieveResource(url));
+        Assertions.assertThatThrownBy(() -> resourceRetriever.retrieveResource(url))
+                .isInstanceOf(IOException.class)
+                .hasMessageStartingWith("Parsing of content of 'http://localhost:");
         // Size overrun exception poses as file not found
         // FIXME Can we bring this message back?
-        assertThat(e.getMessage()).startsWith("Parsing of content of 'http://localhost:");
 
     }
 }

@@ -22,8 +22,6 @@ import org.junit.jupiter.api.Test;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 
 /**
  * Tests the Base64URL class.
@@ -50,15 +48,15 @@ public class Base64URLValueTest {
     @Test
     public void testByteArrayEncodeAndDecode() {
 
-        assertThat(Base64URLValue.encode(BYTES).toString()).isEqualTo("A-z_4ME");
+        Assertions.assertThat(Base64URLValue.encode(BYTES).toString()).isEqualTo("A-z_4ME");
 
         byte[] decoded = new Base64URLValue("A-z_4ME").decode();
 
-        assertThat(decoded.length).isEqualTo(BYTES.length);
-        assertThat(decoded[0]).isEqualTo(BYTES[0]);
-        assertThat(decoded[1]).isEqualTo(BYTES[1]);
-        assertThat(decoded[2]).isEqualTo(BYTES[2]);
-        assertThat(decoded[3]).isEqualTo(BYTES[3]);
+        Assertions.assertThat(decoded.length).isEqualTo(BYTES.length);
+        Assertions.assertThat(decoded[0]).isEqualTo(BYTES[0]);
+        Assertions.assertThat(decoded[1]).isEqualTo(BYTES[1]);
+        Assertions.assertThat(decoded[2]).isEqualTo(BYTES[2]);
+        Assertions.assertThat(decoded[3]).isEqualTo(BYTES[3]);
     }
 
     @Test
@@ -69,7 +67,7 @@ public class Base64URLValueTest {
         Base64URLValue b64url = Base64URLValue.encode(bytes);
 
         String expected = "eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ";
-        assertThat(b64url.toString()).isEqualTo(expected);
+        Assertions.assertThat(b64url.toString()).isEqualTo(expected);
     }
 
     @Test
@@ -77,7 +75,7 @@ public class Base64URLValueTest {
 
         Base64URLValue b64url = Base64URLValue.encode(BIGINT);
 
-        assertThat(b64url.decodeToBigInteger()).isEqualTo(BIGINT);
+        Assertions.assertThat(b64url.decodeToBigInteger()).isEqualTo(BIGINT);
     }
 
     @Test
@@ -86,13 +84,13 @@ public class Base64URLValueTest {
         Base64URLValue base64URL = Base64URLValue.encode("foobar");
 
         Base64URLValue base64From = Base64URLValue.from(base64URL.toString());
-        assertThat(base64From).isEqualTo(base64URL);
+        Assertions.assertThat(base64From).isEqualTo(base64URL);
     }
 
     @Test
     public void testFromNull() {
 
-        assertThat(Base64URLValue.from(null)).isNull();
+        Assertions.assertThat(Base64URLValue.from(null)).isNull();
     }
 
     @Test

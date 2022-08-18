@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,11 @@
 package be.atbash.ee.security.octopus.keys;
 
 import be.atbash.ee.security.octopus.nimbus.jwk.JWKSet;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class JWKSetCacheTest {
 
@@ -30,25 +29,25 @@ public class JWKSetCacheTest {
 
         JWKSetCache cache = new JWKSetCache();
 
-        assertThat(cache.getLifespan(TimeUnit.HOURS)).isEqualTo(24);
-        assertThat(cache.get()).isNull();
-        assertThat(cache.getPutTimestamp()).isEqualTo(-1L);
-        assertThat(cache.isExpired()).isFalse();
+        Assertions.assertThat(cache.getLifespan(TimeUnit.HOURS)).isEqualTo(24);
+        Assertions.assertThat(cache.get()).isNull();
+        Assertions.assertThat(cache.getPutTimestamp()).isEqualTo(-1L);
+        Assertions.assertThat(cache.isExpired()).isFalse();
 
         JWKSet jwkSet = new JWKSet();
 
         cache.put(jwkSet);
         Thread.sleep(20);
 
-        assertThat(cache.get()).isEqualTo(jwkSet);
-        assertThat(new Date().getTime()).isGreaterThan(cache.getPutTimestamp());
+        Assertions.assertThat(cache.get()).isEqualTo(jwkSet);
+        Assertions.assertThat(new Date().getTime()).isGreaterThan(cache.getPutTimestamp());
         Thread.sleep(20);
 
-        assertThat(cache.isExpired()).isFalse();
+        Assertions.assertThat(cache.isExpired()).isFalse();
 
         cache.put(null); // clear
-        assertThat(cache.get()).isNull();
-        assertThat(cache.isExpired()).isFalse();
+        Assertions.assertThat(cache.get()).isNull();
+        Assertions.assertThat(cache.isExpired()).isFalse();
     }
 
 
@@ -58,23 +57,23 @@ public class JWKSetCacheTest {
 
         JWKSetCache cache = new JWKSetCache();
 
-        assertThat(cache.get()).isNull();
-        assertThat(cache.getPutTimestamp()).isEqualTo(-1L);
-        assertThat(cache.isExpired()).isFalse();
+        Assertions.assertThat(cache.get()).isNull();
+        Assertions.assertThat(cache.getPutTimestamp()).isEqualTo(-1L);
+        Assertions.assertThat(cache.isExpired()).isFalse();
 
         JWKSet jwkSet = new JWKSet();
 
         cache.put(jwkSet);
         Thread.sleep(20);
 
-        assertThat(cache.getPutTimestamp() > 0).isTrue();
-        assertThat(cache.isExpired()).isFalse();
+        Assertions.assertThat(cache.getPutTimestamp() > 0).isTrue();
+        Assertions.assertThat(cache.isExpired()).isFalse();
 
         // clear cache
         cache.put(null);
 
-        assertThat(cache.get()).isNull();
-        assertThat(cache.getPutTimestamp()).isEqualTo(-1L);
-        assertThat(cache.isExpired()).isFalse();
+        Assertions.assertThat(cache.get()).isNull();
+        Assertions.assertThat(cache.getPutTimestamp()).isEqualTo(-1L);
+        Assertions.assertThat(cache.isExpired()).isFalse();
     }
 }

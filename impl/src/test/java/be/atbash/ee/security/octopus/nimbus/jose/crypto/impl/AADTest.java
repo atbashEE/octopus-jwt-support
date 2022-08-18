@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,17 +21,16 @@ import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEHeader;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.ee.security.octopus.nimbus.util.IntegerOverflowException;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 
 /**
  * Tests the Additional Authenticated Data (AAD) functions.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
 public class AADTest {
@@ -43,7 +42,7 @@ public class AADTest {
 
         byte[] expected = jweHeader.toBase64URL().toString().getBytes(StandardCharsets.US_ASCII);
 
-        assertThat(Arrays.equals(expected, AAD.compute(jweHeader))).isTrue();
+        Assertions.assertThat(Arrays.equals(expected, AAD.compute(jweHeader))).isTrue();
     }
 
     @Test
@@ -53,7 +52,7 @@ public class AADTest {
 
         byte[] expected = base64URL.toString().getBytes(StandardCharsets.US_ASCII);
 
-        assertThat(Arrays.equals(expected, AAD.compute(base64URL))).isTrue();
+        Assertions.assertThat(Arrays.equals(expected, AAD.compute(base64URL))).isTrue();
     }
 
     @Test
@@ -64,6 +63,6 @@ public class AADTest {
 
         byte[] expectedBitLength = new byte[]{0, 0, 0, 0, 0, 0, 0, 32};
 
-        assertThat(Arrays.equals(expectedBitLength, AAD.computeLength(aad))).isTrue();
+        Assertions.assertThat(Arrays.equals(expectedBitLength, AAD.computeLength(aad))).isTrue();
     }
 }

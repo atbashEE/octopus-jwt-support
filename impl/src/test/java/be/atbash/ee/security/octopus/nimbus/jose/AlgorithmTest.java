@@ -19,15 +19,13 @@ package be.atbash.ee.security.octopus.nimbus.jose;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
-import java.text.ParseException;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import java.text.ParseException;
 
 /**
  * Tests the base Algorithm class.
@@ -40,15 +38,15 @@ public class AlgorithmTest {
     @Test
     public void noneConstant() {
 
-        assertThat(Algorithm.NONE.getName()).isEqualTo("none");
+        Assertions.assertThat(Algorithm.NONE.getName()).isEqualTo("none");
     }
 
     @Test
     public void testEquals() {
 
-        assertThat(Algorithm.NONE.getName()).isEqualTo("none");
+        Assertions.assertThat(Algorithm.NONE.getName()).isEqualTo("none");
 
-        assertThat(new Algorithm("none")).isEqualTo(Algorithm.NONE);
+        Assertions.assertThat(new Algorithm("none")).isEqualTo(Algorithm.NONE);
     }
 
     @Test
@@ -56,8 +54,8 @@ public class AlgorithmTest {
 
         Algorithm alg = new Algorithm("my-alg");
 
-        assertThat(alg.getName()).isEqualTo("my-alg");
-        assertThat(alg.toString()).isEqualTo("my-alg");
+        Assertions.assertThat(alg.getName()).isEqualTo("my-alg");
+        Assertions.assertThat(alg.toString()).isEqualTo("my-alg");
     }
 
     @Test
@@ -66,7 +64,7 @@ public class AlgorithmTest {
         Algorithm alg1 = new Algorithm("my-alg");
         Algorithm alg2 = new Algorithm("my-alg");
 
-        assertThat(alg1).isEqualTo(alg2);
+        Assertions.assertThat(alg1).isEqualTo(alg2);
     }
 
 
@@ -76,7 +74,7 @@ public class AlgorithmTest {
         Algorithm alg1 = new Algorithm("my-alg");
         Algorithm alg2 = new Algorithm("your-alg");
 
-        assertThat(alg1).isNotEqualTo(alg2);
+        Assertions.assertThat(alg1).isNotEqualTo(alg2);
     }
 
 
@@ -86,7 +84,7 @@ public class AlgorithmTest {
         Algorithm alg1 = new Algorithm("my-alg");
         Algorithm alg2 = new Algorithm("my-alg");
 
-        assertThat(alg1.hashCode()).isEqualTo(alg2.hashCode());
+        Assertions.assertThat(alg1.hashCode()).isEqualTo(alg2.hashCode());
     }
 
     @Test
@@ -95,7 +93,7 @@ public class AlgorithmTest {
         builder.add(HeaderParameterNames.ALGORITHM, Algorithm.NONE.getName());
         JsonObject json = builder.build();
         Algorithm algorithm = Algorithm.parseAlgorithm(json);
-        assertThat(algorithm).isEqualTo(Algorithm.NONE);
+        Assertions.assertThat(algorithm).isEqualTo(Algorithm.NONE);
     }
 
     @Test
@@ -104,7 +102,7 @@ public class AlgorithmTest {
         builder.add(HeaderParameterNames.ALGORITHM, JWSAlgorithm.HS256.getName());
         JsonObject json = builder.build();
         Algorithm algorithm = Algorithm.parseAlgorithm(json);
-        assertThat(algorithm).isEqualTo(JWSAlgorithm.HS256);
+        Assertions.assertThat(algorithm).isEqualTo(JWSAlgorithm.HS256);
     }
 
     @Test
@@ -114,13 +112,14 @@ public class AlgorithmTest {
         builder.add(HeaderParameterNames.ENCRYPTION_ALGORITHM, EncryptionMethod.A256GCM.getName());
         JsonObject json = builder.build();
         Algorithm algorithm = Algorithm.parseAlgorithm(json);
-        assertThat(algorithm).isEqualTo(JWEAlgorithm.A256KW);
+        Assertions.assertThat(algorithm).isEqualTo(JWEAlgorithm.A256KW);
     }
 
     @Test
     public void testParseAlgorithm_nullAlg() {
 
-        Assertions.assertThrows(ParseException.class, () -> Algorithm.parseAlgorithm(Json.createObjectBuilder().build()));
+        Assertions.assertThatThrownBy(() -> Algorithm.parseAlgorithm(Json.createObjectBuilder().build()))
+                .isInstanceOf(ParseException.class);
 
     }
 

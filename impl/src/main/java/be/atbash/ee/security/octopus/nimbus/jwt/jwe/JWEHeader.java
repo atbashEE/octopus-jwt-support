@@ -78,9 +78,6 @@ import java.util.*;
 public final class JWEHeader extends CommonJWTHeader {
 
 
-    private static final long serialVersionUID = 1L;
-
-
     /**
      * The registered parameter names.
      */
@@ -765,7 +762,7 @@ public final class JWEHeader extends CommonJWTHeader {
         }
 
         this.epk = HeaderParameterType.getParameterValue(HeaderParameterNames.EPHEMERAL_PUBLIC_KEY, epk, parameters);
-        if (this.epk != null && epk.isPrivate()) {
+        if (this.epk != null && this.epk.isPrivate()) {
             throw new IllegalArgumentException("Ephemeral public key should not be a private key");
         }
 

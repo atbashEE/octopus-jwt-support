@@ -49,8 +49,6 @@ import be.atbash.ee.security.octopus.nimbus.jose.AlgorithmFamily;
 public final class JWEAlgorithm extends Algorithm {
 
 
-    private static final long serialVersionUID = 1L;
-
     /**
      * RSAES using Optimal Asymmetric Encryption Padding (OAEP) (RFC 3447),
      * with the SHA-256 hash function and the MGF1 with SHA-256 mask
@@ -247,43 +245,61 @@ public final class JWEAlgorithm extends Algorithm {
      * a newly created algorithm).
      */
     public static JWEAlgorithm parse(String value) {
-
+        JWEAlgorithm result = null;
         if (value.equals(RSA_OAEP_256.getName())) {
-            return RSA_OAEP_256;
-        } else if (value.equals(RSA_OAEP_384.getName())) {
-            return RSA_OAEP_384;
-        } else if (value.equals(RSA_OAEP_512.getName())) {
-            return RSA_OAEP_512;
-        } else if (value.equals(A128KW.getName())) {
-            return A128KW;
-        } else if (value.equals(A192KW.getName())) {
-            return A192KW;
-        } else if (value.equals(A256KW.getName())) {
-            return A256KW;
-        } else if (value.equals(DIR.getName())) {
-            return DIR;
-        } else if (value.equals(ECDH_ES.getName())) {
-            return ECDH_ES;
-        } else if (value.equals(ECDH_ES_A128KW.getName())) {
-            return ECDH_ES_A128KW;
-        } else if (value.equals(ECDH_ES_A192KW.getName())) {
-            return ECDH_ES_A192KW;
-        } else if (value.equals(ECDH_ES_A256KW.getName())) {
-            return ECDH_ES_A256KW;
-        } else if (value.equals(A128GCMKW.getName())) {
-            return A128GCMKW;
-        } else if (value.equals(A192GCMKW.getName())) {
-            return A192GCMKW;
-        } else if (value.equals(A256GCMKW.getName())) {
-            return A256GCMKW;
-        } else if (value.equals(PBES2_HS256_A128KW.getName())) {
-            return PBES2_HS256_A128KW;
-        } else if (value.equals(PBES2_HS384_A192KW.getName())) {
-            return PBES2_HS384_A192KW;
-        } else if (value.equals(PBES2_HS512_A256KW.getName())) {
-            return PBES2_HS512_A256KW;
-        } else {
-            return new JWEAlgorithm(value);
+            result = RSA_OAEP_256;
         }
+        if (value.equals(RSA_OAEP_384.getName())) {
+            result = RSA_OAEP_384;
+        }
+        if (value.equals(RSA_OAEP_512.getName())) {
+            result = RSA_OAEP_512;
+        }
+        if (value.equals(A128KW.getName())) {
+            result = A128KW;
+        }
+        if (value.equals(A192KW.getName())) {
+            result = A192KW;
+        }
+        if (value.equals(A256KW.getName())) {
+            result = A256KW;
+        }
+        if (value.equals(DIR.getName())) {
+            result = DIR;
+        }
+        if (value.equals(ECDH_ES.getName())) {
+            result = ECDH_ES;
+        }
+        if (value.equals(ECDH_ES_A128KW.getName())) {
+            result = ECDH_ES_A128KW;
+        }
+        if (value.equals(ECDH_ES_A192KW.getName())) {
+            result = ECDH_ES_A192KW;
+        }
+        if (value.equals(ECDH_ES_A256KW.getName())) {
+            result = ECDH_ES_A256KW;
+        }
+        if (value.equals(A128GCMKW.getName())) {
+            result = A128GCMKW;
+        }
+        if (value.equals(A192GCMKW.getName())) {
+            result = A192GCMKW;
+        }
+        if (value.equals(A256GCMKW.getName())) {
+            result = A256GCMKW;
+        }
+        if (value.equals(PBES2_HS256_A128KW.getName())) {
+            result = PBES2_HS256_A128KW;
+        }
+        if (value.equals(PBES2_HS384_A192KW.getName())) {
+            result = PBES2_HS384_A192KW;
+        }
+        if (value.equals(PBES2_HS512_A256KW.getName())) {
+            result = PBES2_HS512_A256KW;
+        }
+        if (result == null) {
+            result = new JWEAlgorithm(value);
+        }
+        return result;
     }
 }

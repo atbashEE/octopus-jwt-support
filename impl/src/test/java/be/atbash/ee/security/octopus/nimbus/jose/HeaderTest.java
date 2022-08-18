@@ -27,8 +27,6 @@ import org.junit.jupiter.api.Test;
 
 import java.text.ParseException;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 
 /**
  * Tests the base JOSE header class.
@@ -46,9 +44,9 @@ public class HeaderTest {
 
         Header header = Header.parse(in);
 
-        assertThat(header).isInstanceOf(PlainHeader.class);
-        assertThat(header.toBase64URL()).isEqualTo(in);
-        assertThat(header.getAlgorithm()).isEqualTo(Algorithm.NONE);
+        Assertions.assertThat(header).isInstanceOf(PlainHeader.class);
+        Assertions.assertThat(header.toBase64URL()).isEqualTo(in);
+        Assertions.assertThat(header.getAlgorithm()).isEqualTo(Algorithm.NONE);
     }
 
 
@@ -61,9 +59,9 @@ public class HeaderTest {
 
         Header header = Header.parse(in);
 
-        assertThat(header).isInstanceOf(JWSHeader.class);
-        assertThat(header.toBase64URL()).isEqualTo(in);
-        assertThat(header.getAlgorithm()).isEqualTo(JWSAlgorithm.HS256);
+        Assertions.assertThat(header).isInstanceOf(JWSHeader.class);
+        Assertions.assertThat(header.toBase64URL()).isEqualTo(in);
+        Assertions.assertThat(header.getAlgorithm()).isEqualTo(JWSAlgorithm.HS256);
     }
 
     @Test
@@ -75,12 +73,12 @@ public class HeaderTest {
 
         Header header = Header.parse(in);
 
-        assertThat(header).isInstanceOf(JWEHeader.class);
-        assertThat(header.toBase64URL()).isEqualTo(in);
-        assertThat(header.getAlgorithm()).isEqualTo(JWEAlgorithm.RSA_OAEP_256);
+        Assertions.assertThat(header).isInstanceOf(JWEHeader.class);
+        Assertions.assertThat(header.toBase64URL()).isEqualTo(in);
+        Assertions.assertThat(header.getAlgorithm()).isEqualTo(JWEAlgorithm.RSA_OAEP_256);
 
         JWEHeader jweHeader = (JWEHeader) header;
-        assertThat(jweHeader.getEncryptionMethod()).isEqualTo(EncryptionMethod.A128CBC_HS256);
+        Assertions.assertThat(jweHeader.getEncryptionMethod()).isEqualTo(EncryptionMethod.A128CBC_HS256);
     }
 
     @Test

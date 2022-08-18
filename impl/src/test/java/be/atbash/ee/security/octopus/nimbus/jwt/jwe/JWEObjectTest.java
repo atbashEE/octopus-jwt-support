@@ -62,7 +62,7 @@ public class JWEObjectTest {
         Assertions.assertThat(jwe.getCipherText()).isEqualTo(fourthPart);
 
         Assertions.assertThat(jwe.serialize()).isEqualTo(firstPart.toString() + ".abc.def.ghi.jkl");
-        Assertions.assertThat(jwe.getParsedString()).isEqualTo(firstPart.toString() + ".abc.def.ghi.jkl");
+        Assertions.assertThat(jwe.getParsedString()).isEqualTo(firstPart + ".abc.def.ghi.jkl");
 
         Assertions.assertThat(jwe.getState()).isEqualTo(JWEObject.State.ENCRYPTED);
     }

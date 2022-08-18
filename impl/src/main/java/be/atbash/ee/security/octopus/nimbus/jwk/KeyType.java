@@ -16,9 +16,6 @@
 package be.atbash.ee.security.octopus.nimbus.jwk;
 
 
-import java.io.Serializable;
-
-
 /**
  * Key type. Represents the {@code kty} parameter in a JSON Web Key (JWK).
  * This class is immutable.
@@ -36,10 +33,7 @@ import java.io.Serializable;
  * <p>
  * Based on code by Vladimir Dzhuvinov and Justin Richer
  */
-public final class KeyType implements Serializable {
-
-
-    private static final long serialVersionUID = 1L;
+public final class KeyType {
 
 
     /**

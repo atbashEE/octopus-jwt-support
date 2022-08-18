@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,8 @@
 package be.atbash.ee.security.octopus.nimbus.jose;
 
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 
 /**
@@ -29,18 +28,18 @@ public class JOSEObjectTypeTest {
     @Test
     public void testConstants() {
 
-        assertThat(JOSEObjectType.JOSE.getType()).isEqualTo("JOSE");
-        assertThat(JOSEObjectType.JOSE_JSON.getType()).isEqualTo("JOSE+JSON");
-        assertThat(JOSEObjectType.JWT.getType()).isEqualTo("JWT");
+        Assertions.assertThat(JOSEObjectType.JOSE.getType()).isEqualTo("JOSE");
+        Assertions.assertThat(JOSEObjectType.JOSE_JSON.getType()).isEqualTo("JOSE+JSON");
+        Assertions.assertThat(JOSEObjectType.JWT.getType()).isEqualTo("JWT");
     }
 
 
     @Test
     public void testToString() {
 
-        assertThat(JOSEObjectType.JOSE.toString()).isEqualTo(JOSEObjectType.JOSE.getType());
-        assertThat(JOSEObjectType.JOSE_JSON.toString()).isEqualTo(JOSEObjectType.JOSE_JSON.getType());
-        assertThat(JOSEObjectType.JWT.toString()).isEqualTo(JOSEObjectType.JWT.getType());
+        Assertions.assertThat(JOSEObjectType.JOSE.toString()).isEqualTo(JOSEObjectType.JOSE.getType());
+        Assertions.assertThat(JOSEObjectType.JOSE_JSON.toString()).isEqualTo(JOSEObjectType.JOSE_JSON.getType());
+        Assertions.assertThat(JOSEObjectType.JWT.toString()).isEqualTo(JOSEObjectType.JWT.getType());
     }
 
 }

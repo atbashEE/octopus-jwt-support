@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,13 +21,12 @@ import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import javax.crypto.SecretKey;
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class MACSignerVerifierTest {
 
@@ -42,6 +41,6 @@ class MACSignerVerifierTest {
         MACVerifier verifier = new MACVerifier((SecretKey) atbashKeys.get(0).getKey());
         boolean verify = verifier.verify(header, "The Secret Message".getBytes(), signature);
 
-        assertThat(verify).isTrue();
+        Assertions.assertThat(verify).isTrue();
     }
 }

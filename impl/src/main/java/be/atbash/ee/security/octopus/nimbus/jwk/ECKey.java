@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -111,9 +111,8 @@ import java.util.*;
  */
 public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
 
-
-    private static final long serialVersionUID = 1L;
-
+    private static final String X_MUST_NOT_BE_NULL = "The 'x' coordinate must not be null";
+    private static final String Y_MUST_NOT_BE_NULL = "The 'y' coordinate must not be null";
 
     /**
      * Supported EC curves.
@@ -240,13 +239,13 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
             this.crv = crv;
 
             if (x == null) {
-                throw new IllegalArgumentException("The 'x' coordinate must not be null");
+                throw new IllegalArgumentException(X_MUST_NOT_BE_NULL);
             }
 
             this.x = x;
 
             if (y == null) {
-                throw new IllegalArgumentException("The 'y' coordinate must not be null");
+                throw new IllegalArgumentException(Y_MUST_NOT_BE_NULL);
             }
 
             this.y = y;
@@ -674,13 +673,13 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
         this.crv = crv;
 
         if (x == null) {
-            throw new IllegalArgumentException("The 'x' coordinate must not be null");
+            throw new IllegalArgumentException(X_MUST_NOT_BE_NULL);
         }
 
         this.x = x;
 
         if (y == null) {
-            throw new IllegalArgumentException("The 'y' coordinate must not be null");
+            throw new IllegalArgumentException(Y_MUST_NOT_BE_NULL);
         }
 
         this.y = y;
@@ -741,13 +740,13 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
         this.crv = crv;
 
         if (x == null) {
-            throw new IllegalArgumentException("The 'x' coordinate must not be null");
+            throw new IllegalArgumentException(X_MUST_NOT_BE_NULL);
         }
 
         this.x = x;
 
         if (y == null) {
-            throw new IllegalArgumentException("The 'y' coordinate must not be null");
+            throw new IllegalArgumentException(Y_MUST_NOT_BE_NULL);
         }
 
         this.y = y;
@@ -809,13 +808,13 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
         this.crv = crv;
 
         if (x == null) {
-            throw new IllegalArgumentException("The 'x' coordinate must not be null");
+            throw new IllegalArgumentException(X_MUST_NOT_BE_NULL);
         }
 
         this.x = x;
 
         if (y == null) {
-            throw new IllegalArgumentException("The 'y' coordinate must not be null");
+            throw new IllegalArgumentException(Y_MUST_NOT_BE_NULL);
         }
 
         this.y = y;
@@ -1245,12 +1244,12 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
 
         Base64URLValue x = JSONObjectUtils.getBase64URL(jsonObject, JWKIdentifiers.X_COORD);
         if (x == null) {
-            throw new ParseException("The 'x' coordinate must not be null", 0);
+            throw new ParseException(X_MUST_NOT_BE_NULL, 0);
         }
 
         Base64URLValue y = JSONObjectUtils.getBase64URL(jsonObject, JWKIdentifiers.Y_COORD);
         if (y == null) {
-            throw new ParseException("The 'y' coordinate must not be null", 0);
+            throw new ParseException(Y_MUST_NOT_BE_NULL, 0);
         }
 
         // Get optional private key

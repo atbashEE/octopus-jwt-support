@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,10 +22,10 @@ import be.atbash.ee.security.octopus.nimbus.jwk.JWKSet;
 import be.atbash.util.CDIUtils;
 import be.atbash.util.exception.AtbashIllegalActionException;
 import be.atbash.util.reflection.CDICheck;
+import jakarta.enterprise.inject.Vetoed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.enterprise.inject.Vetoed;
 import java.io.IOException;
 import java.net.URI;
 import java.util.*;
@@ -49,30 +49,27 @@ public class RemoteKeyManager extends AbstractKeyManager implements KeyManager {
 
         List<AtbashKey> result = new ArrayList<>();
 
-        if (selectorCriteria.getJku() != null) {
+        if (selectorCriteria.getJku() != null && validator.validate(selectorCriteria.getJku())) {
 
-            if (validator.validate(selectorCriteria.getJku())) {
+            List<KeyFilter> filters = selectorCriteria.asKeyFilters();
+            JWKSet jwkSet = getJWKSet(selectorCriteria.getJku());
 
-                List<KeyFilter> filters = selectorCriteria.asKeyFilters();
-                JWKSet jwkSet = getJWKSet(selectorCriteria.getJku());
+            if (jwkSet != null) {
+                result = filterKeys(jwkSet.getAtbashKeys(), filters);
 
-                if (jwkSet != null) {
-                    result = filterKeys(jwkSet.getAtbashKeys(), filters);
+                if (result.isEmpty()) {
+                    // Not found in the jwkSet, maybe cache needs to be expired and reread
 
-                    if (result.isEmpty()) {
-                        // Not found in the jwkSet, maybe cache needs to be expired and reread
+                    dropCache(selectorCriteria.getJku());
+                    jwkSet = getJWKSet(selectorCriteria.getJku());
 
-                        dropCache(selectorCriteria.getJku());
-                        jwkSet = getJWKSet(selectorCriteria.getJku());
-
-                        if (jwkSet != null) {
-                            result = filterKeys(jwkSet.getAtbashKeys(), filters);
-                        }
-
+                    if (jwkSet != null) {
+                        result = filterKeys(jwkSet.getAtbashKeys(), filters);
                     }
-                }
 
+                }
             }
+
         }
 
         return result;
@@ -83,11 +80,7 @@ public class RemoteKeyManager extends AbstractKeyManager implements KeyManager {
     }
 
     private JWKSet getJWKSet(URI jku) {
-        JWKSetCache cache = remoteJWKSetCache.get(jku);
-        if (cache == null) {
-            cache = new JWKSetCache();
-            remoteJWKSetCache.put(jku, cache);
-        }
+        JWKSetCache cache = remoteJWKSetCache.computeIfAbsent(jku, p -> new JWKSetCache());
         JWKSet jwkSet = cache.get();
         if (jwkSet == null) {  // expired?
             try {

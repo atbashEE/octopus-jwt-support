@@ -28,7 +28,6 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
 import java.util.*;
 
 class JWTClaimsSetTest {
@@ -185,22 +184,22 @@ class JWTClaimsSetTest {
     }
 
     @Test
-    void expirationTime_asDuration() throws ParseException {
+    void expirationTime_asDuration() {
         Date now = new Date();
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                 .expirationTime(Duration.of(30, ChronoUnit.SECONDS))
                 .build();
 
         long timeDifference = claimsSet.getExpirationTime().getTime() - now.getTime();
-        Assertions.assertThat(timeDifference).isCloseTo(30_000L,  Offset.offset(50L));
+        Assertions.assertThat(timeDifference).isCloseTo(30_000L, Offset.offset(50L));
     }
 
     @Test
-    void expirationTime_asDuration_negative() throws ParseException {
+    void expirationTime_asDuration_negative() {
 
-        Assertions.assertThatThrownBy( () ->
-         new JWTClaimsSet.Builder()
-                .expirationTime(Duration.of(-30, ChronoUnit.SECONDS))
+        Assertions.assertThatThrownBy(() ->
+                new JWTClaimsSet.Builder()
+                        .expirationTime(Duration.of(-30, ChronoUnit.SECONDS))
         ).isInstanceOf(IllegalArgumentException.class).hasMessage("The specified time duration in the parameter can't be smaller then 0.");
 
     }

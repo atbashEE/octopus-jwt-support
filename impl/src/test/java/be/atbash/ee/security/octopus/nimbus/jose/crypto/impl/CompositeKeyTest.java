@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,19 +17,17 @@ package be.atbash.ee.security.octopus.nimbus.jose.crypto.impl;
 
 
 import be.atbash.ee.security.octopus.nimbus.jose.KeyLengthException;
-import org.junit.jupiter.api.Assertions;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 
 /**
- * Tests composite MAC + AES key extraction. Test cases from 
- * http://tools.ietf.org/html/rfc7518#appendix-B
- *
+ * Tests composite MAC + AES key extraction. Test cases from
+ * <a href="http://tools.ietf.org/html/rfc7518#appendix-B">Appendix B</a>
+ * <p>
  * Based on code by  Vladimir Dzhuvinov
  */
 public class CompositeKeyTest  {
@@ -99,61 +97,62 @@ public class CompositeKeyTest  {
 	@Test
 	public void testExample256() {
 
-		SecretKey inputKey = new SecretKeySpec(K_256, "AES");
+        SecretKey inputKey = new SecretKeySpec(K_256, "AES");
 
-		CompositeKey compositeKey = new CompositeKey(inputKey);
+        CompositeKey compositeKey = new CompositeKey(inputKey);
 
-		assertThat(compositeKey.getInputKey().getEncoded()).isEqualTo(K_256);
+        Assertions.assertThat(compositeKey.getInputKey().getEncoded()).isEqualTo(K_256);
 
-		assertThat(compositeKey.getMACKey().getEncoded()).isEqualTo(MAC_KEY_128);
-		assertThat(compositeKey.getMACKey().getAlgorithm()).isEqualTo("HMACSHA256");
-		assertThat(compositeKey.getTruncatedMACByteLength()).isEqualTo(16);
+        Assertions.assertThat(compositeKey.getMACKey().getEncoded()).isEqualTo(MAC_KEY_128);
+        Assertions.assertThat(compositeKey.getMACKey().getAlgorithm()).isEqualTo("HMACSHA256");
+        Assertions.assertThat(compositeKey.getTruncatedMACByteLength()).isEqualTo(16);
 
-		assertThat(compositeKey.getAESKey().getEncoded()).isEqualTo(ENC_KEY_128);
-		assertThat(compositeKey.getAESKey().getAlgorithm()).isEqualTo("AES");
-	}
+        Assertions.assertThat(compositeKey.getAESKey().getEncoded()).isEqualTo(ENC_KEY_128);
+        Assertions.assertThat(compositeKey.getAESKey().getAlgorithm()).isEqualTo("AES");
+    }
 
 
-	@Test
+    @Test
 	public void testExample384() {
 
-		SecretKey inputKey = new SecretKeySpec(K_384, "AES");
+        SecretKey inputKey = new SecretKeySpec(K_384, "AES");
 
-		CompositeKey compositeKey = new CompositeKey(inputKey);
+        CompositeKey compositeKey = new CompositeKey(inputKey);
 
-		assertThat(compositeKey.getInputKey().getEncoded()).isEqualTo(K_384);
+        Assertions.assertThat(compositeKey.getInputKey().getEncoded()).isEqualTo(K_384);
 
-		assertThat(compositeKey.getMACKey().getEncoded()).isEqualTo(MAC_KEY_192);
-		assertThat(compositeKey.getMACKey().getAlgorithm()).isEqualTo("HMACSHA384");
-		assertThat(compositeKey.getTruncatedMACByteLength()).isEqualTo(24);
+        Assertions.assertThat(compositeKey.getMACKey().getEncoded()).isEqualTo(MAC_KEY_192);
+        Assertions.assertThat(compositeKey.getMACKey().getAlgorithm()).isEqualTo("HMACSHA384");
+        Assertions.assertThat(compositeKey.getTruncatedMACByteLength()).isEqualTo(24);
 
-		assertThat(compositeKey.getAESKey().getEncoded()).isEqualTo(ENC_KEY_192);
-		assertThat(compositeKey.getAESKey().getAlgorithm()).isEqualTo("AES");
-	}
+        Assertions.assertThat(compositeKey.getAESKey().getEncoded()).isEqualTo(ENC_KEY_192);
+        Assertions.assertThat(compositeKey.getAESKey().getAlgorithm()).isEqualTo("AES");
+    }
 
-	@Test
+    @Test
 	public void testExample512() {
 
-		SecretKey inputKey = new SecretKeySpec(K_512, "AES");
+        SecretKey inputKey = new SecretKeySpec(K_512, "AES");
 
-		CompositeKey compositeKey = new CompositeKey(inputKey);
+        CompositeKey compositeKey = new CompositeKey(inputKey);
 
-		assertThat(compositeKey.getInputKey().getEncoded()).isEqualTo(K_512);
+        Assertions.assertThat(compositeKey.getInputKey().getEncoded()).isEqualTo(K_512);
 
-		assertThat(compositeKey.getMACKey().getEncoded()).isEqualTo(MAC_KEY_256);
-		assertThat(compositeKey.getMACKey().getAlgorithm()).isEqualTo("HMACSHA512");
-		assertThat(compositeKey.getTruncatedMACByteLength()).isEqualTo(32);
+        Assertions.assertThat(compositeKey.getMACKey().getEncoded()).isEqualTo(MAC_KEY_256);
+        Assertions.assertThat(compositeKey.getMACKey().getAlgorithm()).isEqualTo("HMACSHA512");
+        Assertions.assertThat(compositeKey.getTruncatedMACByteLength()).isEqualTo(32);
 
-		assertThat(compositeKey.getAESKey().getEncoded()).isEqualTo(ENC_KEY_256);
-		assertThat(compositeKey.getAESKey().getAlgorithm()).isEqualTo("AES");
-	}
+        Assertions.assertThat(compositeKey.getAESKey().getEncoded()).isEqualTo(ENC_KEY_256);
+        Assertions.assertThat(compositeKey.getAESKey().getAlgorithm()).isEqualTo("AES");
+    }
 
-	@Test
+    @Test
 	public void testUnsupportedInputKeyLength() {
 
-		SecretKey inputKey = new SecretKeySpec(new byte[]{1, 2, 3, 4, 5, 6, 7, 8}, "AES");
+        SecretKey inputKey = new SecretKeySpec(new byte[]{1, 2, 3, 4, 5, 6, 7, 8}, "AES");
 
-		Assertions.assertThrows(KeyLengthException.class,
-				() -> new CompositeKey(inputKey));
-	}
+        Assertions.assertThatThrownBy(
+                        () -> new CompositeKey(inputKey))
+                .isInstanceOf(KeyLengthException.class);
+    }
 }

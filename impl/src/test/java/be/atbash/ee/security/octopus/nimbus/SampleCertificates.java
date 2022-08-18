@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package be.atbash.ee.security.octopus.nimbus;
 import be.atbash.ee.security.octopus.nimbus.jwk.Curve;
 import be.atbash.ee.security.octopus.nimbus.util.Base64Value;
 import be.atbash.ee.security.octopus.nimbus.util.X509CertUtils;
+import org.assertj.core.api.Assertions;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.KeyUsage;
@@ -37,8 +38,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class SampleCertificates {
@@ -182,8 +181,8 @@ public class SampleCertificates {
             JcaContentSignerBuilder signerBuilder = new JcaContentSignerBuilder("SHA256withECDSA");
             X509CertificateHolder certHolder = x509certBuilder.build(signerBuilder.build(privateKey));
             X509Certificate cert = X509CertUtils.parse(certHolder.getEncoded());
-            assertThat(cert).isNotNull();
-            SAMPLE_X5C_EC = Collections.unmodifiableList(Collections.singletonList(Base64Value.encode(cert.getEncoded())));
+            Assertions.assertThat(cert).isNotNull();
+            SAMPLE_X5C_EC = Collections.singletonList(Base64Value.encode(cert.getEncoded()));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

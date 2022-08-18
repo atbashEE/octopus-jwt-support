@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,13 @@
 package be.atbash.ee.security.octopus.nimbus.util;
 
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Arrays;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class KeyUtilsTest {
@@ -36,22 +35,22 @@ public class KeyUtilsTest {
         gen.init(128);
         SecretKey key = gen.generateKey();
 
-        assertThat(ByteUtils.bitLength(key.getEncoded())).isEqualTo(128);
-        assertThat(key.getAlgorithm()).isEqualTo("AES");
+        Assertions.assertThat(ByteUtils.bitLength(key.getEncoded())).isEqualTo(128);
+        Assertions.assertThat(key.getAlgorithm()).isEqualTo("AES");
 
         key = new SecretKeySpec(key.getEncoded(), "UNKNOWN");
-        assertThat(ByteUtils.bitLength(key.getEncoded())).isEqualTo(128);
-        assertThat(key.getAlgorithm()).isEqualTo("UNKNOWN");
+        Assertions.assertThat(ByteUtils.bitLength(key.getEncoded())).isEqualTo(128);
+        Assertions.assertThat(key.getAlgorithm()).isEqualTo("UNKNOWN");
 
         SecretKey aesKey = KeyUtils.toAESKey(key);
-        assertThat(ByteUtils.bitLength(key.getEncoded())).isEqualTo(128);
-        assertThat(Arrays.equals(key.getEncoded(), aesKey.getEncoded())).isTrue();
-        assertThat(aesKey.getAlgorithm()).isEqualTo("AES");
+        Assertions.assertThat(ByteUtils.bitLength(key.getEncoded())).isEqualTo(128);
+        Assertions.assertThat(Arrays.equals(key.getEncoded(), aesKey.getEncoded())).isTrue();
+        Assertions.assertThat(aesKey.getAlgorithm()).isEqualTo("AES");
     }
 
     @Test
     public void testToAESSecretKey_null() {
 
-        assertThat(KeyUtils.toAESKey(null)).isNull();
+        Assertions.assertThat(KeyUtils.toAESKey(null)).isNull();
     }
 }

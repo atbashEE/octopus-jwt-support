@@ -16,9 +16,8 @@
 package be.atbash.ee.security.octopus.nimbus.jwt.jwe;
 
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests the JWS Algorithm class.
@@ -30,64 +29,64 @@ public class JWEAlgorithmTest {
     @Test
     public void testParse() {
 
-        assertThat(JWEAlgorithm.RSA_OAEP_256).isEqualTo(JWEAlgorithm.parse("RSA-OAEP-256"));
-        assertThat(JWEAlgorithm.RSA_OAEP_512).isEqualTo(JWEAlgorithm.parse("RSA-OAEP-512"));
+        Assertions.assertThat(JWEAlgorithm.RSA_OAEP_256).isEqualTo(JWEAlgorithm.parse("RSA-OAEP-256"));
+        Assertions.assertThat(JWEAlgorithm.RSA_OAEP_512).isEqualTo(JWEAlgorithm.parse("RSA-OAEP-512"));
 
-        assertThat(JWEAlgorithm.A128KW).isEqualTo(JWEAlgorithm.parse("A128KW"));
-        assertThat(JWEAlgorithm.A192KW).isEqualTo(JWEAlgorithm.parse("A192KW"));
-        assertThat(JWEAlgorithm.A256KW).isEqualTo(JWEAlgorithm.parse("A256KW"));
+        Assertions.assertThat(JWEAlgorithm.A128KW).isEqualTo(JWEAlgorithm.parse("A128KW"));
+        Assertions.assertThat(JWEAlgorithm.A192KW).isEqualTo(JWEAlgorithm.parse("A192KW"));
+        Assertions.assertThat(JWEAlgorithm.A256KW).isEqualTo(JWEAlgorithm.parse("A256KW"));
 
-        assertThat(JWEAlgorithm.DIR).isEqualTo(JWEAlgorithm.parse("dir"));
+        Assertions.assertThat(JWEAlgorithm.DIR).isEqualTo(JWEAlgorithm.parse("dir"));
 
-        assertThat(JWEAlgorithm.ECDH_ES).isEqualTo(JWEAlgorithm.parse("ECDH-ES"));
+        Assertions.assertThat(JWEAlgorithm.ECDH_ES).isEqualTo(JWEAlgorithm.parse("ECDH-ES"));
 
-        assertThat(JWEAlgorithm.ECDH_ES_A128KW).isEqualTo(JWEAlgorithm.parse("ECDH-ES+A128KW"));
-        assertThat(JWEAlgorithm.ECDH_ES_A192KW).isEqualTo(JWEAlgorithm.parse("ECDH-ES+A192KW"));
-        assertThat(JWEAlgorithm.ECDH_ES_A256KW).isEqualTo(JWEAlgorithm.parse("ECDH-ES+A256KW"));
+        Assertions.assertThat(JWEAlgorithm.ECDH_ES_A128KW).isEqualTo(JWEAlgorithm.parse("ECDH-ES+A128KW"));
+        Assertions.assertThat(JWEAlgorithm.ECDH_ES_A192KW).isEqualTo(JWEAlgorithm.parse("ECDH-ES+A192KW"));
+        Assertions.assertThat(JWEAlgorithm.ECDH_ES_A256KW).isEqualTo(JWEAlgorithm.parse("ECDH-ES+A256KW"));
 
-        assertThat(JWEAlgorithm.A128GCMKW).isEqualTo(JWEAlgorithm.parse("A128GCMKW"));
-        assertThat(JWEAlgorithm.A192GCMKW).isEqualTo(JWEAlgorithm.parse("A192GCMKW"));
-        assertThat(JWEAlgorithm.A256GCMKW).isEqualTo(JWEAlgorithm.parse("A256GCMKW"));
+        Assertions.assertThat(JWEAlgorithm.A128GCMKW).isEqualTo(JWEAlgorithm.parse("A128GCMKW"));
+        Assertions.assertThat(JWEAlgorithm.A192GCMKW).isEqualTo(JWEAlgorithm.parse("A192GCMKW"));
+        Assertions.assertThat(JWEAlgorithm.A256GCMKW).isEqualTo(JWEAlgorithm.parse("A256GCMKW"));
 
-        assertThat(JWEAlgorithm.PBES2_HS256_A128KW).isEqualTo(JWEAlgorithm.parse("PBES2-HS256+A128KW"));
-        assertThat(JWEAlgorithm.PBES2_HS384_A192KW).isEqualTo(JWEAlgorithm.parse("PBES2-HS384+A192KW"));
-        assertThat(JWEAlgorithm.PBES2_HS512_A256KW).isEqualTo(JWEAlgorithm.parse("PBES2-HS512+A256KW"));
+        Assertions.assertThat(JWEAlgorithm.PBES2_HS256_A128KW).isEqualTo(JWEAlgorithm.parse("PBES2-HS256+A128KW"));
+        Assertions.assertThat(JWEAlgorithm.PBES2_HS384_A192KW).isEqualTo(JWEAlgorithm.parse("PBES2-HS384+A192KW"));
+        Assertions.assertThat(JWEAlgorithm.PBES2_HS512_A256KW).isEqualTo(JWEAlgorithm.parse("PBES2-HS512+A256KW"));
     }
 
 
     @Test
     public void testRSAFamily() {
 
-        assertThat(JWEAlgorithm.Family.RSA).containsOnly(JWEAlgorithm.RSA_OAEP_256, JWEAlgorithm.RSA_OAEP_384, JWEAlgorithm.RSA_OAEP_512);
-        assertThat(JWEAlgorithm.Family.RSA).hasSize(3);
+        Assertions.assertThat(JWEAlgorithm.Family.RSA).containsOnly(JWEAlgorithm.RSA_OAEP_256, JWEAlgorithm.RSA_OAEP_384, JWEAlgorithm.RSA_OAEP_512);
+        Assertions.assertThat(JWEAlgorithm.Family.RSA).hasSize(3);
     }
 
     @Test
     public void testAxxxKWFamily() {
 
-        assertThat(JWEAlgorithm.Family.AES_KW).contains(JWEAlgorithm.A128KW);
-        assertThat(JWEAlgorithm.Family.AES_KW).contains(JWEAlgorithm.A192KW);
-        assertThat(JWEAlgorithm.Family.AES_KW).contains(JWEAlgorithm.A256KW);
-        assertThat(JWEAlgorithm.Family.AES_KW).hasSize(3);
+        Assertions.assertThat(JWEAlgorithm.Family.AES_KW).contains(JWEAlgorithm.A128KW);
+        Assertions.assertThat(JWEAlgorithm.Family.AES_KW).contains(JWEAlgorithm.A192KW);
+        Assertions.assertThat(JWEAlgorithm.Family.AES_KW).contains(JWEAlgorithm.A256KW);
+        Assertions.assertThat(JWEAlgorithm.Family.AES_KW).hasSize(3);
     }
 
     @Test
     public void testAxxxGCMKWFamily() {
 
-        assertThat(JWEAlgorithm.Family.AES_GCM_KW).contains(JWEAlgorithm.A256GCMKW);
-        assertThat(JWEAlgorithm.Family.AES_GCM_KW).contains(JWEAlgorithm.A256GCMKW);
-        assertThat(JWEAlgorithm.Family.AES_GCM_KW).contains(JWEAlgorithm.A256GCMKW);
-        assertThat(JWEAlgorithm.Family.AES_GCM_KW).hasSize(3);
+        Assertions.assertThat(JWEAlgorithm.Family.AES_GCM_KW).contains(JWEAlgorithm.A256GCMKW);
+        Assertions.assertThat(JWEAlgorithm.Family.AES_GCM_KW).contains(JWEAlgorithm.A256GCMKW);
+        Assertions.assertThat(JWEAlgorithm.Family.AES_GCM_KW).contains(JWEAlgorithm.A256GCMKW);
+        Assertions.assertThat(JWEAlgorithm.Family.AES_GCM_KW).hasSize(3);
     }
 
     @Test
     public void testECDHFamily() {
 
-        assertThat(JWEAlgorithm.Family.ECDH_ES).contains(JWEAlgorithm.ECDH_ES);
-        assertThat(JWEAlgorithm.Family.ECDH_ES).contains(JWEAlgorithm.ECDH_ES_A128KW);
-        assertThat(JWEAlgorithm.Family.ECDH_ES).contains(JWEAlgorithm.ECDH_ES_A192KW);
-        assertThat(JWEAlgorithm.Family.ECDH_ES).contains(JWEAlgorithm.ECDH_ES_A256KW);
-        assertThat(JWEAlgorithm.Family.ECDH_ES).hasSize(4);
+        Assertions.assertThat(JWEAlgorithm.Family.ECDH_ES).contains(JWEAlgorithm.ECDH_ES);
+        Assertions.assertThat(JWEAlgorithm.Family.ECDH_ES).contains(JWEAlgorithm.ECDH_ES_A128KW);
+        Assertions.assertThat(JWEAlgorithm.Family.ECDH_ES).contains(JWEAlgorithm.ECDH_ES_A192KW);
+        Assertions.assertThat(JWEAlgorithm.Family.ECDH_ES).contains(JWEAlgorithm.ECDH_ES_A256KW);
+        Assertions.assertThat(JWEAlgorithm.Family.ECDH_ES).hasSize(4);
     }
 
     /*
@@ -102,7 +101,7 @@ public class JWEAlgorithmTest {
         assertTrue(JWEAlgorithm.Family.ASYMMETRIC.contains(JWEAlgorithm.ECDH_ES_A128KW));
         assertTrue(JWEAlgorithm.Family.ASYMMETRIC.contains(JWEAlgorithm.ECDH_ES_A192KW));
         assertTrue(JWEAlgorithm.Family.ASYMMETRIC.contains(JWEAlgorithm.ECDH_ES_A256KW));
-        assertThat(JWEAlgorithm.Family.ASYMMETRIC.size()).isEqualTo(7);
+        Assertions.assertThat(JWEAlgorithm.Family.ASYMMETRIC.size()).isEqualTo(7);
     }
 
 
@@ -117,7 +116,7 @@ public class JWEAlgorithmTest {
         assertTrue(JWEAlgorithm.Family.SYMMETRIC.contains(JWEAlgorithm.A256GCMKW));
         assertTrue(JWEAlgorithm.Family.SYMMETRIC.contains(JWEAlgorithm.A256GCMKW));
         assertTrue(JWEAlgorithm.Family.SYMMETRIC.contains(JWEAlgorithm.DIR));
-        assertThat(JWEAlgorithm.Family.ASYMMETRIC.size()).isEqualTo(7);
+        Assertions.assertThat(JWEAlgorithm.Family.ASYMMETRIC.size()).isEqualTo(7);
     }
     */
 

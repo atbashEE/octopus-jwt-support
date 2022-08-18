@@ -38,8 +38,6 @@ import org.junit.jupiter.api.Test;
 import java.util.Collections;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 // a low level test
 class Ed25519SignerVerifierTest {
 
@@ -55,11 +53,11 @@ class Ed25519SignerVerifierTest {
         Ed25519Verifier verifier = new Ed25519Verifier(publicKey);
         boolean verify = verifier.verify(header, "The Secret Message".getBytes(), signature);
 
-        assertThat(verify).isTrue();
+        Assertions.assertThat(verify).isTrue();
     }
 
     @Test
-    public void testRfc8032Vectors() throws Exception {
+    public void testRfc8032Vectors() {
         // Test vectors from https://tools.ietf.org/html/rfc8032#section-7.1
         byte[][][] testVectors = new byte[][][]{
                 // -----TEST 1

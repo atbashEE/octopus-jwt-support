@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,14 +21,13 @@ import be.atbash.ee.security.octopus.json.testclasses.ReferencedClass;
 import be.atbash.ee.security.octopus.json.testclasses.SomePojo;
 import be.atbash.ee.security.octopus.jwt.encoder.JWTEncoder;
 import be.atbash.ee.security.octopus.jwt.parameter.JWTParametersNone;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class AbstractJacksonJsonSerializerTest {
 
@@ -57,7 +56,7 @@ public class AbstractJacksonJsonSerializerTest {
         JWTEncoder encoder = new JWTEncoder();
         String json = encoder.encode(data, new JWTParametersNone());
 
-        assertThat(json).isEqualTo("{\"field-a\":\"stringValue\",\"age\":42,\"counter\":1,\"flag\":1,\"roles\":[\"role1\",\"role2\"],\"reference\":{\"data\":[\"value2\",\"value1\"]},\"parent\":\"parentString\"}");
+        Assertions.assertThat(json).isEqualTo("{\"field-a\":\"stringValue\",\"age\":42,\"counter\":1,\"flag\":1,\"roles\":[\"role1\",\"role2\"],\"reference\":{\"data\":[\"value2\",\"value1\"]},\"parent\":\"parentString\"}");
 
     }
 
@@ -76,7 +75,7 @@ public class AbstractJacksonJsonSerializerTest {
         JWTEncoder encoder = new JWTEncoder();
         String json = encoder.encode(main, new JWTParametersNone());
 
-        assertThat(json).isEqualTo("{\"type\":\"test\",\"pojo-arr\":[{\"pojo-id\":1,\"pojo-name\":\"name1\"},{\"pojo-id\":2,\"pojo-name\":\"name2\"}]}");
+        Assertions.assertThat(json).isEqualTo("{\"type\":\"test\",\"pojo-arr\":[{\"pojo-id\":1,\"pojo-name\":\"name1\"},{\"pojo-id\":2,\"pojo-name\":\"name2\"}]}");
 
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,11 @@ package be.atbash.ee.security.octopus.util;
 
 import be.atbash.ee.security.octopus.exception.DecryptionFailedException;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
-import org.junit.jupiter.api.Assertions;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import javax.crypto.SecretKey;
 import java.security.SecureRandom;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class EncryptionHelperTest {
 
@@ -35,14 +33,15 @@ public class EncryptionHelperTest {
 
         String decoded = EncryptionHelper.decode(encoded, password);
 
-        assertThat(decoded).isEqualTo("This is the text which needs to encrypted");
+        Assertions.assertThat(decoded).isEqualTo("This is the text which needs to encrypted");
     }
 
     @Test
     public void encode_decode_WrongPassword() {
 
         String encoded = EncryptionHelper.encode("This is the text which needs to encrypted", "pw".toCharArray());
-        Assertions.assertThrows(DecryptionFailedException.class, () -> EncryptionHelper.decode(encoded, "Atbash".toCharArray()));
+        Assertions.assertThatThrownBy(() -> EncryptionHelper.decode(encoded, "Atbash".toCharArray()))
+                .isInstanceOf(DecryptionFailedException.class);
 
     }
 
@@ -52,7 +51,7 @@ public class EncryptionHelperTest {
         String encoded1 = EncryptionHelper.encode("This is the text which needs to encrypted", "pw".toCharArray());
         String encoded2 = EncryptionHelper.encode("This is the text which needs to encrypted", "pw".toCharArray());
 
-        assertThat(encoded1).isNotEqualTo(encoded2);
+        Assertions.assertThat(encoded1).isNotEqualTo(encoded2);
     }
 
     @Test
@@ -67,7 +66,7 @@ public class EncryptionHelperTest {
 
         String decoded = EncryptionHelper.decode(encoded, (SecretKey) key.getKey());
 
-        assertThat(decoded).isEqualTo("This is the text which needs to encrypted");
+        Assertions.assertThat(decoded).isEqualTo("This is the text which needs to encrypted");
     }
 
 }

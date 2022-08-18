@@ -20,7 +20,6 @@ import be.atbash.ee.security.octopus.nimbus.jwt.util.DateUtils;
 import be.atbash.ee.security.octopus.nimbus.util.JSONObjectUtils;
 import jakarta.json.*;
 
-import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
@@ -70,10 +69,7 @@ import java.util.*;
  *
  * Based on code by Vladimir Dzhuvinov and Justin Richer
  */
-public final class JWTClaimsSet implements Serializable {
-
-
-    private static final long serialVersionUID = 1L;
+public final class JWTClaimsSet {
 
 
     /**

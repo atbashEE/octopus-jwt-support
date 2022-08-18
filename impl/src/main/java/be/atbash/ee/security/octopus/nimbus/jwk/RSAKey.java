@@ -25,7 +25,6 @@ import be.atbash.ee.security.octopus.nimbus.jose.KeyTypeException;
 import be.atbash.ee.security.octopus.nimbus.util.*;
 import jakarta.json.*;
 
-import java.io.Serializable;
 import java.math.BigInteger;
 import java.net.URI;
 import java.security.*;
@@ -132,17 +131,11 @@ import java.util.*;
 public final class RSAKey extends JWK implements AsymmetricJWK {
 
 
-    private static final long serialVersionUID = 1L;
-
-
     /**
      * Other Primes Info, represents the private {@code oth} parameter of a
      * RSA JWK. This class is immutable.
      */
-    public static class OtherPrimesInfo implements Serializable {
-
-
-        private static final long serialVersionUID = 1L;
+    public static class OtherPrimesInfo {
 
 
         /**
@@ -897,9 +890,9 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
                         use, ops, alg, kid, x5u, x5t256, x5c,
                         keystore);
 
-            } catch (IllegalArgumentException e) {
+            } catch (IllegalArgumentException ex) {
 
-                throw new IllegalStateException(e.getMessage(), e);
+                throw new IllegalStateException(ex.getMessage(), ex);
             }
         }
     }
@@ -1211,10 +1204,8 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
         }
         this.e = e;
 
-        if (getParsedX509CertChain() != null) {
-            if (!matches(getParsedX509CertChain().get(0))) {
-                throw new IllegalArgumentException("The public subject key info of the first X.509 certificate in the chain must match the JWK type and public parameters");
-            }
+        if (getParsedX509CertChain() != null && !matches(getParsedX509CertChain().get(0))) {
+            throw new IllegalArgumentException("The public subject key info of the first X.509 certificate in the chain must match the JWK type and public parameters");
         }
 
         // Private params, 1st representation
@@ -1377,6 +1368,7 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
     public RSAKey(RSAPublicKey pub, RSAPrivateCrtKey priv,
                   KeyUse use, Set<KeyOperation> ops, Algorithm alg, String kid,
                   URI x5u, Base64URLValue x5t, Base64URLValue x5t256, List<Base64Value> x5c,
+                  // FIXME Base64URLValue x5t remove and restructure constructors.
                   KeyStore ks) {
 
         this(Base64URLValue.encode(pub.getModulus()),
@@ -1627,9 +1619,9 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
 
             return (RSAPublicKey) factory.generatePublic(spec);
 
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
 
-            throw new InvalidKeyException(e.getMessage(), e);
+            throw new InvalidKeyException(ex.getMessage(), ex);
         }
     }
 

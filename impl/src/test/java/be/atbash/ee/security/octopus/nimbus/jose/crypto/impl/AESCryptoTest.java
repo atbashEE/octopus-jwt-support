@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,13 @@ package be.atbash.ee.security.octopus.nimbus.jose.crypto.impl;
 
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 
 /**
  * Tests static AES crypto provider constants and methods.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
 public class AESCryptoTest  {
@@ -34,26 +33,26 @@ public class AESCryptoTest  {
 	@Test
 	public void testClassAlgorithmSupport() {
 
-		assertThat(AESCryptoProvider.SUPPORTED_ALGORITHMS).hasSize(6);
+        Assertions.assertThat(AESCryptoProvider.SUPPORTED_ALGORITHMS).hasSize(6);
 
-		assertThat(AESCryptoProvider.SUPPORTED_ALGORITHMS).contains(JWEAlgorithm.A128KW);
-		assertThat(AESCryptoProvider.SUPPORTED_ALGORITHMS).contains(JWEAlgorithm.A192KW);
-		assertThat(AESCryptoProvider.SUPPORTED_ALGORITHMS).contains(JWEAlgorithm.A256KW);
-		assertThat(AESCryptoProvider.SUPPORTED_ALGORITHMS).contains(JWEAlgorithm.A128GCMKW);
-		assertThat(AESCryptoProvider.SUPPORTED_ALGORITHMS).contains(JWEAlgorithm.A192GCMKW);
-		assertThat(AESCryptoProvider.SUPPORTED_ALGORITHMS).contains(JWEAlgorithm.A256GCMKW);
-	}
+        Assertions.assertThat(AESCryptoProvider.SUPPORTED_ALGORITHMS).contains(JWEAlgorithm.A128KW);
+        Assertions.assertThat(AESCryptoProvider.SUPPORTED_ALGORITHMS).contains(JWEAlgorithm.A192KW);
+        Assertions.assertThat(AESCryptoProvider.SUPPORTED_ALGORITHMS).contains(JWEAlgorithm.A256KW);
+        Assertions.assertThat(AESCryptoProvider.SUPPORTED_ALGORITHMS).contains(JWEAlgorithm.A128GCMKW);
+        Assertions.assertThat(AESCryptoProvider.SUPPORTED_ALGORITHMS).contains(JWEAlgorithm.A192GCMKW);
+        Assertions.assertThat(AESCryptoProvider.SUPPORTED_ALGORITHMS).contains(JWEAlgorithm.A256GCMKW);
+    }
 
 	@Test
 	public void testClassEncryptionMethodSupport() {
 
-		assertThat(AESCryptoProvider.SUPPORTED_ENCRYPTION_METHODS).hasSize(6);
+        Assertions.assertThat(AESCryptoProvider.SUPPORTED_ENCRYPTION_METHODS).hasSize(6);
 
-		assertThat(AESCryptoProvider.SUPPORTED_ENCRYPTION_METHODS).contains(EncryptionMethod.A128CBC_HS256);
-		assertThat(AESCryptoProvider.SUPPORTED_ENCRYPTION_METHODS).contains(EncryptionMethod.A192CBC_HS384);
-		assertThat(AESCryptoProvider.SUPPORTED_ENCRYPTION_METHODS).contains(EncryptionMethod.A256CBC_HS512);
-		assertThat(AESCryptoProvider.SUPPORTED_ENCRYPTION_METHODS).contains(EncryptionMethod.A128GCM);
-		assertThat(AESCryptoProvider.SUPPORTED_ENCRYPTION_METHODS).contains(EncryptionMethod.A192GCM);
-		assertThat(AESCryptoProvider.SUPPORTED_ENCRYPTION_METHODS).contains(EncryptionMethod.A256GCM);
-	}
+        Assertions.assertThat(AESCryptoProvider.SUPPORTED_ENCRYPTION_METHODS).contains(EncryptionMethod.A128CBC_HS256);
+        Assertions.assertThat(AESCryptoProvider.SUPPORTED_ENCRYPTION_METHODS).contains(EncryptionMethod.A192CBC_HS384);
+        Assertions.assertThat(AESCryptoProvider.SUPPORTED_ENCRYPTION_METHODS).contains(EncryptionMethod.A256CBC_HS512);
+        Assertions.assertThat(AESCryptoProvider.SUPPORTED_ENCRYPTION_METHODS).contains(EncryptionMethod.A128GCM);
+        Assertions.assertThat(AESCryptoProvider.SUPPORTED_ENCRYPTION_METHODS).contains(EncryptionMethod.A192GCM);
+        Assertions.assertThat(AESCryptoProvider.SUPPORTED_ENCRYPTION_METHODS).contains(EncryptionMethod.A256GCM);
+    }
 }

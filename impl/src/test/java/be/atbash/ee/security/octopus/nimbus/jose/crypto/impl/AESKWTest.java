@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,12 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto.impl;
 
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Arrays;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 
 /**
@@ -54,7 +53,7 @@ public class AESKWTest {
                 (byte) 249, (byte) 52, (byte) 117, (byte) 184, (byte) 140, (byte) 81, (byte) 246, (byte) 158,
                 (byte) 161, (byte) 177, (byte) 20, (byte) 33, (byte) 245, (byte) 57, (byte) 59, (byte) 4};
 
-        assertThat(Arrays.equals(expectedEncryptedCEK, encryptedCEK)).isTrue();
+        Assertions.assertThat(Arrays.equals(expectedEncryptedCEK, encryptedCEK)).isTrue();
     }
 
 
@@ -72,16 +71,16 @@ public class AESKWTest {
                 (byte) 110, (byte) 171, (byte) 169, (byte) 92, (byte) 129, (byte) 92, (byte) 109, (byte) 117,
                 (byte) 233, (byte) 242, (byte) 116, (byte) 233, (byte) 170, (byte) 14, (byte) 24, (byte) 75};
 
-         SecretKey cek = AESKW.unwrapCEK(new SecretKeySpec(kek, "AES"), encryptedCEK);
+        SecretKey cek = AESKW.unwrapCEK(new SecretKeySpec(kek, "AES"), encryptedCEK);
 
-         byte[] expectedCEK = {
+        byte[] expectedCEK = {
                 (byte) 111, (byte) 27, (byte) 25, (byte) 52, (byte) 66, (byte) 29, (byte) 20, (byte) 78,
                 (byte) 92, (byte) 176, (byte) 56, (byte) 240, (byte) 65, (byte) 208, (byte) 82, (byte) 112,
                 (byte) 161, (byte) 131, (byte) 36, (byte) 55, (byte) 202, (byte) 236, (byte) 185, (byte) 172,
                 (byte) 129, (byte) 23, (byte) 153, (byte) 194, (byte) 195, (byte) 48, (byte) 253, (byte) 182};
 
-        assertThat(Arrays.equals(expectedCEK, cek.getEncoded())).isTrue();
-        assertThat(cek.getAlgorithm()).isEqualTo("AES");
+        Assertions.assertThat(Arrays.equals(expectedCEK, cek.getEncoded())).isTrue();
+        Assertions.assertThat(cek.getAlgorithm()).isEqualTo("AES");
     }
 
     @Test
@@ -98,15 +97,15 @@ public class AESKWTest {
                 (byte) 110, (byte) 171, (byte) 169, (byte) 92, (byte) 129, (byte) 92, (byte) 109, (byte) 117,
                 (byte) 233, (byte) 242, (byte) 116, (byte) 233, (byte) 170, (byte) 14, (byte) 24, (byte) 75};
 
-         SecretKey cek = AESKW.unwrapCEK(new SecretKeySpec(kek, "SOME_ALG_NOT_AES"), encryptedCEK);
+        SecretKey cek = AESKW.unwrapCEK(new SecretKeySpec(kek, "SOME_ALG_NOT_AES"), encryptedCEK);
 
-         byte[] expectedCEK = {
+        byte[] expectedCEK = {
                 (byte) 111, (byte) 27, (byte) 25, (byte) 52, (byte) 66, (byte) 29, (byte) 20, (byte) 78,
                 (byte) 92, (byte) 176, (byte) 56, (byte) 240, (byte) 65, (byte) 208, (byte) 82, (byte) 112,
                 (byte) 161, (byte) 131, (byte) 36, (byte) 55, (byte) 202, (byte) 236, (byte) 185, (byte) 172,
                 (byte) 129, (byte) 23, (byte) 153, (byte) 194, (byte) 195, (byte) 48, (byte) 253, (byte) 182};
 
-        assertThat(cek.getEncoded()).isEqualTo(expectedCEK);
-        assertThat(cek.getAlgorithm()).isEqualTo("AES");
+        Assertions.assertThat(cek.getEncoded()).isEqualTo(expectedCEK);
+        Assertions.assertThat(cek.getAlgorithm()).isEqualTo("AES");
     }
 }

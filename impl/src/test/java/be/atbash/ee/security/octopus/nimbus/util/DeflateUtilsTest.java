@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,10 @@
 package be.atbash.ee.security.octopus.nimbus.util;
 
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 
 /**
@@ -42,9 +41,9 @@ public class DeflateUtilsTest {
         String textDecompressed = new String(textBytesDecompressed, StandardCharsets.UTF_8);
 
 
-        assertThat(textBytesDecompressed.length).withFailMessage("byte length check").isEqualTo(textBytes.length);
-        assertThat(textDecompressed.length()).withFailMessage("text length check").isEqualTo(text.length());
-        assertThat(textDecompressed).withFailMessage("text comparison").isEqualTo(text);
+        Assertions.assertThat(textBytesDecompressed.length).withFailMessage("byte length check").isEqualTo(textBytes.length);
+        Assertions.assertThat(textDecompressed.length()).withFailMessage("text length check").isEqualTo(text.length());
+        Assertions.assertThat(textDecompressed).withFailMessage("text comparison").isEqualTo(text);
 
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,6 @@
 package be.atbash.ee.security.octopus.nimbus.jose;
 
 
-import java.io.Serializable;
-
-
 /**
  * JOSE object type, represents the {@code typ} header parameter in unsecured,
  * JSON Web Signature (JWS) and JSON Web Encryption (JWE) objects. This class
@@ -33,13 +30,10 @@ import java.io.Serializable;
  * </ul>
  *
  * <p>Additional types can be defined using the constructor.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
-public final class JOSEObjectType implements Serializable {
-
-
-    private static final long serialVersionUID = 1L;
+public final class JOSEObjectType {
 
 
     /**

@@ -260,10 +260,8 @@ public class JWTDecoder {
         processor.setJWSKeySelector(keySelector);
         JWTClaimsSet jwtClaimsSet = processor.process(signedJWT);
 
-        if (verifier != null) {
-            if (!verifier.verify(signedJWT.getHeader(), signedJWT.getJWTClaimsSet())) {
-                throw new InvalidJWTException("JWT verification failed");
-            }
+        if (verifier != null && !verifier.verify(signedJWT.getHeader(), signedJWT.getJWTClaimsSet())) {
+            throw new InvalidJWTException("JWT verification failed");
         }
 
         String keyID = signedJWT.getHeader().getKeyID();
@@ -291,10 +289,8 @@ public class JWTDecoder {
         processor.setJWEKeySelector(keySelector);
         JWTClaimsSet jwtClaimsSet = processor.process(encryptedJWT);
 
-        if (verifier != null) {
-            if (!verifier.verify(encryptedJWT.getHeader(), jwtClaimsSet)) {
-                throw new InvalidJWTException("JWT verification failed");
-            }
+        if (verifier != null && !verifier.verify(encryptedJWT.getHeader(), jwtClaimsSet)) {
+            throw new InvalidJWTException("JWT verification failed");
         }
 
         MetaJWTData metaJWTData = new MetaJWTData(keyID, encryptedJWT.getHeader().getCustomParameters());

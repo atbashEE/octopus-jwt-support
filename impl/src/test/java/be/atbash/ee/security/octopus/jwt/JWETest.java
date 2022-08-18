@@ -41,6 +41,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.org.lidalia.slf4jext.Level;
 import uk.org.lidalia.slf4jtest.TestLogger;
@@ -49,8 +50,6 @@ import uk.org.lidalia.slf4jtest.TestLoggerFactory;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class JWETest {
@@ -87,7 +86,7 @@ public class JWETest {
 
     @Test
     public void encodingJWE_RSA() throws ParseException {
-        when(jwtSupportConfigurationMock.getDefaultJWEAlgorithmRSA()).thenReturn(JWEAlgorithm.RSA_OAEP_256);
+        Mockito.when(jwtSupportConfigurationMock.getDefaultJWEAlgorithmRSA()).thenReturn(JWEAlgorithm.RSA_OAEP_256);
 
         List<AtbashKey> keys = TestKeys.generateRSAKeys(KID_SIGN);
         keys.addAll(TestKeys.generateRSAKeys(KID_ENCRYPT));
@@ -117,7 +116,7 @@ public class JWETest {
 
         KeySelector keySelector = new TestKeySelector(keyManager);
         Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector).getData();
-        Assertions.assertThat(data).isEqualToComparingFieldByField(payload);
+        Assertions.assertThat(data).usingRecursiveComparison().isEqualTo(payload);
 
     }
 
@@ -153,7 +152,7 @@ public class JWETest {
 
         KeySelector keySelector = new TestKeySelector(keyManager);
         Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector).getData();
-        Assertions.assertThat(data).isEqualToComparingFieldByField(payload);
+        Assertions.assertThat(data).usingRecursiveComparison().isEqualTo(payload);
 
     }
 
@@ -189,13 +188,13 @@ public class JWETest {
 
         KeySelector keySelector = new TestKeySelector(keyManager);
         Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector).getData();
-        Assertions.assertThat(data).isEqualToComparingFieldByField(payload);
+        Assertions.assertThat(data).usingRecursiveComparison().isEqualTo(payload);
 
     }
 
     @Test
     public void encodingJWE_EC() throws ParseException {
-        when(jwtSupportConfigurationMock.getDefaultJWEAlgorithmEC()).thenReturn(JWEAlgorithm.ECDH_ES_A256KW);
+        Mockito.when(jwtSupportConfigurationMock.getDefaultJWEAlgorithmEC()).thenReturn(JWEAlgorithm.ECDH_ES_A256KW);
 
         List<AtbashKey> keys = TestKeys.generateECKeys(KID_SIGN, "P-256");
         keys.addAll(TestKeys.generateECKeys(KID_ENCRYPT, "P-256"));
@@ -221,7 +220,7 @@ public class JWETest {
 
         KeySelector keySelector = new TestKeySelector(keyManager);
         Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector).getData();
-        Assertions.assertThat(data).isEqualToComparingFieldByField(payload);
+        Assertions.assertThat(data).usingRecursiveComparison().isEqualTo(payload);
 
         JWEObject jweObject = JWEObject.parse(encoded);
         Assertions.assertThat(jweObject.getHeader().getAlgorithm()).isEqualTo(JWEAlgorithm.ECDH_ES_A256KW);
@@ -231,7 +230,7 @@ public class JWETest {
     @Test
     public void encodingJWE_EC_unsupportedCurve() {
 
-        when(jwtSupportConfigurationMock.getDefaultJWEAlgorithmEC()).thenReturn(JWEAlgorithm.ECDH_ES_A256KW);
+        Mockito.when(jwtSupportConfigurationMock.getDefaultJWEAlgorithmEC()).thenReturn(JWEAlgorithm.ECDH_ES_A256KW);
 
         List<AtbashKey> keys = TestKeys.generateECKeys(KID_SIGN, "prime192v1");
         keys.addAll(TestKeys.generateECKeys(KID_ENCRYPT, "prime192v1"));
@@ -262,7 +261,7 @@ public class JWETest {
     @Test
     public void encodingJWE_RSA_EC() {
 
-        when(jwtSupportConfigurationMock.getDefaultJWEAlgorithmEC()).thenReturn(JWEAlgorithm.ECDH_ES_A256KW);
+        Mockito.when(jwtSupportConfigurationMock.getDefaultJWEAlgorithmEC()).thenReturn(JWEAlgorithm.ECDH_ES_A256KW);
 
         List<AtbashKey> keys = TestKeys.generateRSAKeys(KID_SIGN);
         keys.addAll(TestKeys.generateECKeys(KID_ENCRYPT, "P-256"));
@@ -288,13 +287,13 @@ public class JWETest {
 
         KeySelector keySelector = new TestKeySelector(keyManager);
         Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector).getData();
-        Assertions.assertThat(data).isEqualToComparingFieldByField(payload);
+        Assertions.assertThat(data).usingRecursiveComparison().isEqualTo(payload);
 
     }
 
     @Test
     public void encodingJWE_EC_RSA() {
-        when(jwtSupportConfigurationMock.getDefaultJWEAlgorithmEC()).thenReturn(JWEAlgorithm.ECDH_ES_A256KW);
+        Mockito.when(jwtSupportConfigurationMock.getDefaultJWEAlgorithmEC()).thenReturn(JWEAlgorithm.ECDH_ES_A256KW);
 
         List<AtbashKey> keys = TestKeys.generateECKeys(KID_ENCRYPT, "P-256");
         keys.addAll(TestKeys.generateRSAKeys(KID_SIGN));
@@ -320,7 +319,7 @@ public class JWETest {
 
         KeySelector keySelector = new TestKeySelector(keyManager);
         Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector).getData();
-        Assertions.assertThat(data).isEqualToComparingFieldByField(payload);
+        Assertions.assertThat(data).usingRecursiveComparison().isEqualTo(payload);
 
     }
 
@@ -354,7 +353,7 @@ public class JWETest {
 
     @Test
     public void encodingJWE_OCT() {
-        when(jwtSupportConfigurationMock.getDefaultJWEAlgorithmOCT()).thenReturn(JWEAlgorithm.A256KW);
+        Mockito.when(jwtSupportConfigurationMock.getDefaultJWEAlgorithmOCT()).thenReturn(JWEAlgorithm.A256KW);
 
         List<AtbashKey> signKeyList = TestKeys.generateOCTKeys(KID_SIGN);
 
@@ -379,7 +378,7 @@ public class JWETest {
 
         KeySelector keySelector = new TestKeySelector(keyManager);
         Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector).getData();
-        Assertions.assertThat(data).isEqualToComparingFieldByField(payload);
+        Assertions.assertThat(data).usingRecursiveComparison().isEqualTo(payload);
 
     }
 
@@ -403,13 +402,13 @@ public class JWETest {
 
         KeySelector keySelector = new PasswordKeySelector(keyManager);
         Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector).getData();
-        Assertions.assertThat(data).isEqualToComparingFieldByField(payload);
+        Assertions.assertThat(data).usingRecursiveComparison().isEqualTo(payload);
 
     }
 
     @Test
     public void encodingJWE_NoKeyMatch() {
-        when(jwtSupportConfigurationMock.getDefaultJWEAlgorithmRSA()).thenReturn(JWEAlgorithm.RSA_OAEP_256);
+        Mockito.when(jwtSupportConfigurationMock.getDefaultJWEAlgorithmRSA()).thenReturn(JWEAlgorithm.RSA_OAEP_256);
 
         List<AtbashKey> signKeys = TestKeys.generateRSAKeys(KID_SIGN);
         List<AtbashKey> keys = TestKeys.generateRSAKeys(KID_SIGN);
@@ -454,7 +453,7 @@ public class JWETest {
 
     @Test
     public void encodingJWE_OCT_wrongKeyLength() {
-        when(jwtSupportConfigurationMock.getDefaultJWEAlgorithmOCT()).thenReturn(JWEAlgorithm.A256KW);
+        Mockito.when(jwtSupportConfigurationMock.getDefaultJWEAlgorithmOCT()).thenReturn(JWEAlgorithm.A256KW);
 
         List<AtbashKey> signKeyList = TestKeys.generateOCTKeys(KID_SIGN, 256);
 
@@ -476,7 +475,7 @@ public class JWETest {
 
     @Test
     public void encodingJWE_RSA_wrongKey() {
-        when(jwtSupportConfigurationMock.getDefaultJWEAlgorithmRSA()).thenReturn(JWEAlgorithm.RSA_OAEP_256);
+        Mockito.when(jwtSupportConfigurationMock.getDefaultJWEAlgorithmRSA()).thenReturn(JWEAlgorithm.RSA_OAEP_256);
 
         List<AtbashKey> keys = TestKeys.generateRSAKeys(KID_SIGN);
         List<AtbashKey> signKeys = new ArrayList<>(keys);
@@ -516,7 +515,7 @@ public class JWETest {
 
     @Test
     public void encodingJWE_RSA_tamperedPayload() {
-        when(jwtSupportConfigurationMock.getDefaultJWEAlgorithmRSA()).thenReturn(JWEAlgorithm.RSA_OAEP_256);
+        Mockito.when(jwtSupportConfigurationMock.getDefaultJWEAlgorithmRSA()).thenReturn(JWEAlgorithm.RSA_OAEP_256);
 
         List<AtbashKey> keys = TestKeys.generateRSAKeys(KID_SIGN);
         keys.addAll(TestKeys.generateRSAKeys(KID_ENCRYPT));
@@ -551,7 +550,7 @@ public class JWETest {
 
     @Test
     public void encodingJWE_RSA_tamperedIV() {
-        when(jwtSupportConfigurationMock.getDefaultJWEAlgorithmRSA()).thenReturn(JWEAlgorithm.RSA_OAEP_256);
+        Mockito.when(jwtSupportConfigurationMock.getDefaultJWEAlgorithmRSA()).thenReturn(JWEAlgorithm.RSA_OAEP_256);
 
         List<AtbashKey> keys = TestKeys.generateRSAKeys(KID_SIGN);
         keys.addAll(TestKeys.generateRSAKeys(KID_ENCRYPT));
@@ -586,7 +585,7 @@ public class JWETest {
 
     @Test
     public void encodingJWE_EC_customAlgo() throws ParseException {
-        when(jwtSupportConfigurationMock.getDefaultJWEAlgorithmEC()).thenReturn(JWEAlgorithm.ECDH_ES);
+        Mockito.when(jwtSupportConfigurationMock.getDefaultJWEAlgorithmEC()).thenReturn(JWEAlgorithm.ECDH_ES);
 
         List<AtbashKey> keys = TestKeys.generateECKeys(KID_SIGN, "P-256");
         keys.addAll(TestKeys.generateECKeys(KID_ENCRYPT, "P-256"));
@@ -612,7 +611,7 @@ public class JWETest {
 
         KeySelector keySelector = new TestKeySelector(keyManager);
         Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector).getData();
-        Assertions.assertThat(data).isEqualToComparingFieldByField(payload);
+        Assertions.assertThat(data).usingRecursiveComparison().isEqualTo(payload);
 
         JWEObject jweObject = JWEObject.parse(encoded);
         Assertions.assertThat(jweObject.getHeader().getAlgorithm()).isEqualTo(JWEAlgorithm.ECDH_ES);
@@ -620,7 +619,7 @@ public class JWETest {
 
     @Test
     public void encodingJWE_verifier() {
-        when(jwtSupportConfigurationMock.getDefaultJWEAlgorithmRSA()).thenReturn(JWEAlgorithm.RSA_OAEP_256);
+        Mockito.when(jwtSupportConfigurationMock.getDefaultJWEAlgorithmRSA()).thenReturn(JWEAlgorithm.RSA_OAEP_256);
 
         List<AtbashKey> keys = TestKeys.generateRSAKeys(KID_SIGN);
         keys.addAll(TestKeys.generateRSAKeys(KID_ENCRYPT));
@@ -647,10 +646,7 @@ public class JWETest {
         KeySelector keySelector = new TestKeySelector(keyManager);
 
         JWTVerifier verifier = (header, jwtClaimsSet) -> {
-            boolean result = true;
-            if (!"JWT".equals(header.getContentType())) {
-                result = false;
-            }
+            boolean result = "JWT".equals(header.getContentType());
             if (!jwtClaimsSet.getClaim("number").equals(42)) {
                 result = false;
             }
@@ -659,13 +655,13 @@ public class JWETest {
         };
 
         Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector, verifier).getData();
-        Assertions.assertThat(data).isEqualToComparingFieldByField(payload);
+        Assertions.assertThat(data).usingRecursiveComparison().isEqualTo(payload);
 
     }
 
     @Test
     public void encodingJWE_verifier_false() {
-        when(jwtSupportConfigurationMock.getDefaultJWEAlgorithmRSA()).thenReturn(JWEAlgorithm.RSA_OAEP_256);
+        Mockito.when(jwtSupportConfigurationMock.getDefaultJWEAlgorithmRSA()).thenReturn(JWEAlgorithm.RSA_OAEP_256);
 
         List<AtbashKey> keys = TestKeys.generateRSAKeys(KID_SIGN);
         keys.addAll(TestKeys.generateRSAKeys(KID_ENCRYPT));
@@ -691,15 +687,7 @@ public class JWETest {
 
         KeySelector keySelector = new TestKeySelector(keyManager);
 
-        JWTVerifier verifier = (header, jwtClaimsSet) -> {
-            boolean result = true;
-
-            if (!jwtClaimsSet.getClaim("number").equals(41)) {
-                result = false;
-            }
-
-            return result;
-        };
+        JWTVerifier verifier = (header, jwtClaimsSet) -> jwtClaimsSet.getClaim("number").equals(41);
 
         Assertions.assertThatThrownBy(
                         () -> new JWTDecoder().decode(encoded, Payload.class, keySelector, verifier))

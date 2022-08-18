@@ -52,10 +52,6 @@ import java.util.*;
  */
 public final class PlainHeader extends Header {
 
-
-    private static final long serialVersionUID = 1L;
-
-
     /**
      * Builder for constructing unsecured (plain) headers.
      *

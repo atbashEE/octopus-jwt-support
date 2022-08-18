@@ -19,11 +19,11 @@ package be.atbash.ee.security.octopus.nimbus.jwk;
 import be.atbash.ee.security.octopus.nimbus.IOUtil;
 import be.atbash.ee.security.octopus.nimbus.jose.HeaderParameterNames;
 import be.atbash.ee.security.octopus.nimbus.util.X509CertUtils;
+import org.assertj.core.api.Assertions;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigInteger;
@@ -33,8 +33,6 @@ import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.util.Date;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 
 /**
@@ -47,13 +45,13 @@ public class KeyUseTest {
     @Test
     public void testConstantIdentifiers() {
 
-        assertThat(KeyUse.SIGNATURE.identifier()).isEqualTo("sig");
-        assertThat(KeyUse.SIGNATURE.getValue()).isEqualTo("sig");
-        assertThat(KeyUse.SIGNATURE.toString()).isEqualTo("sig");
+        Assertions.assertThat(KeyUse.SIGNATURE.identifier()).isEqualTo("sig");
+        Assertions.assertThat(KeyUse.SIGNATURE.getValue()).isEqualTo("sig");
+        Assertions.assertThat(KeyUse.SIGNATURE.toString()).isEqualTo("sig");
 
-        assertThat(KeyUse.ENCRYPTION.identifier()).isEqualTo(HeaderParameterNames.ENCRYPTION_ALGORITHM);
-        assertThat(KeyUse.ENCRYPTION.getValue()).isEqualTo(HeaderParameterNames.ENCRYPTION_ALGORITHM);
-        assertThat(KeyUse.ENCRYPTION.toString()).isEqualTo(HeaderParameterNames.ENCRYPTION_ALGORITHM);
+        Assertions.assertThat(KeyUse.ENCRYPTION.identifier()).isEqualTo(HeaderParameterNames.ENCRYPTION_ALGORITHM);
+        Assertions.assertThat(KeyUse.ENCRYPTION.getValue()).isEqualTo(HeaderParameterNames.ENCRYPTION_ALGORITHM);
+        Assertions.assertThat(KeyUse.ENCRYPTION.toString()).isEqualTo(HeaderParameterNames.ENCRYPTION_ALGORITHM);
     }
 
     @Test
@@ -61,45 +59,45 @@ public class KeyUseTest {
             throws ParseException {
 
         KeyUse tls = new KeyUse("tls");
-        assertThat(tls.identifier()).isEqualTo("tls");
-        assertThat(tls.getValue()).isEqualTo("tls");
-        assertThat(tls.toString()).isEqualTo("tls");
+        Assertions.assertThat(tls.identifier()).isEqualTo("tls");
+        Assertions.assertThat(tls.getValue()).isEqualTo("tls");
+        Assertions.assertThat(tls.toString()).isEqualTo("tls");
 
-        assertThat(KeyUse.parse("tls").identifier()).isEqualTo("tls");
-        assertThat(tls.equals(new KeyUse("tls"))).isTrue();
+        Assertions.assertThat(KeyUse.parse("tls").identifier()).isEqualTo("tls");
+        Assertions.assertThat(tls.equals(new KeyUse("tls"))).isTrue();
     }
 
     @Test
     public void testParseConstants()
             throws ParseException {
 
-        assertThat(KeyUse.parse("sig")).isEqualTo(KeyUse.SIGNATURE);
-        assertThat(KeyUse.parse(HeaderParameterNames.ENCRYPTION_ALGORITHM)).isEqualTo(KeyUse.ENCRYPTION);
+        Assertions.assertThat(KeyUse.parse("sig")).isEqualTo(KeyUse.SIGNATURE);
+        Assertions.assertThat(KeyUse.parse(HeaderParameterNames.ENCRYPTION_ALGORITHM)).isEqualTo(KeyUse.ENCRYPTION);
     }
 
     @Test
     public void testParseException_empty() {
 
-        ParseException e = Assertions.assertThrows(ParseException.class,
-                () -> KeyUse.parse(""));
-
-        assertThat(e.getMessage()).isEqualTo("JWK use value must not be empty or blank");
+        Assertions.assertThatThrownBy(
+                        () -> KeyUse.parse(""))
+                .isInstanceOf(ParseException.class)
+                .hasMessage("JWK use value must not be empty or blank");
     }
 
     @Test
     public void testParseException_blank() {
 
-        ParseException e = Assertions.assertThrows(ParseException.class,
-                () -> KeyUse.parse("  "));
-
-        assertThat(e.getMessage()).isEqualTo("JWK use value must not be empty or blank");
+        Assertions.assertThatThrownBy(
+                        () -> KeyUse.parse("  "))
+                .isInstanceOf(ParseException.class)
+                .hasMessage("JWK use value must not be empty or blank");
     }
 
     @Test
     public void testParseNull()
             throws ParseException {
 
-        assertThat(KeyUse.parse(null)).isNull();
+        Assertions.assertThat(KeyUse.parse(null)).isNull();
     }
 
     @Test
@@ -107,8 +105,8 @@ public class KeyUseTest {
 
         String pemEncodedCert = IOUtil.readFileToString("src/test/resources/sample-certs/ietf.crt");
         X509Certificate x509Cert = X509CertUtils.parse(pemEncodedCert);
-        assertThat(x509Cert).isNotNull();
-        assertThat(KeyUse.from(x509Cert)).isNull();
+        Assertions.assertThat(x509Cert).isNotNull();
+        Assertions.assertThat(KeyUse.from(x509Cert)).isNull();
     }
 
     @Test
@@ -116,8 +114,8 @@ public class KeyUseTest {
 
         String pemEncodedCert = IOUtil.readFileToString("src/test/resources/sample-certs/wikipedia.crt");
         X509Certificate x509Cert = X509CertUtils.parse(pemEncodedCert);
-        assertThat(x509Cert).isNotNull();
-        assertThat(KeyUse.from(x509Cert)).isNull();
+        Assertions.assertThat(x509Cert).isNotNull();
+        Assertions.assertThat(KeyUse.from(x509Cert)).isNull();
     }
 
     @Test
@@ -147,7 +145,7 @@ public class KeyUseTest {
         JcaContentSignerBuilder signerBuilder = new JcaContentSignerBuilder("SHA256withRSA");
         X509CertificateHolder certHolder = x509certBuilder.build(signerBuilder.build(keyPair.getPrivate()));
         X509Certificate x509Cert = X509CertUtils.parse(certHolder.getEncoded());
-        assertThat(x509Cert).isNotNull();
-        assertThat(KeyUse.from(x509Cert)).isNull();
+        Assertions.assertThat(x509Cert).isNotNull();
+        Assertions.assertThat(KeyUse.from(x509Cert)).isNull();
     }
 }

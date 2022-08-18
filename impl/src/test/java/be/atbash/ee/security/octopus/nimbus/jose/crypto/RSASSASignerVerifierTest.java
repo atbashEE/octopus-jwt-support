@@ -29,8 +29,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 // a low level test
 class RSASSASignerVerifierTest {
 
@@ -47,7 +45,7 @@ class RSASSASignerVerifierTest {
         RSASSAVerifier verifier = new RSASSAVerifier(publicKey);
         boolean verify = verifier.verify(header, "The Secret Message".getBytes(), signature);
 
-        assertThat(verify).isTrue();
+        Assertions.assertThat(verify).isTrue();
     }
 
     @Test

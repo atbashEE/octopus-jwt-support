@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,10 @@
  */
 package be.atbash.ee.security.octopus.keys.generator;
 
-import org.junit.jupiter.api.Assertions;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import static be.atbash.ee.security.octopus.keys.generator.DHGenerationParameters.DH;
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class DHGenerationParametersTest {
 
@@ -30,20 +29,20 @@ public class DHGenerationParametersTest {
                 .withKeySize(124)
                 .build();
 
-        assertThat(parameters).isNotNull();
-        assertThat(parameters.getKid()).isEqualTo("kid");
-        assertThat(parameters.getKeyType()).isEqualTo(DH);
-        assertThat(parameters.getKeySize()).isEqualTo(124);
+        Assertions.assertThat(parameters).isNotNull();
+        Assertions.assertThat(parameters.getKid()).isEqualTo("kid");
+        Assertions.assertThat(parameters.getKeyType()).isEqualTo(DH);
+        Assertions.assertThat(parameters.getKeySize()).isEqualTo(124);
 
     }
 
     @Test
     public void dhGenerationParameters_kidRequired() {
-        Assertions.assertThrows(KeyGenerationParameterException.class, () ->
+        Assertions.assertThatThrownBy(() ->
                 new DHGenerationParameters.DHGenerationParametersBuilder()
                         .withKeySize(124)
                         .build()
-        );
+        ).isInstanceOf(KeyGenerationParameterException.class);
     }
 
 
@@ -53,10 +52,10 @@ public class DHGenerationParametersTest {
                 .withKeyId("kid")
                 .build();
 
-        assertThat(parameters).isNotNull();
-        assertThat(parameters.getKid()).isEqualTo("kid");
-        assertThat(parameters.getKeyType()).isEqualTo(DH);
-        assertThat(parameters.getKeySize()).isEqualTo(2048);
+        Assertions.assertThat(parameters).isNotNull();
+        Assertions.assertThat(parameters.getKid()).isEqualTo("kid");
+        Assertions.assertThat(parameters.getKeyType()).isEqualTo(DH);
+        Assertions.assertThat(parameters.getKeySize()).isEqualTo(2048);
 
     }
 

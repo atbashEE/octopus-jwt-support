@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,20 +28,26 @@ import be.atbash.ee.security.octopus.keys.selector.filter.KeyFilter;
 import be.atbash.ee.security.octopus.nimbus.jwk.JWKSet;
 import be.atbash.util.TestReflectionUtils;
 import be.atbash.util.resource.ResourceUtil;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
 import jakarta.json.JsonObject;
 import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
-import java.io.*;
-import java.text.ParseException;
-import java.util.List;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
+import java.io.*;
+import java.security.Key;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.PrivateKey;
+import java.security.interfaces.RSAKey;
+import java.text.ParseException;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -51,11 +57,9 @@ public class KeyWriterTest {
 
     private static final char[] PASSWORD = "atbash".toCharArray();
 
-    private KeyReader keyReader = new KeyReader();
+    private final KeyReader keyReader = new KeyReader();
 
     private JwtSupportConfiguration jwtSupportConfigurationMock;
-
-    private KeyWriterFactory keyWriterFactory;
 
     private KeyWriter keyWriter;
 
@@ -63,7 +67,7 @@ public class KeyWriterTest {
     public void setup() throws IllegalAccessException {
         jwtSupportConfigurationMock = Mockito.mock(JwtSupportConfiguration.class);
 
-        keyWriterFactory = new KeyWriterFactory();
+        KeyWriterFactory keyWriterFactory = new KeyWriterFactory();
         keyWriterFactory.init();
 
         keyWriter = new KeyWriter();
@@ -73,8 +77,8 @@ public class KeyWriterTest {
 
     @Test
     public void writeKeyResource_scenario1() throws IOException {
-        when(jwtSupportConfigurationMock.getPemKeyEncryption()).thenReturn(PemKeyEncryption.PKCS1);
-        when(jwtSupportConfigurationMock.getPKCS1EncryptionAlgorithm()).thenReturn("DES-EDE3-CBC");
+        Mockito.when(jwtSupportConfigurationMock.getPemKeyEncryption()).thenReturn(PemKeyEncryption.PKCS1);
+        Mockito.when(jwtSupportConfigurationMock.getPKCS1EncryptionAlgorithm()).thenReturn("DES-EDE3-CBC");
 
         // scenario 1 RSA PKCS#1 format
         List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.pk.pem", new TestPasswordLookup(PASSWORD));
@@ -88,7 +92,7 @@ public class KeyWriterTest {
         String expected = readFile("/rsa.pk.pem");
         // Since encryption is performed with some kind of Salt, the 2 values will never be the same.
         //However, first part needs to be identical.
-        assertThat(pemFile.substring(0, 78)).isEqualTo(expected.substring(0, 78));
+        Assertions.assertThat(pemFile.substring(0, 78)).isEqualTo(expected.substring(0, 78));
 
     }
 
@@ -104,14 +108,15 @@ public class KeyWriterTest {
         String pemFile = new String(bytes);
 
         String expected = readFile("/rsa.pub.pem");
-        assertThat(pemFile).isEqualTo(expected);
+        Assertions.assertThat(pemFile).isEqualTo(expected);
 
     }
 
     @Test
+    @Disabled
     public void writeKeyResource_scenario3() {
         // scenario 3 RSA PKCS#8 format
-        when(jwtSupportConfigurationMock.getPemKeyEncryption()).thenReturn(PemKeyEncryption.PKCS8);
+        Mockito.when(jwtSupportConfigurationMock.getPemKeyEncryption()).thenReturn(PemKeyEncryption.PKCS8);
 
         List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.pk.pem", new TestPasswordLookup(PASSWORD));
 
@@ -126,9 +131,10 @@ public class KeyWriterTest {
     }
 
     @Test
+    @Disabled
     public void writeKeyResource_scenario4() {
         // scenario 4 RSA not encrypted format
-        when(jwtSupportConfigurationMock.getPemKeyEncryption()).thenReturn(PemKeyEncryption.NONE);
+        Mockito.when(jwtSupportConfigurationMock.getPemKeyEncryption()).thenReturn(PemKeyEncryption.NONE);
 
         List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.pk.pem", new TestPasswordLookup(PASSWORD));
 
@@ -146,7 +152,7 @@ public class KeyWriterTest {
     @Test
     public void writeKeyResource_scenario5() throws IOException {
         // scenario 5 RSA private key as JWK
-        when(jwtSupportConfigurationMock.isJWKEncrypted()).thenReturn(false);
+        Mockito.when(jwtSupportConfigurationMock.isJWKEncrypted()).thenReturn(false);
 
         List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.jwk");
 
@@ -163,14 +169,14 @@ public class KeyWriterTest {
         JsonObject expected = jsonb.fromJson(readFile("/rsa.jwk"), JsonObject.class);
 
         for (String key : expected.keySet()) {
-            assertThat(expected.getString(key)).isEqualTo(data.getString(key));
+            Assertions.assertThat(expected.getString(key)).isEqualTo(data.getString(key));
         }
     }
 
     @Test
     public void writeKeyResource_RSA_encrypted() {
         // RSA Private key is 'encrypted'
-        when(jwtSupportConfigurationMock.isJWKEncrypted()).thenReturn(true);
+        Mockito.when(jwtSupportConfigurationMock.isJWKEncrypted()).thenReturn(true);
 
         List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.jwk");
 
@@ -181,7 +187,7 @@ public class KeyWriterTest {
         Jsonb jsonb = JsonbBuilder.create();
 
         JsonObject data = jsonb.fromJson(new String(bytes), JsonObject.class);
-        assertThat(data.keySet()).containsOnly("kty", "kid", "enc");
+        Assertions.assertThat(data.keySet()).containsOnly("kty", "kid", "enc");
 
         // test to get the AtbashKey back, see KeyReaderJWKTest
     }
@@ -189,50 +195,81 @@ public class KeyWriterTest {
     @Test
     public void writeKeyResource_scenario7() throws IOException {
         // scenario 7 RSA private key as KeyStore
-        when(jwtSupportConfigurationMock.getKeyStoreType()).thenReturn("jks");
+        Mockito.when(jwtSupportConfigurationMock.getKeyStoreType()).thenReturn("jks");
 
         List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.jwk");
 
         AtbashKey privateKey = filterKeys(keys, AsymmetricPart.PRIVATE);
 
-        byte[] bytes = keyWriter.writeKeyResource(privateKey, KeyResourceType.KEYSTORE, "atbash".toCharArray(), "atbash".toCharArray());
+        String password = "atbash";
+        byte[] bytes = keyWriter.writeKeyResource(privateKey, KeyResourceType.KEYSTORE, password.toCharArray(), password.toCharArray());
 
-        FileOutputStream outputStream = new FileOutputStream("./scenario7.jks");
+        String fileName = "./scenario7.jks";
+        FileOutputStream outputStream = new FileOutputStream(fileName);
         outputStream.write(bytes);
         outputStream.close();
 
+        FileInputStream is = new FileInputStream(fileName);
+        Assertions.assertThatCode(
+                () -> {
+                    KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
+                    keystore.load(is, password.toCharArray());
+                    Set<String> alias = getAliases(keystore);
+                    Assertions.assertThat(alias).containsOnly("rsa.pk.free");
+                    Key key = keystore.getKey("rsa.pk.free", password.toCharArray());
+                    Assertions.assertThat(key).isInstanceOf(PrivateKey.class);
+                    Assertions.assertThat(key).isInstanceOf(RSAKey.class);
+
+                    is.close();
+                }
+
+        ).doesNotThrowAnyException();
+
+    }
+
+    private static Set<String> getAliases(KeyStore keystore) throws KeyStoreException {
+        Set<String> alias = new HashSet<>();
+
+        Enumeration<String> aliases = keystore.aliases();
+
+        while (aliases.hasMoreElements()) {
+            alias.add(aliases.nextElement());
+        }
+        return alias;
     }
 
     @Test
     public void writeKeyResource_scenario7_missingKeyPassword() {
         // scenario 7 RSA private key as KeyStore
-        when(jwtSupportConfigurationMock.getKeyStoreType()).thenReturn("jks");
+        Mockito.when(jwtSupportConfigurationMock.getKeyStoreType()).thenReturn("jks");
 
         List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.jwk");
 
         AtbashKey privateKey = filterKeys(keys, AsymmetricPart.PRIVATE);
 
-        Assertions.assertThrows(MissingPasswordException.class, () -> keyWriter.writeKeyResource(privateKey, KeyResourceType.KEYSTORE, "atbash".toCharArray()));
+        Assertions.assertThatThrownBy(() -> keyWriter.writeKeyResource(privateKey, KeyResourceType.KEYSTORE, "atbash".toCharArray()))
+                .isInstanceOf(MissingPasswordException.class);
 
     }
 
     @Test
     public void writeKeyResource_scenario7_missingFilePassword() {
         // scenario 7 RSA private key as KeyStore
-        when(jwtSupportConfigurationMock.getKeyStoreType()).thenReturn("jks");
+        Mockito.when(jwtSupportConfigurationMock.getKeyStoreType()).thenReturn("jks");
 
         List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.jwk");
 
         AtbashKey privateKey = filterKeys(keys, AsymmetricPart.PRIVATE);
 
-        Assertions.assertThrows(MissingPasswordException.class, () -> keyWriter.writeKeyResource(privateKey, KeyResourceType.KEYSTORE, "atbash".toCharArray(), null));
+        Assertions.assertThatThrownBy(() -> keyWriter.writeKeyResource(privateKey, KeyResourceType.KEYSTORE, "atbash".toCharArray(), null))
+                .isInstanceOf(MissingPasswordException.class);
 
     }
 
     @Test
     public void writeKeyResource_scenario9() throws IOException, ParseException {
         // scenario 9 RSA private key as JWKSet
-        when(jwtSupportConfigurationMock.isJWKEncrypted()).thenReturn(false);
+        Mockito.when(jwtSupportConfigurationMock.isJWKEncrypted()).thenReturn(false);
 
         List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.jwk");
 
@@ -241,7 +278,7 @@ public class KeyWriterTest {
         byte[] bytes = keyWriter.writeKeyResource(privateKey, KeyResourceType.JWKSET);
 
         JWKSet jwkSet = JWKSet.parse(new String(bytes));
-        assertThat(jwkSet.getKeys()).hasSize(1);
+        Assertions.assertThat(jwkSet.getKeys()).hasSize(1);
 
         Jsonb jsonb = JsonbBuilder.create();
         JsonObject dataAsSet = jsonb.fromJson(new String(bytes), JsonObject.class);
@@ -250,7 +287,7 @@ public class KeyWriterTest {
         JsonObject expected = jsonb.fromJson(readFile("/rsa.jwk"), JsonObject.class);
 
         for (String key : expected.keySet()) {
-            assertThat(expected.getString(key)).isEqualTo(data.getString(key));
+            Assertions.assertThat(expected.getString(key)).isEqualTo(data.getString(key));
         }
 
     }

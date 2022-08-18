@@ -19,6 +19,7 @@ package be.atbash.ee.security.octopus.nimbus.jwk;
 import be.atbash.ee.security.octopus.nimbus.IOUtil;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.util.X509CertUtils;
+import jakarta.json.Json;
 import org.assertj.core.api.Assertions;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extension;
@@ -30,7 +31,6 @@ import org.junit.jupiter.api.Test;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import jakarta.json.Json;
 import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -282,7 +282,7 @@ public class JWKTest {
     }
 
     @Test
-    public void testParseJsonNotJWK() throws ParseException {
+    public void testParseJsonNotJWK() {
         String json = "{\"crv\":\"X448\",\"kid\":\"Dave\",\"x\":\"PreoKbDNIPW8_AtZm2_sz22kYnEHvbDU80W0MCfYuXL8PjT7QjKhPKcG3LV67D2uB73BxnvzNgk\"}";
         Assertions.assertThatThrownBy(
                         () -> JWK.parse(json))

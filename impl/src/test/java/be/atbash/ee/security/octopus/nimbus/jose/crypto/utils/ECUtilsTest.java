@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package be.atbash.ee.security.octopus.nimbus.jose.crypto.utils;
 
 
 import be.atbash.ee.security.octopus.nimbus.jwk.Curve;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.security.KeyPair;
@@ -24,8 +25,6 @@ import java.security.KeyPairGenerator;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.spec.ECParameterSpec;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class ECUtilsTest {
@@ -61,6 +60,6 @@ public class ECUtilsTest {
 
         ECPublicKey ephemeralPublicKey = generateECPublicKey(Curve.P_256);
         ECPrivateKey privateKey = generateECPrivateKey(Curve.P_256);
-        assertThat(ECUtils.isPointOnCurve(ephemeralPublicKey, privateKey)).isTrue();
+        Assertions.assertThat(ECUtils.isPointOnCurve(ephemeralPublicKey, privateKey)).isTrue();
     }
 }

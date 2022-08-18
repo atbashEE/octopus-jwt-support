@@ -23,6 +23,9 @@ import be.atbash.ee.security.octopus.nimbus.jose.crypto.ECDSAVerifier;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.Ed25519Verifier;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.MACVerifier;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.RSASSAVerifier;
+import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.ECDSAProvider;
+import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.MACProvider;
+import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.RSASSAProvider;
 import be.atbash.ee.security.octopus.nimbus.jose.proc.JWSVerifierFactory;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
@@ -44,7 +47,7 @@ import java.util.Set;
  *
  * <p>Supports all standard JWS algorithms implemented in the
  * {@link be.atbash.ee.security.octopus.nimbus.jose.crypto} package.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
 public class DefaultJWSVerifierFactory implements JWSVerifierFactory {
@@ -59,9 +62,9 @@ public class DefaultJWSVerifierFactory implements JWSVerifierFactory {
 
     static {
         Set<JWSAlgorithm> algs = new LinkedHashSet<>();
-        algs.addAll(MACVerifier.SUPPORTED_ALGORITHMS);
-        algs.addAll(RSASSAVerifier.SUPPORTED_ALGORITHMS);
-        algs.addAll(ECDSAVerifier.SUPPORTED_ALGORITHMS);
+        algs.addAll(MACProvider.SUPPORTED_ALGORITHMS);
+        algs.addAll(RSASSAProvider.SUPPORTED_ALGORITHMS);
+        algs.addAll(ECDSAProvider.SUPPORTED_ALGORITHMS);
         SUPPORTED_ALGORITHMS = Collections.unmodifiableSet(algs);
     }
 

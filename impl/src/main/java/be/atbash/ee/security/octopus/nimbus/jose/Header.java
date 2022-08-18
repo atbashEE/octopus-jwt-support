@@ -27,7 +27,6 @@ import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
 
-import java.io.Serializable;
 import java.text.ParseException;
 import java.util.Collections;
 import java.util.HashSet;
@@ -44,10 +43,7 @@ import java.util.Set;
  * <p>
  * Based on code by Vladimir Dzhuvinov
  */
-public abstract class Header implements Serializable {
-
-
-    private static final long serialVersionUID = 1L;
+public abstract class Header {
 
     /**
      * The max allowed string length when parsing a JOSE header (after the

@@ -450,7 +450,7 @@ public final class JSONObjectUtils {
         }
 
         if (value instanceof Collection) {
-            return new ArrayList<>((Collection) value);
+            return new ArrayList<>((Collection<String>) value);
         }
 
         String tempValue;

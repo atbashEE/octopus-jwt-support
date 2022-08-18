@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import java.util.*;
  * <p>
  * Based on code by Vladimir Dzhuvinov
  */
-class KeyUseAndOpsConsistency {
+final class KeyUseAndOpsConsistency {
 
 
     /**
@@ -53,6 +53,8 @@ class KeyUseAndOpsConsistency {
         MAP = Collections.unmodifiableMap(map);
     }
 
+    private KeyUseAndOpsConsistency() {
+    }
 
     /**
      * Checks if the specified key use and key operations are consistent.

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,13 +22,11 @@ import be.atbash.ee.security.octopus.keys.fake.FakeRSAPrivate;
 import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import be.atbash.ee.security.octopus.util.HmacSecretUtil;
 import be.atbash.util.exception.AtbashIllegalActionException;
-import org.junit.jupiter.api.Assertions;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class JWTParametersBuilderTest {
 
@@ -40,12 +38,12 @@ public class JWTParametersBuilderTest {
                 .withHeader("UnitTest", "Spock")
                 .build();
 
-        assertThat(parameters).isInstanceOf(JWTParametersSigning.class);
+        Assertions.assertThat(parameters).isInstanceOf(JWTParametersSigning.class);
         JWTParametersSigning parametersSigning = (JWTParametersSigning) parameters;
-        assertThat(parametersSigning.getEncoding()).isEqualTo(JWTEncoding.JWS);
+        Assertions.assertThat(parametersSigning.getEncoding()).isEqualTo(JWTEncoding.JWS);
 
-        assertThat(parametersSigning.getHeaderValues()).hasSize(1);
-        assertThat(parametersSigning.getHeaderValues()).containsEntry("UnitTest", "Spock");
+        Assertions.assertThat(parametersSigning.getHeaderValues()).hasSize(1);
+        Assertions.assertThat(parametersSigning.getHeaderValues()).containsEntry("UnitTest", "Spock");
     }
 
     @Test
@@ -57,13 +55,13 @@ public class JWTParametersBuilderTest {
                 .withHeader("key", "value")
                 .build();
 
-        assertThat(parameters).isInstanceOf(JWTParametersSigning.class);
+        Assertions.assertThat(parameters).isInstanceOf(JWTParametersSigning.class);
         JWTParametersSigning parametersSigning = (JWTParametersSigning) parameters;
-        assertThat(parametersSigning.getEncoding()).isEqualTo(JWTEncoding.JWS);
+        Assertions.assertThat(parametersSigning.getEncoding()).isEqualTo(JWTEncoding.JWS);
 
-        assertThat(parametersSigning.getHeaderValues()).hasSize(2);
-        assertThat(parametersSigning.getHeaderValues()).containsEntry("UnitTest", "Spock");
-        assertThat(parametersSigning.getHeaderValues()).containsEntry("key", "value");
+        Assertions.assertThat(parametersSigning.getHeaderValues()).hasSize(2);
+        Assertions.assertThat(parametersSigning.getHeaderValues()).containsEntry("UnitTest", "Spock");
+        Assertions.assertThat(parametersSigning.getHeaderValues()).containsEntry("key", "value");
 
     }
 
@@ -74,11 +72,11 @@ public class JWTParametersBuilderTest {
                 .withSecretKeyForSigning(HmacSecretUtil.generateSecretKey("testSecret", "Spock".getBytes(StandardCharsets.UTF_8)))
                 .build();
 
-        assertThat(parameters).isInstanceOf(JWTParametersSigning.class);
+        Assertions.assertThat(parameters).isInstanceOf(JWTParametersSigning.class);
         JWTParametersSigning parametersSigning = (JWTParametersSigning) parameters;
-        assertThat(parametersSigning.getEncoding()).isEqualTo(JWTEncoding.JWS);
+        Assertions.assertThat(parametersSigning.getEncoding()).isEqualTo(JWTEncoding.JWS);
 
-        assertThat(parametersSigning.getHeaderValues()).isEmpty();
+        Assertions.assertThat(parametersSigning.getHeaderValues()).isEmpty();
     }
 
     @Test
@@ -89,13 +87,14 @@ public class JWTParametersBuilderTest {
                 .withHeader("UnitTest", "Spock")
                 .build();
 
-        assertThat(parameters).isInstanceOf(JWTParametersNone.class);
+        Assertions.assertThat(parameters).isInstanceOf(JWTParametersNone.class);
     }
 
     @Test
     public void validate_requiredKeys_jws() {
 
-        Assertions.assertThrows(AtbashIllegalActionException.class, () -> JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS).build());
+        Assertions.assertThatThrownBy(() -> JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS).build())
+                .isInstanceOf(AtbashIllegalActionException.class);
     }
 
     @Test
@@ -105,8 +104,9 @@ public class JWTParametersBuilderTest {
         JWTParametersBuilder builder = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWE)
                 .withSecretKeyForSigning(rsa);
 
-        AtbashIllegalActionException exception = Assertions.assertThrows(AtbashIllegalActionException.class, () -> builder.build());
-        assertThat(exception.getMessage()).isEqualTo("(OCT-DEV-106) JWE encoding requires a JWK secret for the encryption");
+        Assertions.assertThatThrownBy(builder::build)
+                .isInstanceOf(AtbashIllegalActionException.class)
+                .hasMessage("(OCT-DEV-106) JWE encoding requires a JWK secret for the encryption");
     }
 
     @Test
@@ -116,8 +116,9 @@ public class JWTParametersBuilderTest {
         JWTParametersBuilder builder = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWE)
                 .withSecretKeyForEncryption(rsa);
 
-        AtbashIllegalActionException exception = Assertions.assertThrows(AtbashIllegalActionException.class, () -> builder.build());
-        assertThat(exception.getMessage()).isEqualTo("(OCT-DEV-112) JWE encoding requires a JWK secret for the signing");
+        Assertions.assertThatThrownBy(builder::build)
+                .isInstanceOf(AtbashIllegalActionException.class)
+                .hasMessage("(OCT-DEV-112) JWE encoding requires a JWK secret for the signing");
     }
 
     @Test
@@ -130,12 +131,12 @@ public class JWTParametersBuilderTest {
                 .withSecretKeyForEncryption(ec);
 
         JWTParameters parameters = builder.build();
-        assertThat(parameters).isInstanceOf(JWTParametersEncryption.class);
+        Assertions.assertThat(parameters).isInstanceOf(JWTParametersEncryption.class);
         JWTParametersEncryption parametersEncryption = (JWTParametersEncryption) parameters;
-        assertThat(parametersEncryption.getEncoding()).isEqualTo(JWTEncoding.JWE);
+        Assertions.assertThat(parametersEncryption.getEncoding()).isEqualTo(JWTEncoding.JWE);
 
-        assertThat(parametersEncryption.getKeyType()).isEqualTo(KeyType.EC);
-        assertThat(parametersEncryption.getParametersSigning().getKeyType()).isEqualTo(KeyType.RSA);
+        Assertions.assertThat(parametersEncryption.getKeyType()).isEqualTo(KeyType.EC);
+        Assertions.assertThat(parametersEncryption.getParametersSigning().getKeyType()).isEqualTo(KeyType.RSA);
     }
 
 
@@ -148,11 +149,11 @@ public class JWTParametersBuilderTest {
                 .withSecretKeyForSigning(rsa)
                 .build();
 
-        assertThat(parameters).isInstanceOf(JWTParametersSigning.class);
+        Assertions.assertThat(parameters).isInstanceOf(JWTParametersSigning.class);
         JWTParametersSigning parametersSigning = (JWTParametersSigning) parameters;
-        assertThat(parametersSigning.getEncoding()).isEqualTo(JWTEncoding.JWS);
+        Assertions.assertThat(parametersSigning.getEncoding()).isEqualTo(JWTEncoding.JWS);
 
-        assertThat(parametersSigning.getKeyType()).isEqualTo(KeyType.RSA);
+        Assertions.assertThat(parametersSigning.getKeyType()).isEqualTo(KeyType.RSA);
 
     }
 
@@ -168,11 +169,11 @@ public class JWTParametersBuilderTest {
                 .withSecretKeyForSigning(atbashKey)
                 .build();
 
-        assertThat(parameters).isInstanceOf(JWTParametersSigning.class);
+        Assertions.assertThat(parameters).isInstanceOf(JWTParametersSigning.class);
         JWTParametersSigning parametersSigning = (JWTParametersSigning) parameters;
-        assertThat(parametersSigning.getEncoding()).isEqualTo(JWTEncoding.JWS);
+        Assertions.assertThat(parametersSigning.getEncoding()).isEqualTo(JWTEncoding.JWS);
 
-        assertThat(parametersSigning.getKeyType()).isEqualTo(KeyType.OCT);
+        Assertions.assertThat(parametersSigning.getKeyType()).isEqualTo(KeyType.OCT);
 
     }
 
@@ -186,13 +187,13 @@ public class JWTParametersBuilderTest {
                 .withHeader("UnitTest", "Spock")
                 .build();
 
-        assertThat(parameters).isInstanceOf(JWTParametersSigning.class);
+        Assertions.assertThat(parameters).isInstanceOf(JWTParametersSigning.class);
         JWTParametersSigning parametersSigning = (JWTParametersSigning) parameters;
 
-        assertThat(parametersSigning.getHeaderValues()).hasSize(3);
-        assertThat(parametersSigning.getHeaderValues()).containsEntry("UnitTest", "Spock");
-        assertThat(parametersSigning.getHeaderValues()).containsEntry("default-key1", "value1");
-        assertThat(parametersSigning.getHeaderValues()).containsEntry("default-key2", "value");
+        Assertions.assertThat(parametersSigning.getHeaderValues()).hasSize(3);
+        Assertions.assertThat(parametersSigning.getHeaderValues()).containsEntry("UnitTest", "Spock");
+        Assertions.assertThat(parametersSigning.getHeaderValues()).containsEntry("default-key1", "value1");
+        Assertions.assertThat(parametersSigning.getHeaderValues()).containsEntry("default-key2", "value");
 
         System.setProperty("default.provider.1", "");
         System.setProperty("default.provider.2", "");
@@ -207,12 +208,12 @@ public class JWTParametersBuilderTest {
                 .withJSONKeyURL("jku_value")
                 .build();
 
-        assertThat(parameters).isInstanceOf(JWTParametersSigning.class);
+        Assertions.assertThat(parameters).isInstanceOf(JWTParametersSigning.class);
         JWTParametersSigning parametersSigning = (JWTParametersSigning) parameters;
 
-        assertThat(parametersSigning.getHeaderValues()).hasSize(2);
-        assertThat(parametersSigning.getHeaderValues()).containsEntry("UnitTest", "Spock");
-        assertThat(parametersSigning.getHeaderValues()).containsEntry("jku", "jku_value");
+        Assertions.assertThat(parametersSigning.getHeaderValues()).hasSize(2);
+        Assertions.assertThat(parametersSigning.getHeaderValues()).containsEntry("UnitTest", "Spock");
+        Assertions.assertThat(parametersSigning.getHeaderValues()).containsEntry("jku", "jku_value");
 
     }
 }

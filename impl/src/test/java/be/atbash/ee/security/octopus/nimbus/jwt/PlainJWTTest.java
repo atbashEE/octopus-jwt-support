@@ -26,8 +26,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Date;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 public class PlainJWTTest {
 
     @Test
@@ -42,9 +40,9 @@ public class PlainJWTTest {
 
         PlainJWT jwt = new PlainJWT(claimsSet);
 
-        assertThat(jwt.getJWTClaimsSet().getSubject()).isEqualTo("alice");
-        assertThat(jwt.getJWTClaimsSet().getIssuer()).isEqualTo("http://c2id.com");
-        assertThat(jwt.getJWTClaimsSet().getAudience().get(0)).isEqualTo("http://app.example.com");
+        Assertions.assertThat(jwt.getJWTClaimsSet().getSubject()).isEqualTo("alice");
+        Assertions.assertThat(jwt.getJWTClaimsSet().getIssuer()).isEqualTo("http://c2id.com");
+        Assertions.assertThat(jwt.getJWTClaimsSet().getAudience().get(0)).isEqualTo("http://app.example.com");
     }
 
     @Test
@@ -61,11 +59,11 @@ public class PlainJWTTest {
 
         PlainJWT jwt = new PlainJWT(header, claimsSet);
 
-        assertThat(jwt.getHeader()).isEqualTo(header);
+        Assertions.assertThat(jwt.getHeader()).isEqualTo(header);
 
-        assertThat(jwt.getJWTClaimsSet().getSubject()).isEqualTo("alice");
-        assertThat(jwt.getJWTClaimsSet().getIssuer()).isEqualTo("http://c2id.com");
-        assertThat(jwt.getJWTClaimsSet().getAudience().get(0)).isEqualTo("http://app.example.com");
+        Assertions.assertThat(jwt.getJWTClaimsSet().getSubject()).isEqualTo("alice");
+        Assertions.assertThat(jwt.getJWTClaimsSet().getIssuer()).isEqualTo("http://c2id.com");
+        Assertions.assertThat(jwt.getJWTClaimsSet().getAudience().get(0)).isEqualTo("http://app.example.com");
     }
 
     @Test
@@ -81,15 +79,15 @@ public class PlainJWTTest {
 
         PlainJWT jwt = new PlainJWT(part1, part2);
 
-        assertThat(jwt.getHeader().getAlgorithm()).isEqualTo(Algorithm.NONE);
-        assertThat(jwt.getHeader().getType()).isNull();
-        assertThat(jwt.getHeader().getContentType()).isNull();
+        Assertions.assertThat(jwt.getHeader().getAlgorithm()).isEqualTo(Algorithm.NONE);
+        Assertions.assertThat(jwt.getHeader().getType()).isNull();
+        Assertions.assertThat(jwt.getHeader().getContentType()).isNull();
 
         JWTClaimsSet cs = jwt.getJWTClaimsSet();
 
-        assertThat(cs.getIssuer()).isEqualTo("joe");
-        assertThat(cs.getExpirationTime()).isEqualTo(new Date(1300819380L * 1000));
-        assertThat((Boolean) cs.getClaim("http://example.com/is_root")).isTrue();
+        Assertions.assertThat(cs.getIssuer()).isEqualTo("joe");
+        Assertions.assertThat(cs.getExpirationTime()).isEqualTo(new Date(1300819380L * 1000));
+        Assertions.assertThat((Boolean) cs.getClaim("http://example.com/is_root")).isTrue();
     }
 
     @Test
@@ -104,15 +102,15 @@ public class PlainJWTTest {
 
         PlainJWT jwt = PlainJWT.parse(jwtString);
 
-        assertThat(jwt.getHeader().getAlgorithm()).isEqualTo(Algorithm.NONE);
-        assertThat(jwt.getHeader().getType()).isNull();
-        assertThat(jwt.getHeader().getContentType()).isNull();
+        Assertions.assertThat(jwt.getHeader().getAlgorithm()).isEqualTo(Algorithm.NONE);
+        Assertions.assertThat(jwt.getHeader().getType()).isNull();
+        Assertions.assertThat(jwt.getHeader().getContentType()).isNull();
 
         JWTClaimsSet cs = jwt.getJWTClaimsSet();
 
-        assertThat(cs.getIssuer()).isEqualTo("joe");
-        assertThat(cs.getExpirationTime()).isEqualTo(new Date(1300819380L * 1000));
-        assertThat((Boolean) cs.getClaim("http://example.com/is_root")).isTrue();
+        Assertions.assertThat(cs.getIssuer()).isEqualTo("joe");
+        Assertions.assertThat(cs.getExpirationTime()).isEqualTo(new Date(1300819380L * 1000));
+        Assertions.assertThat((Boolean) cs.getClaim("http://example.com/is_root")).isTrue();
     }
 
     @Test
@@ -129,25 +127,26 @@ public class PlainJWTTest {
         PlainJWT plainJWT = PlainJWT.parse(jwtString);
 
         // Header
-        assertThat(plainJWT.getHeader().getAlgorithm()).isEqualTo(Algorithm.NONE);
-        assertThat(plainJWT.getHeader().getType()).isEqualTo(new JOSEObjectType("JWT"));
+        Assertions.assertThat(plainJWT.getHeader().getAlgorithm()).isEqualTo(Algorithm.NONE);
+        Assertions.assertThat(plainJWT.getHeader().getType()).isEqualTo(new JOSEObjectType("JWT"));
 
         // Claims
-        assertThat(plainJWT.getJWTClaimsSet().getExpirationTime()).isEqualTo(new Date(377486405L * 1000));
-        assertThat(plainJWT.getJWTClaimsSet().getClaim("azp")).isEqualTo("DP01gy3QkwVGGdIejIJgLXCtRTga");
-        assertThat(plainJWT.getJWTClaimsSet().getSubject()).isEqualTo("admin@carbon.super");
-        assertThat(plainJWT.getJWTClaimsSet().getAudience().get(0)).isEqualTo("DP01gy3QkwVGGdIejIJgLXCtRTga");
-        assertThat(plainJWT.getJWTClaimsSet().getIssuer()).isEqualTo("https://localhost:9443/oauth2endpoints/token");
-        assertThat(plainJWT.getJWTClaimsSet().getIssueTime()).isEqualTo(new Date(373886405L * 1000));
+        Assertions.assertThat(plainJWT.getJWTClaimsSet().getExpirationTime()).isEqualTo(new Date(377486405L * 1000));
+        Assertions.assertThat(plainJWT.getJWTClaimsSet().getClaim("azp")).isEqualTo("DP01gy3QkwVGGdIejIJgLXCtRTga");
+        Assertions.assertThat(plainJWT.getJWTClaimsSet().getSubject()).isEqualTo("admin@carbon.super");
+        Assertions.assertThat(plainJWT.getJWTClaimsSet().getAudience().get(0)).isEqualTo("DP01gy3QkwVGGdIejIJgLXCtRTga");
+        Assertions.assertThat(plainJWT.getJWTClaimsSet().getIssuer()).isEqualTo("https://localhost:9443/oauth2endpoints/token");
+        Assertions.assertThat(plainJWT.getJWTClaimsSet().getIssueTime()).isEqualTo(new Date(373886405L * 1000));
     }
 
     @Test
-    public void testTrimWhitespace()
-            throws Exception {
+    public void testTrimWhitespace() {
 
         PlainJWT jwt = new PlainJWT(new JWTClaimsSet.Builder().build());
         String jwtString = " " + jwt.serialize() + " ";
-        PlainJWT.parse(jwtString);
+        Assertions.assertThatCode(
+                () -> PlainJWT.parse(jwtString)
+        ).doesNotThrowAnyException();
     }
 
     @Test

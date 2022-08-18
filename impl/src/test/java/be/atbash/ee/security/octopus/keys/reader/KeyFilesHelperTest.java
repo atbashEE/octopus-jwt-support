@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package be.atbash.ee.security.octopus.keys.reader;
 
 import com.google.common.collect.ImmutableList;
 import net.jadler.Jadler;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import uk.org.lidalia.slf4jext.Level;
@@ -26,13 +27,11 @@ import uk.org.lidalia.slf4jtest.TestLoggerFactory;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 class KeyFilesHelperTest {
 
-    private KeyFilesHelper helper = new KeyFilesHelper();
+    private final KeyFilesHelper helper = new KeyFilesHelper();
 
-    private TestLogger logger = TestLoggerFactory.getTestLogger(KeyFilesHelper.class);
+    private final TestLogger logger = TestLoggerFactory.getTestLogger(KeyFilesHelper.class);
 
     @AfterEach
     public void tearDown() {
@@ -43,40 +42,40 @@ class KeyFilesHelperTest {
     @Test
     void determineKeyFiles() {
         List<String> files = helper.determineKeyFiles("classpath:test.jwkset");
-        assertThat(files).containsOnly("classpath:test.jwkset");
+        Assertions.assertThat(files).containsOnly("classpath:test.jwkset");
     }
 
     @Test
     void determineKeyFiles_wrongExtension() {
         List<String> files = helper.determineKeyFiles("classpath:test.wrong");
-        assertThat(files).isEmpty();
+        Assertions.assertThat(files).isEmpty();
         ImmutableList<LoggingEvent> loggingEvents = logger.getLoggingEvents();
-        assertThat(loggingEvents).hasSize(1);
-        assertThat(loggingEvents.get(0).getLevel()).isEqualTo(Level.WARN);
-        assertThat(loggingEvents.get(0).getMessage()).isEqualTo("(OCT-KEY-012) Unable to determine type of 'classpath:test.wrong'");
+        Assertions.assertThat(loggingEvents).hasSize(1);
+        Assertions.assertThat(loggingEvents.get(0).getLevel()).isEqualTo(Level.WARN);
+        Assertions.assertThat(loggingEvents.get(0).getMessage()).isEqualTo("(OCT-KEY-012) Unable to determine type of 'classpath:test.wrong'");
     }
 
     @Test
     void determineKeyFiles_file() {
         List<String> files = helper.determineKeyFiles("file:./src/test/resources/rsa.pub.pem");
-        assertThat(files).containsOnly("file:./src/test/resources/rsa.pub.pem");
+        Assertions.assertThat(files).containsOnly("file:./src/test/resources/rsa.pub.pem");
     }
 
     @Test
     void determineKeyFiles_directory() {
         List<String> files = helper.determineKeyFiles("file:./target/test-classes");
-        assertThat(files.size()).isGreaterThan(10); // There are many files and when one is added, it should no fail the test
+        Assertions.assertThat(files.size()).isGreaterThan(10); // There are many files and when one is added, it should no fail the test
         ImmutableList<LoggingEvent> loggingEvents = logger.getLoggingEvents();
-        assertThat(loggingEvents.size()).isGreaterThan(5);
+        Assertions.assertThat(loggingEvents.size()).isGreaterThan(5);
 
     }
 
     @Test
     void determineKeyFiles_ClasspathDirectory() {
         List<String> files = helper.determineKeyFiles("classpath:");
-        assertThat(files.size()).isGreaterThan(10); // There are many files and when one is added, it should no fail the test
+        Assertions.assertThat(files.size()).isGreaterThan(10); // There are many files and when one is added, it should no fail the test
         ImmutableList<LoggingEvent> loggingEvents = logger.getLoggingEvents();
-        assertThat(loggingEvents.size()).isGreaterThan(5);
+        Assertions.assertThat(loggingEvents.size()).isGreaterThan(5);
 
     }
 
@@ -90,6 +89,6 @@ class KeyFilesHelperTest {
                 .withStatus(200);
 
         List<String> files = helper.determineKeyFiles("http://localhost:" + Jadler.port() + "/auth/realms/public");
-        assertThat(files).containsOnly("http://localhost:" + Jadler.port() + "/auth/realms/public");
+        Assertions.assertThat(files).containsOnly("http://localhost:" + Jadler.port() + "/auth/realms/public");
     }
 }

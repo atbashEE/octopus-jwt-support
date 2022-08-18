@@ -19,12 +19,10 @@ import be.atbash.ee.security.octopus.keys.fake.FakeRSAPrivate;
 import be.atbash.ee.security.octopus.keys.fake.FakeRSAPublic;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.util.resource.ResourceUtil;
-import org.junit.jupiter.api.Assertions;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class AtbashKeyTest {
 
@@ -33,7 +31,7 @@ public class AtbashKeyTest {
 
         AtbashKey key = new AtbashKey(ResourceUtil.CLASSPATH_PREFIX + "test.pem", new FakeRSAPublic());
 
-        assertThat(key.getKeyId()).isEqualTo("test");
+        Assertions.assertThat(key.getKeyId()).isEqualTo("test");
     }
 
     @Test
@@ -41,7 +39,7 @@ public class AtbashKeyTest {
 
         AtbashKey key = new AtbashKey(ResourceUtil.CLASSPATH_PREFIX + "test.pub.pem", new FakeRSAPublic());
 
-        assertThat(key.getKeyId()).isEqualTo("test.pub");
+        Assertions.assertThat(key.getKeyId()).isEqualTo("test.pub");
     }
 
     @Test
@@ -49,43 +47,45 @@ public class AtbashKeyTest {
 
         AtbashKey key = new AtbashKey(ResourceUtil.CLASSPATH_PREFIX + "test", new FakeRSAPublic());
 
-        assertThat(key.getKeyId()).isEqualTo("test");
+        Assertions.assertThat(key.getKeyId()).isEqualTo("test");
 
     }
 
     @Test
     public void getIsMatch_match() {
         AtbashKey key = new AtbashKey(ResourceUtil.CLASSPATH_PREFIX + "test.pem", new FakeRSAPrivate());
-        assertThat(key.isMatch("test", AsymmetricPart.PRIVATE)).isTrue();
+        Assertions.assertThat(key.isMatch("test", AsymmetricPart.PRIVATE)).isTrue();
     }
 
     @Test
     public void getIsMatch_differentId() {
         AtbashKey key = new AtbashKey(ResourceUtil.CLASSPATH_PREFIX + "test.pem", new FakeRSAPrivate());
-        assertThat(key.isMatch("Other", AsymmetricPart.PRIVATE)).isFalse();
+        Assertions.assertThat(key.isMatch("Other", AsymmetricPart.PRIVATE)).isFalse();
     }
 
     @Test
     public void getIsMatch_differentType() {
         AtbashKey key = new AtbashKey(ResourceUtil.CLASSPATH_PREFIX + "test.pem", new FakeRSAPrivate());
-        assertThat(key.isMatch("test", AsymmetricPart.PUBLIC)).isFalse();
+        Assertions.assertThat(key.isMatch("test", AsymmetricPart.PUBLIC)).isFalse();
     }
 
     @Test
     public void create_missingPath() {
-        Assertions.assertThrows(IllegalArgumentException.class, () -> new AtbashKey(null, new FakeRSAPrivate()));
+        Assertions.assertThatThrownBy(() -> new AtbashKey(null, new FakeRSAPrivate()))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     public void create_missingKey() {
-        Assertions.assertThrows(IllegalArgumentException.class, () -> new AtbashKey(ResourceUtil.CLASSPATH_PREFIX + "test.pem", null));
+        Assertions.assertThatThrownBy(() -> new AtbashKey(ResourceUtil.CLASSPATH_PREFIX + "test.pem", null))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     public void RSA_specification_2048() {
         List<AtbashKey> keys = TestKeys.generateRSAKeys("test", 2048);
         for (AtbashKey key : keys) {
-            assertThat(key.getSpecification()).isEqualTo("key length : 2048");
+            Assertions.assertThat(key.getSpecification()).isEqualTo("key length : 2048");
         }
     }
 
@@ -93,7 +93,7 @@ public class AtbashKeyTest {
     public void RSA_specification_3072() {
         List<AtbashKey> keys = TestKeys.generateRSAKeys("test", 3072);
         for (AtbashKey key : keys) {
-            assertThat(key.getSpecification()).isEqualTo("key length : 3072");
+            Assertions.assertThat(key.getSpecification()).isEqualTo("key length : 3072");
         }
     }
 
@@ -101,7 +101,7 @@ public class AtbashKeyTest {
     public void RSA_specification_4096() {
         List<AtbashKey> keys = TestKeys.generateRSAKeys("test", 4096);
         for (AtbashKey key : keys) {
-            assertThat(key.getSpecification()).isEqualTo("key length : 4096");
+            Assertions.assertThat(key.getSpecification()).isEqualTo("key length : 4096");
         }
     }
 
@@ -109,7 +109,7 @@ public class AtbashKeyTest {
     public void OCT_specification_256() {
         List<AtbashKey> keys = TestKeys.generateOCTKeys("test", 256);
         for (AtbashKey key : keys) {
-            assertThat(key.getSpecification()).isEqualTo("key length : 256");
+            Assertions.assertThat(key.getSpecification()).isEqualTo("key length : 256");
         }
     }
 
@@ -117,7 +117,7 @@ public class AtbashKeyTest {
     public void OCT_specification_512() {
         List<AtbashKey> keys = TestKeys.generateOCTKeys("test", 512);
         for (AtbashKey key : keys) {
-            assertThat(key.getSpecification()).isEqualTo("key length : 512");
+            Assertions.assertThat(key.getSpecification()).isEqualTo("key length : 512");
         }
     }
 
@@ -125,7 +125,7 @@ public class AtbashKeyTest {
     public void EC_specification_P256() {
         List<AtbashKey> keys = TestKeys.generateECKeys("test", "P-256");
         for (AtbashKey key : keys) {
-            assertThat(key.getSpecification()).isEqualTo("Curve name : P-256");
+            Assertions.assertThat(key.getSpecification()).isEqualTo("Curve name : P-256");
         }
     }
 
@@ -133,7 +133,7 @@ public class AtbashKeyTest {
     public void EC_specification_P521() {
         List<AtbashKey> keys = TestKeys.generateECKeys("test", "P-521");
         for (AtbashKey key : keys) {
-            assertThat(key.getSpecification()).isEqualTo("Curve name : P-521");
+            Assertions.assertThat(key.getSpecification()).isEqualTo("Curve name : P-521");
         }
     }
 
@@ -142,7 +142,7 @@ public class AtbashKeyTest {
         // For the deprecated Curve.P256K
         List<AtbashKey> keys = TestKeys.generateECKeys("test", "P-256K");
         for (AtbashKey key : keys) {
-            assertThat(key.getSpecification()).isEqualTo("Curve name : secp256k1");
+            Assertions.assertThat(key.getSpecification()).isEqualTo("Curve name : secp256k1");
         }
     }
 
@@ -150,7 +150,7 @@ public class AtbashKeyTest {
     public void EC_specification_SECP256K1() {
         List<AtbashKey> keys = TestKeys.generateECKeys("test", "secp256k1");
         for (AtbashKey key : keys) {
-            assertThat(key.getSpecification()).isEqualTo("Curve name : secp256k1");
+            Assertions.assertThat(key.getSpecification()).isEqualTo("Curve name : secp256k1");
         }
     }
 
@@ -159,7 +159,7 @@ public class AtbashKeyTest {
     public void EC_specification_P384() {
         List<AtbashKey> keys = TestKeys.generateECKeys("test", "P-384");
         for (AtbashKey key : keys) {
-            assertThat(key.getSpecification()).isEqualTo("Curve name : P-384");
+            Assertions.assertThat(key.getSpecification()).isEqualTo("Curve name : P-384");
         }
     }
 
@@ -167,7 +167,7 @@ public class AtbashKeyTest {
     public void EC_specification_prime256v1() {
         List<AtbashKey> keys = TestKeys.generateECKeys("test", "prime256v1");
         for (AtbashKey key : keys) {
-            assertThat(key.getSpecification()).isEqualTo("Curve name : P-256");
+            Assertions.assertThat(key.getSpecification()).isEqualTo("Curve name : P-256");
         }
     }
 
@@ -175,7 +175,7 @@ public class AtbashKeyTest {
     public void OKP_specification() {
         List<AtbashKey> keys = TestKeys.generateOKPKeys("test");
         for (AtbashKey key : keys) {
-            assertThat(key.getSpecification()).isEqualTo("Curve name : Ed25519");
+            Assertions.assertThat(key.getSpecification()).isEqualTo("Curve name : Ed25519");
         }
     }
 

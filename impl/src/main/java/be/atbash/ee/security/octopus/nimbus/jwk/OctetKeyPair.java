@@ -93,16 +93,14 @@ import java.util.*;
  */
 public class OctetKeyPair extends JWK implements AsymmetricJWK, CurveBasedJWK {
 
-
-    private static final long serialVersionUID = 1L;
-
-
     /**
      * Supported Edwards curves.
      */
     public static final Set<Curve> SUPPORTED_CURVES = Collections.unmodifiableSet(
             new HashSet<>(Arrays.asList(Curve.Ed25519, Curve.Ed448, Curve.X25519, Curve.X448))
     );
+    private static final String CURVE_MUST_NOT_BE_NULL = "The curve must not be null";
+    private static final String X_MUST_NOT_BE_NULL = "The 'x' coordinate must not be null";
 
 
     /**
@@ -198,13 +196,13 @@ public class OctetKeyPair extends JWK implements AsymmetricJWK, CurveBasedJWK {
         public Builder(Curve crv, Base64URLValue x) {
 
             if (crv == null) {
-                throw new IllegalArgumentException("The curve must not be null");
+                throw new IllegalArgumentException(CURVE_MUST_NOT_BE_NULL);
             }
 
             this.crv = crv;
 
             if (x == null) {
-                throw new IllegalArgumentException("The 'x' coordinate must not be null");
+                throw new IllegalArgumentException(X_MUST_NOT_BE_NULL);
             }
 
             this.x = x;
@@ -489,7 +487,7 @@ public class OctetKeyPair extends JWK implements AsymmetricJWK, CurveBasedJWK {
         super(KeyType.OKP, use, ops, alg, kid, x5u, x5t256, x5c, ks);
 
         if (crv == null) {
-            throw new IllegalArgumentException("The curve must not be null");
+            throw new IllegalArgumentException(CURVE_MUST_NOT_BE_NULL);
         }
 
         if (!SUPPORTED_CURVES.contains(crv)) {
@@ -540,7 +538,7 @@ public class OctetKeyPair extends JWK implements AsymmetricJWK, CurveBasedJWK {
         super(KeyType.OKP, use, ops, alg, kid, x5u, x5t256, x5c, ks);
 
         if (crv == null) {
-            throw new IllegalArgumentException("The curve must not be null");
+            throw new IllegalArgumentException(CURVE_MUST_NOT_BE_NULL);
         }
 
         if (!SUPPORTED_CURVES.contains(crv)) {

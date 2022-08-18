@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import be.atbash.ee.security.octopus.keys.generator.RSAGenerationParameters;
 import be.atbash.ee.security.octopus.keys.selector.filter.*;
 import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import be.atbash.util.TestReflectionUtils;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,15 +32,13 @@ import uk.org.lidalia.slf4jtest.TestLoggerFactory;
 import java.security.Key;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 /**
  *
  */
 
 public class KeySelectorTest {
 
-    private KeySelector keySelector = new KeySelector();
+    private final KeySelector keySelector = new KeySelector();
 
     private static AtbashKey key1;
     private static AtbashKey key2;
@@ -78,7 +77,7 @@ public class KeySelectorTest {
 
         SelectorCriteria criteria = SelectorCriteria.newBuilder().withId("kid").build();
         Key key = keySelector.selectSecretKey(criteria);
-        assertThat(key).isNotNull();
+        Assertions.assertThat(key).isNotNull();
     }
 
     @Test
@@ -86,7 +85,7 @@ public class KeySelectorTest {
 
         SelectorCriteria criteria = SelectorCriteria.newBuilder().build();
         Key key = keySelector.selectSecretKey(criteria);
-        assertThat(key).isNull();
+        Assertions.assertThat(key).isNull();
     }
 
     @Test
@@ -96,15 +95,15 @@ public class KeySelectorTest {
 
         SelectorCriteria criteria = SelectorCriteria.newBuilder().withId("kid").build();
         AtbashKey key = keySelector.selectAtbashKey(criteria);
-        assertThat(key).isNotNull();
+        Assertions.assertThat(key).isNotNull();
 
-        assertThat(key).isEqualTo(key1);
-        assertThat(FakeKeyManager.keyFilters).hasSize(1);
+        Assertions.assertThat(key).isEqualTo(key1);
+        Assertions.assertThat(FakeKeyManager.keyFilters).hasSize(1);
         KeyFilter filter = FakeKeyManager.keyFilters.get(0);
-        assertThat(filter).isInstanceOf(IdKeyFilter.class);
+        Assertions.assertThat(filter).isInstanceOf(IdKeyFilter.class);
 
         String keyId = TestReflectionUtils.getValueOf(filter, "keyId");
-        assertThat(keyId).isEqualTo("kid");
+        Assertions.assertThat(keyId).isEqualTo("kid");
 
     }
 
@@ -116,17 +115,17 @@ public class KeySelectorTest {
         SecretKeyType secretKeyType = new SecretKeyType(KeyType.RSA, AsymmetricPart.PRIVATE);
         SelectorCriteria criteria = SelectorCriteria.newBuilder().withSecretKeyType(secretKeyType).build();
         AtbashKey key = keySelector.selectAtbashKey(criteria);
-        assertThat(key).isNotNull();
+        Assertions.assertThat(key).isNotNull();
 
-        assertThat(key).isEqualTo(key1);
-        assertThat(FakeKeyManager.keyFilters).hasSize(1);
+        Assertions.assertThat(key).isEqualTo(key1);
+        Assertions.assertThat(FakeKeyManager.keyFilters).hasSize(1);
         KeyFilter filter = FakeKeyManager.keyFilters.get(0);
-        assertThat(filter).isInstanceOf(SecretKeyTypeKeyFilter.class);
+        Assertions.assertThat(filter).isInstanceOf(SecretKeyTypeKeyFilter.class);
 
         SecretKeyType value = TestReflectionUtils.getValueOf(filter, "secretKeyType");
-        assertThat(value).isNotNull();
-        assertThat(value.getKeyType()).isEqualTo(KeyType.RSA);
-        assertThat(value.getAsymmetricPart()).isEqualTo(AsymmetricPart.PRIVATE);
+        Assertions.assertThat(value).isNotNull();
+        Assertions.assertThat(value.getKeyType()).isEqualTo(KeyType.RSA);
+        Assertions.assertThat(value.getAsymmetricPart()).isEqualTo(AsymmetricPart.PRIVATE);
 
     }
 
@@ -137,16 +136,16 @@ public class KeySelectorTest {
 
         SelectorCriteria criteria = SelectorCriteria.newBuilder().withKeyType(KeyType.RSA).build();
         AtbashKey key = keySelector.selectAtbashKey(criteria);
-        assertThat(key).isNotNull();
+        Assertions.assertThat(key).isNotNull();
 
-        assertThat(key).isEqualTo(key1);
-        assertThat(FakeKeyManager.keyFilters).hasSize(1);
+        Assertions.assertThat(key).isEqualTo(key1);
+        Assertions.assertThat(FakeKeyManager.keyFilters).hasSize(1);
         KeyFilter filter = FakeKeyManager.keyFilters.get(0);
-        assertThat(filter).isInstanceOf(KeyTypeKeyFilter.class);
+        Assertions.assertThat(filter).isInstanceOf(KeyTypeKeyFilter.class);
 
         KeyType value = TestReflectionUtils.getValueOf(filter, "keyType");
-        assertThat(value).isNotNull();
-        assertThat(value).isEqualTo(KeyType.RSA);
+        Assertions.assertThat(value).isNotNull();
+        Assertions.assertThat(value).isEqualTo(KeyType.RSA);
 
     }
 
@@ -157,16 +156,16 @@ public class KeySelectorTest {
 
         SelectorCriteria criteria = SelectorCriteria.newBuilder().withAsymmetricPart(AsymmetricPart.PRIVATE).build();
         AtbashKey key = keySelector.selectAtbashKey(criteria);
-        assertThat(key).isNotNull();
+        Assertions.assertThat(key).isNotNull();
 
-        assertThat(key).isEqualTo(key1);
-        assertThat(FakeKeyManager.keyFilters).hasSize(1);
+        Assertions.assertThat(key).isEqualTo(key1);
+        Assertions.assertThat(FakeKeyManager.keyFilters).hasSize(1);
         KeyFilter filter = FakeKeyManager.keyFilters.get(0);
-        assertThat(filter).isInstanceOf(AsymmetricPartKeyFilter.class);
+        Assertions.assertThat(filter).isInstanceOf(AsymmetricPartKeyFilter.class);
 
         AsymmetricPart value = TestReflectionUtils.getValueOf(filter, "asymmetricPart");
-        assertThat(value).isNotNull();
-        assertThat(value).isEqualTo(AsymmetricPart.PRIVATE);
+        Assertions.assertThat(value).isNotNull();
+        Assertions.assertThat(value).isEqualTo(AsymmetricPart.PRIVATE);
 
     }
 
@@ -177,22 +176,22 @@ public class KeySelectorTest {
 
         SelectorCriteria criteria = SelectorCriteria.newBuilder().withId("kid").withKeyType(KeyType.RSA).build();
         AtbashKey key = keySelector.selectAtbashKey(criteria);
-        assertThat(key).isNotNull();
+        Assertions.assertThat(key).isNotNull();
 
-        assertThat(key).isEqualTo(key1);
-        assertThat(FakeKeyManager.keyFilters).hasSize(2);
+        Assertions.assertThat(key).isEqualTo(key1);
+        Assertions.assertThat(FakeKeyManager.keyFilters).hasSize(2);
         KeyFilter filter = FakeKeyManager.keyFilters.get(0);
-        assertThat(filter).isInstanceOf(IdKeyFilter.class);
+        Assertions.assertThat(filter).isInstanceOf(IdKeyFilter.class);
 
         String keyId = TestReflectionUtils.getValueOf(filter, "keyId");
-        assertThat(keyId).isEqualTo("kid");
+        Assertions.assertThat(keyId).isEqualTo("kid");
 
         filter = FakeKeyManager.keyFilters.get(1);
-        assertThat(filter).isInstanceOf(KeyTypeKeyFilter.class);
+        Assertions.assertThat(filter).isInstanceOf(KeyTypeKeyFilter.class);
 
         KeyType value = TestReflectionUtils.getValueOf(filter, "keyType");
-        assertThat(value).isNotNull();
-        assertThat(value).isEqualTo(KeyType.RSA);
+        Assertions.assertThat(value).isNotNull();
+        Assertions.assertThat(value).isEqualTo(KeyType.RSA);
 
     }
 
@@ -204,22 +203,22 @@ public class KeySelectorTest {
         // Here the order is switched from ^^revious test, but the rest should be the same
         SelectorCriteria criteria = SelectorCriteria.newBuilder().withKeyType(KeyType.RSA).withId("kid").build();
         AtbashKey key = keySelector.selectAtbashKey(criteria);
-        assertThat(key).isNotNull();
+        Assertions.assertThat(key).isNotNull();
 
-        assertThat(key).isEqualTo(key1);
-        assertThat(FakeKeyManager.keyFilters).hasSize(2);
+        Assertions.assertThat(key).isEqualTo(key1);
+        Assertions.assertThat(FakeKeyManager.keyFilters).hasSize(2);
         KeyFilter filter = FakeKeyManager.keyFilters.get(0);
-        assertThat(filter).isInstanceOf(IdKeyFilter.class);
+        Assertions.assertThat(filter).isInstanceOf(IdKeyFilter.class);
 
         String keyId = TestReflectionUtils.getValueOf(filter, "keyId");
-        assertThat(keyId).isEqualTo("kid");
+        Assertions.assertThat(keyId).isEqualTo("kid");
 
         filter = FakeKeyManager.keyFilters.get(1);
-        assertThat(filter).isInstanceOf(KeyTypeKeyFilter.class);
+        Assertions.assertThat(filter).isInstanceOf(KeyTypeKeyFilter.class);
 
         KeyType value = TestReflectionUtils.getValueOf(filter, "keyType");
-        assertThat(value).isNotNull();
-        assertThat(value).isEqualTo(KeyType.RSA);
+        Assertions.assertThat(value).isNotNull();
+        Assertions.assertThat(value).isEqualTo(KeyType.RSA);
 
     }
 
@@ -232,41 +231,41 @@ public class KeySelectorTest {
 
         SelectorCriteria criteria = SelectorCriteria.newBuilder().withId("kid").withSecretKeyType(secretKeyType).withKeyType(KeyType.EC).withAsymmetricPart(AsymmetricPart.PUBLIC).build();
         AtbashKey key = keySelector.selectAtbashKey(criteria);
-        assertThat(key).isNotNull();
+        Assertions.assertThat(key).isNotNull();
 
-        assertThat(key).isEqualTo(key1);
-        assertThat(FakeKeyManager.keyFilters).hasSize(4);
+        Assertions.assertThat(key).isEqualTo(key1);
+        Assertions.assertThat(FakeKeyManager.keyFilters).hasSize(4);
         // Id
         KeyFilter filter = FakeKeyManager.keyFilters.get(0);
-        assertThat(filter).isInstanceOf(IdKeyFilter.class);
+        Assertions.assertThat(filter).isInstanceOf(IdKeyFilter.class);
 
         String keyId = TestReflectionUtils.getValueOf(filter, "keyId");
-        assertThat(keyId).isEqualTo("kid");
+        Assertions.assertThat(keyId).isEqualTo("kid");
 
         // Secret Key Type
         filter = FakeKeyManager.keyFilters.get(1);
-        assertThat(filter).isInstanceOf(SecretKeyTypeKeyFilter.class);
+        Assertions.assertThat(filter).isInstanceOf(SecretKeyTypeKeyFilter.class);
 
         SecretKeyType value = TestReflectionUtils.getValueOf(filter, "secretKeyType");
-        assertThat(value).isNotNull();
-        assertThat(value.getKeyType()).isEqualTo(KeyType.RSA);
-        assertThat(value.getAsymmetricPart()).isEqualTo(AsymmetricPart.PRIVATE);
+        Assertions.assertThat(value).isNotNull();
+        Assertions.assertThat(value.getKeyType()).isEqualTo(KeyType.RSA);
+        Assertions.assertThat(value.getAsymmetricPart()).isEqualTo(AsymmetricPart.PRIVATE);
 
         // Key type
         filter = FakeKeyManager.keyFilters.get(2);
-        assertThat(filter).isInstanceOf(KeyTypeKeyFilter.class);
+        Assertions.assertThat(filter).isInstanceOf(KeyTypeKeyFilter.class);
 
         KeyType value2 = TestReflectionUtils.getValueOf(filter, "keyType");
-        assertThat(value2).isNotNull();
-        assertThat(value2).isEqualTo(KeyType.EC);
+        Assertions.assertThat(value2).isNotNull();
+        Assertions.assertThat(value2).isEqualTo(KeyType.EC);
 
         // asymmetric
         filter = FakeKeyManager.keyFilters.get(3);
-        assertThat(filter).isInstanceOf(AsymmetricPartKeyFilter.class);
+        Assertions.assertThat(filter).isInstanceOf(AsymmetricPartKeyFilter.class);
 
         AsymmetricPart value3 = TestReflectionUtils.getValueOf(filter, "asymmetricPart");
-        assertThat(value3).isNotNull();
-        assertThat(value3).isEqualTo(AsymmetricPart.PUBLIC);
+        Assertions.assertThat(value3).isNotNull();
+        Assertions.assertThat(value3).isEqualTo(AsymmetricPart.PUBLIC);
 
     }
 

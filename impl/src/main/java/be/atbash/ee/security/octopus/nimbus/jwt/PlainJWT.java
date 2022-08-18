@@ -36,10 +36,6 @@ import java.text.ParseException;
  */
 public class PlainJWT extends PlainObject implements JWT {
 
-
-    private static final long serialVersionUID = 1L;
-
-
     // Cached JWTClaimsSet
     private JWTClaimsSet claimsSet;
 

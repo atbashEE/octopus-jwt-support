@@ -25,6 +25,7 @@ import be.atbash.util.exception.AtbashUnexpectedException;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.json.bind.JsonbException;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.pkcs.PKCSException;
 
@@ -312,23 +313,38 @@ public class KeyReader {
                 }
 
                 if (resourceType == KeyResourceType.JWK) {
-                    try {
-                        result = keyReaderJWK.parse(json, path, passwordLookup);
-                    } catch (ParseException e) {
-                        ;// Carry on with next format.
-                    }
+                    result = parseFromJWK(path, passwordLookup, result, json);
                 }
                 if (resourceType == KeyResourceType.JWKSET) {
-                    result = keyReaderJWKSet.parseContent(json, path, passwordLookup);
+                    result = parseFromJWKSet(path, passwordLookup, result, json);
                 }
                 if (resourceType == KeyResourceType.KEYSTORE) {
                     result = keyReaderKeyStore.parseContent(new ByteArrayInputStream(content), path, passwordLookup);
                 }
-            } catch (IOException | PKCSException | OperatorCreationException | NoSuchAlgorithmException | CertificateException | KeyStoreException | UnrecoverableKeyException e) {
+            } catch (IOException | PKCSException | OperatorCreationException | NoSuchAlgorithmException |
+                     CertificateException | KeyStoreException | UnrecoverableKeyException e) {
                 throw new AtbashUnexpectedException(e);
             }
         }
 
+        return result;
+    }
+
+    private List<AtbashKey> parseFromJWKSet(String path, KeyResourcePasswordLookup passwordLookup, List<AtbashKey> result, String json) {
+        try {
+            result = keyReaderJWKSet.parseContent(json, path, passwordLookup);
+        } catch (JsonbException e) {
+            // Carry on with next format.
+        }
+        return result;
+    }
+
+    private List<AtbashKey> parseFromJWK(String path, KeyResourcePasswordLookup passwordLookup, List<AtbashKey> result, String json) {
+        try {
+            result = keyReaderJWK.parse(json, path, passwordLookup);
+        } catch (ParseException | JsonbException e) {
+            // Carry on with next format.
+        }
         return result;
     }
 

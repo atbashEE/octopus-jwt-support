@@ -115,7 +115,7 @@ public class JwkKeyEncoderPrivatePart implements KeyEncoder {
 
         ASN1Encodable item2 = sequence.getObjectAt(3);
         DLTaggedObject publicPart = (DLTaggedObject) item2;
-        DEROctetString publicBytes = (DEROctetString) publicPart.getObject();
+        DEROctetString publicBytes = (DEROctetString) publicPart.getBaseObject();
 
         byte[] xBytes = new byte[Ed25519.SECRET_KEY_SIZE];
         System.arraycopy(publicBytes.getOctets(), 1, xBytes, 0, Ed25519.SECRET_KEY_SIZE);

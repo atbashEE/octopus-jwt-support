@@ -38,9 +38,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 public class JWSObject extends JOSEObject {
 
 
-    private static final long serialVersionUID = 1L;
-
-
     /**
      * Enumeration of the states of a JSON Web Signature (JWS) object.
      */

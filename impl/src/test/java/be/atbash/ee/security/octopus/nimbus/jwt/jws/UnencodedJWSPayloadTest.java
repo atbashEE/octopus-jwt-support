@@ -24,6 +24,7 @@ import be.atbash.ee.security.octopus.nimbus.jwk.OctetSequenceKey;
 import be.atbash.ee.security.octopus.nimbus.jwt.JWTClaimsSet;
 import be.atbash.ee.security.octopus.nimbus.jwt.SignedJWT;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
@@ -31,8 +32,6 @@ import java.text.ParseException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 
 /**
@@ -62,7 +61,7 @@ public class UnencodedJWSPayloadTest {
     @Test
     public void testPayloadAsBase64URL() {
 
-        assertThat(new Base64URLValue("JC4wMg").decodeToString()).isEqualTo("$.02");
+        Assertions.assertThat(new Base64URLValue("JC4wMg").decodeToString()).isEqualTo("$.02");
     }
 
     @Test
@@ -71,7 +70,7 @@ public class UnencodedJWSPayloadTest {
         JWSObject jwsObject = new JWSObject(new JWSHeader(JWSAlgorithm.HS256), new Payload("$.02"));
         jwsObject.sign(new MACSigner(JWK));
         String expected = "eyJhbGciOiJIUzI1NiJ9.JC4wMg.5mvfOroL-g7HyqJoozehmsaqmvTYGEq5jTI1gVvoEoQ";
-        assertThat(jwsObject.serialize()).isEqualTo(expected);
+        Assertions.assertThat(jwsObject.serialize()).isEqualTo(expected);
     }
 
     @Test
@@ -80,12 +79,12 @@ public class UnencodedJWSPayloadTest {
 
         Base64URLValue headerB64 = new Base64URLValue("eyJhbGciOiJIUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19");
         JWSHeader header = JWSHeader.parse(headerB64);
-        assertThat(header.getAlgorithm()).isEqualTo(JWSAlgorithm.HS256);
-        assertThat(header.isBase64URLEncodePayload()).isFalse();
+        Assertions.assertThat(header.getAlgorithm()).isEqualTo(JWSAlgorithm.HS256);
+        Assertions.assertThat(header.isBase64URLEncodePayload()).isFalse();
         Set<String> crit = header.getCriticalParams();
-        assertThat(crit.contains(HeaderParameterNames.BASE64_URL_ENCODE_PAYLOAD)).isTrue();
-        assertThat(crit).hasSize(1);
-        assertThat(header.toJSONObject().build()).hasSize(3);
+        Assertions.assertThat(crit.contains(HeaderParameterNames.BASE64_URL_ENCODE_PAYLOAD)).isTrue();
+        Assertions.assertThat(crit).hasSize(1);
+        Assertions.assertThat(header.toJSONObject().build()).hasSize(3);
 
         JWSSigner signer = new MACSigner(JWK);
 
@@ -97,10 +96,10 @@ public class UnencodedJWSPayloadTest {
 
         Base64URLValue signature = signer.sign(header, signingInput);
         Base64URLValue expectedSignature = new Base64URLValue("A5dxf2s96_n5FLueVuW1Z_vh161FwXZC4YLPff6dmDY");
-        assertThat(signature).isEqualTo(expectedSignature);
+        Assertions.assertThat(signature).isEqualTo(expectedSignature);
 
         JWSVerifier verifier = new MACVerifier(JWK, new HashSet<>(Collections.singletonList("b64")));
-        assertThat(verifier.verify(header, signingInput, signature)).isTrue();
+        Assertions.assertThat(verifier.verify(header, signingInput, signature)).isTrue();
     }
 
     @Test
@@ -125,7 +124,7 @@ public class UnencodedJWSPayloadTest {
         signedJWT = SignedJWT.parse(serializedJWT);
 
         //Then
-        assertThat((Boolean) header.isBase64URLEncodePayload()).isFalse();
+        Assertions.assertThat((Boolean) header.isBase64URLEncodePayload()).isFalse();
 
         JWSVerifier verifier = new MACVerifier(JWK, new HashSet<>(Collections.singletonList("b64")));
         byte[] payloadBytes = claimsSet.toString().getBytes(StandardCharsets.UTF_8);
@@ -134,7 +133,7 @@ public class UnencodedJWSPayloadTest {
         System.arraycopy(headerBytes, 0, signingInput, 0, headerBytes.length);
         System.arraycopy(payloadBytes, 0, signingInput, headerBytes.length, payloadBytes.length);
 
-        assertThat(verifier.verify(header, signingInput, signedJWT.getSignature())).isTrue();
+        Assertions.assertThat(verifier.verify(header, signingInput, signedJWT.getSignature())).isTrue();
     }
 
     @Test
@@ -159,7 +158,7 @@ public class UnencodedJWSPayloadTest {
         signedJWT = SignedJWT.parse(serializedJWT);
 
         //Then
-        assertThat((Boolean) header.isBase64URLEncodePayload()).isFalse();
+        Assertions.assertThat((Boolean) header.isBase64URLEncodePayload()).isFalse();
 
         JWSVerifier verifier = new MACVerifier(JWK, new HashSet<>(Collections.singletonList("b64")));
         byte[] payloadBytes = claimsSet.toString().getBytes(StandardCharsets.UTF_8);
@@ -168,6 +167,6 @@ public class UnencodedJWSPayloadTest {
         System.arraycopy(headerBytes, 0, signingInput, 0, headerBytes.length);
         System.arraycopy(payloadBytes, 0, signingInput, headerBytes.length, payloadBytes.length);
 
-        assertThat(verifier.verify(header, signingInput, signedJWT.getSignature())).isTrue();
+        Assertions.assertThat(verifier.verify(header, signingInput, signedJWT.getSignature())).isTrue();
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
 
-import java.io.Serializable;
 import java.net.URI;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -67,10 +66,7 @@ import java.util.*;
  *
  * Based on code by Vladimir Dzhuvinov, Justin Richer and Stefan Larsson
  */
-public abstract class JWK implements Serializable {
-
-
-    private static final long serialVersionUID = 1L;
+public abstract class JWK {
 
 
     /**

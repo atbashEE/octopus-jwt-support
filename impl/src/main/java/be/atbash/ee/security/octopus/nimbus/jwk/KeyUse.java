@@ -18,7 +18,6 @@ package be.atbash.ee.security.octopus.nimbus.jwk;
 
 import be.atbash.ee.security.octopus.nimbus.jose.HeaderParameterNames;
 
-import java.io.Serializable;
 import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.util.HashSet;
@@ -39,10 +38,7 @@ import java.util.Set;
  *
  * Based on code by Vladimir Dzhuvinov
  */
-public final class KeyUse implements Serializable {
-
-
-    private static final long serialVersionUID = 1L;
+public final class KeyUse {
 
     /**
      * @see <a href="https://datatracker.ietf.org/doc/html/rfc7517#section-4.2">RFC 7517 "sig" (signature) Parameter Value</a>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,13 @@
 package be.atbash.ee.security.octopus.nimbus.jwt.jwe;
 
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 
 /**
  * Tests the EncryptionMethod class.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
 public class EncryptionMethodTest {
@@ -33,13 +32,13 @@ public class EncryptionMethodTest {
     public void testCMKLengths() {
 
 
-        assertThat(EncryptionMethod.A128CBC_HS256.cekBitLength()).isEqualTo(256);
-        assertThat(EncryptionMethod.A192CBC_HS384.cekBitLength()).isEqualTo(384);
-        assertThat(EncryptionMethod.A256CBC_HS512.cekBitLength()).isEqualTo(512);
+        Assertions.assertThat(EncryptionMethod.A128CBC_HS256.cekBitLength()).isEqualTo(256);
+        Assertions.assertThat(EncryptionMethod.A192CBC_HS384.cekBitLength()).isEqualTo(384);
+        Assertions.assertThat(EncryptionMethod.A256CBC_HS512.cekBitLength()).isEqualTo(512);
 
-        assertThat(EncryptionMethod.A128GCM.cekBitLength()).isEqualTo(128);
-        assertThat(EncryptionMethod.A192GCM.cekBitLength()).isEqualTo(192);
-        assertThat(EncryptionMethod.A256GCM.cekBitLength()).isEqualTo(256);
+        Assertions.assertThat(EncryptionMethod.A128GCM.cekBitLength()).isEqualTo(128);
+        Assertions.assertThat(EncryptionMethod.A192GCM.cekBitLength()).isEqualTo(192);
+        Assertions.assertThat(EncryptionMethod.A256GCM.cekBitLength()).isEqualTo(256);
 
     }
 
@@ -47,20 +46,20 @@ public class EncryptionMethodTest {
     @Test
     public void testAESCBCHMACFamily() {
 
-        assertThat(EncryptionMethod.Family.AES_CBC_HMAC_SHA).contains(EncryptionMethod.A128CBC_HS256);
-        assertThat(EncryptionMethod.Family.AES_CBC_HMAC_SHA).contains(EncryptionMethod.A192CBC_HS384);
-        assertThat(EncryptionMethod.Family.AES_CBC_HMAC_SHA).contains(EncryptionMethod.A256CBC_HS512);
-        assertThat(EncryptionMethod.Family.AES_CBC_HMAC_SHA.size()).isEqualTo(3);
+        Assertions.assertThat(EncryptionMethod.Family.AES_CBC_HMAC_SHA).contains(EncryptionMethod.A128CBC_HS256);
+        Assertions.assertThat(EncryptionMethod.Family.AES_CBC_HMAC_SHA).contains(EncryptionMethod.A192CBC_HS384);
+        Assertions.assertThat(EncryptionMethod.Family.AES_CBC_HMAC_SHA).contains(EncryptionMethod.A256CBC_HS512);
+        Assertions.assertThat(EncryptionMethod.Family.AES_CBC_HMAC_SHA.size()).isEqualTo(3);
     }
 
 
     @Test
     public void testAESGCMFamily() {
 
-        assertThat(EncryptionMethod.Family.AES_GCM).contains(EncryptionMethod.A256GCM);
-        assertThat(EncryptionMethod.Family.AES_GCM).contains(EncryptionMethod.A192GCM);
-        assertThat(EncryptionMethod.Family.AES_GCM).contains(EncryptionMethod.A256GCM);
+        Assertions.assertThat(EncryptionMethod.Family.AES_GCM).contains(EncryptionMethod.A256GCM);
+        Assertions.assertThat(EncryptionMethod.Family.AES_GCM).contains(EncryptionMethod.A192GCM);
+        Assertions.assertThat(EncryptionMethod.Family.AES_GCM).contains(EncryptionMethod.A256GCM);
 
-        assertThat(EncryptionMethod.Family.AES_GCM.size()).isEqualTo(3);
+        Assertions.assertThat(EncryptionMethod.Family.AES_GCM.size()).isEqualTo(3);
     }
 }

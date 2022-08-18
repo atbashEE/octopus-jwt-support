@@ -66,9 +66,7 @@ import java.util.Set;
 public final class OctetSequenceKey extends JWK implements SecretJWK {
 
 
-    private static final long serialVersionUID = 1L;
-
-
+    private static final String KEY_MUST_NOT_BE_NULL = "The key value must not be null";
     /**
      * The key value.
      */
@@ -153,7 +151,7 @@ public final class OctetSequenceKey extends JWK implements SecretJWK {
         public Builder(Base64URLValue k) {
 
             if (k == null) {
-                throw new IllegalArgumentException("The key value must not be null");
+                throw new IllegalArgumentException(KEY_MUST_NOT_BE_NULL);
             }
 
             this.k = k;
@@ -410,7 +408,7 @@ public final class OctetSequenceKey extends JWK implements SecretJWK {
         super(KeyType.OCT, use, ops, alg, kid, x5u, x5t256, x5c, ks);
 
         if (k == null) {
-            throw new IllegalArgumentException("The key value must not be null");
+            throw new IllegalArgumentException(KEY_MUST_NOT_BE_NULL);
         }
 
         this.k = k;
@@ -554,7 +552,7 @@ public final class OctetSequenceKey extends JWK implements SecretJWK {
         Base64URLValue k = JSONObjectUtils.getBase64URL(jsonObject, JWKIdentifiers.OCT_KEY_VALUE);
 
         if (k == null) {
-            throw new ParseException("The key value must not be null", 0);
+            throw new ParseException(KEY_MUST_NOT_BE_NULL, 0);
         }
 
         return new OctetSequenceKey(k,

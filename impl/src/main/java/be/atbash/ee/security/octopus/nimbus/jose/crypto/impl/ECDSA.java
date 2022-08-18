@@ -38,6 +38,8 @@ import java.util.Set;
 public final class ECDSA {
 
 
+    private static final String INVALID_ECDSA_SIGNATURE_FORMAT = "Invalid ECDSA signature format";
+
     /**
      * Creates a new JCA signer / verifier for ECDSA.
      *
@@ -119,7 +121,7 @@ public final class ECDSA {
     public static byte[] transcodeSignatureToConcat(byte[] derSignature, int outputLength) {
 
         if (derSignature.length < 8 || derSignature[0] != 48) {
-            throw new JOSEException("Invalid ECDSA signature format");
+            throw new JOSEException(INVALID_ECDSA_SIGNATURE_FORMAT);
         }
 
         int offset;
@@ -128,7 +130,7 @@ public final class ECDSA {
         } else if (derSignature[1] == (byte) 0x81) {
             offset = 3;
         } else {
-            throw new JOSEException("Invalid ECDSA signature format");
+            throw new JOSEException(INVALID_ECDSA_SIGNATURE_FORMAT);
         }
 
         byte rLength = derSignature[offset + 1];
@@ -154,7 +156,7 @@ public final class ECDSA {
                 || (derSignature[offset - 1] & 0xff) != 2 + rLength + 2 + sLength
                 || derSignature[offset] != 2
                 || derSignature[offset + 2 + rLength] != 2) {
-            throw new JOSEException("Invalid ECDSA signature format");
+            throw new JOSEException(INVALID_ECDSA_SIGNATURE_FORMAT);
         }
 
         byte[] concatSignature = new byte[2 * rawLen];
@@ -209,7 +211,7 @@ public final class ECDSA {
             int len = 2 + j + 2 + l;
 
             if (len > 255) {
-                throw new JOSEException("Invalid ECDSA signature format");
+                throw new JOSEException(INVALID_ECDSA_SIGNATURE_FORMAT);
             }
 
             int offset;
@@ -240,13 +242,10 @@ public final class ECDSA {
             System.arraycopy(jwsSignature, 2 * rawLen - k, derSignature, (offset + l) - k, k);
 
             return derSignature;
+        } catch (JOSEException e) {
+            throw e;
         } catch (Exception e) {
             // Watch for unchecked exceptions
-
-            if (e instanceof JOSEException) {
-                throw e;
-            }
-
             throw new JOSEException(e.getMessage(), e);
         }
     }

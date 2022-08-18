@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import be.atbash.ee.security.octopus.keys.Filters;
 import be.atbash.ee.security.octopus.keys.TestKeys;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jwk.RSAKey;
-import org.junit.jupiter.api.Assertions;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigInteger;
@@ -29,8 +29,6 @@ import java.security.PrivateKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class RSAKeyUtilsTest {
@@ -42,10 +40,10 @@ public class RSAKeyUtilsTest {
 
         RSAPrivateKey privateKey = (RSAPrivateKey) RSAKeyUtils.toRSAPrivateKey(rsaJWK);
 
-        assertThat(privateKey.getModulus().bitLength()).isEqualTo(2048);
-        assertThat(rsaJWK.toRSAPrivateKey()).isNotNull();
+        Assertions.assertThat(privateKey.getModulus().bitLength()).isEqualTo(2048);
+        Assertions.assertThat(rsaJWK.toRSAPrivateKey()).isNotNull();
 
-        assertThat(rsaJWK.toRSAPrivateKey().getEncoded()).isEqualTo(privateKey.getEncoded());
+        Assertions.assertThat(rsaJWK.toRSAPrivateKey().getEncoded()).isEqualTo(privateKey.getEncoded());
     }
 
     @Test
@@ -53,10 +51,10 @@ public class RSAKeyUtilsTest {
 
         RSAKey rsaJWK = generateKey().toPublicJWK();
 
-        JOSEException e = Assertions.assertThrows(JOSEException.class,
-                () -> RSAKeyUtils.toRSAPrivateKey(rsaJWK));
-
-        assertThat(e.getMessage()).isEqualTo("The RSA JWK doesn't contain a private part");
+        Assertions.assertThatThrownBy(
+                        () -> RSAKeyUtils.toRSAPrivateKey(rsaJWK))
+                .isInstanceOf(JOSEException.class)
+                .hasMessage("The RSA JWK doesn't contain a private part");
 
     }
 
@@ -65,7 +63,7 @@ public class RSAKeyUtilsTest {
 
         RSAKey rsaJWK = generateKey();
 
-        assertThat(RSAKeyUtils.keyBitLength(rsaJWK.toPrivateKey())).isEqualTo(2048);
+        Assertions.assertThat(RSAKeyUtils.keyBitLength(rsaJWK.toPrivateKey())).isEqualTo(2048);
     }
 
     @Test
@@ -91,7 +89,7 @@ public class RSAKeyUtilsTest {
             }
         };
 
-        assertThat(RSAKeyUtils.keyBitLength(privateKey)).isEqualTo(-1);
+        Assertions.assertThat(RSAKeyUtils.keyBitLength(privateKey)).isEqualTo(-1);
     }
 
     @Test
@@ -129,7 +127,7 @@ public class RSAKeyUtilsTest {
             }
         };
 
-        assertThat(RSAKeyUtils.keyBitLength(rsaPrivateKey)).isEqualTo(-1);
+        Assertions.assertThat(RSAKeyUtils.keyBitLength(rsaPrivateKey)).isEqualTo(-1);
     }
 
     private RSAKey generateKey() {

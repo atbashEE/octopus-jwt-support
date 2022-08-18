@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,14 +21,12 @@ import be.atbash.ee.security.octopus.keys.generator.KeyGenerator;
 import be.atbash.ee.security.octopus.keys.generator.RSAGenerationParameters;
 import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import be.atbash.util.exception.AtbashIllegalActionException;
-import org.junit.jupiter.api.Assertions;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  *
@@ -71,8 +69,8 @@ public class KeyTypeKeyFilterTest {
 
         List<AtbashKey> data = keyFilter.filter(keys);
 
-        assertThat(data).hasSize(1);
-        assertThat(data.get(0)).isEqualTo(key1);
+        Assertions.assertThat(data).hasSize(1);
+        Assertions.assertThat(data.get(0)).isEqualTo(key1);
 
     }
 
@@ -85,7 +83,7 @@ public class KeyTypeKeyFilterTest {
 
         List<AtbashKey> data = keyFilter.filter(keys);
 
-        assertThat(data).isEmpty();
+        Assertions.assertThat(data).isEmpty();
 
     }
 
@@ -93,13 +91,15 @@ public class KeyTypeKeyFilterTest {
     public void filter_NullArgument() {
 
         keyFilter = new KeyTypeKeyFilter(KeyType.RSA);
-        Assertions.assertThrows(AtbashIllegalActionException.class, () -> keyFilter.filter(null));
+        Assertions.assertThatThrownBy(() -> keyFilter.filter(null))
+                .isInstanceOf(AtbashIllegalActionException.class);
 
     }
 
     @Test
     public void filter_NullKeyType() {
-        Assertions.assertThrows(AtbashIllegalActionException.class, () -> keyFilter = new KeyTypeKeyFilter(null));
+        Assertions.assertThatThrownBy(() -> keyFilter = new KeyTypeKeyFilter(null))
+                .isInstanceOf(AtbashIllegalActionException.class);
 
     }
 

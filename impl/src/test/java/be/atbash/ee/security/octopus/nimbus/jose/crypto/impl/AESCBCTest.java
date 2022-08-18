@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,20 +17,18 @@ package be.atbash.ee.security.octopus.nimbus.jose.crypto.impl;
 
 
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
-import org.junit.jupiter.api.Assertions;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Arrays;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 
 /**
  * Tests the authenticated AES/CBC encryption and decryption methods. Uses test
  * vectors from draft-ietf-jose-json-web-algorithms-10, appendix C.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
 public class AESCBCTest {
@@ -149,7 +147,7 @@ public class AESCBCTest {
     public void testAADLengthComputation()
             throws JOSEException {
 
-        assertThat(AAD.computeLength(AAD_VALUE)).isEqualTo(AAD_LENGTH);
+        Assertions.assertThat(AAD.computeLength(AAD_VALUE)).isEqualTo(AAD_LENGTH);
     }
 
     @Test
@@ -157,12 +155,12 @@ public class AESCBCTest {
 
         SecretKey inputKey = new SecretKeySpec(INPUT_KEY_256, "AES");
 
-        assertThat(inputKey.getEncoded()).withFailMessage("Input key").isEqualTo(INPUT_KEY_256);
+        Assertions.assertThat(inputKey.getEncoded()).withFailMessage("Input key").isEqualTo(INPUT_KEY_256);
 
         AuthenticatedCipherText act = AESCBC.encryptAuthenticated(inputKey, IV, PLAIN_TEXT, AAD_VALUE);
 
-        assertThat(act.getCipherText()).withFailMessage("Cipher text").isEqualTo(CIPHER_TEXT_256);
-        assertThat(act.getAuthenticationTag()).withFailMessage("Auth tag").isEqualTo(AUTH_TAG_256);
+        Assertions.assertThat(act.getCipherText()).withFailMessage("Cipher text").isEqualTo(CIPHER_TEXT_256);
+        Assertions.assertThat(act.getAuthenticationTag()).withFailMessage("Auth tag").isEqualTo(AUTH_TAG_256);
     }
 
     @Test
@@ -170,12 +168,12 @@ public class AESCBCTest {
 
         SecretKey inputKey = new SecretKeySpec(INPUT_KEY_512, "AES");
 
-        assertThat(inputKey.getEncoded()).withFailMessage("Input key").isEqualTo(INPUT_KEY_512);
+        Assertions.assertThat(inputKey.getEncoded()).withFailMessage("Input key").isEqualTo(INPUT_KEY_512);
 
         AuthenticatedCipherText act = AESCBC.encryptAuthenticated(inputKey, IV, PLAIN_TEXT, AAD_VALUE);
 
-        assertThat(act.getCipherText()).withFailMessage("Cipher text").isEqualTo(CIPHER_TEXT_512);
-        assertThat(act.getAuthenticationTag()).withFailMessage("Auth tag").isEqualTo(AUTH_TAG_512);
+        Assertions.assertThat(act.getCipherText()).withFailMessage("Cipher text").isEqualTo(CIPHER_TEXT_512);
+        Assertions.assertThat(act.getAuthenticationTag()).withFailMessage("Auth tag").isEqualTo(AUTH_TAG_512);
     }
 
     @Test
@@ -183,7 +181,7 @@ public class AESCBCTest {
 
         SecretKey inputKey = new SecretKeySpec(INPUT_KEY_256, "AES");
 
-        assertThat(inputKey.getEncoded()).withFailMessage("Input key").isEqualTo(INPUT_KEY_256);
+        Assertions.assertThat(inputKey.getEncoded()).withFailMessage("Input key").isEqualTo(INPUT_KEY_256);
 
         AuthenticatedCipherText act = AESCBC.encryptAuthenticated(inputKey, IV, PLAIN_TEXT, AAD_VALUE);
 
@@ -193,8 +191,9 @@ public class AESCBCTest {
         cipherText[cipherText.length - 1] ^= 0x01;
 
 
-        JOSEException exception = Assertions.assertThrows(JOSEException.class, () -> AESCBC.decryptAuthenticated(inputKey, IV, cipherText, AAD_VALUE, act.getAuthenticationTag()));
-        assertThat(exception.getMessage()).isEqualTo("MAC check failed");
+        Assertions.assertThatThrownBy(() -> AESCBC.decryptAuthenticated(inputKey, IV, cipherText, AAD_VALUE, act.getAuthenticationTag()))
+                .isInstanceOf(JOSEException.class)
+                .hasMessage("MAC check failed");
     }
 
 
@@ -203,7 +202,7 @@ public class AESCBCTest {
 
         SecretKey inputKey = new SecretKeySpec(INPUT_KEY_256, "AES");
 
-        assertThat(inputKey.getEncoded()).withFailMessage("Input key").isEqualTo(INPUT_KEY_256);
+        Assertions.assertThat(inputKey.getEncoded()).withFailMessage("Input key").isEqualTo(INPUT_KEY_256);
         byte[] iv = new byte[16];
         byte[] aad = new byte[8];
         byte[] plaintext = new byte[536870928];
@@ -240,18 +239,19 @@ public class AESCBCTest {
         byte[] newCiphertext = Arrays.copyOfRange(buffer, newAadSize + 16,
                 buffer.length);
 
-        Assertions.assertThrows(JOSEException.class,
-                () -> {
-                    AESCBC.decryptAuthenticated(inputKey, newIv,
-                            newCiphertext, newAad,
-                            authTag // Note that the authTag does NOT change.
+        Assertions.assertThatThrownBy(
+                        () -> {
+                            AESCBC.decryptAuthenticated(inputKey, newIv,
+                                    newCiphertext, newAad,
+                                    authTag // Note that the authTag does NOT change.
                             );
-                    // Reaching this point means that the HMac check is
-                    // bypassed although the decrypted data is different
-                    // from plaintext.
-                    // Assert.assertArrayEquals(decrypted, plaintext);
+                            // Reaching this point means that the HMac check is
+                            // bypassed although the decrypted data is different
+                            // from plaintext.
+                            // Assert.assertArrayEquals(decrypted, plaintext);
 
-                });
+                        })
+                .isInstanceOf(JOSEException.class);
     }
 
 }

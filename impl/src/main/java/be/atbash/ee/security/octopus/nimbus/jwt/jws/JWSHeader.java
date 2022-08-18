@@ -69,9 +69,6 @@ import java.util.*;
 public final class JWSHeader extends CommonJWTHeader {
 
 
-    private static final long serialVersionUID = 1L;
-
-
     /**
      * Builder for constructing JSON Web Signature (JWS) headers.
      *

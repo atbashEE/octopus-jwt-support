@@ -27,9 +27,9 @@ import be.atbash.util.PublicAPI;
 import be.atbash.util.StringUtils;
 import be.atbash.util.exception.AtbashUnexpectedException;
 import be.atbash.util.resource.ResourceUtil;
-
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -255,24 +255,18 @@ public class KeyWriter {
         if (file.isDirectory()) {
             throw new KeyResourceLocationException(String.format("Location '%s' denotes a directory and must point to a file", target));
         }
-        if (existingCheck) {
-            if (file.exists()) {
-                throw new KeyResourceLocationException(String.format("File '%s' already exists and overwrite is not allowed for this key resource type", target));
-            }
+        if (existingCheck && file.exists()) {
+            throw new KeyResourceLocationException(String.format("File '%s' already exists and overwrite is not allowed for this key resource type", target));
         }
         boolean fileExists = file.exists();
-        if (fileExists) {
-            if (!file.canWrite()) {
-                throw new KeyResourceLocationException(String.format("File '%s' must be writable", target));
-            }
+        if (fileExists && !file.canWrite()) {
+            throw new KeyResourceLocationException(String.format("File '%s' must be writable", target));
         }
         if (!fileExists) {
 
             File parentDirectory = file.getParentFile();
-            if (!parentDirectory.exists()) {
-                if (!parentDirectory.mkdirs()) {
-                    throw new AtbashUnexpectedException(String.format("Directory %s could not be created", parentDirectory.getAbsolutePath()));
-                }
+            if (!parentDirectory.exists() && !parentDirectory.mkdirs()) {
+                throw new AtbashUnexpectedException(String.format("Directory %s could not be created", parentDirectory.getAbsolutePath()));
             }
         } else {
             if (!file.canRead() || !file.canWrite()) {
@@ -284,10 +278,8 @@ public class KeyWriter {
     }
 
     private void checkKeyPassword(AtbashKey atbashKey, char[] keyPasssword, MissingPasswordException.ObjectType objectType) {
-        if (atbashKey.getSecretKeyType().isAsymmetric() && atbashKey.getSecretKeyType().getAsymmetricPart() == AsymmetricPart.PRIVATE) {
-            if (StringUtils.isEmpty(keyPasssword)) {
-                throw new MissingPasswordException(objectType, "A passphrase is required in order to save the key info");
-            }
+        if (atbashKey.getSecretKeyType().isAsymmetric() && atbashKey.getSecretKeyType().getAsymmetricPart() == AsymmetricPart.PRIVATE && StringUtils.isEmpty(keyPasssword)) {
+            throw new MissingPasswordException(objectType, "A passphrase is required in order to save the key info");
         }
     }
 

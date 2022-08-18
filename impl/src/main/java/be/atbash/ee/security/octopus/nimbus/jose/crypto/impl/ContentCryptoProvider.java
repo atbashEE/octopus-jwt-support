@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,10 +34,10 @@ import java.util.*;
 
 /**
  * JWE content encryption / decryption provider.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
-public class ContentCryptoProvider {
+public final class ContentCryptoProvider {
 
 
     /**
@@ -82,6 +82,9 @@ public class ContentCryptoProvider {
         COMPATIBLE_ENCRYPTION_METHODS = Collections.unmodifiableMap(encsMap);
     }
 
+
+    private ContentCryptoProvider() {
+    }
 
     /**
      * Generates a Content Encryption Key (CEK) for the specified JOSE

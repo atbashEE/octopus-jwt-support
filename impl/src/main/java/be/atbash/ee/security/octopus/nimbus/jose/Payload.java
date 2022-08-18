@@ -24,7 +24,6 @@ import be.atbash.ee.security.octopus.nimbus.util.JSONObjectUtils;
 import jakarta.json.JsonObject;
 import org.slf4j.MDC;
 
-import java.io.Serializable;
 import java.text.ParseException;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -50,7 +49,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  *
  * Based on code by Vladimir Dzhuvinov
  */
-public final class Payload implements Serializable {
+public final class Payload {
 
 
     /**
@@ -95,9 +94,6 @@ public final class Payload implements Serializable {
          */
         SIGNED_JWT
     }
-
-
-    private static final long serialVersionUID = 1L;
 
 
     /**

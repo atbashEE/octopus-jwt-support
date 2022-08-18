@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,8 +29,8 @@ import be.atbash.ee.security.octopus.keys.TestKeys;
 import be.atbash.ee.security.octopus.keys.selector.*;
 import be.atbash.ee.security.octopus.nimbus.jose.KeyTypeException;
 import be.atbash.ee.security.octopus.util.HmacSecretUtil;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.org.lidalia.slf4jext.Level;
@@ -42,8 +42,6 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * This in one of the high level test for testing complete process end to end.
@@ -80,7 +78,7 @@ public class JWSTest {
 
         Payload data = new JWTDecoder().decode(encoded, Payload.class).getData();
 
-        assertThat(payload).isEqualToComparingFieldByField(data);
+        Assertions.assertThat(payload).usingRecursiveComparison().isEqualTo(data);
     }
 
     @Test
@@ -99,7 +97,7 @@ public class JWSTest {
         TestKeySelector keySelector = new TestKeySelector(keyManager);  // Using TestKeySelector with ListKeyManager is more realistic for Key selection
         Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector).getData();
 
-        assertThat(payload).isEqualToComparingFieldByField(data);
+        Assertions.assertThat(payload).usingRecursiveComparison().isEqualTo(data);
     }
 
     @Test
@@ -121,7 +119,8 @@ public class JWSTest {
         String encoded = new JWTEncoder().encode(payload, parameters);
 
         KeySelector keySelector = new SingleKeySelector(key2);
-        Assertions.assertThrows(InvalidJWTException.class, () -> new JWTDecoder().decode(encoded, Payload.class, keySelector));
+        Assertions.assertThatThrownBy(() -> new JWTDecoder().decode(encoded, Payload.class, keySelector))
+                .isInstanceOf(InvalidJWTException.class);
     }
 
     @Test
@@ -137,7 +136,8 @@ public class JWSTest {
         String updatedEncoded = tamperWithPayload(encoded);
 
         KeySelector keySelector = new SingleKeySelector(key);
-        Assertions.assertThrows(InvalidJWTException.class, () -> new JWTDecoder().decode(updatedEncoded, Payload.class, keySelector));
+        Assertions.assertThatThrownBy(() -> new JWTDecoder().decode(updatedEncoded, Payload.class, keySelector))
+                .isInstanceOf(InvalidJWTException.class);
     }
 
     private String tamperWithPayload(String encoded) {
@@ -159,7 +159,7 @@ public class JWSTest {
         SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PRIVATE).build();
         List<AtbashKey> signKeyList = keyManager.retrieveKeys(criteria);
 
-        assertThat(signKeyList).as("We should have 1 Private key for signing").hasSize(1);
+        Assertions.assertThat(signKeyList).as("We should have 1 Private key for signing").hasSize(1);
 
         JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS)
                 .withSecretKeyForSigning(signKeyList.get(0))
@@ -169,7 +169,7 @@ public class JWSTest {
 
         // Check algo in header
         String header = new String(Base64.getDecoder().decode(encoded.split("\\.")[0]));
-        assertThat(header).contains("\"alg\":\"RS256\"");
+        Assertions.assertThat(header).contains("\"alg\":\"RS256\"");
 
         criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PUBLIC).build();
         List<AtbashKey> publicList = keyManager.retrieveKeys(criteria);
@@ -177,7 +177,7 @@ public class JWSTest {
         KeySelector keySelector = new SingleKeySelector(publicList.get(0));
         Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector).getData();
 
-        assertThat(payload).isEqualToComparingFieldByField(data);
+        Assertions.assertThat(payload).usingRecursiveComparison().isEqualTo(data);
     }
 
     @Test
@@ -191,7 +191,7 @@ public class JWSTest {
         SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PRIVATE).build();
         List<AtbashKey> signKeyList = keyManager.retrieveKeys(criteria);
 
-        assertThat(signKeyList).as("We should have 1 Private key for signing").hasSize(1);
+        Assertions.assertThat(signKeyList).as("We should have 1 Private key for signing").hasSize(1);
 
         JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS)
                 .withSecretKeyForSigning(signKeyList.get(0))
@@ -201,7 +201,7 @@ public class JWSTest {
 
         // Check algo in header
         String header = new String(Base64.getDecoder().decode(encoded.split("\\.")[0]));
-        assertThat(header).contains("\"alg\":\"PS512\"");
+        Assertions.assertThat(header).contains("\"alg\":\"PS512\"");
 
         criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PUBLIC).build();
         List<AtbashKey> publicList = keyManager.retrieveKeys(criteria);
@@ -209,7 +209,7 @@ public class JWSTest {
         KeySelector keySelector = new SingleKeySelector(publicList.get(0));
         Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector).getData();
 
-        assertThat(payload).isEqualToComparingFieldByField(data);
+        Assertions.assertThat(payload).usingRecursiveComparison().isEqualTo(data);
     }
 
     @Test
@@ -222,7 +222,7 @@ public class JWSTest {
         SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PRIVATE).build();
         List<AtbashKey> signKeyList = keyManager.retrieveKeys(criteria);
 
-        assertThat(signKeyList).as("We should have 1 Private key for signing").hasSize(1);
+        Assertions.assertThat(signKeyList).as("We should have 1 Private key for signing").hasSize(1);
 
         JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS)
                 .withSecretKeyForSigning(signKeyList.get(0))
@@ -238,7 +238,8 @@ public class JWSTest {
         List<AtbashKey> publicList = keyManager.retrieveKeys(criteria);
 
         KeySelector keySelector = new SingleKeySelector(publicList.get(0));
-        Assertions.assertThrows(InvalidJWTException.class, () -> new JWTDecoder().decode(encoded, Payload.class, keySelector));
+        Assertions.assertThatThrownBy(() -> new JWTDecoder().decode(encoded, Payload.class, keySelector))
+                .isInstanceOf(InvalidJWTException.class);
     }
 
     @Test
@@ -251,7 +252,7 @@ public class JWSTest {
         SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PRIVATE).build();
         List<AtbashKey> signKeyList = keyManager.retrieveKeys(criteria);
 
-        assertThat(signKeyList).as("We should have 1 Private key for signing").hasSize(1);
+        Assertions.assertThat(signKeyList).as("We should have 1 Private key for signing").hasSize(1);
 
         JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS)
                 .withSecretKeyForSigning(signKeyList.get(0))
@@ -265,7 +266,8 @@ public class JWSTest {
         List<AtbashKey> publicList = keyManager.retrieveKeys(criteria);
 
         KeySelector keySelector = new SingleKeySelector(publicList.get(0));
-        Assertions.assertThrows(InvalidJWTException.class, () -> new JWTDecoder().decode(updatedEncoded, Payload.class, keySelector));
+        Assertions.assertThatThrownBy(() -> new JWTDecoder().decode(updatedEncoded, Payload.class, keySelector))
+                .isInstanceOf(InvalidJWTException.class);
 
     }
 
@@ -283,7 +285,8 @@ public class JWSTest {
                 .withSecretKeyForSigning(signKeyList.get(0))
                 .build();
 
-        Assertions.assertThrows(KeyTypeException.class, () -> new JWTEncoder().encode(payload, parameters));
+        Assertions.assertThatThrownBy(() -> new JWTEncoder().encode(payload, parameters))
+                .isInstanceOf(KeyTypeException.class);
 
     }
 
@@ -297,7 +300,7 @@ public class JWSTest {
         SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PRIVATE).build();
         List<AtbashKey> signKeyList = keyManager.retrieveKeys(criteria);
 
-        assertThat(signKeyList).as("We should have 1 Private key for signing").hasSize(1);
+        Assertions.assertThat(signKeyList).as("We should have 1 Private key for signing").hasSize(1);
 
         JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS)
                 .withSecretKeyForSigning(signKeyList.get(0))
@@ -307,7 +310,7 @@ public class JWSTest {
 
         // check algo in header
         String header = new String(Base64.getDecoder().decode(encoded.split("\\.")[0]));
-        assertThat(header).contains("\"alg\":\"ES256\"");
+        Assertions.assertThat(header).contains("\"alg\":\"ES256\"");
 
         criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PUBLIC).build();
         List<AtbashKey> publicList = keyManager.retrieveKeys(criteria);
@@ -315,7 +318,7 @@ public class JWSTest {
         KeySelector keySelector = new SingleKeySelector(publicList.get(0));
         Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector).getData();
 
-        assertThat(payload).isEqualToComparingFieldByField(data);
+        Assertions.assertThat(payload).usingRecursiveComparison().isEqualTo(data);
     }
 
     @Test
@@ -328,7 +331,7 @@ public class JWSTest {
         SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PRIVATE).build();
         List<AtbashKey> signKeyList = keyManager.retrieveKeys(criteria);
 
-        assertThat(signKeyList).as("We should have 1 Private key for signing").hasSize(1);
+        Assertions.assertThat(signKeyList).as("We should have 1 Private key for signing").hasSize(1);
 
         JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS)
                 .withSecretKeyForSigning(signKeyList.get(0))
@@ -338,7 +341,7 @@ public class JWSTest {
 
         // check algo in header
         String header = new String(Base64.getDecoder().decode(encoded.split("\\.")[0]));
-        assertThat(header).contains("\"alg\":\"ES512\"");
+        Assertions.assertThat(header).contains("\"alg\":\"ES512\"");
 
         criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PUBLIC).build();
         List<AtbashKey> publicList = keyManager.retrieveKeys(criteria);
@@ -346,7 +349,7 @@ public class JWSTest {
         KeySelector keySelector = new SingleKeySelector(publicList.get(0));
         Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector).getData();
 
-        assertThat(payload).isEqualToComparingFieldByField(data);
+        Assertions.assertThat(payload).usingRecursiveComparison().isEqualTo(data);
     }
 
     @Test
@@ -359,7 +362,7 @@ public class JWSTest {
         SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PRIVATE).build();
         List<AtbashKey> signKeyList = keyManager.retrieveKeys(criteria);
 
-        assertThat(signKeyList).as("We should have 1 Private key for signing").hasSize(1);
+        Assertions.assertThat(signKeyList).as("We should have 1 Private key for signing").hasSize(1);
 
         JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS)
                 .withSecretKeyForSigning(signKeyList.get(0))
@@ -374,7 +377,8 @@ public class JWSTest {
         List<AtbashKey> publicList = keyManager.retrieveKeys(criteria);
 
         KeySelector keySelector = new SingleKeySelector(publicList.get(0));
-        Assertions.assertThrows(InvalidJWTException.class, () -> new JWTDecoder().decode(encoded, Payload.class, keySelector));
+        Assertions.assertThatThrownBy(() -> new JWTDecoder().decode(encoded, Payload.class, keySelector))
+                .isInstanceOf(InvalidJWTException.class);
     }
 
     @Test
@@ -387,7 +391,7 @@ public class JWSTest {
         SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PRIVATE).build();
         List<AtbashKey> signKeyList = keyManager.retrieveKeys(criteria);
 
-        assertThat(signKeyList).as("We should have 1 Private key for signing").hasSize(1);
+        Assertions.assertThat(signKeyList).as("We should have 1 Private key for signing").hasSize(1);
 
         JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS)
                 .withSecretKeyForSigning(signKeyList.get(0))
@@ -401,7 +405,8 @@ public class JWSTest {
         List<AtbashKey> publicList = keyManager.retrieveKeys(criteria);
 
         KeySelector keySelector = new SingleKeySelector(publicList.get(0));
-        Assertions.assertThrows(InvalidJWTException.class, () -> new JWTDecoder().decode(updatedEncoded, Payload.class, keySelector));
+        Assertions.assertThatThrownBy(() -> new JWTDecoder().decode(updatedEncoded, Payload.class, keySelector))
+                .isInstanceOf(InvalidJWTException.class);
 
     }
 
@@ -419,7 +424,8 @@ public class JWSTest {
                 .withSecretKeyForSigning(signKeyList.get(0))
                 .build();
 
-        Assertions.assertThrows(KeyTypeException.class, () -> new JWTEncoder().encode(payload, parameters));
+        Assertions.assertThatThrownBy(() -> new JWTEncoder().encode(payload, parameters))
+                .isInstanceOf(KeyTypeException.class);
 
     }
 
@@ -433,13 +439,14 @@ public class JWSTest {
         SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PRIVATE).build();
         List<AtbashKey> signKeyList = keyManager.retrieveKeys(criteria);
 
-        assertThat(signKeyList).as("We should have 1 Private key for signing").hasSize(1);
+        Assertions.assertThat(signKeyList).as("We should have 1 Private key for signing").hasSize(1);
 
         JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS)
                 .withSecretKeyForSigning(signKeyList.get(0))
                 .build();
 
-        Assertions.assertThrows(UnsupportedECCurveException.class, () -> new JWTEncoder().encode(payload, parameters));
+        Assertions.assertThatThrownBy(() -> new JWTEncoder().encode(payload, parameters))
+                .isInstanceOf(UnsupportedECCurveException.class);
     }
 
     @Test
@@ -452,7 +459,7 @@ public class JWSTest {
         SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PRIVATE).build();
         List<AtbashKey> signKeyList = keyManager.retrieveKeys(criteria);
 
-        assertThat(signKeyList).as("We should have 1 Private key for signing").hasSize(1);
+        Assertions.assertThat(signKeyList).as("We should have 1 Private key for signing").hasSize(1);
 
         JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS)
                 .withSecretKeyForSigning(signKeyList.get(0))
@@ -462,11 +469,12 @@ public class JWSTest {
 
         keys.clear();  // remove all keys
         KeySelector keySelector = new TestKeySelector(keyManager);
-        Assertions.assertThrows(InvalidJWTException.class, () -> new JWTDecoder().decode(encoded, Payload.class, keySelector));
+        Assertions.assertThatThrownBy(() -> new JWTDecoder().decode(encoded, Payload.class, keySelector))
+                .isInstanceOf(InvalidJWTException.class);
 
-        assertThat(logger.getLoggingEvents()).hasSize(1);
-        assertThat(logger.getLoggingEvents().get(0).getLevel()).isEqualTo(Level.ERROR);
-        assertThat(logger.getLoggingEvents().get(0).getMessage()).isEqualTo("(OCT-KEY-010) No or multiple keys found for criteria :\n" +
+        Assertions.assertThat(logger.getLoggingEvents()).hasSize(1);
+        Assertions.assertThat(logger.getLoggingEvents().get(0).getLevel()).isEqualTo(Level.ERROR);
+        Assertions.assertThat(logger.getLoggingEvents().get(0).getMessage()).isEqualTo("(OCT-KEY-010) No or multiple keys found for criteria :\n" +
                 " KeySelectorCriteria{\n" +
                 "     KeyFilter{keyId='sign'}\n" +
                 "     KeyFilter{part='PUBLIC'}\n" +
@@ -482,7 +490,7 @@ public class JWSTest {
         SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PRIVATE).build();
         List<AtbashKey> signKeyList = keyManager.retrieveKeys(criteria);
 
-        assertThat(signKeyList).as("We should have 1 Private key for signing").hasSize(1);
+        Assertions.assertThat(signKeyList).as("We should have 1 Private key for signing").hasSize(1);
 
         JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS)
                 .withSecretKeyForSigning(signKeyList.get(0))
@@ -492,7 +500,7 @@ public class JWSTest {
 
         // Check algo in header
         String header = new String(Base64.getDecoder().decode(encoded.split("\\.")[0]));
-        assertThat(header).contains("\"alg\":\"EdDSA\"");
+        Assertions.assertThat(header).contains("\"alg\":\"EdDSA\"");
 
         criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PUBLIC).build();
         List<AtbashKey> publicList = keyManager.retrieveKeys(criteria);
@@ -500,7 +508,7 @@ public class JWSTest {
         KeySelector keySelector = new SingleKeySelector(publicList.get(0));
         Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector).getData();
 
-        assertThat(payload).isEqualToComparingFieldByField(data);
+        Assertions.assertThat(payload).usingRecursiveComparison().isEqualTo(data);
     }
 
     @Test
@@ -512,7 +520,7 @@ public class JWSTest {
         SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PRIVATE).build();
         List<AtbashKey> signKeyList = keyManager.retrieveKeys(criteria);
 
-        assertThat(signKeyList).as("We should have 1 Private key for signing").hasSize(1);
+        Assertions.assertThat(signKeyList).as("We should have 1 Private key for signing").hasSize(1);
 
         JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS)
                 .withSecretKeyForSigning(signKeyList.get(0))
@@ -523,13 +531,14 @@ public class JWSTest {
 
         // Check algo in header
         String header = new String(Base64.getDecoder().decode(encoded.split("\\.")[0]));
-        assertThat(header).contains("\"alg\":\"EdDSA\"");
+        Assertions.assertThat(header).contains("\"alg\":\"EdDSA\"");
 
         criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PUBLIC).build();
         List<AtbashKey> publicList = keyManager.retrieveKeys(criteria);
 
         KeySelector keySelector = new SingleKeySelector(publicList.get(0));
-        Assertions.assertThrows(InvalidJWTException.class, () -> new JWTDecoder().decode(updatedEncoded, Payload.class, keySelector));
+        Assertions.assertThatThrownBy(() -> new JWTDecoder().decode(updatedEncoded, Payload.class, keySelector))
+                .isInstanceOf(InvalidJWTException.class);
     }
 
     @Test
@@ -541,7 +550,7 @@ public class JWSTest {
         SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID_SIGN).withAsymmetricPart(AsymmetricPart.PRIVATE).build();
         List<AtbashKey> signKeyList = keyManager.retrieveKeys(criteria);
 
-        assertThat(signKeyList).as("We should have 1 Private key for signing").hasSize(1);
+        Assertions.assertThat(signKeyList).as("We should have 1 Private key for signing").hasSize(1);
 
         JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS)
                 .withSecretKeyForSigning(signKeyList.get(0))
@@ -557,6 +566,7 @@ public class JWSTest {
         List<AtbashKey> publicList = keyManager.retrieveKeys(criteria);
 
         KeySelector keySelector = new SingleKeySelector(publicList.get(0));
-        Assertions.assertThrows(InvalidJWTException.class, () -> new JWTDecoder().decode(updatedEncoded, Payload.class, keySelector, null));
+        Assertions.assertThatThrownBy(() -> new JWTDecoder().decode(updatedEncoded, Payload.class, keySelector, null))
+                .isInstanceOf(InvalidJWTException.class);
     }
 }

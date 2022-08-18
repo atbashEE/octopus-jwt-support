@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package be.atbash.ee.security.octopus.nimbus.jose.crypto.impl;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.ee.security.octopus.nimbus.util.ByteUtils;
 import be.atbash.ee.security.octopus.nimbus.util.IntegerUtils;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import javax.crypto.KeyGenerator;
@@ -27,12 +28,10 @@ import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 
 /**
  * Tests the Concatenation KDF.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
 public class ConcatKDFTest {
@@ -61,7 +60,7 @@ public class ConcatKDFTest {
 			(byte) 66, (byte) 111, (byte) 98, (byte) 0, (byte) 0, (byte) 0, (byte) 128
 		};
 
-		assertThat(Arrays.equals(expected, otherInfo)).isTrue();
+        Assertions.assertThat(Arrays.equals(expected, otherInfo)).isTrue();
 	}
 
 	@Test
@@ -83,8 +82,8 @@ public class ConcatKDFTest {
 		int pubInfo = 128;
 		
 		ConcatKDF concatKDF = new ConcatKDF("SHA-256");
-		
-		assertThat(concatKDF.getHashAlgorithm()).isEqualTo("SHA-256");
+
+        Assertions.assertThat(concatKDF.getHashAlgorithm()).isEqualTo("SHA-256");
 		
 		SecretKey derivedKey = concatKDF.deriveKey(
 			new SecretKeySpec(Z, "AES"),
@@ -94,14 +93,14 @@ public class ConcatKDFTest {
 			ConcatKDF.encodeStringData(consumer),
 			ConcatKDF.encodeIntData(pubInfo),
 			ConcatKDF.encodeNoData());
-		
-		assertThat(derivedKey.getEncoded().length * 8).isEqualTo(128);
+
+        Assertions.assertThat(derivedKey.getEncoded().length * 8).isEqualTo(128);
 		
 		byte[] expectedDerivedKey = {
 			(byte) 86, (byte) 170, (byte) 141, (byte) 234, (byte) 248, (byte) 35, (byte) 109, (byte) 32,
 			(byte) 92, (byte) 34, (byte) 40, (byte) 205, (byte) 113, (byte) 167, (byte) 16, (byte) 26};
 
-		assertThat(Arrays.equals(expectedDerivedKey, derivedKey.getEncoded())).isTrue();
+        Assertions.assertThat(Arrays.equals(expectedDerivedKey, derivedKey.getEncoded())).isTrue();
 	}
 
 	@Test
@@ -109,8 +108,8 @@ public class ConcatKDFTest {
 		
 		int digestLength = 256;
 		int keyLength = 521;
-		
-		assertThat(ConcatKDF.computeDigestCycles(digestLength, keyLength)).isEqualTo(3);
+
+        Assertions.assertThat(ConcatKDF.computeDigestCycles(digestLength, keyLength)).isEqualTo(3);
 	}
 
 	@Test
@@ -118,16 +117,16 @@ public class ConcatKDFTest {
 		
 		int digestLength = 256;
 		int keyLength = 128;
-		
-		assertThat(ConcatKDF.computeDigestCycles(digestLength, keyLength)).isEqualTo(1);
+
+        Assertions.assertThat(ConcatKDF.computeDigestCycles(digestLength, keyLength)).isEqualTo(1);
 	}
 
 	@Test
 	public void testEncodeNoData() {
 		
 		byte[] out = ConcatKDF.encodeNoData();
-		
-		assertThat(out.length).isEqualTo(0);
+
+        Assertions.assertThat(out.length).isEqualTo(0);
 	}
 
 	@Test
@@ -135,7 +134,7 @@ public class ConcatKDFTest {
 		
 		byte[] out = ConcatKDF.encodeIntData(1);
 
-		assertThat(Arrays.equals(new byte[]{0, 0, 0, 1}, out)).isTrue();
+        Assertions.assertThat(Arrays.equals(new byte[]{0, 0, 0, 1}, out)).isTrue();
 	}
 
 	@Test
@@ -144,10 +143,10 @@ public class ConcatKDFTest {
 		byte[] out = ConcatKDF.encodeStringData("Hello world!");
 		
 		byte[] length = ByteUtils.subArray(out, 0, 4);
-		assertThat(Arrays.equals(IntegerUtils.toBytes("Hello world!".length()), length)).isTrue();
+        Assertions.assertThat(Arrays.equals(IntegerUtils.toBytes("Hello world!".length()), length)).isTrue();
 		
 		byte[] chars = ByteUtils.subArray(out, 4, out.length - 4);
-		assertThat(Arrays.equals("Hello world!".getBytes(StandardCharsets.UTF_8), chars)).isTrue();
+        Assertions.assertThat(Arrays.equals("Hello world!".getBytes(StandardCharsets.UTF_8), chars)).isTrue();
 	}
 
 	@Test
@@ -156,10 +155,10 @@ public class ConcatKDFTest {
 		byte[] out = ConcatKDF.encodeDataWithLength(new byte[]{0, 1, 2, 3});
 		
 		byte[] length = ByteUtils.subArray(out, 0, 4);
-		assertThat(Arrays.equals(IntegerUtils.toBytes(4), length)).isTrue();
+        Assertions.assertThat(Arrays.equals(IntegerUtils.toBytes(4), length)).isTrue();
 		
 		byte[] data = ByteUtils.subArray(out, 4, out.length - 4);
-		assertThat(Arrays.equals(new byte[]{0, 1, 2, 3}, data)).isTrue();
+        Assertions.assertThat(Arrays.equals(new byte[]{0, 1, 2, 3}, data)).isTrue();
 	}
 
 	@Test
@@ -168,10 +167,10 @@ public class ConcatKDFTest {
 		byte[] out = ConcatKDF.encodeDataWithLength(Base64URLValue.encode(new byte[]{0, 1, 2, 3}));
 		
 		byte[] length = ByteUtils.subArray(out, 0, 4);
-		assertThat(Arrays.equals(IntegerUtils.toBytes(4), length)).isTrue();
+        Assertions.assertThat(Arrays.equals(IntegerUtils.toBytes(4), length)).isTrue();
 		
 		byte[] data = ByteUtils.subArray(out, 4, out.length - 4);
-		assertThat(Arrays.equals(new byte[]{0, 1, 2, 3}, data)).isTrue();
+        Assertions.assertThat(Arrays.equals(new byte[]{0, 1, 2, 3}, data)).isTrue();
 	}
 
 	@Test
@@ -185,29 +184,29 @@ public class ConcatKDFTest {
 		SecretKey sharedKey = keyGenerator.generateKey();
 		
 		SecretKey derivedKey128 = concatKDF.deriveKey(sharedKey, 128, null);
-		assertThat(ByteUtils.bitLength(derivedKey128.getEncoded().length)).isEqualTo(128);
+        Assertions.assertThat(ByteUtils.bitLength(derivedKey128.getEncoded().length)).isEqualTo(128);
 		
 		SecretKey derivedKey256 = concatKDF.deriveKey(sharedKey, 256, null);
-		assertThat(ByteUtils.bitLength(derivedKey256.getEncoded().length)).isEqualTo(256);
+        Assertions.assertThat(ByteUtils.bitLength(derivedKey256.getEncoded().length)).isEqualTo(256);
 	}
 
 	@Test
     public void testComputeDigestCycles() {
-		
-		assertThat(ConcatKDF.computeDigestCycles(256, 128)).isEqualTo(1);
-		assertThat(ConcatKDF.computeDigestCycles(384, 128)).isEqualTo(1);
-		assertThat(ConcatKDF.computeDigestCycles(512, 128)).isEqualTo(1);
-		
-		assertThat(ConcatKDF.computeDigestCycles(256, 256)).isEqualTo(1);
-		assertThat(ConcatKDF.computeDigestCycles(384, 256)).isEqualTo(1);
-		assertThat(ConcatKDF.computeDigestCycles(512, 256)).isEqualTo(1);
-		
-		assertThat(ConcatKDF.computeDigestCycles(256, 384)).isEqualTo(2);
-		assertThat(ConcatKDF.computeDigestCycles(384, 384)).isEqualTo(1);
-		assertThat(ConcatKDF.computeDigestCycles(512, 384)).isEqualTo(1);
-		
-		assertThat(ConcatKDF.computeDigestCycles(256, 512)).isEqualTo(2);
-		assertThat(ConcatKDF.computeDigestCycles(384, 512)).isEqualTo(2);
-		assertThat(ConcatKDF.computeDigestCycles(512, 512)).isEqualTo(1);
-	}
+
+        Assertions.assertThat(ConcatKDF.computeDigestCycles(256, 128)).isEqualTo(1);
+        Assertions.assertThat(ConcatKDF.computeDigestCycles(384, 128)).isEqualTo(1);
+        Assertions.assertThat(ConcatKDF.computeDigestCycles(512, 128)).isEqualTo(1);
+
+        Assertions.assertThat(ConcatKDF.computeDigestCycles(256, 256)).isEqualTo(1);
+        Assertions.assertThat(ConcatKDF.computeDigestCycles(384, 256)).isEqualTo(1);
+        Assertions.assertThat(ConcatKDF.computeDigestCycles(512, 256)).isEqualTo(1);
+
+        Assertions.assertThat(ConcatKDF.computeDigestCycles(256, 384)).isEqualTo(2);
+        Assertions.assertThat(ConcatKDF.computeDigestCycles(384, 384)).isEqualTo(1);
+        Assertions.assertThat(ConcatKDF.computeDigestCycles(512, 384)).isEqualTo(1);
+
+        Assertions.assertThat(ConcatKDF.computeDigestCycles(256, 512)).isEqualTo(2);
+        Assertions.assertThat(ConcatKDF.computeDigestCycles(384, 512)).isEqualTo(2);
+        Assertions.assertThat(ConcatKDF.computeDigestCycles(512, 512)).isEqualTo(1);
+    }
 }

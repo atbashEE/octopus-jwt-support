@@ -36,8 +36,6 @@ import java.text.ParseException;
 public class EncryptedJWT extends JWEObject implements JWT {
 
 
-    private static final long serialVersionUID = 1L;
-
     // Cached JWTClaimsSet
     private JWTClaimsSet claimsSet;
 

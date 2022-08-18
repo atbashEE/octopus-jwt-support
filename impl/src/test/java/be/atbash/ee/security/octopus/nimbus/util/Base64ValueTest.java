@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,13 @@
 package be.atbash.ee.security.octopus.nimbus.util;
 
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 
 /**
  * Tests the Base64URL class.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
 public class Base64ValueTest {
@@ -34,7 +33,7 @@ public class Base64ValueTest {
 
         // Test vector from rfc4648#section-10
         Base64Value b64 = Base64Value.encode("foobar");
-        assertThat(b64.toString()).isEqualTo("Zm9vYmFy");
+        Assertions.assertThat(b64.toString()).isEqualTo("Zm9vYmFy");
     }
 
     @Test
@@ -42,34 +41,23 @@ public class Base64ValueTest {
 
         // Test vector from rfc4648#section-10
         Base64Value b64 = new Base64Value("Zm9vYmFy");
-        assertThat(b64.decodeToString()).isEqualTo("foobar");
+        Assertions.assertThat(b64.decodeToString()).isEqualTo("foobar");
     }
-
-    /*
-	@Test
-    public void testBigIntegerEncodeAndDecode() {
-
-        BigInteger bigInt = new BigInteger("12345678901234567890");
-        Base64Value b64 = Base64Value.encode(bigInt);
-        assertThat(b64.decodeToBigInteger()).isEqualTo(bigInt);
-    }
-
-     */
 
     @Test
     public void testFrom() {
 
         Base64Value b64 = Base64Value.encode("foobar");
-        assertThat(b64.toString()).isEqualTo("Zm9vYmFy");
+        Assertions.assertThat(b64.toString()).isEqualTo("Zm9vYmFy");
 
         Base64Value base64From = Base64Value.from(b64.toString());
-        assertThat(base64From).isEqualTo(b64);
+        Assertions.assertThat(base64From).isEqualTo(b64);
     }
 
     @Test
     public void testFromNull() {
 
-        assertThat(Base64Value.from(null)).isNull();
+        Assertions.assertThat(Base64Value.from(null)).isNull();
     }
 }
 
