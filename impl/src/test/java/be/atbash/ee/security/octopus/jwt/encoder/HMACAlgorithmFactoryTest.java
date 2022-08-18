@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,10 @@ package be.atbash.ee.security.octopus.jwt.encoder;
 
 import be.atbash.config.exception.ConfigurationException;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
-import org.junit.jupiter.api.Assertions;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.security.SecureRandom;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class HMACAlgorithmFactoryTest {
 
@@ -34,7 +32,7 @@ public class HMACAlgorithmFactoryTest {
 
         JWSAlgorithm algorithm = factory.determineOptimalAlgorithm(secret);
 
-        assertThat(algorithm).isEqualTo(JWSAlgorithm.HS256);
+        Assertions.assertThat(algorithm).isEqualTo(JWSAlgorithm.HS256);
     }
 
     @Test
@@ -44,7 +42,7 @@ public class HMACAlgorithmFactoryTest {
 
         JWSAlgorithm algorithm = factory.determineOptimalAlgorithm(secret);
 
-        assertThat(algorithm).isEqualTo(JWSAlgorithm.HS384);
+        Assertions.assertThat(algorithm).isEqualTo(JWSAlgorithm.HS384);
     }
 
     @Test
@@ -56,7 +54,7 @@ public class HMACAlgorithmFactoryTest {
 
         JWSAlgorithm algorithm = factory.determineOptimalAlgorithm(secret);
 
-        assertThat(algorithm).isEqualTo(JWSAlgorithm.HS512);
+        Assertions.assertThat(algorithm).isEqualTo(JWSAlgorithm.HS512);
     }
 
     @Test
@@ -64,9 +62,9 @@ public class HMACAlgorithmFactoryTest {
 
         byte[] secret = defineSecret(184 / 8 + 1);
         HMACAlgorithmFactory factory = new HMACAlgorithmFactory();
-        Assertions.assertThrows(ConfigurationException.class, () -> {
+        Assertions.assertThatThrownBy(() -> {
             factory.determineOptimalAlgorithm(secret);
-        });
+        }).isInstanceOf(ConfigurationException.class);
 
     }
 

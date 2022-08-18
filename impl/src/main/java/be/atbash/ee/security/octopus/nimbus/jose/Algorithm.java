@@ -21,7 +21,6 @@ import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.util.JSONObjectUtils;
 
 import javax.json.JsonObject;
-import java.io.Serializable;
 import java.text.ParseException;
 
 
@@ -36,10 +35,7 @@ import java.text.ParseException;
  *
  * Based on code by Vladimir Dzhuvinov
  */
-public class Algorithm implements Serializable {
-
-
-    private static final long serialVersionUID = 1L;
+public class Algorithm {
 
 
     /**

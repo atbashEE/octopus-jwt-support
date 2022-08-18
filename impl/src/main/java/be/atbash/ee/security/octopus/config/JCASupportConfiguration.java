@@ -75,7 +75,7 @@ public class JCASupportConfiguration extends AbstractConfiguration implements Mo
             // Do we need to recreate the Secure Random after x seconds of usage?
             Integer secureRandomRecreateSeconds = getSecureRandomRecreateSeconds();
             if (secureRandomRecreateSeconds != 0 && task == null) {
-                long recreatePeriod = secureRandomRecreateSeconds * 1000;
+                long recreatePeriod = secureRandomRecreateSeconds * 1000L;
                 task = new TimerTask() {
                     public void run() {
                         synchronized (SECURE_RANDOM_LOCK) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,12 @@ package be.atbash.ee.security.octopus.nimbus.jose.crypto.impl;
 
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.assertj.core.api.Assertions;
 
 
 /**
  * Tests the authenticated cipher text wrapper.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
 public class AuthenticatedCipherTextTest {
@@ -36,8 +36,8 @@ public class AuthenticatedCipherTextTest {
 
         AuthenticatedCipherText act = new AuthenticatedCipherText(cipherText, authTag);
 
-        assertThat(act.getCipherText()).isEqualTo(cipherText);
+        Assertions.assertThat(act.getCipherText()).isEqualTo(cipherText);
 
-        assertThat(act.getAuthenticationTag()).isEqualTo(authTag);
+        Assertions.assertThat(act.getAuthenticationTag()).isEqualTo(authTag);
     }
 }

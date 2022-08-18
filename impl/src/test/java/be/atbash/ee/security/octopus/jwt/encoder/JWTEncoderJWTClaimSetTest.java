@@ -27,12 +27,11 @@ import be.atbash.ee.security.octopus.keys.selector.SelectorCriteria;
 import be.atbash.ee.security.octopus.nimbus.jose.HeaderParameterNames;
 import be.atbash.ee.security.octopus.nimbus.jwt.JWTClaimsSet;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 // Test JWTEncoder with JWTClaimSet
 public class JWTEncoderJWTClaimSetTest {
@@ -61,7 +60,7 @@ public class JWTEncoderJWTClaimSetTest {
         SelectorCriteria criteria = SelectorCriteria.newBuilder().withAsymmetricPart(AsymmetricPart.PRIVATE).build();
         List<AtbashKey> keyList = keyManager.retrieveKeys(criteria);
 
-        assertThat(keyList).as("We should have 1 Private key").hasSize(1);
+        Assertions.assertThat(keyList).as("We should have 1 Private key").hasSize(1);
 
         JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS)
                 .withSecretKeyForSigning(keyList.get(0))
@@ -71,21 +70,21 @@ public class JWTEncoderJWTClaimSetTest {
         String encoded = encoder.encode(jwtClaimsSet, parameters);
 
         String[] jwtParts = encoded.split("\\.");
-        assertThat(jwtParts).hasSize(3);
+        Assertions.assertThat(jwtParts).hasSize(3);
 
         Map<String, Object> header = getJson(jwtParts[0]);
 
-        assertThat(header).hasSize(3);
-        assertThat(header).containsEntry(HeaderParameterNames.ALGORITHM, "RS256");
-        assertThat(header).containsEntry("kid", "kid");
-        assertThat(header).containsEntry("typ", "JWT");
+        Assertions.assertThat(header).hasSize(3);
+        Assertions.assertThat(header).containsEntry(HeaderParameterNames.ALGORITHM, "RS256");
+        Assertions.assertThat(header).containsEntry("kid", "kid");
+        Assertions.assertThat(header).containsEntry("typ", "JWT");
 
         Map<String, Object> content = getJson(jwtParts[1]);
-        assertThat(content).hasSize(4);
-        assertThat(content).containsEntry("iss", "http://atbash.be");
-        assertThat(content).containsEntry("aud", "someClient");
-        assertThat(content).containsEntry("sub", "theSubject");
-        assertThat(content).containsKey("exp");
+        Assertions.assertThat(content).hasSize(4);
+        Assertions.assertThat(content).containsEntry("iss", "http://atbash.be");
+        Assertions.assertThat(content).containsEntry("aud", "someClient");
+        Assertions.assertThat(content).containsEntry("sub", "theSubject");
+        Assertions.assertThat(content).containsKey("exp");
 
     }
 
@@ -106,15 +105,15 @@ public class JWTEncoderJWTClaimSetTest {
         String encoded = encoder.encode(jwtClaimsSet, parameters);
 
         String[] jwtParts = encoded.split("\\.");
-        assertThat(jwtParts).hasSize(5);
+        Assertions.assertThat(jwtParts).hasSize(5);
 
         Map<String, Object> header = getJson(jwtParts[0]);
 
-        assertThat(header).hasSize(4);
-        assertThat(header).containsEntry(HeaderParameterNames.ALGORITHM, "RSA-OAEP-256");
-        assertThat(header).containsEntry(HeaderParameterNames.KEY_ID, "encrypt");
-        assertThat(header).containsEntry(HeaderParameterNames.CONTENT_TYPE, "JWT");
-        assertThat(header).containsEntry(HeaderParameterNames.ENCRYPTION_ALGORITHM, "A256GCM");
+        Assertions.assertThat(header).hasSize(4);
+        Assertions.assertThat(header).containsEntry(HeaderParameterNames.ALGORITHM, "RSA-OAEP-256");
+        Assertions.assertThat(header).containsEntry(HeaderParameterNames.KEY_ID, "encrypt");
+        Assertions.assertThat(header).containsEntry(HeaderParameterNames.CONTENT_TYPE, "JWT");
+        Assertions.assertThat(header).containsEntry(HeaderParameterNames.ENCRYPTION_ALGORITHM, "A256GCM");
 
         // The rest is really not decipherable.
     }
@@ -126,7 +125,7 @@ public class JWTEncoderJWTClaimSetTest {
         SelectorCriteria criteria = SelectorCriteria.newBuilder().withAsymmetricPart(AsymmetricPart.PRIVATE).build();
         List<AtbashKey> keyList = keyManager.retrieveKeys(criteria);
 
-        assertThat(keyList).as("We should have 1 Private key").hasSize(1);
+        Assertions.assertThat(keyList).as("We should have 1 Private key").hasSize(1);
 
         return keyList.get(0);
     }
@@ -138,7 +137,7 @@ public class JWTEncoderJWTClaimSetTest {
         SelectorCriteria criteria = SelectorCriteria.newBuilder().withAsymmetricPart(AsymmetricPart.PUBLIC).build();
         List<AtbashKey> keyList = keyManager.retrieveKeys(criteria);
 
-        assertThat(keyList).as("We should have 1 Public key").hasSize(1);
+        Assertions.assertThat(keyList).as("We should have 1 Public key").hasSize(1);
 
         return keyList.get(0);
     }

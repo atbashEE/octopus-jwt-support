@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,9 @@
 package be.atbash.ee.security.octopus.keys.generator;
 
 import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.assertj.core.api.Assertions;
 
 public class RSAGenerationParametersTest {
 
@@ -30,19 +29,19 @@ public class RSAGenerationParametersTest {
                 .withKeySize(124)
                 .build();
 
-        assertThat(parameters).isNotNull();
-        assertThat(parameters.getKid()).isEqualTo("kid");
-        assertThat(parameters.getKeyType()).isEqualTo(KeyType.RSA);
-        assertThat(parameters.getKeySize()).isEqualTo(124);
+        Assertions.assertThat(parameters).isNotNull();
+        Assertions.assertThat(parameters.getKid()).isEqualTo("kid");
+        Assertions.assertThat(parameters.getKeyType()).isEqualTo(KeyType.RSA);
+        Assertions.assertThat(parameters.getKeySize()).isEqualTo(124);
 
     }
 
     @Test
     public void rsaGenerationParameters_kidRequired() {
-        Assertions.assertThrows(KeyGenerationParameterException.class, () -> new RSAGenerationParameters.RSAGenerationParametersBuilder()
+        Assertions.assertThatThrownBy(() -> new RSAGenerationParameters.RSAGenerationParametersBuilder()
                 .withKeySize(124)
                 .build()
-        );
+        ).isInstanceOf(KeyGenerationParameterException.class);
     }
 
     @Test
@@ -51,10 +50,10 @@ public class RSAGenerationParametersTest {
                 .withKeyId("kid")
                 .build();
 
-        assertThat(parameters).isNotNull();
-        assertThat(parameters.getKid()).isEqualTo("kid");
-        assertThat(parameters.getKeyType()).isEqualTo(KeyType.RSA);
-        assertThat(parameters.getKeySize()).isEqualTo(2048);
+        Assertions.assertThat(parameters).isNotNull();
+        Assertions.assertThat(parameters.getKid()).isEqualTo("kid");
+        Assertions.assertThat(parameters.getKeyType()).isEqualTo(KeyType.RSA);
+        Assertions.assertThat(parameters.getKeySize()).isEqualTo(2048);
 
     }
 }

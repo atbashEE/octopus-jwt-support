@@ -20,7 +20,6 @@ import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.nimbus.util.JSONObjectUtils;
 
 import javax.json.*;
-import java.io.Serializable;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.text.ParseException;
@@ -58,11 +57,7 @@ import java.util.*;
  *
  * Based on code by Vladimir Dzhuvinov and Vedran Pavic
  */
-public class JWKSet implements Serializable {
-
-
-    private static final long serialVersionUID = 1L;
-
+public class JWKSet {
 
     /**
      * The MIME type of JWK set objects:

@@ -21,18 +21,19 @@ import be.atbash.ee.security.octopus.keys.TestPasswordLookup;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.keys.selector.SecretKeyType;
 import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
-import org.junit.jupiter.api.Assertions;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 class KeyReaderPEMTest {
 
-    private KeyReaderPEM reader = new KeyReaderPEM();
+    private final KeyReaderPEM reader = new KeyReaderPEM();
 
     @Test
     public void readResource() {
-        Assertions.assertThrows(ResourceNotFoundException.class, () -> reader.readResource("./not-existent", new TestPasswordLookup()));
+        Assertions.assertThatThrownBy(() -> reader.readResource("./not-existent", new TestPasswordLookup()))
+                .isInstanceOf(ResourceNotFoundException.class);
     }
 
     @Test
@@ -47,8 +48,8 @@ class KeyReaderPEMTest {
                 "kQIDAQAB\n" +
                 "-----END PUBLIC KEY-----\n";
         List<AtbashKey> atbashKeys = reader.parseContent(content, null);
-        Assertions.assertEquals(1, atbashKeys.size());
-        Assertions.assertEquals(new SecretKeyType(KeyType.RSA, AsymmetricPart.PUBLIC), atbashKeys.get(0).getSecretKeyType());
+        Assertions.assertThat(atbashKeys).hasSize(1);
+        Assertions.assertThat(atbashKeys.get(0).getSecretKeyType()).isEqualTo(new SecretKeyType(KeyType.RSA, AsymmetricPart.PUBLIC));
     }
 
 }

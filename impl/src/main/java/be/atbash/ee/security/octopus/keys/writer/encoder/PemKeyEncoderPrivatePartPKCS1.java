@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ public class PemKeyEncoderPrivatePartPKCS1 implements KeyEncoder {
 	 * can be used in combination with DES to use DES3 with EDE. Examples:
 	 * AES-192-ECB or DES-EDE3.
                 */
-        String encryptionAlg = parameters.getValue("PKCS1.encryption", String.class);
+        String encryptionAlg = parameters.getValue("PKCS1.encryption");
         JcaMiscPEMGenerator generator;
         if (StringUtils.isEmpty(encryptionAlg)) {
             // No encryption, Unencrypted format (SSLeay format?)

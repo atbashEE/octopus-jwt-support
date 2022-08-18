@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ import javax.json.bind.JsonbBuilder;
 import java.util.Base64;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.assertj.core.api.Assertions;
 
 public class AtbashKeyWriterTest {
 
@@ -45,9 +45,7 @@ public class AtbashKeyWriterTest {
         SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID).withAsymmetricPart(AsymmetricPart.PRIVATE).build();
         List<AtbashKey> keyList = keyManager.retrieveKeys(criteria);
 
-        assertThat(keyList).
-
-                hasSize(1);
+        Assertions.assertThat(keyList).hasSize(1);
 
         JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.NONE).build();
         String json = new JWTEncoder().encode(keyList.get(0), parameters);
@@ -55,13 +53,13 @@ public class AtbashKeyWriterTest {
         Jsonb jsonb = JsonbBuilder.create();
         JsonObject data = jsonb.fromJson(json, JsonObject.class);
 
-        assertThat(data.getString("kid")).isEqualTo(KID);
+        Assertions.assertThat(data.getString("kid")).isEqualTo(KID);
 
         String key = new String(Base64.getDecoder().decode(data.getString("key")));
 
         data = jsonb.fromJson(key, JsonObject.class);
 
-        assertThat(data.keySet()).containsOnly("p", "kty", "q", "d", "e", "kid", "qi", "dp", "dq", "n");
+        Assertions.assertThat(data.keySet()).containsOnly("p", "kty", "q", "d", "e", "kid", "qi", "dp", "dq", "n");
 
 
     }

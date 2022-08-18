@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.spec.ECParameterSpec;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.assertj.core.api.Assertions;
 
 
 public class ECUtilsTest {
@@ -61,6 +61,6 @@ public class ECUtilsTest {
 
         ECPublicKey ephemeralPublicKey = generateECPublicKey(Curve.P_256);
         ECPrivateKey privateKey = generateECPrivateKey(Curve.P_256);
-        assertThat(ECUtils.isPointOnCurve(ephemeralPublicKey, privateKey)).isTrue();
+        Assertions.assertThat(ECUtils.isPointOnCurve(ephemeralPublicKey, privateKey)).isTrue();
     }
 }

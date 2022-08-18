@@ -132,7 +132,7 @@ public class Base64URLValue extends Base64Value {
     public byte[] decode() {
 
         try {
-            return Base64.getUrlDecoder().decode(value.replaceAll("\n", ""));
+            return Base64.getUrlDecoder().decode(value.replace("\n", ""));
         } catch (IllegalArgumentException e) {
             // assuming all illegal argumentExceptions come from this cause.
             throw new InvalidBase64ValueException(e.getMessage());

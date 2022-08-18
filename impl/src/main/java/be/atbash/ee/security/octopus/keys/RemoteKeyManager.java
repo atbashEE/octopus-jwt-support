@@ -49,30 +49,27 @@ public class RemoteKeyManager extends AbstractKeyManager implements KeyManager {
 
         List<AtbashKey> result = new ArrayList<>();
 
-        if (selectorCriteria.getJku() != null) {
+        if (selectorCriteria.getJku() != null && validator.validate(selectorCriteria.getJku())) {
 
-            if (validator.validate(selectorCriteria.getJku())) {
+            List<KeyFilter> filters = selectorCriteria.asKeyFilters();
+            JWKSet jwkSet = getJWKSet(selectorCriteria.getJku());
 
-                List<KeyFilter> filters = selectorCriteria.asKeyFilters();
-                JWKSet jwkSet = getJWKSet(selectorCriteria.getJku());
+            if (jwkSet != null) {
+                result = filterKeys(jwkSet.getAtbashKeys(), filters);
 
-                if (jwkSet != null) {
-                    result = filterKeys(jwkSet.getAtbashKeys(), filters);
+                if (result.isEmpty()) {
+                    // Not found in the jwkSet, maybe cache needs to be expired and reread
 
-                    if (result.isEmpty()) {
-                        // Not found in the jwkSet, maybe cache needs to be expired and reread
+                    dropCache(selectorCriteria.getJku());
+                    jwkSet = getJWKSet(selectorCriteria.getJku());
 
-                        dropCache(selectorCriteria.getJku());
-                        jwkSet = getJWKSet(selectorCriteria.getJku());
-
-                        if (jwkSet != null) {
-                            result = filterKeys(jwkSet.getAtbashKeys(), filters);
-                        }
-
+                    if (jwkSet != null) {
+                        result = filterKeys(jwkSet.getAtbashKeys(), filters);
                     }
-                }
 
+                }
             }
+
         }
 
         return result;
@@ -83,11 +80,7 @@ public class RemoteKeyManager extends AbstractKeyManager implements KeyManager {
     }
 
     private JWKSet getJWKSet(URI jku) {
-        JWKSetCache cache = remoteJWKSetCache.get(jku);
-        if (cache == null) {
-            cache = new JWKSetCache();
-            remoteJWKSetCache.put(jku, cache);
-        }
+        JWKSetCache cache = remoteJWKSetCache.computeIfAbsent(jku, p -> new JWKSetCache());
         JWKSet jwkSet = cache.get();
         if (jwkSet == null) {  // expired?
             try {

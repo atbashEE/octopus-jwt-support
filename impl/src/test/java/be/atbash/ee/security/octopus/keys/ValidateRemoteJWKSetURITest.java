@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,17 @@
  */
 package be.atbash.ee.security.octopus.keys;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 import java.util.ArrayList;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class ValidateRemoteJWKSetURITest {
 
     @Test
     void validate() {
         ValidateRemoteJWKSetURI validator = new ValidateRemoteJWKSetURI(new ArrayList<>());
-        assertThat(validator.validate(URI.create("http://localhost"))).isFalse();
+        Assertions.assertThat(validator.validate(URI.create("http://localhost"))).isFalse();
     }
 }

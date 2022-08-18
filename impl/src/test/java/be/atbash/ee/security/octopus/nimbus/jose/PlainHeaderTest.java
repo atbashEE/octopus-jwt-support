@@ -18,6 +18,7 @@ package be.atbash.ee.security.octopus.nimbus.jose;
 
 import be.atbash.ee.security.octopus.nimbus.jwk.JWKIdentifiers;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import javax.json.Json;
@@ -28,8 +29,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 
 /**
@@ -45,23 +44,23 @@ public class PlainHeaderTest {
 
         PlainHeader header = new PlainHeader();
 
-        assertThat(header.getAlgorithm()).isEqualTo(Algorithm.NONE);
-        assertThat(header.getType()).isNull();
-        assertThat(header.getContentType()).isNull();
-        assertThat(header.getCriticalParams()).isNull();
-        assertThat(header.getParsedBase64URL()).isNull();
+        Assertions.assertThat(header.getAlgorithm()).isEqualTo(Algorithm.NONE);
+        Assertions.assertThat(header.getType()).isNull();
+        Assertions.assertThat(header.getContentType()).isNull();
+        Assertions.assertThat(header.getCriticalParams()).isNull();
+        Assertions.assertThat(header.getParsedBase64URL()).isNull();
 
         Base64URLValue b64url = header.toBase64URL();
 
         // Parse back
         header = PlainHeader.parse(b64url);
 
-        assertThat(header.getAlgorithm()).isEqualTo(Algorithm.NONE);
-        assertThat(header.getType()).isNull();
-        assertThat(header.getContentType()).isNull();
-        assertThat(header.getCriticalParams()).isNull();
-        assertThat(header.getParsedBase64URL()).isEqualTo(b64url);
-        assertThat(header.toBase64URL()).isEqualTo(b64url);
+        Assertions.assertThat(header.getAlgorithm()).isEqualTo(Algorithm.NONE);
+        Assertions.assertThat(header.getType()).isNull();
+        Assertions.assertThat(header.getContentType()).isNull();
+        Assertions.assertThat(header.getCriticalParams()).isNull();
+        Assertions.assertThat(header.getParsedBase64URL()).isEqualTo(b64url);
+        Assertions.assertThat(header.toBase64URL()).isEqualTo(b64url);
     }
 
     @Test
@@ -83,42 +82,42 @@ public class PlainHeaderTest {
                 customParams,
                 null);
 
-        assertThat(header.getIncludedParameters()).containsOnly("alg", "typ", "cty", "crit", "xCustom");
+        Assertions.assertThat(header.getIncludedParameters()).containsOnly("alg", "typ", "cty", "crit", "xCustom");
 
 
-        assertThat(header.getAlgorithm()).isEqualTo(Algorithm.NONE);
-        assertThat(header.getType()).isEqualTo(new JOSEObjectType("JWT"));
-        assertThat(header.getContentType()).isEqualTo("application/jwt");
-        assertThat(header.getCriticalParams().size()).isEqualTo(3);
-        assertThat(header.getCustomParameter("xCustom")).isEqualTo("abc");
-        assertThat(header.getCustomParameters().size()).isEqualTo(1);
-        assertThat(header.getParsedBase64URL()).isNull();
+        Assertions.assertThat(header.getAlgorithm()).isEqualTo(Algorithm.NONE);
+        Assertions.assertThat(header.getType()).isEqualTo(new JOSEObjectType("JWT"));
+        Assertions.assertThat(header.getContentType()).isEqualTo("application/jwt");
+        Assertions.assertThat(header.getCriticalParams().size()).isEqualTo(3);
+        Assertions.assertThat(header.getCustomParameter("xCustom")).isEqualTo("abc");
+        Assertions.assertThat(header.getCustomParameters().size()).isEqualTo(1);
+        Assertions.assertThat(header.getParsedBase64URL()).isNull();
 
         Base64URLValue b64url = header.toBase64URL();
 
         // Parse back
         header = PlainHeader.parse(b64url);
 
-        assertThat(header.toBase64URL()).isEqualTo(b64url);
+        Assertions.assertThat(header.toBase64URL()).isEqualTo(b64url);
 
-        assertThat(header.getAlgorithm()).isEqualTo(Algorithm.NONE);
-        assertThat(header.getType()).isEqualTo(new JOSEObjectType("JWT"));
-        assertThat(header.getContentType()).isEqualTo("application/jwt");
-        assertThat(header.getCriticalParams().size()).isEqualTo(3);
-        assertThat(header.getCustomParameter("xCustom")).isEqualTo("abc");
-        assertThat(header.getCustomParameters().size()).isEqualTo(1);
-        assertThat(header.getParsedBase64URL()).isEqualTo(b64url);
+        Assertions.assertThat(header.getAlgorithm()).isEqualTo(Algorithm.NONE);
+        Assertions.assertThat(header.getType()).isEqualTo(new JOSEObjectType("JWT"));
+        Assertions.assertThat(header.getContentType()).isEqualTo("application/jwt");
+        Assertions.assertThat(header.getCriticalParams().size()).isEqualTo(3);
+        Assertions.assertThat(header.getCustomParameter("xCustom")).isEqualTo("abc");
+        Assertions.assertThat(header.getCustomParameters().size()).isEqualTo(1);
+        Assertions.assertThat(header.getParsedBase64URL()).isEqualTo(b64url);
 
         // Copy
         header = new PlainHeader(header);
 
-        assertThat(header.getAlgorithm()).isEqualTo(Algorithm.NONE);
-        assertThat(header.getType()).isEqualTo(new JOSEObjectType("JWT"));
-        assertThat(header.getContentType()).isEqualTo("application/jwt");
-        assertThat(header.getCriticalParams().size()).isEqualTo(3);
-        assertThat(header.getCustomParameter("xCustom")).isEqualTo("abc");
-        assertThat(header.getCustomParameters().size()).isEqualTo(1);
-        assertThat(header.getParsedBase64URL()).isEqualTo(b64url);
+        Assertions.assertThat(header.getAlgorithm()).isEqualTo(Algorithm.NONE);
+        Assertions.assertThat(header.getType()).isEqualTo(new JOSEObjectType("JWT"));
+        Assertions.assertThat(header.getContentType()).isEqualTo("application/jwt");
+        Assertions.assertThat(header.getCriticalParams().size()).isEqualTo(3);
+        Assertions.assertThat(header.getCustomParameter("xCustom")).isEqualTo("abc");
+        Assertions.assertThat(header.getCustomParameters().size()).isEqualTo(1);
+        Assertions.assertThat(header.getParsedBase64URL()).isEqualTo(b64url);
     }
 
     @Test
@@ -137,21 +136,21 @@ public class PlainHeaderTest {
                 parameter("xCustom", "abc").
                 build();
 
-        assertThat(header.getIncludedParameters()).containsOnly("alg", "typ", "cty", "crit", "xCustom");
+        Assertions.assertThat(header.getIncludedParameters()).containsOnly("alg", "typ", "cty", "crit", "xCustom");
 
         Base64URLValue b64url = header.toBase64URL();
 
         // Parse back
         header = PlainHeader.parse(b64url);
 
-        assertThat(header.toBase64URL()).isEqualTo(b64url);
+        Assertions.assertThat(header.toBase64URL()).isEqualTo(b64url);
 
-        assertThat(header.getAlgorithm()).isEqualTo(Algorithm.NONE);
-        assertThat(header.getType()).isEqualTo(new JOSEObjectType("JWT"));
-        assertThat(header.getContentType()).isEqualTo("application/jwt");
-        assertThat(header.getCriticalParams().size()).isEqualTo(3);
-        assertThat(header.getCustomParameter("xCustom")).isEqualTo("abc");
-        assertThat(header.getCustomParameters().size()).isEqualTo(1);
+        Assertions.assertThat(header.getAlgorithm()).isEqualTo(Algorithm.NONE);
+        Assertions.assertThat(header.getType()).isEqualTo(new JOSEObjectType("JWT"));
+        Assertions.assertThat(header.getContentType()).isEqualTo("application/jwt");
+        Assertions.assertThat(header.getCriticalParams().size()).isEqualTo(3);
+        Assertions.assertThat(header.getCustomParameter("xCustom")).isEqualTo("abc");
+        Assertions.assertThat(header.getCustomParameters().size()).isEqualTo(1);
     }
 
     @Test
@@ -163,9 +162,9 @@ public class PlainHeaderTest {
 
         PlainHeader header = PlainHeader.parse(in);
 
-        assertThat(header.toBase64URL()).isEqualTo(in);
+        Assertions.assertThat(header.toBase64URL()).isEqualTo(in);
 
-        assertThat(header.getAlgorithm()).isEqualTo(Algorithm.NONE);
+        Assertions.assertThat(header.getAlgorithm()).isEqualTo(Algorithm.NONE);
     }
 
     @Test
@@ -179,9 +178,9 @@ public class PlainHeaderTest {
                 parameters(customParams).
                 build();
 
-        assertThat(header.getCustomParameter("x")).isEqualTo("1");
-        assertThat(header.getCustomParameter("y")).isEqualTo("2");
-        assertThat(header.getCustomParameters().size()).isEqualTo(2);
+        Assertions.assertThat(header.getCustomParameter("x")).isEqualTo("1");
+        Assertions.assertThat(header.getCustomParameter("y")).isEqualTo("2");
+        Assertions.assertThat(header.getCustomParameters().size()).isEqualTo(2);
     }
 
     @Test
@@ -194,10 +193,10 @@ public class PlainHeaderTest {
         builder.add(HeaderParameterNames.ALGORITHM, Algorithm.NONE.getName());
         builder.addNull(HeaderParameterNames.TYPE);
         JsonObject jsonObject = builder.build();
-        assertThat(jsonObject).hasSize(2);
+        Assertions.assertThat(jsonObject).hasSize(2);
 
         Header header = PlainHeader.parse(jsonObject);
-        assertThat(header.getType()).isNull();
+        Assertions.assertThat(header.getType()).isNull();
     }
 
     @Test
@@ -210,10 +209,10 @@ public class PlainHeaderTest {
         builder.add(HeaderParameterNames.ALGORITHM, Algorithm.NONE.getName());
         builder.addNull(HeaderParameterNames.TYPE);
         JsonObject jsonObject = builder.build();
-        assertThat(jsonObject).hasSize(2);
+        Assertions.assertThat(jsonObject).hasSize(2);
 
         Header header = PlainHeader.parse(jsonObject);
-        assertThat(header.getCriticalParams()).isNull();
+        Assertions.assertThat(header.getCriticalParams()).isNull();
     }
 }
 

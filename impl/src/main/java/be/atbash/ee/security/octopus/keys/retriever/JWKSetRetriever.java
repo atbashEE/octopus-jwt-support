@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,13 +34,13 @@ import java.util.Scanner;
  * The default retriever of resources specified by URL. Provides setting of a
  * HTTP proxy, HTTP connect and read timeouts as well as a size limit of the
  * retrieved entity. Caching header directives are not honoured.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov and Artun Subasi
  */
 public class JWKSetRetriever {
 
-
     private static final Logger LOGGER = LoggerFactory.getLogger(JWKSetRetriever.class);
+    private static final String PARSING_FAILED = "Parsing of content of '%s' failed";
 
     /**
      * The proxy to use when opening the HttpURLConnection. Can be
@@ -176,8 +176,8 @@ public class JWKSetRetriever {
                 try {
                     content = new Scanner(inputStream).useDelimiter("\\Z").next();
                 } catch (NoSuchElementException e) {
-                    LOGGER.warn(String.format("Parsing of content of '%s' failed", url.toExternalForm()));
-                    throw new IOException(String.format("Parsing of content of '%s' failed", url.toExternalForm()));
+                    LOGGER.warn(String.format(PARSING_FAILED, url.toExternalForm()));
+                    throw new IOException(String.format(PARSING_FAILED, url.toExternalForm()));
                 }
             }
 
@@ -193,7 +193,7 @@ public class JWKSetRetriever {
             return JWKSet.parse(content);
 
         } catch (ParseException e) {
-            LOGGER.warn(String.format("Parsing of content of '%s' failed", url.toExternalForm()));
+            LOGGER.warn(String.format(PARSING_FAILED, url.toExternalForm()));
             return null;
         } finally {
             if (connection != null) {

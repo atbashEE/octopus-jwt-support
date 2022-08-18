@@ -20,6 +20,10 @@ import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.ee.security.octopus.nimbus.jose.KeyLengthException;
 import be.atbash.ee.security.octopus.nimbus.jose.KeyTypeException;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.*;
+import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.AESCryptoProvider;
+import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.DirectCryptoProvider;
+import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.ECDHCryptoProvider;
+import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.RSACryptoProvider;
 import be.atbash.ee.security.octopus.nimbus.jose.proc.JWEDecrypterFactory;
 import be.atbash.ee.security.octopus.nimbus.jwk.Curve;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod;
@@ -62,17 +66,17 @@ public class DefaultJWEDecrypterFactory implements JWEDecrypterFactory {
 
     static {
         Set<JWEAlgorithm> algs = new LinkedHashSet<>();
-        algs.addAll(RSADecrypter.SUPPORTED_ALGORITHMS);
-        algs.addAll(ECDHDecrypter.SUPPORTED_ALGORITHMS);
-        algs.addAll(DirectDecrypter.SUPPORTED_ALGORITHMS);
-        algs.addAll(AESDecrypter.SUPPORTED_ALGORITHMS);
+        algs.addAll(RSACryptoProvider.SUPPORTED_ALGORITHMS);
+        algs.addAll(ECDHCryptoProvider.SUPPORTED_ALGORITHMS);
+        algs.addAll(DirectCryptoProvider.SUPPORTED_ALGORITHMS);
+        algs.addAll(AESCryptoProvider.SUPPORTED_ALGORITHMS);
         SUPPORTED_ALGORITHMS = Collections.unmodifiableSet(algs);
 
         Set<EncryptionMethod> encs = new LinkedHashSet<>();
-        encs.addAll(RSADecrypter.SUPPORTED_ENCRYPTION_METHODS);
-        encs.addAll(ECDHDecrypter.SUPPORTED_ENCRYPTION_METHODS);
-        encs.addAll(DirectDecrypter.SUPPORTED_ENCRYPTION_METHODS);
-        encs.addAll(AESDecrypter.SUPPORTED_ENCRYPTION_METHODS);
+        encs.addAll(RSACryptoProvider.SUPPORTED_ENCRYPTION_METHODS);
+        encs.addAll(ECDHCryptoProvider.SUPPORTED_ENCRYPTION_METHODS);
+        encs.addAll(DirectCryptoProvider.SUPPORTED_ENCRYPTION_METHODS);
+        encs.addAll(AESCryptoProvider.SUPPORTED_ENCRYPTION_METHODS);
         SUPPORTED_ENCRYPTION_METHODS = Collections.unmodifiableSet(encs);
     }
 

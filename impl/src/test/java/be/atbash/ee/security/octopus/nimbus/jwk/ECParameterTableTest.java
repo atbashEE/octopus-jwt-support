@@ -16,6 +16,7 @@
 package be.atbash.ee.security.octopus.nimbus.jwk;
 
 
+import org.assertj.core.api.Assertions;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
 import org.bouncycastle.jce.spec.ECNamedCurveSpec;
@@ -23,8 +24,6 @@ import org.junit.jupiter.api.Test;
 
 import java.security.spec.ECParameterSpec;
 import java.util.Arrays;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 
 /**
@@ -48,17 +47,17 @@ public class ECParameterTableTest {
 
             // Lookup
             ECParameterSpec spec = ECParameterTable.get(crv);
-            assertThat(spec).isNotNull();
-            assertThat(spec.getCurve().getField().getFieldSize()).isEqualTo(expectedSpec.getCurve().getField().getFieldSize());
-            assertThat(spec.getCurve().getA()).isEqualTo(expectedSpec.getCurve().getA());
-            assertThat(spec.getCurve().getB()).isEqualTo(expectedSpec.getCurve().getB());
-            assertThat(spec.getGenerator().getAffineX()).isEqualTo(expectedSpec.getGenerator().getAffineX());
-            assertThat(spec.getGenerator().getAffineY()).isEqualTo(expectedSpec.getGenerator().getAffineY());
-            assertThat(spec.getOrder()).isEqualTo(expectedSpec.getOrder());
-            assertThat(spec.getCofactor()).isEqualTo(expectedSpec.getCofactor());
+            Assertions.assertThat(spec).isNotNull();
+            Assertions.assertThat(spec.getCurve().getField().getFieldSize()).isEqualTo(expectedSpec.getCurve().getField().getFieldSize());
+            Assertions.assertThat(spec.getCurve().getA()).isEqualTo(expectedSpec.getCurve().getA());
+            Assertions.assertThat(spec.getCurve().getB()).isEqualTo(expectedSpec.getCurve().getB());
+            Assertions.assertThat(spec.getGenerator().getAffineX()).isEqualTo(expectedSpec.getGenerator().getAffineX());
+            Assertions.assertThat(spec.getGenerator().getAffineY()).isEqualTo(expectedSpec.getGenerator().getAffineY());
+            Assertions.assertThat(spec.getOrder()).isEqualTo(expectedSpec.getOrder());
+            Assertions.assertThat(spec.getCofactor()).isEqualTo(expectedSpec.getCofactor());
 
             // Reverse lookup
-            assertThat(ECParameterTable.get(expectedSpec)).isEqualTo(crv);
+            Assertions.assertThat(ECParameterTable.get(expectedSpec)).isEqualTo(crv);
         }
     }
 }

@@ -24,7 +24,6 @@ import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.ee.security.octopus.nimbus.util.JSONObjectUtils;
 
 import javax.json.JsonObject;
-import java.io.Serializable;
 import java.text.ParseException;
 
 
@@ -34,10 +33,7 @@ import java.text.ParseException;
  * <p>
  * Based on code by Vladimir Dzhuvinov
  */
-public abstract class JOSEObject implements Serializable {
-
-
-    private static final long serialVersionUID = 1L;
+public abstract class JOSEObject {
 
 
     /**

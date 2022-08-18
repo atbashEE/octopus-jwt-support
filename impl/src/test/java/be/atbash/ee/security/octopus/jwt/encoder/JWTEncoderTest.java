@@ -44,8 +44,6 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 public class JWTEncoderTest {
 
     private Payload payload;
@@ -69,9 +67,9 @@ public class JWTEncoderTest {
         String json = encoder.encode(payload, parameters);
 
         // Can't use equals checks as order of elements in JSON aren't defined.
-        assertThat(json).contains("\"number\":42");
-        assertThat(json).contains("\"myList\":[\"permission1\",\"permission2\"]");
-        assertThat(json).contains("\"value\":\"JUnit\"");
+        Assertions.assertThat(json).contains("\"number\":42");
+        Assertions.assertThat(json).contains("\"myList\":[\"permission1\",\"permission2\"]");
+        Assertions.assertThat(json).contains("\"value\":\"JUnit\"");
     }
 
     @Test
@@ -83,21 +81,21 @@ public class JWTEncoderTest {
         JWTEncoder encoder = new JWTEncoder();
         String json = encoder.encode(payload, parameters);
 
-        assertThat(json).endsWith(".");
+        Assertions.assertThat(json).endsWith(".");
         String[] jwtParts = json.split("\\.");
-        assertThat(jwtParts).hasSize(2);
+        Assertions.assertThat(jwtParts).hasSize(2);
 
         Map<String, Object> header = getJson(jwtParts[0]);
-        assertThat(header).hasSize(1);
-        assertThat(header).containsEntry(HeaderParameterNames.ALGORITHM, "none");
+        Assertions.assertThat(header).hasSize(1);
+        Assertions.assertThat(header).containsEntry(HeaderParameterNames.ALGORITHM, "none");
 
         Map<String, Object> content = getJson(jwtParts[1]);
-        assertThat(content).hasSize(3);
-        assertThat(content).containsEntry("number", BigDecimal.valueOf(42));
-        assertThat(content).containsKey("myList");
+        Assertions.assertThat(content).hasSize(3);
+        Assertions.assertThat(content).containsEntry("number", BigDecimal.valueOf(42));
+        Assertions.assertThat(content).containsKey("myList");
         List<String> list = (List<String>) content.get("myList");
-        assertThat(list).containsOnly("permission1", "permission2");
-        assertThat(content).containsEntry("value", "JUnit");
+        Assertions.assertThat(list).containsOnly("permission1", "permission2");
+        Assertions.assertThat(content).containsEntry("value", "JUnit");
 
     }
 
@@ -139,22 +137,22 @@ public class JWTEncoderTest {
         JWTEncoder encoder = new JWTEncoder();
         String json = encoder.encode(jwtClaimsSet, parameters);
 
-        assertThat(json).endsWith(".");
+        Assertions.assertThat(json).endsWith(".");
         String[] jwtParts = json.split("\\.");
-        assertThat(jwtParts).hasSize(2);
+        Assertions.assertThat(jwtParts).hasSize(2);
 
         Map<String, Object> header = getJson(jwtParts[0]);
-        assertThat(header).hasSize(1);
-        assertThat(header).containsEntry(HeaderParameterNames.ALGORITHM, "none");
+        Assertions.assertThat(header).hasSize(1);
+        Assertions.assertThat(header).containsEntry(HeaderParameterNames.ALGORITHM, "none");
 
         Map<String, Object> content = getJson(jwtParts[1]);
-        assertThat(content).hasSize(4);
-        assertThat(content.keySet()).containsOnly("aud", "sub", "iss", "exp");
+        Assertions.assertThat(content).hasSize(4);
+        Assertions.assertThat(content.keySet()).containsOnly("aud", "sub", "iss", "exp");
 
-        assertThat(content.get("aud")).isEqualTo("someClient");
-        assertThat(content.get("sub")).isEqualTo("theSubject");
-        assertThat(content.get("iss")).isEqualTo("http://atbash.be");
-        assertThat(content.get("exp")).isEqualTo(BigDecimal.valueOf(exp.getTime() / 1000));
+        Assertions.assertThat(content.get("aud")).isEqualTo("someClient");
+        Assertions.assertThat(content.get("sub")).isEqualTo("theSubject");
+        Assertions.assertThat(content.get("iss")).isEqualTo("http://atbash.be");
+        Assertions.assertThat(content.get("exp")).isEqualTo(BigDecimal.valueOf(exp.getTime() / 1000));
     }
 
     @Test
@@ -167,22 +165,22 @@ public class JWTEncoderTest {
         String encoded = encoder.encode(payload, parameters);
 
         String[] jwtParts = encoded.split("\\.");
-        assertThat(jwtParts).hasSize(3);
+        Assertions.assertThat(jwtParts).hasSize(3);
 
         Map<String, Object> header = getJson(jwtParts[0]);
 
-        assertThat(header).hasSize(3);
-        assertThat(header).containsEntry(HeaderParameterNames.ALGORITHM, "RS256");
-        assertThat(header).containsEntry("kid", "kid");
-        assertThat(header).containsEntry("typ", "JWT");
+        Assertions.assertThat(header).hasSize(3);
+        Assertions.assertThat(header).containsEntry(HeaderParameterNames.ALGORITHM, "RS256");
+        Assertions.assertThat(header).containsEntry("kid", "kid");
+        Assertions.assertThat(header).containsEntry("typ", "JWT");
 
         Map<String, Object> content = getJson(jwtParts[1]);
-        assertThat(content).hasSize(3);
-        assertThat(content).containsEntry("number", BigDecimal.valueOf(42));
-        assertThat(content).containsKey("myList");
+        Assertions.assertThat(content).hasSize(3);
+        Assertions.assertThat(content).containsEntry("number", BigDecimal.valueOf(42));
+        Assertions.assertThat(content).containsKey("myList");
         List<String> list = (List<String>) content.get("myList");
-        assertThat(list).containsOnly("permission1", "permission2");
-        assertThat(content).containsEntry("value", "JUnit");
+        Assertions.assertThat(list).containsOnly("permission1", "permission2");
+        Assertions.assertThat(content).containsEntry("value", "JUnit");
     }
 
     @Test
@@ -213,7 +211,7 @@ public class JWTEncoderTest {
         SelectorCriteria criteria = SelectorCriteria.newBuilder().withAsymmetricPart(AsymmetricPart.PRIVATE).build();
         List<AtbashKey> keyList = keyManager.retrieveKeys(criteria);
 
-        assertThat(keyList).as("We should have 1 Private key").hasSize(1);
+        Assertions.assertThat(keyList).as("We should have 1 Private key").hasSize(1);
 
         return JWTParametersBuilder.newBuilderFor(JWTEncoding.JWS)
                 .withSecretKeyForSigning(keyList.get(0))
@@ -237,15 +235,15 @@ public class JWTEncoderTest {
         String encoded = encoder.encode(payload, parameters);
 
         String[] jwtParts = encoded.split("\\.");
-        assertThat(jwtParts).hasSize(5);
+        Assertions.assertThat(jwtParts).hasSize(5);
 
         Map<String, Object> header = getJson(jwtParts[0]);
 
-        assertThat(header).hasSize(4);
-        assertThat(header).containsEntry(HeaderParameterNames.ALGORITHM, "RSA-OAEP-256");
-        assertThat(header).containsEntry(HeaderParameterNames.KEY_ID, "encrypt");
-        assertThat(header).containsEntry(HeaderParameterNames.CONTENT_TYPE, "JWT");
-        assertThat(header).containsEntry(HeaderParameterNames.ENCRYPTION_ALGORITHM, "A256GCM");
+        Assertions.assertThat(header).hasSize(4);
+        Assertions.assertThat(header).containsEntry(HeaderParameterNames.ALGORITHM, "RSA-OAEP-256");
+        Assertions.assertThat(header).containsEntry(HeaderParameterNames.KEY_ID, "encrypt");
+        Assertions.assertThat(header).containsEntry(HeaderParameterNames.CONTENT_TYPE, "JWT");
+        Assertions.assertThat(header).containsEntry(HeaderParameterNames.ENCRYPTION_ALGORITHM, "A256GCM");
 
         // The rest is really not decipherable.
     }
@@ -286,7 +284,7 @@ public class JWTEncoderTest {
         SelectorCriteria criteria = SelectorCriteria.newBuilder().withAsymmetricPart(AsymmetricPart.PRIVATE).build();
         List<AtbashKey> keyList = keyManager.retrieveKeys(criteria);
 
-        assertThat(keyList).as("We should have 1 Private key").hasSize(1);
+        Assertions.assertThat(keyList).as("We should have 1 Private key").hasSize(1);
 
         return keyList.get(0);
     }
@@ -298,7 +296,7 @@ public class JWTEncoderTest {
         SelectorCriteria criteria = SelectorCriteria.newBuilder().withAsymmetricPart(AsymmetricPart.PUBLIC).build();
         List<AtbashKey> keyList = keyManager.retrieveKeys(criteria);
 
-        assertThat(keyList).as("We should have 1 Public key").hasSize(1);
+        Assertions.assertThat(keyList).as("We should have 1 Public key").hasSize(1);
 
         return keyList.get(0);
     }
@@ -316,7 +314,7 @@ public class JWTEncoderTest {
         String json = encoder.encode(new MyColor(100, 150, 200), parameters);
 
         JWT jwt = JWTParser.parse(json);
-        assertThat(jwt.getJWTClaimsSet().getStringClaim("value")).isEqualTo("100,150,200");
+        Assertions.assertThat(jwt.getJWTClaimsSet().getStringClaim("value")).isEqualTo("100,150,200");
 
     }
 }

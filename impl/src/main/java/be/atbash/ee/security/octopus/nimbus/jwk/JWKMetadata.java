@@ -39,6 +39,9 @@ import java.util.Set;
 final class JWKMetadata {
 
 
+    private JWKMetadata() {
+    }
+
     /**
      * Parses the JWK type.
      *

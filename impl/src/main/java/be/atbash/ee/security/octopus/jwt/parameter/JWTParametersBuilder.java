@@ -122,10 +122,8 @@ public final class JWTParametersBuilder {
     public JWTParameters build() {
         JWTParameters result;
 
-        if (encoding == JWTEncoding.JWE) {
-            if (password != null) {
-                    defineKeyBasedOnPassword();
-            }
+        if (encoding == JWTEncoding.JWE && password != null) {
+            defineKeyBasedOnPassword();
         }
         validateParameters();
 

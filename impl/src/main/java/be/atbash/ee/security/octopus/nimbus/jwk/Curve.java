@@ -18,7 +18,6 @@ package be.atbash.ee.security.octopus.nimbus.jwk;
 
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 
-import java.io.Serializable;
 import java.security.spec.ECParameterSpec;
 import java.util.Arrays;
 import java.util.Collections;
@@ -53,10 +52,7 @@ import java.util.Set;
  *
  * Based on code by Vladimir Dzhuvinov and Aleksei Doroganov
  */
-public final class Curve implements Serializable {
-
-
-    private static final long serialVersionUID = 1L;
+public final class Curve {
 
 
     /**

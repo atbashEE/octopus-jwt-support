@@ -57,9 +57,6 @@ import java.util.*;
 abstract public class CommonJWTHeader extends Header {
 
 
-    private static final long serialVersionUID = 1L;
-
-
     /**
      * JWK Set URL, {@code null} if not specified.
      */

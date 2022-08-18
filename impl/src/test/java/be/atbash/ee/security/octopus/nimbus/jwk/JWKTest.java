@@ -282,7 +282,7 @@ public class JWKTest {
     }
 
     @Test
-    public void testParseJsonNotJWK() throws ParseException {
+    public void testParseJsonNotJWK() {
         String json = "{\"crv\":\"X448\",\"kid\":\"Dave\",\"x\":\"PreoKbDNIPW8_AtZm2_sz22kYnEHvbDU80W0MCfYuXL8PjT7QjKhPKcG3LV67D2uB73BxnvzNgk\"}";
         Assertions.assertThatThrownBy(
                         () -> JWK.parse(json))

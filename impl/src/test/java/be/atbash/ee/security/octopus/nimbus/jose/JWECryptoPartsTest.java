@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,12 +23,12 @@ import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEHeader;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.assertj.core.api.Assertions;
 
 
 /**
  * Tests the JWE crypto parts class.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
 public class JWECryptoPartsTest {
@@ -45,11 +45,11 @@ public class JWECryptoPartsTest {
         );
 
 
-        assertThat(parts.getHeader()).isNull();
-        assertThat(parts.getEncryptedKey().toString()).isEqualTo("abc");
-        assertThat(parts.getInitializationVector().toString()).isEqualTo("def");
-        assertThat(parts.getCipherText().toString()).isEqualTo("ghi");
-        assertThat(parts.getAuthenticationTag().toString()).isEqualTo("jkl");
+        Assertions.assertThat(parts.getHeader()).isNull();
+        Assertions.assertThat(parts.getEncryptedKey().toString()).isEqualTo("abc");
+        Assertions.assertThat(parts.getInitializationVector().toString()).isEqualTo("def");
+        Assertions.assertThat(parts.getCipherText().toString()).isEqualTo("ghi");
+        Assertions.assertThat(parts.getAuthenticationTag().toString()).isEqualTo("jkl");
     }
 
     @Test
@@ -57,11 +57,11 @@ public class JWECryptoPartsTest {
 
         JWECryptoParts parts = new JWECryptoParts(null, null, new Base64URLValue("abc"), null);
 
-        assertThat(parts.getHeader()).isNull();
-        assertThat(parts.getEncryptedKey()).isNull();
-        assertThat(parts.getInitializationVector()).isNull();
-        assertThat(parts.getCipherText().toString()).isEqualTo("abc");
-        assertThat(parts.getAuthenticationTag()).isNull();
+        Assertions.assertThat(parts.getHeader()).isNull();
+        Assertions.assertThat(parts.getEncryptedKey()).isNull();
+        Assertions.assertThat(parts.getInitializationVector()).isNull();
+        Assertions.assertThat(parts.getCipherText().toString()).isEqualTo("abc");
+        Assertions.assertThat(parts.getAuthenticationTag()).isNull();
     }
 
 
@@ -78,11 +78,11 @@ public class JWECryptoPartsTest {
                 new Base64URLValue("jkl")
         );
 
-        assertThat(parts.getHeader()).isEqualTo(header);
-        assertThat(parts.getEncryptedKey().toString()).isEqualTo("abc");
-        assertThat(parts.getInitializationVector().toString()).isEqualTo("def");
-        assertThat(parts.getCipherText().toString()).isEqualTo("ghi");
-        assertThat(parts.getAuthenticationTag().toString()).isEqualTo("jkl");
+        Assertions.assertThat(parts.getHeader()).isEqualTo(header);
+        Assertions.assertThat(parts.getEncryptedKey().toString()).isEqualTo("abc");
+        Assertions.assertThat(parts.getInitializationVector().toString()).isEqualTo("def");
+        Assertions.assertThat(parts.getCipherText().toString()).isEqualTo("ghi");
+        Assertions.assertThat(parts.getAuthenticationTag().toString()).isEqualTo("jkl");
     }
 
 

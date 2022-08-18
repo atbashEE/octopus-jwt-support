@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,11 @@ package be.atbash.ee.security.octopus.keys.generator;
 
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class KeyGeneratorTest {
 
@@ -43,10 +42,10 @@ public class KeyGeneratorTest {
 
         List<AtbashKey> keys = keyGenerator.generateKeys(generationParameters);
 
-        assertThat(keys).hasSize(2);
+        Assertions.assertThat(keys).hasSize(2);
         for (int i = 0; i < 2; i++) {
-            assertThat(keys.get(i).getSecretKeyType().getKeyType()).isEqualTo(KeyType.RSA);
-            assertThat(keys.get(i).getKeyId()).isEqualTo(KID);
+            Assertions.assertThat(keys.get(i).getSecretKeyType().getKeyType()).isEqualTo(KeyType.RSA);
+            Assertions.assertThat(keys.get(i).getKeyId()).isEqualTo(KID);
         }
     }
 
@@ -59,10 +58,10 @@ public class KeyGeneratorTest {
 
         List<AtbashKey> keys = keyGenerator.generateKeys(generationParameters);
 
-        assertThat(keys).hasSize(2);
+        Assertions.assertThat(keys).hasSize(2);
         for (int i = 0; i < 2; i++) {
-            assertThat(keys.get(i).getSecretKeyType().getKeyType()).isEqualTo(KeyType.EC);
-            assertThat(keys.get(i).getKeyId()).isEqualTo(KID);
+            Assertions.assertThat(keys.get(i).getSecretKeyType().getKeyType()).isEqualTo(KeyType.EC);
+            Assertions.assertThat(keys.get(i).getKeyId()).isEqualTo(KID);
         }
 
     }
@@ -75,10 +74,10 @@ public class KeyGeneratorTest {
 
         List<AtbashKey> keys = keyGenerator.generateKeys(generationParameters);
 
-        assertThat(keys).hasSize(2);
+        Assertions.assertThat(keys).hasSize(2);
         for (int i = 0; i < 2; i++) {
-            assertThat(keys.get(i).getSecretKeyType().getKeyType()).isEqualTo(DHGenerationParameters.DH);
-            assertThat(keys.get(i).getKeyId()).isEqualTo(KID);
+            Assertions.assertThat(keys.get(i).getSecretKeyType().getKeyType()).isEqualTo(DHGenerationParameters.DH);
+            Assertions.assertThat(keys.get(i).getKeyId()).isEqualTo(KID);
         }
     }
 
@@ -90,10 +89,10 @@ public class KeyGeneratorTest {
 
         List<AtbashKey> keys = keyGenerator.generateKeys(generationParameters);
 
-        assertThat(keys).hasSize(1);
+        Assertions.assertThat(keys).hasSize(1);
 
-        assertThat(keys.get(0).getSecretKeyType().getKeyType()).isEqualTo(KeyType.OCT);
-        assertThat(keys.get(0).getKeyId()).isEqualTo(KID);
+        Assertions.assertThat(keys.get(0).getSecretKeyType().getKeyType()).isEqualTo(KeyType.OCT);
+        Assertions.assertThat(keys.get(0).getKeyId()).isEqualTo(KID);
 
     }
 
@@ -105,10 +104,10 @@ public class KeyGeneratorTest {
 
         List<AtbashKey> keys = keyGenerator.generateKeys(generationParameters);
 
-        assertThat(keys).hasSize(2);
+        Assertions.assertThat(keys).hasSize(2);
         for (int i = 0; i < 2; i++) {
-            assertThat(keys.get(i).getSecretKeyType().getKeyType()).isEqualTo(KeyType.OKP);
-            assertThat(keys.get(i).getKeyId()).isEqualTo(KID);
+            Assertions.assertThat(keys.get(i).getSecretKeyType().getKeyType()).isEqualTo(KeyType.OKP);
+            Assertions.assertThat(keys.get(i).getKeyId()).isEqualTo(KID);
         }
 
     }

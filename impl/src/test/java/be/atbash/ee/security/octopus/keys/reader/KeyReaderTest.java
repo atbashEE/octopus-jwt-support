@@ -21,7 +21,6 @@ import be.atbash.ee.security.octopus.keys.TestPasswordLookup;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.util.resource.ResourceUtil;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -33,7 +32,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.assertj.core.api.Assertions;
 
 /**
  *
@@ -41,7 +40,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class KeyReaderTest {
 
-    private KeyReader keyReader = new KeyReader();
+    private final KeyReader keyReader = new KeyReader();
 
     @AfterEach
     public void tearDown() {
@@ -53,27 +52,27 @@ public class KeyReaderTest {
         // RSA PKCS#1 format
 
         List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.pk.pem", new TestPasswordLookup("atbash".toCharArray()));
-        assertThat(keys).hasSize(2);
+        Assertions.assertThat(keys).hasSize(2);
 
         boolean privateKey = false;
         boolean publicKey = false;
         for (int i = 0; i < 2; i++) {
 
             AtbashKey atbashKey = keys.get(i);
-            assertThat(atbashKey.getKeyId()).isEqualTo("rsa.pk");  // filename without extension
-            assertThat(atbashKey.getSecretKeyType().isAsymmetric()).isTrue();
+            Assertions.assertThat(atbashKey.getKeyId()).isEqualTo("rsa.pk");  // filename without extension
+            Assertions.assertThat(atbashKey.getSecretKeyType().isAsymmetric()).isTrue();
             if (atbashKey.getSecretKeyType().getAsymmetricPart() == AsymmetricPart.PRIVATE) {
-                assertThat(atbashKey.getKey()).isInstanceOf(RSAPrivateKey.class);
+                Assertions.assertThat(atbashKey.getKey()).isInstanceOf(RSAPrivateKey.class);
                 privateKey = true;
             }
             if (atbashKey.getSecretKeyType().getAsymmetricPart() == AsymmetricPart.PUBLIC) {
-                assertThat(atbashKey.getKey()).isInstanceOf(RSAPublicKey.class);
+                Assertions.assertThat(atbashKey.getKey()).isInstanceOf(RSAPublicKey.class);
                 publicKey = true;
             }
         }
 
-        assertThat(privateKey).isTrue();
-        assertThat(publicKey).isTrue();
+        Assertions.assertThat(privateKey).isTrue();
+        Assertions.assertThat(publicKey).isTrue();
 
     }
 
@@ -82,9 +81,9 @@ public class KeyReaderTest {
         // RSA public key
         List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.pub.pem");
 
-        assertThat(keys).hasSize(1);
-        assertThat(keys.get(0).getKeyId()).isEqualTo("rsa.pub");  // filename without extension
-        assertThat(keys.get(0).getKey()).isInstanceOf(RSAPublicKey.class);
+        Assertions.assertThat(keys).hasSize(1);
+        Assertions.assertThat(keys.get(0).getKeyId()).isEqualTo("rsa.pub");  // filename without extension
+        Assertions.assertThat(keys.get(0).getKey()).isInstanceOf(RSAPublicKey.class);
     }
 
     @Test
@@ -96,9 +95,9 @@ public class KeyReaderTest {
 
         List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.pkcs8.pem", new TestPasswordLookup("atbash8".toCharArray()));
 
-        assertThat(keys).hasSize(1);
-        assertThat(keys.get(0).getKeyId()).isEqualTo("authentication.pkcs8");  // filename without extension
-        assertThat(keys.get(0).getKey()).isInstanceOf(RSAPrivateKey.class);
+        Assertions.assertThat(keys).hasSize(1);
+        Assertions.assertThat(keys.get(0).getKeyId()).isEqualTo("authentication.pkcs8");  // filename without extension
+        Assertions.assertThat(keys.get(0).getKey()).isInstanceOf(RSAPrivateKey.class);
 
     }
 
@@ -108,11 +107,11 @@ public class KeyReaderTest {
 
         List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.pkcs8.free.pem", null);
 
-        assertThat(keys).hasSize(2);
-        assertThat(keys.get(0).getKeyId()).isEqualTo("rsa.pkcs8.free");  // filename without extension
-        assertThat(keys.get(0).getKey()).isInstanceOf(RSAPrivateKey.class);
-        assertThat(keys.get(1).getKeyId()).isEqualTo("rsa.pkcs8.free");  // filename without extension
-        assertThat(keys.get(1).getKey()).isInstanceOf(RSAPublicKey.class);
+        Assertions.assertThat(keys).hasSize(2);
+        Assertions.assertThat(keys.get(0).getKeyId()).isEqualTo("rsa.pkcs8.free");  // filename without extension
+        Assertions.assertThat(keys.get(0).getKey()).isInstanceOf(RSAPrivateKey.class);
+        Assertions.assertThat(keys.get(1).getKeyId()).isEqualTo("rsa.pkcs8.free");  // filename without extension
+        Assertions.assertThat(keys.get(1).getKey()).isInstanceOf(RSAPublicKey.class);
 
     }
 
@@ -121,27 +120,27 @@ public class KeyReaderTest {
         // EC PKCS#1 format
 
         List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "secp256r1-key-aes.pem", new TestPasswordLookup("atbash".toCharArray()));
-        assertThat(keys).hasSize(2);
+        Assertions.assertThat(keys).hasSize(2);
 
         boolean privateKey = false;
         boolean publicKey = false;
         for (int i = 0; i < 2; i++) {
 
             AtbashKey atbashKey = keys.get(i);
-            assertThat(atbashKey.getKeyId()).isEqualTo("secp256r1-key-aes");  // filename without extension
-            assertThat(atbashKey.getSecretKeyType().isAsymmetric()).isTrue();
+            Assertions.assertThat(atbashKey.getKeyId()).isEqualTo("secp256r1-key-aes");  // filename without extension
+            Assertions.assertThat(atbashKey.getSecretKeyType().isAsymmetric()).isTrue();
             if (atbashKey.getSecretKeyType().getAsymmetricPart() == AsymmetricPart.PRIVATE) {
-                assertThat(atbashKey.getKey()).isInstanceOf(ECPrivateKey.class);
+                Assertions.assertThat(atbashKey.getKey()).isInstanceOf(ECPrivateKey.class);
                 privateKey = true;
             }
             if (atbashKey.getSecretKeyType().getAsymmetricPart() == AsymmetricPart.PUBLIC) {
-                assertThat(atbashKey.getKey()).isInstanceOf(ECPublicKey.class);
+                Assertions.assertThat(atbashKey.getKey()).isInstanceOf(ECPublicKey.class);
                 publicKey = true;
             }
         }
 
-        assertThat(privateKey).isTrue();
-        assertThat(publicKey).isTrue();
+        Assertions.assertThat(privateKey).isTrue();
+        Assertions.assertThat(publicKey).isTrue();
 
     }
 
@@ -150,9 +149,9 @@ public class KeyReaderTest {
         // EC public key
         List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "ecpubkey.pem");
 
-        assertThat(keys).hasSize(1);
-        assertThat(keys.get(0).getKeyId()).isEqualTo("ecpubkey");  // filename without extension
-        assertThat(keys.get(0).getKey()).isInstanceOf(ECPublicKey.class);
+        Assertions.assertThat(keys).hasSize(1);
+        Assertions.assertThat(keys.get(0).getKeyId()).isEqualTo("ecpubkey");  // filename without extension
+        Assertions.assertThat(keys.get(0).getKey()).isInstanceOf(ECPublicKey.class);
     }
 
     @Test
@@ -161,9 +160,9 @@ public class KeyReaderTest {
 
         List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "ec.pkcs8.pem", new TestPasswordLookup("atbash8".toCharArray()));
 
-        assertThat(keys).hasSize(1);
-        assertThat(keys.get(0).getKeyId()).isEqualTo("ec.pkcs8");  // filename without extension
-        assertThat(keys.get(0).getKey()).isInstanceOf(ECPrivateKey.class);
+        Assertions.assertThat(keys).hasSize(1);
+        Assertions.assertThat(keys.get(0).getKeyId()).isEqualTo("ec.pkcs8");  // filename without extension
+        Assertions.assertThat(keys.get(0).getKey()).isInstanceOf(ECPrivateKey.class);
 
     }
 
@@ -172,27 +171,27 @@ public class KeyReaderTest {
         // RSA JWK
 
         List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.jwk");
-        assertThat(keys).hasSize(2);
+        Assertions.assertThat(keys).hasSize(2);
 
         boolean privateKey = false;
         boolean publicKey = false;
         for (int i = 0; i < 2; i++) {
 
             AtbashKey atbashKey = keys.get(i);
-            assertThat(atbashKey.getKeyId()).isEqualTo("rsa.pk.free");  // kid from within JWK
-            assertThat(atbashKey.getSecretKeyType().isAsymmetric()).isTrue();
+            Assertions.assertThat(atbashKey.getKeyId()).isEqualTo("rsa.pk.free");  // kid from within JWK
+            Assertions.assertThat(atbashKey.getSecretKeyType().isAsymmetric()).isTrue();
             if (atbashKey.getSecretKeyType().getAsymmetricPart() == AsymmetricPart.PRIVATE) {
-                assertThat(atbashKey.getKey()).isInstanceOf(RSAPrivateKey.class);
+                Assertions.assertThat(atbashKey.getKey()).isInstanceOf(RSAPrivateKey.class);
                 privateKey = true;
             }
             if (atbashKey.getSecretKeyType().getAsymmetricPart() == AsymmetricPart.PUBLIC) {
-                assertThat(atbashKey.getKey()).isInstanceOf(RSAPublicKey.class);
+                Assertions.assertThat(atbashKey.getKey()).isInstanceOf(RSAPublicKey.class);
                 publicKey = true;
             }
         }
 
-        assertThat(privateKey).isTrue();
-        assertThat(publicKey).isTrue();
+        Assertions.assertThat(privateKey).isTrue();
+        Assertions.assertThat(publicKey).isTrue();
 
     }
 
@@ -201,27 +200,27 @@ public class KeyReaderTest {
         // EC JWK
 
         List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "ec.jwk");
-        assertThat(keys).hasSize(2);
+        Assertions.assertThat(keys).hasSize(2);
 
         boolean privateKey = false;
         boolean publicKey = false;
         for (int i = 0; i < 2; i++) {
 
             AtbashKey atbashKey = keys.get(i);
-            assertThat(atbashKey.getKeyId()).isEqualTo("secp256r1-key");  // kid from within JWK
-            assertThat(atbashKey.getSecretKeyType().isAsymmetric()).isTrue();
+            Assertions.assertThat(atbashKey.getKeyId()).isEqualTo("secp256r1-key");  // kid from within JWK
+            Assertions.assertThat(atbashKey.getSecretKeyType().isAsymmetric()).isTrue();
             if (atbashKey.getSecretKeyType().getAsymmetricPart() == AsymmetricPart.PRIVATE) {
-                assertThat(atbashKey.getKey()).isInstanceOf(ECPrivateKey.class);
+                Assertions.assertThat(atbashKey.getKey()).isInstanceOf(ECPrivateKey.class);
                 privateKey = true;
             }
             if (atbashKey.getSecretKeyType().getAsymmetricPart() == AsymmetricPart.PUBLIC) {
-                assertThat(atbashKey.getKey()).isInstanceOf(ECPublicKey.class);
+                Assertions.assertThat(atbashKey.getKey()).isInstanceOf(ECPublicKey.class);
                 publicKey = true;
             }
         }
 
-        assertThat(privateKey).isTrue();
-        assertThat(publicKey).isTrue();
+        Assertions.assertThat(privateKey).isTrue();
+        Assertions.assertThat(publicKey).isTrue();
 
     }
 
@@ -230,27 +229,27 @@ public class KeyReaderTest {
         // RSA JWK encrypted
 
         List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.jwke", new TestPasswordLookup(null, "atbash".toCharArray()));
-        assertThat(keys).hasSize(2);
+        Assertions.assertThat(keys).hasSize(2);
 
         boolean privateKey = false;
         boolean publicKey = false;
         for (int i = 0; i < 2; i++) {
 
             AtbashKey atbashKey = keys.get(i);
-            assertThat(atbashKey.getKeyId()).isEqualTo("rsa.pk.free");  // kid from within JWK
-            assertThat(atbashKey.getSecretKeyType().isAsymmetric()).isTrue();
+            Assertions.assertThat(atbashKey.getKeyId()).isEqualTo("rsa.pk.free");  // kid from within JWK
+            Assertions.assertThat(atbashKey.getSecretKeyType().isAsymmetric()).isTrue();
             if (atbashKey.getSecretKeyType().getAsymmetricPart() == AsymmetricPart.PRIVATE) {
-                assertThat(atbashKey.getKey()).isInstanceOf(RSAPrivateKey.class);
+                Assertions.assertThat(atbashKey.getKey()).isInstanceOf(RSAPrivateKey.class);
                 privateKey = true;
             }
             if (atbashKey.getSecretKeyType().getAsymmetricPart() == AsymmetricPart.PUBLIC) {
-                assertThat(atbashKey.getKey()).isInstanceOf(RSAPublicKey.class);
+                Assertions.assertThat(atbashKey.getKey()).isInstanceOf(RSAPublicKey.class);
                 publicKey = true;
             }
         }
 
-        assertThat(privateKey).isTrue();
-        assertThat(publicKey).isTrue();
+        Assertions.assertThat(privateKey).isTrue();
+        Assertions.assertThat(publicKey).isTrue();
 
     }
 
@@ -259,27 +258,27 @@ public class KeyReaderTest {
         // RSA JWK encrypted
 
         List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "ec.jwke", new TestPasswordLookup(null, "atbash".toCharArray()));
-        assertThat(keys).hasSize(2);
+        Assertions.assertThat(keys).hasSize(2);
 
         boolean privateKey = false;
         boolean publicKey = false;
         for (int i = 0; i < 2; i++) {
 
             AtbashKey atbashKey = keys.get(i);
-            assertThat(atbashKey.getKeyId()).isEqualTo("secp256r1-key");  // kid from within JWK
-            assertThat(atbashKey.getSecretKeyType().isAsymmetric()).isTrue();
+            Assertions.assertThat(atbashKey.getKeyId()).isEqualTo("secp256r1-key");  // kid from within JWK
+            Assertions.assertThat(atbashKey.getSecretKeyType().isAsymmetric()).isTrue();
             if (atbashKey.getSecretKeyType().getAsymmetricPart() == AsymmetricPart.PRIVATE) {
-                assertThat(atbashKey.getKey()).isInstanceOf(ECPrivateKey.class);
+                Assertions.assertThat(atbashKey.getKey()).isInstanceOf(ECPrivateKey.class);
                 privateKey = true;
             }
             if (atbashKey.getSecretKeyType().getAsymmetricPart() == AsymmetricPart.PUBLIC) {
-                assertThat(atbashKey.getKey()).isInstanceOf(ECPublicKey.class);
+                Assertions.assertThat(atbashKey.getKey()).isInstanceOf(ECPublicKey.class);
                 publicKey = true;
             }
         }
 
-        assertThat(privateKey).isTrue();
-        assertThat(publicKey).isTrue();
+        Assertions.assertThat(privateKey).isTrue();
+        Assertions.assertThat(publicKey).isTrue();
 
     }
 
@@ -288,7 +287,7 @@ public class KeyReaderTest {
         // JWKSet (RSA + EC)
 
         List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "test.jwkset", new TestPasswordLookup(null, "atbash".toCharArray()));
-        assertThat(keys).hasSize(4);
+        Assertions.assertThat(keys).hasSize(4);
 
         Set<String> data = new HashSet<>();
         for (int i = 0; i < 4; i++) {
@@ -298,7 +297,7 @@ public class KeyReaderTest {
             data.add(atbashKey.getKeyId() + " - " + atbashKey.getSecretKeyType().getKeyType().getValue() + " - " + atbashKey.getSecretKeyType().getAsymmetricPart());
         }
 
-        assertThat(data).containsOnly("rsa.pk.free - RSA - PRIVATE", "secp256r1-key - EC - PUBLIC", "rsa.pk.free - RSA - PUBLIC", "secp256r1-key - EC - PRIVATE");
+        Assertions.assertThat(data).containsOnly("rsa.pk.free - RSA - PRIVATE", "secp256r1-key - EC - PUBLIC", "rsa.pk.free - RSA - PUBLIC", "secp256r1-key - EC - PRIVATE");
 
     }
 
@@ -308,41 +307,43 @@ public class KeyReaderTest {
         TestConfig.addConfigValue("key.store.type", "JKS");
 
         List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "keystore.jks", new TestPasswordLookup("atbash".toCharArray(), "atbash_key".toCharArray()));
-        assertThat(keys).hasSize(2);
+        Assertions.assertThat(keys).hasSize(2);
 
         boolean privateKey = false;
         boolean publicKey = false;
         for (int i = 0; i < 2; i++) {
 
             AtbashKey atbashKey = keys.get(i);
-            assertThat(atbashKey.getKeyId()).isEqualTo("rsa_jks");  // alias from keystore
-            assertThat(atbashKey.getSecretKeyType().isAsymmetric()).isTrue();
+            Assertions.assertThat(atbashKey.getKeyId()).isEqualTo("rsa_jks");  // alias from keystore
+            Assertions.assertThat(atbashKey.getSecretKeyType().isAsymmetric()).isTrue();
             if (atbashKey.getSecretKeyType().getAsymmetricPart() == AsymmetricPart.PRIVATE) {
-                assertThat(atbashKey.getKey()).isInstanceOf(RSAPrivateKey.class);
+                Assertions.assertThat(atbashKey.getKey()).isInstanceOf(RSAPrivateKey.class);
                 privateKey = true;
             }
             if (atbashKey.getSecretKeyType().getAsymmetricPart() == AsymmetricPart.PUBLIC) {
-                assertThat(atbashKey.getKey()).isInstanceOf(RSAPublicKey.class);
+                Assertions.assertThat(atbashKey.getKey()).isInstanceOf(RSAPublicKey.class);
                 publicKey = true;
             }
         }
 
-        assertThat(privateKey).isTrue();
-        assertThat(publicKey).isTrue();
+        Assertions.assertThat(privateKey).isTrue();
+        Assertions.assertThat(publicKey).isTrue();
 
     }
 
     @Test
     public void readKeyResource_scenario13() {
         // unknown key type from path
-        Assertions.assertThrows(UnknownKeyResourceTypeException.class, () -> keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "key.txt"));
+        Assertions.assertThatThrownBy(() -> keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "key.txt"))
+                .isInstanceOf(UnknownKeyResourceTypeException.class);
     }
 
 
     @Test
     public void readKeyResource_scenario14() {
         // JWKSet (but same Id)
-        Assertions.assertThrows(InvalidJWKSetFormatException.class, () -> keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "duplicate-id.jwkset", new TestPasswordLookup(null, null)));
+        Assertions.assertThatThrownBy(() -> keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "duplicate-id.jwkset", new TestPasswordLookup(null, null)))
+                .isInstanceOf(InvalidJWKSetFormatException.class);
 
     }
 
@@ -350,7 +351,7 @@ public class KeyReaderTest {
     public void readKeyResource_scenario15() {
         // JWK, RSA public only
         List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa.pub.jwk");
-        assertThat(keys).hasSize(1);
+        Assertions.assertThat(keys).hasSize(1);
     }
 
     @Test
@@ -358,8 +359,8 @@ public class KeyReaderTest {
         // JWKSet (RSA Public)
 
         List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "test2.jwkset");
-        assertThat(keys).hasSize(1);
-        assertThat(keys.get(0).getSecretKeyType().getAsymmetricPart()).isEqualTo(AsymmetricPart.PUBLIC);
+        Assertions.assertThat(keys).hasSize(1);
+        Assertions.assertThat(keys.get(0).getSecretKeyType().getAsymmetricPart()).isEqualTo(AsymmetricPart.PUBLIC);
 
     }
 
@@ -369,25 +370,25 @@ public class KeyReaderTest {
         // JKS with cert and rsa
 
         List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "rsa_cert.jks", new TestPasswordLookup("password".toCharArray(), null));
-        assertThat(keys).hasSize(1);
+        Assertions.assertThat(keys).hasSize(1);
 
         boolean privateKey = false;
         boolean publicKey = false;
 
         AtbashKey atbashKey = keys.get(0);
-        assertThat(atbashKey.getKeyId()).isEqualTo("selfsigned");  // alias from keystore
-        assertThat(atbashKey.getSecretKeyType().isAsymmetric()).isTrue();
+        Assertions.assertThat(atbashKey.getKeyId()).isEqualTo("selfsigned");  // alias from keystore
+        Assertions.assertThat(atbashKey.getSecretKeyType().isAsymmetric()).isTrue();
         if (atbashKey.getSecretKeyType().getAsymmetricPart() == AsymmetricPart.PRIVATE) {
-            assertThat(atbashKey.getKey()).isInstanceOf(RSAPrivateKey.class);
+            Assertions.assertThat(atbashKey.getKey()).isInstanceOf(RSAPrivateKey.class);
             privateKey = true;
         }
         if (atbashKey.getSecretKeyType().getAsymmetricPart() == AsymmetricPart.PUBLIC) {
-            assertThat(atbashKey.getKey()).isInstanceOf(RSAPublicKey.class);
+            Assertions.assertThat(atbashKey.getKey()).isInstanceOf(RSAPublicKey.class);
             publicKey = true;
         }
 
-        assertThat(privateKey).isFalse();
-        assertThat(publicKey).isTrue();
+        Assertions.assertThat(privateKey).isFalse();
+        Assertions.assertThat(publicKey).isTrue();
 
     }
 

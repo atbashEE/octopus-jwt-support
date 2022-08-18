@@ -184,7 +184,7 @@ class JWTClaimsSetTest {
     }
 
     @Test
-    void expirationTime_asDuration() throws ParseException {
+    void expirationTime_asDuration() {
         Date now = new Date();
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                 .expirationTime(Duration.of(30, ChronoUnit.SECONDS))
@@ -195,7 +195,7 @@ class JWTClaimsSetTest {
     }
 
     @Test
-    void expirationTime_asDuration_negative() throws ParseException {
+    void expirationTime_asDuration_negative() {
 
         Assertions.assertThatThrownBy(() ->
                 new JWTClaimsSet.Builder()

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,11 +25,14 @@ import java.security.NoSuchAlgorithmException;
 /**
  * Utility for creating {@link AlgorithmParameters} objects with
  * an optional JCA provider.
- *
+ * <p>
  * Based on code by Justin Richer
  */
-public class AlgorithmParametersHelper {
+public final class AlgorithmParametersHelper {
 
+
+    private AlgorithmParametersHelper() {
+    }
 
     /**
      * Creates a new {@link AlgorithmParameters} instance.

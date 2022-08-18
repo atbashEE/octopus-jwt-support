@@ -36,9 +36,6 @@ import java.text.ParseException;
 public class JWEObject extends JOSEObject {
 
 
-    private static final long serialVersionUID = 1L;
-
-
     /**
      * Enumeration of the states of a JSON Web Encryption (JWE) object.
      */

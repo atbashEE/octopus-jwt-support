@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,16 +20,15 @@ import be.atbash.ee.security.octopus.nimbus.jose.Algorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.EncryptionMethod;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEObject;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.Date;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 
 /**
  * Tests the JWT parser. Uses test vectors from JWT spec.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
 public class JWTParserTest {
@@ -46,21 +45,21 @@ public class JWTParserTest {
 
         JWT jwt = JWTParser.parse(jwtString);
 
-        assertThat(jwt.getHeader().getAlgorithm()).isEqualTo(Algorithm.NONE);
+        Assertions.assertThat(jwt.getHeader().getAlgorithm()).isEqualTo(Algorithm.NONE);
 
-        assertThat(jwt).isInstanceOf(PlainJWT.class);
+        Assertions.assertThat(jwt).isInstanceOf(PlainJWT.class);
 
         PlainJWT plainJWT = (PlainJWT) jwt;
 
-        assertThat(plainJWT.getHeader().getAlgorithm()).isEqualTo(Algorithm.NONE);
-        assertThat(plainJWT.getHeader().getType()).isNull();
-        assertThat(plainJWT.getHeader().getContentType()).isNull();
+        Assertions.assertThat(plainJWT.getHeader().getAlgorithm()).isEqualTo(Algorithm.NONE);
+        Assertions.assertThat(plainJWT.getHeader().getType()).isNull();
+        Assertions.assertThat(plainJWT.getHeader().getContentType()).isNull();
 
         JWTClaimsSet cs = plainJWT.getJWTClaimsSet();
 
-        assertThat(cs.getIssuer()).isEqualTo("joe");
-        assertThat(cs.getExpirationTime()).isEqualTo(new Date(1300819380L * 1000));
-        assertThat((Boolean) cs.getClaim("http://example.com/is_root")).isTrue();
+        Assertions.assertThat(cs.getIssuer()).isEqualTo("joe");
+        Assertions.assertThat(cs.getExpirationTime()).isEqualTo(new Date(1300819380L * 1000));
+        Assertions.assertThat((Boolean) cs.getClaim("http://example.com/is_root")).isTrue();
     }
 
     @Test
@@ -81,17 +80,17 @@ public class JWTParserTest {
 
         JWT jwt = JWTParser.parse(jwtString);
 
-        assertThat(jwt.getHeader().getAlgorithm()).isEqualTo(JWEAlgorithm.RSA_OAEP_256);
+        Assertions.assertThat(jwt.getHeader().getAlgorithm()).isEqualTo(JWEAlgorithm.RSA_OAEP_256);
 
-        assertThat(jwt).isInstanceOf(EncryptedJWT.class);
+        Assertions.assertThat(jwt).isInstanceOf(EncryptedJWT.class);
 
         EncryptedJWT encryptedJWT = (EncryptedJWT) jwt;
 
-        assertThat(encryptedJWT.getState()).isEqualTo(JWEObject.State.ENCRYPTED);
+        Assertions.assertThat(encryptedJWT.getState()).isEqualTo(JWEObject.State.ENCRYPTED);
 
-        assertThat(encryptedJWT.getHeader().getAlgorithm()).isEqualTo(JWEAlgorithm.RSA_OAEP_256);
-        assertThat(encryptedJWT.getHeader().getEncryptionMethod()).isEqualTo(EncryptionMethod.A128CBC_HS256);
-        assertThat(encryptedJWT.getHeader().getType()).isNull();
-        assertThat(encryptedJWT.getHeader().getContentType()).isNull();
+        Assertions.assertThat(encryptedJWT.getHeader().getAlgorithm()).isEqualTo(JWEAlgorithm.RSA_OAEP_256);
+        Assertions.assertThat(encryptedJWT.getHeader().getEncryptionMethod()).isEqualTo(EncryptionMethod.A128CBC_HS256);
+        Assertions.assertThat(encryptedJWT.getHeader().getType()).isNull();
+        Assertions.assertThat(encryptedJWT.getHeader().getContentType()).isNull();
     }
 }

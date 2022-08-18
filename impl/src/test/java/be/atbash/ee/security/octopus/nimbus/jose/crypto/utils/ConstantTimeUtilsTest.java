@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,8 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto.utils;
 
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests the array utilities.
@@ -31,7 +30,7 @@ public class ConstantTimeUtilsTest {
         byte[] a = {1, 2, 3, 4, 5, 6, 7, 8};
         byte[] b = {1, 2, 3, 4, 5, 6, 7, 8};
 
-        assertThat(ConstantTimeUtils.areEqual(a, b)).isTrue();
+        Assertions.assertThat(ConstantTimeUtils.areEqual(a, b)).isTrue();
     }
 
     @Test
@@ -40,7 +39,7 @@ public class ConstantTimeUtilsTest {
         byte[] a = {1, 2, 3, 4, 5, 6, 7, 8};
         byte[] b = {1, 2, 3, 4, 5, 6, 7, 7};
 
-        assertThat(ConstantTimeUtils.areEqual(a, b)).isFalse();
+        Assertions.assertThat(ConstantTimeUtils.areEqual(a, b)).isFalse();
     }
 
     @Test
@@ -49,6 +48,6 @@ public class ConstantTimeUtilsTest {
         byte[] a = {1, 2, 3, 4, 5, 6, 7, 8};
         byte[] b = {1, 2, 3, 4, 5, 6, 7};
 
-        assertThat(ConstantTimeUtils.areEqual(a, b)).isFalse();
+        Assertions.assertThat(ConstantTimeUtils.areEqual(a, b)).isFalse();
     }
 }

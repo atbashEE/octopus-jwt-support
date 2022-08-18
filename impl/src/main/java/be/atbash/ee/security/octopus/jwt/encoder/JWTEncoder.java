@@ -132,7 +132,7 @@ public class JWTEncoder {
             try {
                 plainJWT = new PlainJWT(header, JSONObjectUtils.parse(payload, Header.MAX_HEADER_STRING_LENGTH));
             } catch (ParseException e) {
-                throw new AtbashUnexpectedException(String.format("JSON string can't be parsed which is unexpected \n%s\n%s", payload, e.getMessage()));
+                throw new AtbashUnexpectedException(String.format("JSON string can't be parsed which is unexpected %n%s%n%s", payload, e.getMessage()));
             }
         }
 

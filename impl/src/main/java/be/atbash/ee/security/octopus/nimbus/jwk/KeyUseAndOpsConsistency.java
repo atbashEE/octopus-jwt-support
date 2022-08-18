@@ -26,7 +26,7 @@ import java.util.*;
  * <p>
  * Based on code by Vladimir Dzhuvinov
  */
-class KeyUseAndOpsConsistency {
+final class KeyUseAndOpsConsistency {
 
 
     /**
@@ -53,6 +53,8 @@ class KeyUseAndOpsConsistency {
         MAP = Collections.unmodifiableMap(map);
     }
 
+    private KeyUseAndOpsConsistency() {
+    }
 
     /**
      * Checks if the specified key use and key operations are consistent.

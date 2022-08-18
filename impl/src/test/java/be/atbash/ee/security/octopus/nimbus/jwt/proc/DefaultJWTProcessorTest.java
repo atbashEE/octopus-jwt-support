@@ -335,7 +335,7 @@ class DefaultJWTProcessorTest {
     }
 
     @Test
-    void testRejectPlain() throws Exception {
+    void testRejectPlain() {
 
         JWTClaimsSet claims = new JWTClaimsSet.Builder().subject("alice").build();
 
@@ -836,7 +836,7 @@ class DefaultJWTProcessorTest {
 
         jwtProcessor.setJWEKeySelector(new TestKeySelector(aesKey.toSecretKey()));
 
-        JWTClaimsSet outputClaimsSet = jwtProcessor.process((EncryptedJWT) jwt);
+        JWTClaimsSet outputClaimsSet = jwtProcessor.process(jwt);
 
         Assertions.assertThat(outputClaimsSet.getSubject()).isEqualTo("alice");
     }

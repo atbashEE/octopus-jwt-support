@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ public enum PemKeyEncryption {
     public static PemKeyEncryption parse(String value) {
         PemKeyEncryption result = null;
         if (StringUtils.hasText(value)) {
-            String modifiedValue = value.replaceAll("#", "").toUpperCase(Locale.ENGLISH).trim();
+            String modifiedValue = value.replace("#", "").toUpperCase(Locale.ENGLISH).trim();
             for (PemKeyEncryption pemKeyEncryption : PemKeyEncryption.values()) {
                 if (pemKeyEncryption.name().equals(modifiedValue)) {
                     result = pemKeyEncryption;

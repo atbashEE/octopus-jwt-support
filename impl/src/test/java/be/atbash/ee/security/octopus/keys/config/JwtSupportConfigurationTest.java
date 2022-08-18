@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,8 +31,8 @@ import be.atbash.ee.security.octopus.keys.reader.password.KeyResourcePasswordLoo
 import be.atbash.ee.security.octopus.keys.selector.SelectorCriteria;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
 import com.google.common.collect.ImmutableList;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.org.lidalia.slf4jtest.LoggingEvent;
@@ -40,8 +40,6 @@ import uk.org.lidalia.slf4jtest.TestLogger;
 import uk.org.lidalia.slf4jtest.TestLoggerFactory;
 
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  *
@@ -51,7 +49,7 @@ public class JwtSupportConfigurationTest {
 
     private JwtSupportConfiguration configuration;
 
-    private TestLogger logger = TestLoggerFactory.getTestLogger(JwtSupportConfiguration.class);
+    private final TestLogger logger = TestLoggerFactory.getTestLogger(JwtSupportConfiguration.class);
 
     @BeforeEach
     public void setup() {
@@ -70,21 +68,21 @@ public class JwtSupportConfigurationTest {
         TestConfig.addConfigValue("keys.location", "configLocation");
 
         String keysLocation = configuration.getKeysLocation();
-        assertThat(keysLocation).isEqualTo("configLocation");
+        Assertions.assertThat(keysLocation).isEqualTo("configLocation");
     }
 
     @Test
     public void getKeysLocation_isOptional() {
         // TODO But within code later on it is always required.
         String keysLocation = configuration.getKeysLocation();
-        assertThat(keysLocation).isNull();
+        Assertions.assertThat(keysLocation).isNull();
     }
 
     @Test
     public void getPasswordLookup() {
         KeyResourcePasswordLookup lookup = configuration.getPasswordLookup();
 
-        assertThat(lookup).isInstanceOf(ConfigKeyResourcePasswordLookup.class);
+        Assertions.assertThat(lookup).isInstanceOf(ConfigKeyResourcePasswordLookup.class);
     }
 
     @Test
@@ -92,27 +90,29 @@ public class JwtSupportConfigurationTest {
         TestConfig.addConfigValue("lookup.password.class", TestPasswordLookup.class.getName());
         KeyResourcePasswordLookup lookup = configuration.getPasswordLookup();
 
-        assertThat(lookup).isInstanceOf(TestPasswordLookup.class);
+        Assertions.assertThat(lookup).isInstanceOf(TestPasswordLookup.class);
     }
 
     @Test
     public void getPasswordLookup_required() {
         TestConfig.addConfigValue("lookup.password.class", " ");
-        Assertions.assertThrows(ConfigurationException.class, () -> configuration.getPasswordLookup());
+        Assertions.assertThatThrownBy(() -> configuration.getPasswordLookup())
+                .isInstanceOf(ConfigurationException.class);
 
     }
 
     @Test
     public void getPasswordLookup_WrongType() {
         TestConfig.addConfigValue("lookup.password.class", String.class.getName());
-        Assertions.assertThrows(ConfigurationException.class, () -> configuration.getPasswordLookup());
+        Assertions.assertThatThrownBy(() -> configuration.getPasswordLookup())
+                .isInstanceOf(ConfigurationException.class);
     }
 
     @Test
     public void getKeyManager() {
         KeyManager keyManager = configuration.getKeyManager();
 
-        assertThat(keyManager).isInstanceOf(LocalKeyManager.class);
+        Assertions.assertThat(keyManager).isInstanceOf(LocalKeyManager.class);
     }
 
     @Test
@@ -120,20 +120,22 @@ public class JwtSupportConfigurationTest {
         TestConfig.addConfigValue("key.manager.class", TestKeyManager.class.getName());
         KeyManager keyManager = configuration.getKeyManager();
 
-        assertThat(keyManager).isInstanceOf(TestKeyManager.class);
+        Assertions.assertThat(keyManager).isInstanceOf(TestKeyManager.class);
     }
 
     @Test
     public void getKeyManager_required() {
         TestConfig.addConfigValue("key.manager.class", " ");
-        Assertions.assertThrows(ConfigurationException.class, () -> configuration.getKeyManager());
+        Assertions.assertThatThrownBy(() -> configuration.getKeyManager())
+                .isInstanceOf(ConfigurationException.class);
 
     }
 
     @Test
     public void getKeyManager_WrongType() {
         TestConfig.addConfigValue("key.manager.class", String.class.getName());
-        Assertions.assertThrows(ConfigurationException.class, () -> configuration.getKeyManager());
+        Assertions.assertThatThrownBy(() -> configuration.getKeyManager())
+                .isInstanceOf(ConfigurationException.class);
     }
 
     //
@@ -142,7 +144,7 @@ public class JwtSupportConfigurationTest {
     public void getKeyResourceTypeProvider() {
         KeyResourceTypeProvider provider = configuration.getKeyResourceTypeProvider();
 
-        assertThat(provider).isInstanceOf(DefaultKeyResourceTypeProvider.class);
+        Assertions.assertThat(provider).isInstanceOf(DefaultKeyResourceTypeProvider.class);
     }
 
     @Test
@@ -150,20 +152,22 @@ public class JwtSupportConfigurationTest {
         TestConfig.addConfigValue("key.resourcetype.provider.class", TestKeyResourceTypeProvider.class.getName());
         KeyResourceTypeProvider provider = configuration.getKeyResourceTypeProvider();
 
-        assertThat(provider).isInstanceOf(TestKeyResourceTypeProvider.class);
+        Assertions.assertThat(provider).isInstanceOf(TestKeyResourceTypeProvider.class);
     }
 
     @Test
     public void getKeyResourceTypeProvider_required() {
         TestConfig.addConfigValue("key.resourcetype.provider.class", " ");
-        Assertions.assertThrows(ConfigurationException.class, () -> configuration.getKeyResourceTypeProvider());
+        Assertions.assertThatThrownBy(() -> configuration.getKeyResourceTypeProvider())
+                .isInstanceOf(ConfigurationException.class);
 
     }
 
     @Test
     public void getKeyResourceTypeProvider_WrongType() {
         TestConfig.addConfigValue("key.resourcetype.provider.class", String.class.getName());
-        Assertions.assertThrows(ConfigurationException.class, () -> configuration.getKeyResourceTypeProvider());
+        Assertions.assertThatThrownBy(() -> configuration.getKeyResourceTypeProvider())
+                .isInstanceOf(ConfigurationException.class);
     }
 
     //
@@ -171,7 +175,7 @@ public class JwtSupportConfigurationTest {
     public void getPemKeyEncryption() {
         // Default
         PemKeyEncryption encryption = configuration.getPemKeyEncryption();
-        assertThat(encryption).isEqualTo(PemKeyEncryption.PKCS8);
+        Assertions.assertThat(encryption).isEqualTo(PemKeyEncryption.PKCS8);
     }
 
     @Test
@@ -179,7 +183,7 @@ public class JwtSupportConfigurationTest {
         TestConfig.addConfigValue("key.pem.encryption", "PKCS1");
         TestConfig.registerDefaultConverters();
         PemKeyEncryption encryption = configuration.getPemKeyEncryption();
-        assertThat(encryption).isEqualTo(PemKeyEncryption.PKCS1);
+        Assertions.assertThat(encryption).isEqualTo(PemKeyEncryption.PKCS1);
     }
 
     @Test
@@ -187,7 +191,8 @@ public class JwtSupportConfigurationTest {
         TestConfig.addConfigValue("key.pem.encryption", "value");
         TestConfig.registerDefaultConverters();
 
-        Assertions.assertThrows(ConfigurationException.class, () -> configuration.getPemKeyEncryption());
+        Assertions.assertThatThrownBy(() -> configuration.getPemKeyEncryption())
+                .isInstanceOf(ConfigurationException.class);
 
     }
 
@@ -196,112 +201,119 @@ public class JwtSupportConfigurationTest {
         TestConfig.addConfigValue("key.pem.encryption", "");
         TestConfig.registerDefaultConverters();
 
-        assertThat(configuration.getPemKeyEncryption()).isEqualTo(PemKeyEncryption.NONE);
+        Assertions.assertThat(configuration.getPemKeyEncryption()).isEqualTo(PemKeyEncryption.NONE);
 
     }
 
     @Test
     public void getClockSkewSeconds() {
-        assertThat(configuration.getClockSkewSeconds()).isEqualTo(60);
+        Assertions.assertThat(configuration.getClockSkewSeconds()).isEqualTo(60);
     }
 
     @Test
     public void getClockSkewSeconds_zeroAllowed() {
         TestConfig.addConfigValue("jwt.clock.skew.secs", "0");
-        assertThat(configuration.getClockSkewSeconds()).isEqualTo(0);
+        Assertions.assertThat(configuration.getClockSkewSeconds()).isEqualTo(0);
     }
 
     @Test
     public void getClockSkewSeconds_invalid() {
         TestConfig.addConfigValue("jwt.clock.skew.secs", "-1");
-        Assertions.assertThrows(ConfigurationException.class, () -> configuration.getClockSkewSeconds());
+        Assertions.assertThatThrownBy(() -> configuration.getClockSkewSeconds())
+                .isInstanceOf(ConfigurationException.class);
     }
 
     @Test
     public void getClockSkewSeconds_wrongType() {
         TestConfig.addConfigValue("jwt.clock.skew.secs", "12.34");
-        Assertions.assertThrows(ConfigurationException.class, () -> configuration.getClockSkewSeconds());
+        Assertions.assertThatThrownBy(() -> configuration.getClockSkewSeconds())
+                .isInstanceOf(ConfigurationException.class);
     }
 
     @Test
     public void getDefaultJWEAlgorithmEC() {
         TestConfig.addConfigValue("jwt.jwe.algorithm.default.EC", "ECDH-ES");
         JWEAlgorithm algorithm = configuration.getDefaultJWEAlgorithmEC();
-        assertThat(algorithm).isEqualTo(JWEAlgorithm.ECDH_ES);
+        Assertions.assertThat(algorithm).isEqualTo(JWEAlgorithm.ECDH_ES);
     }
 
     @Test
     public void getDefaultJWEAlgorithmEC_default() {
         // Default
         JWEAlgorithm algorithm = configuration.getDefaultJWEAlgorithmEC();
-        assertThat(algorithm).isEqualTo(JWEAlgorithm.ECDH_ES_A256KW);
+        Assertions.assertThat(algorithm).isEqualTo(JWEAlgorithm.ECDH_ES_A256KW);
     }
 
     @Test
     public void getDefaultJWEAlgorithmEC_invalid() {
         TestConfig.addConfigValue("jwt.jwe.algorithm.default.EC", "RSA-OAEP-256");
-        Assertions.assertThrows(ConfigurationException.class, () -> configuration.getDefaultJWEAlgorithmEC());
+        Assertions.assertThatThrownBy(() -> configuration.getDefaultJWEAlgorithmEC())
+                .isInstanceOf(ConfigurationException.class);
 
     }
 
     @Test
     public void getDefaultJWEAlgorithmEC_empty() {
         TestConfig.addConfigValue("jwt.jwe.algorithm.default.EC", "");
-        Assertions.assertThrows(ConfigurationException.class, () -> configuration.getDefaultJWEAlgorithmEC());
+        Assertions.assertThatThrownBy(() -> configuration.getDefaultJWEAlgorithmEC())
+                .isInstanceOf(ConfigurationException.class);
     }
 
     @Test
     public void getDefaultJWEAlgorithmOCT() {
         TestConfig.addConfigValue("jwt.jwe.algorithm.default.OCT", "A192KW");
         JWEAlgorithm algorithm = configuration.getDefaultJWEAlgorithmOCT();
-        assertThat(algorithm).isEqualTo(JWEAlgorithm.A192KW);
+        Assertions.assertThat(algorithm).isEqualTo(JWEAlgorithm.A192KW);
     }
 
     @Test
     public void getDefaultJWEAlgorithmOCT_default() {
         // Default
         JWEAlgorithm algorithm = configuration.getDefaultJWEAlgorithmOCT();
-        assertThat(algorithm).isEqualTo(JWEAlgorithm.A256KW);
+        Assertions.assertThat(algorithm).isEqualTo(JWEAlgorithm.A256KW);
     }
 
     @Test
     public void getDefaultJWEAlgorithmOCT_invalid() {
         TestConfig.addConfigValue("jwt.jwe.algorithm.default.OCT", "RSA-OAEP-256");
-        Assertions.assertThrows(ConfigurationException.class, () -> configuration.getDefaultJWEAlgorithmOCT());
+        Assertions.assertThatThrownBy(() -> configuration.getDefaultJWEAlgorithmOCT())
+                .isInstanceOf(ConfigurationException.class);
 
     }
 
     @Test
     public void getDefaultJWEAlgorithmOCT_empty() {
         TestConfig.addConfigValue("jwt.jwe.algorithm.default.OCT", "");
-        Assertions.assertThrows(ConfigurationException.class, () -> configuration.getDefaultJWEAlgorithmOCT());
+        Assertions.assertThatThrownBy(() -> configuration.getDefaultJWEAlgorithmOCT())
+                .isInstanceOf(ConfigurationException.class);
     }
 
     @Test
     public void getJWKSetCachePeriod_default() {
         String cachePeriod = configuration.getJWKSetCachePeriod();
-        assertThat(cachePeriod).isEqualTo("24h");
+        Assertions.assertThat(cachePeriod).isEqualTo("24h");
     }
 
     @Test
     public void getJWKSetCachePeriod() {
         TestConfig.addConfigValue("jwt.remote.jwk.cache.period", "15m");
         String cachePeriod = configuration.getJWKSetCachePeriod();
-        assertThat(cachePeriod).isEqualTo("15m");
+        Assertions.assertThat(cachePeriod).isEqualTo("15m");
     }
 
     @Test
     public void getJWKSetCachePeriod_invalid() {
         TestConfig.addConfigValue("jwt.remote.jwk.cache.period", "abc");
-        Assertions.assertThrows(ConfigurationException.class, () -> configuration.getJWKSetCachePeriod());
+        Assertions.assertThatThrownBy(() -> configuration.getJWKSetCachePeriod())
+                .isInstanceOf(ConfigurationException.class);
     }
 
     @Test
     public void getReaderOrder() {
         // The Default Order
         List<KeyResourceType> order = configuration.getReaderOrder();
-        assertThat(order).containsExactly(KeyResourceType.JWKSET, KeyResourceType.JWK, KeyResourceType.PEM, KeyResourceType.KEYSTORE);
-        assertThat(logger.getLoggingEvents()).isEmpty();
+        Assertions.assertThat(order).containsExactly(KeyResourceType.JWKSET, KeyResourceType.JWK, KeyResourceType.PEM, KeyResourceType.KEYSTORE);
+        Assertions.assertThat(logger.getLoggingEvents()).isEmpty();
     }
 
     @Test
@@ -309,8 +321,8 @@ public class JwtSupportConfigurationTest {
         // some order
         TestConfig.addConfigValue("jwt.reader.order", "PEM, JWK, JWKSET, KEYSTORE");
         List<KeyResourceType> order = configuration.getReaderOrder();
-        assertThat(order).containsExactly(KeyResourceType.PEM, KeyResourceType.JWK, KeyResourceType.JWKSET, KeyResourceType.KEYSTORE);
-        assertThat(logger.getLoggingEvents()).isEmpty();
+        Assertions.assertThat(order).containsExactly(KeyResourceType.PEM, KeyResourceType.JWK, KeyResourceType.JWKSET, KeyResourceType.KEYSTORE);
+        Assertions.assertThat(logger.getLoggingEvents()).isEmpty();
     }
 
     @Test
@@ -319,11 +331,11 @@ public class JwtSupportConfigurationTest {
         TestConfig.addConfigValue("jwt.reader.order", "just, some, values");
         List<KeyResourceType> order = configuration.getReaderOrder();
 
-        assertThat(order).containsExactly(KeyResourceType.JWKSET, KeyResourceType.JWK, KeyResourceType.PEM, KeyResourceType.KEYSTORE);
+        Assertions.assertThat(order).containsExactly(KeyResourceType.JWKSET, KeyResourceType.JWK, KeyResourceType.PEM, KeyResourceType.KEYSTORE);
         ImmutableList<LoggingEvent> events = logger.getLoggingEvents();
-        assertThat(events).hasSize(4);
-        assertThat(events.get(0).getMessage()).isEqualTo("Parameter 'jwt.reader.order' must contain only values of 'KeyResourceType' but found 'just'.");
-        assertThat(events.get(3).getMessage()).isEqualTo("Parameter 'jwt.reader.order' resulted in an empty list. Taken the default order.");
+        Assertions.assertThat(events).hasSize(4);
+        Assertions.assertThat(events.get(0).getMessage()).isEqualTo("Parameter 'jwt.reader.order' must contain only values of 'KeyResourceType' but found 'just'.");
+        Assertions.assertThat(events.get(3).getMessage()).isEqualTo("Parameter 'jwt.reader.order' resulted in an empty list. Taken the default order.");
     }
 
     @Test
@@ -331,8 +343,8 @@ public class JwtSupportConfigurationTest {
         // some order
         TestConfig.addConfigValue("jwt.reader.order", "JwkSet");
         List<KeyResourceType> order = configuration.getReaderOrder();
-        assertThat(order).containsExactly(KeyResourceType.JWKSET);
-        assertThat(logger.getLoggingEvents()).isEmpty();
+        Assertions.assertThat(order).containsExactly(KeyResourceType.JWKSET);
+        Assertions.assertThat(logger.getLoggingEvents()).isEmpty();
     }
 
     @Test
@@ -340,41 +352,44 @@ public class JwtSupportConfigurationTest {
         // some order
         TestConfig.addConfigValue("jwt.reader.order", "JwkSet, JWKSET");
         List<KeyResourceType> order = configuration.getReaderOrder();
-        assertThat(order).containsExactly(KeyResourceType.JWKSET, KeyResourceType.JWKSET);
-        assertThat(logger.getLoggingEvents()).isEmpty();
+        Assertions.assertThat(order).containsExactly(KeyResourceType.JWKSET, KeyResourceType.JWKSET);
+        Assertions.assertThat(logger.getLoggingEvents()).isEmpty();
     }
 
     @Test
     public void getSaltLengthPasswordBasedEJWEEncryption() {
         int length = configuration.getSaltLengthPasswordBasedEJWEEncryption();
-        assertThat(length).isEqualTo(8);
+        Assertions.assertThat(length).isEqualTo(8);
     }
 
     @Test
     public void getSaltLengthPasswordBasedEJWEEncryption_value() {
         TestConfig.addConfigValue("jwt.jwe.pwbased.salt.length", "16");
         int length = configuration.getSaltLengthPasswordBasedEJWEEncryption();
-        assertThat(length).isEqualTo(16);
+        Assertions.assertThat(length).isEqualTo(16);
     }
 
     @Test
     public void getSaltLengthPasswordBasedEJWEEncryption_invalid1() {
         TestConfig.addConfigValue("jwt.jwe.pwbased.salt.length", "7");
-        ConfigurationException exception = Assertions.assertThrows(ConfigurationException.class, () -> configuration.getSaltLengthPasswordBasedEJWEEncryption());
-        assertThat(exception.getMessage()).isEqualTo("The value for the parameter 'jwt.jwe.pwbased.salt.length' must be at minimum 8 but was '7'.");
+        Assertions.assertThatThrownBy(() -> configuration.getSaltLengthPasswordBasedEJWEEncryption())
+                .isInstanceOf(ConfigurationException.class)
+                .hasMessage("The value for the parameter 'jwt.jwe.pwbased.salt.length' must be at minimum 8 but was '7'.");
     }
 
     @Test
     public void getSaltLengthPasswordBasedEJWEEncryption_invalid2() {
         TestConfig.addConfigValue("jwt.jwe.pwbased.salt.length", "-1");
-        ConfigurationException exception = Assertions.assertThrows(ConfigurationException.class, () -> configuration.getSaltLengthPasswordBasedEJWEEncryption());
-        assertThat(exception.getMessage()).isEqualTo("The value for the parameter 'jwt.jwe.pwbased.salt.length' must be at minimum 8 but was '-1'.");
+        Assertions.assertThatThrownBy(() -> configuration.getSaltLengthPasswordBasedEJWEEncryption())
+                .isInstanceOf(ConfigurationException.class)
+                .hasMessage("The value for the parameter 'jwt.jwe.pwbased.salt.length' must be at minimum 8 but was '-1'.");
     }
 
     @Test
     public void getSaltLengthPasswordBasedEJWEEncryption_invalid3() {
         TestConfig.addConfigValue("jwt.jwe.pwbased.salt.length", "NotNumber");
-        Assertions.assertThrows(NumberFormatException.class, () -> configuration.getSaltLengthPasswordBasedEJWEEncryption());
+        Assertions.assertThatThrownBy(() -> configuration.getSaltLengthPasswordBasedEJWEEncryption())
+                .isInstanceOf(NumberFormatException.class);
     }
 
     public static class TestKeyManager implements KeyManager {

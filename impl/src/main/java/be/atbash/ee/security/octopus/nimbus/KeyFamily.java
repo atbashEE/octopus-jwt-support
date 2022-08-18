@@ -27,7 +27,7 @@ public enum KeyFamily {
     EC_PUBLIC(KeyType.EC, AsymmetricPart.PUBLIC),
     EC_PRIVATE(KeyType.EC, AsymmetricPart.PRIVATE),
     AES(KeyType.OCT, AsymmetricPart.SYMMETRIC),
-    OKP_PUBlIC(KeyType.OKP, AsymmetricPart.PUBLIC),
+    OKP_PUBLIC(KeyType.OKP, AsymmetricPart.PUBLIC),
     OKP_PRIVATE(KeyType.OKP, AsymmetricPart.PRIVATE),
 
     // TODO What about DH keys. Can they be in JWK and should we add them here?

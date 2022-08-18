@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,15 +17,14 @@ package be.atbash.ee.security.octopus.nimbus.jose;
 
 
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.assertj.core.api.Assertions;
 
 
 /**
  * Tests JOSE object methods.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
 public class JOSEObjectTest {
@@ -37,16 +36,16 @@ public class JOSEObjectTest {
         // Implies JWS
         String data = "abc.def.ghi";
 
-        Assertions.assertDoesNotThrow(() -> {
+        Assertions.assertThatCode(() -> {
 
             Base64URLValue[] parts = JOSEObject.split(data);
 
-            assertThat(parts.length).isEqualTo(3);
+            Assertions.assertThat(parts.length).isEqualTo(3);
 
-            assertThat(parts[0].toString()).isEqualTo("abc");
-            assertThat(parts[1].toString()).isEqualTo("def");
-            assertThat(parts[2].toString()).isEqualTo("ghi");
-        });
+            Assertions.assertThat(parts[0].toString()).isEqualTo("abc");
+            Assertions.assertThat(parts[1].toString()).isEqualTo("def");
+            Assertions.assertThat(parts[2].toString()).isEqualTo("ghi");
+        }).doesNotThrowAnyException();
     }
 
     @Test
@@ -55,17 +54,17 @@ public class JOSEObjectTest {
         // Implies JWE
         String data = "abc.def.ghi.jkl.mno";
 
-        Assertions.assertDoesNotThrow(() -> {
+        Assertions.assertThatCode(() -> {
             Base64URLValue[] parts = JOSEObject.split(data);
 
-            assertThat(parts.length).isEqualTo(5);
+            Assertions.assertThat(parts.length).isEqualTo(5);
 
-            assertThat(parts[0].toString()).isEqualTo("abc");
-            assertThat(parts[1].toString()).isEqualTo("def");
-            assertThat(parts[2].toString()).isEqualTo("ghi");
-            assertThat(parts[3].toString()).isEqualTo("jkl");
-            assertThat(parts[4].toString()).isEqualTo("mno");
-        });
+            Assertions.assertThat(parts[0].toString()).isEqualTo("abc");
+            Assertions.assertThat(parts[1].toString()).isEqualTo("def");
+            Assertions.assertThat(parts[2].toString()).isEqualTo("ghi");
+            Assertions.assertThat(parts[3].toString()).isEqualTo("jkl");
+            Assertions.assertThat(parts[4].toString()).isEqualTo("mno");
+        }).doesNotThrowAnyException();
     }
 
     @Test
@@ -74,32 +73,32 @@ public class JOSEObjectTest {
         // Implies plain JOSE object
         String data = "abc.def.";
 
-        Assertions.assertDoesNotThrow(() -> {
+        Assertions.assertThatCode(() -> {
             Base64URLValue[] parts = JOSEObject.split(data);
 
-            assertThat(parts.length).isEqualTo(3);
+            Assertions.assertThat(parts.length).isEqualTo(3);
 
-            assertThat(parts[0].toString()).isEqualTo("abc");
-            assertThat(parts[1].toString()).isEqualTo("def");
-            assertThat(parts[2].toString()).isEqualTo("");
-        });
+            Assertions.assertThat(parts[0].toString()).isEqualTo("abc");
+            Assertions.assertThat(parts[1].toString()).isEqualTo("def");
+            Assertions.assertThat(parts[2].toString()).isEqualTo("");
+        }).doesNotThrowAnyException();
     }
 
     @Test
-    public void testSplitMissingDiotForPlain() {
+    public void testSplitMissingDotForPlain() {
 
         // Implies plain JOSE object
         String data = "abc.def";
 
-        Assertions.assertDoesNotThrow(() -> {
+        Assertions.assertThatCode(() -> {
             Base64URLValue[] parts = JOSEObject.split(data);
 
-            assertThat(parts.length).isEqualTo(3);
+            Assertions.assertThat(parts.length).isEqualTo(3);
 
-            assertThat(parts[0].toString()).isEqualTo("abc");
-            assertThat(parts[1].toString()).isEqualTo("def");
-            assertThat(parts[2].toString()).isEqualTo("");
-        });
+            Assertions.assertThat(parts[0].toString()).isEqualTo("abc");
+            Assertions.assertThat(parts[1].toString()).isEqualTo("def");
+            Assertions.assertThat(parts[2].toString()).isEqualTo("");
+        }).doesNotThrowAnyException();
     }
 
     @Test
@@ -108,15 +107,15 @@ public class JOSEObjectTest {
         // JWS with empty payload
         String data = "abc..ghi";
 
-        Assertions.assertDoesNotThrow(() -> {
+        Assertions.assertThatCode(() -> {
             Base64URLValue[] parts = JOSEObject.split(data);
 
-            assertThat(parts.length).isEqualTo(3);
+            Assertions.assertThat(parts.length).isEqualTo(3);
 
-            assertThat(parts[0].toString()).isEqualTo("abc");
-            assertThat(parts[1].toString()).isEqualTo("");
-            assertThat(parts[2].toString()).isEqualTo("ghi");
-        });
+            Assertions.assertThat(parts[0].toString()).isEqualTo("abc");
+            Assertions.assertThat(parts[1].toString()).isEqualTo("");
+            Assertions.assertThat(parts[2].toString()).isEqualTo("ghi");
+        }).doesNotThrowAnyException();
     }
 
     @Test
@@ -125,39 +124,39 @@ public class JOSEObjectTest {
         // JWS with empty payload
         String data = "....";
 
-        Assertions.assertDoesNotThrow(() -> {
+        Assertions.assertThatCode(() -> {
             Base64URLValue[] parts = JOSEObject.split(data);
 
-            assertThat(parts.length).isEqualTo(5);
+            Assertions.assertThat(parts.length).isEqualTo(5);
 
-            assertThat(parts[0].toString()).isEqualTo("");
-            assertThat(parts[1].toString()).isEqualTo("");
-            assertThat(parts[2].toString()).isEqualTo("");
-            assertThat(parts[3].toString()).isEqualTo("");
-            assertThat(parts[4].toString()).isEqualTo("");
-        });
+            Assertions.assertThat(parts[0].toString()).isEqualTo("");
+            Assertions.assertThat(parts[1].toString()).isEqualTo("");
+            Assertions.assertThat(parts[2].toString()).isEqualTo("");
+            Assertions.assertThat(parts[3].toString()).isEqualTo("");
+            Assertions.assertThat(parts[4].toString()).isEqualTo("");
+        }).doesNotThrowAnyException();
     }
 
     @Test
     public void testMIMETypes() {
 
-        assertThat(JOSEObject.MIME_TYPE_COMPACT).isEqualTo("application/jose; charset=UTF-8");
-        assertThat(JOSEObject.MIME_TYPE_JS).isEqualTo("application/jose+json; charset=UTF-8");
+        Assertions.assertThat(JOSEObject.MIME_TYPE_COMPACT).isEqualTo("application/jose; charset=UTF-8");
+        Assertions.assertThat(JOSEObject.MIME_TYPE_JS).isEqualTo("application/jose+json; charset=UTF-8");
     }
 
     @Test
     public void testEquality_case() {
 
-        assertThat(new JOSEObjectType("at+jwt")).isEqualTo(new JOSEObjectType("at+jwt"));
-        assertThat(new JOSEObjectType("at+jwt")).isEqualTo(new JOSEObjectType("AT+JWT"));
-        assertThat(new JOSEObjectType("AT+JWT")).isEqualTo(new JOSEObjectType("AT+JWT"));
+        Assertions.assertThat(new JOSEObjectType("at+jwt")).isEqualTo(new JOSEObjectType("at+jwt"));
+        Assertions.assertThat(new JOSEObjectType("at+jwt")).isEqualTo(new JOSEObjectType("AT+JWT"));
+        Assertions.assertThat(new JOSEObjectType("AT+JWT")).isEqualTo(new JOSEObjectType("AT+JWT"));
     }
 
     @Test
     public void testHashCode_case() {
 
-        assertThat(new JOSEObjectType("at+jwt").hashCode()).isEqualTo(new JOSEObjectType("at+jwt").hashCode());
-        assertThat(new JOSEObjectType("AT+JWT").hashCode()).isEqualTo(new JOSEObjectType("at+jwt").hashCode());
-        assertThat(new JOSEObjectType("AT+JWT").hashCode()).isEqualTo(new JOSEObjectType("AT+JWT").hashCode());
+        Assertions.assertThat(new JOSEObjectType("at+jwt").hashCode()).isEqualTo(new JOSEObjectType("at+jwt").hashCode());
+        Assertions.assertThat(new JOSEObjectType("AT+JWT").hashCode()).isEqualTo(new JOSEObjectType("at+jwt").hashCode());
+        Assertions.assertThat(new JOSEObjectType("AT+JWT").hashCode()).isEqualTo(new JOSEObjectType("AT+JWT").hashCode());
     }
 }

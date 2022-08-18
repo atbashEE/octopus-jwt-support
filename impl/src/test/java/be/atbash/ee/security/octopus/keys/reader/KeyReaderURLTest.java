@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package be.atbash.ee.security.octopus.keys.reader;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.util.resource.ResourceUtil;
 import net.jadler.Jadler;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,11 +29,9 @@ import java.net.URI;
 import java.util.List;
 import java.util.Scanner;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 class KeyReaderURLTest {
 
-    private KeyReader reader = new KeyReader();
+    private final KeyReader reader = new KeyReader();
 
     @BeforeEach
     public void setUp() {
@@ -61,7 +60,7 @@ class KeyReaderURLTest {
                 .withBody(fileContent);
 
         List<AtbashKey> keys = reader.readKeyResource(URI.create("http://localhost:" + Jadler.port() + "/data"), null);
-        assertThat(keys).hasSize(2);
+        Assertions.assertThat(keys).hasSize(2);
     }
 
     @Test
@@ -80,7 +79,7 @@ class KeyReaderURLTest {
                 .withBody(fileContent);
 
         List<AtbashKey> keys = reader.readKeyResource(URI.create("http://localhost:" + Jadler.port() + "/data"), null);
-        assertThat(keys).hasSize(2);
+        Assertions.assertThat(keys).hasSize(2);
     }
 
     @Test
@@ -99,6 +98,6 @@ class KeyReaderURLTest {
                 .withBody(fileContent);
 
         List<AtbashKey> keys = reader.readKeyResource(URI.create("http://localhost:" + Jadler.port() + "/data"), null);
-        assertThat(keys).hasSize(4);
+        Assertions.assertThat(keys).hasSize(4);
     }
 }

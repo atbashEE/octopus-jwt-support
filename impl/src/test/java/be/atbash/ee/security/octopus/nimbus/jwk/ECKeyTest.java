@@ -67,57 +67,41 @@ public class ECKeyTest {
     // Test parameters are from JWK spec
     private static final class ExampleKeyP256 {
 
-
         static final Curve CRV = Curve.P_256;
-
 
         static final Base64URLValue X = new Base64URLValue("MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4");
 
-
         static final Base64URLValue Y = new Base64URLValue("4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM");
-
 
         static final Base64URLValue D = new Base64URLValue("870MB6gfuTJ4HtUnUvYMyJpr5eUZNP4Bk43bVdj3eAE");
     }
 
-
     // Test parameters are from Anders Rundgren, public only
     private static final class ExampleKeyP256Alt {
 
-
         static final Curve CRV = Curve.P_256;
 
-
         static final Base64URLValue X = new Base64URLValue("3l2Da_flYc-AuUTm2QzxgyvJxYM_2TeB9DMlwz7j1PE");
-
 
         static final Base64URLValue Y = new Base64URLValue("-kjT7Wrfhwsi9SG6H4UXiyUiVE9GHCLauslksZ3-_t0");
     }
 
-
     // Test parameters are from Anders Rundgren, public only
     private static final class ExampleKeyP384Alt {
 
-
         static final Curve CRV = Curve.P_384;
 
-
         static final Base64URLValue X = new Base64URLValue("Xy0mn0LmRyDBeHBjZrqH9z5Weu5pzCZYl1FJGHdoEj1utAoCpD4-Wn3VAIT-qgFF");
-
 
         static final Base64URLValue Y = new Base64URLValue("mrZQ1aB1E7JksXe6LXmM3BiGzqtlwCtMN0cpJb5EU62JMSISSK8l7cXSFt84A25z");
     }
 
-
     // Test parameters are from Anders Rundgren, public only
     private static final class ExampleKeyP521Alt {
 
-
         static final Curve CRV = Curve.P_521;
 
-
         static final Base64URLValue X = new Base64URLValue("AfwEaSkqoPQynn4SdAXOqbyDuK6KsbI04i-6aWvh3GdvREZuHaWFyg791gcvJ4OqG13-gzfYxZxfblPMqfOtQrzk");
-
 
         static final Base64URLValue Y = new Base64URLValue("AHgOZhhJb2ZiozkquiEa0Z9SfERJbWaaE7qEnCuk9VVZaWruKWKNzZadoIRPt8h305r14KRoxu8AfV20X-d_2Ups");
     }
@@ -1033,9 +1017,11 @@ public class ECKeyTest {
         KeyPairGenerator generator = KeyPairGenerator.getInstance("EC");
         generator.initialize(ecParameterSpec);
         KeyPair keyPair = generator.generateKeyPair();
-        new ECKey.Builder(Curve.P_256, (ECPublicKey) keyPair.getPublic())
-                .privateKey((ECPrivateKey) keyPair.getPrivate())
-                .build();
+        Assertions.assertThatCode(
+                () -> new ECKey.Builder(Curve.P_256, (ECPublicKey) keyPair.getPublic())
+                        .privateKey((ECPrivateKey) keyPair.getPrivate())
+                        .build()
+        ).doesNotThrowAnyException();
 
     }
 
@@ -1048,9 +1034,11 @@ public class ECKeyTest {
         KeyPairGenerator generator = KeyPairGenerator.getInstance("EC");
         generator.initialize(ecParameterSpec);
         KeyPair keyPair = generator.generateKeyPair();
-        new ECKey.Builder(Curve.P_384, (ECPublicKey) keyPair.getPublic())
+        Assertions.assertThatCode(
+                () -> new ECKey.Builder(Curve.P_384, (ECPublicKey) keyPair.getPublic())
                 .privateKey((ECPrivateKey) keyPair.getPrivate())
-                .build();
+                .build()
+        ).doesNotThrowAnyException();
 
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,10 @@ import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.fake.FakeECPrivate;
 import be.atbash.ee.security.octopus.keys.fake.FakeRSAPublic;
 import be.atbash.ee.security.octopus.util.HmacSecretUtil;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class JWTParametersSigningTest {
 
@@ -35,7 +34,7 @@ public class JWTParametersSigningTest {
 
         JWTParametersSigning parameters = new JWTParametersSigning(null, atbashKey);
 
-        assertThat(parameters.getKeyID()).isEqualTo("hmacKeyId");
+        Assertions.assertThat(parameters.getKeyID()).isEqualTo("hmacKeyId");
     }
 
     @Test
@@ -44,7 +43,7 @@ public class JWTParametersSigningTest {
         AtbashKey key = new AtbashKey("rsaKeyId", new FakeRSAPublic());
         JWTParametersSigning parameters = new JWTParametersSigning(null, key);
 
-        assertThat(parameters.getKeyID()).isEqualTo("rsaKeyId");
+        Assertions.assertThat(parameters.getKeyID()).isEqualTo("rsaKeyId");
     }
 
     @Test
@@ -52,7 +51,7 @@ public class JWTParametersSigningTest {
         AtbashKey key = new AtbashKey("ecKeyId", new FakeECPrivate());
         JWTParametersSigning parameters = new JWTParametersSigning(null, key);
 
-        assertThat(parameters.getKeyID()).isEqualTo("ecKeyId");
+        Assertions.assertThat(parameters.getKeyID()).isEqualTo("ecKeyId");
     }
 
 }

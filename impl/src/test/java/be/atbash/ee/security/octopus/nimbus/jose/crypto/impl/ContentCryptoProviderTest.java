@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWECryptoParts;
 import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEHeader;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 import be.atbash.ee.security.octopus.nimbus.util.ByteUtils;
-import org.junit.jupiter.api.Assertions;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import javax.crypto.SecretKey;
@@ -32,12 +32,10 @@ import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.Arrays;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 
 /**
  * Tests the content encryption / decryption provider.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
 public class ContentCryptoProviderTest {
@@ -46,28 +44,28 @@ public class ContentCryptoProviderTest {
 	public void testCompatibleEncryptionMethods() {
 
 		// 128 bit cek
-		assertThat(ContentCryptoProvider.COMPATIBLE_ENCRYPTION_METHODS.get(128)).contains(EncryptionMethod.A128GCM);
-		assertThat(ContentCryptoProvider.COMPATIBLE_ENCRYPTION_METHODS.get(128).size()).isEqualTo(1);
+		Assertions.assertThat(ContentCryptoProvider.COMPATIBLE_ENCRYPTION_METHODS.get(128)).contains(EncryptionMethod.A128GCM);
+		Assertions.assertThat(ContentCryptoProvider.COMPATIBLE_ENCRYPTION_METHODS.get(128).size()).isEqualTo(1);
 
 		// 192 bit cek
-		assertThat(ContentCryptoProvider.COMPATIBLE_ENCRYPTION_METHODS.get(192)).contains(EncryptionMethod.A192GCM);
-		assertThat(ContentCryptoProvider.COMPATIBLE_ENCRYPTION_METHODS.get(192).size()).isEqualTo(1);
+		Assertions.assertThat(ContentCryptoProvider.COMPATIBLE_ENCRYPTION_METHODS.get(192)).contains(EncryptionMethod.A192GCM);
+		Assertions.assertThat(ContentCryptoProvider.COMPATIBLE_ENCRYPTION_METHODS.get(192).size()).isEqualTo(1);
 
 		// 256 bit cek
-		assertThat(ContentCryptoProvider.COMPATIBLE_ENCRYPTION_METHODS.get(256)).contains(EncryptionMethod.A256GCM);
-		assertThat(ContentCryptoProvider.COMPATIBLE_ENCRYPTION_METHODS.get(256)).contains(EncryptionMethod.A128CBC_HS256);
-		assertThat(ContentCryptoProvider.COMPATIBLE_ENCRYPTION_METHODS.get(256).size()).isEqualTo(2);
+		Assertions.assertThat(ContentCryptoProvider.COMPATIBLE_ENCRYPTION_METHODS.get(256)).contains(EncryptionMethod.A256GCM);
+		Assertions.assertThat(ContentCryptoProvider.COMPATIBLE_ENCRYPTION_METHODS.get(256)).contains(EncryptionMethod.A128CBC_HS256);
+		Assertions.assertThat(ContentCryptoProvider.COMPATIBLE_ENCRYPTION_METHODS.get(256).size()).isEqualTo(2);
 
 		// 384 bit cek
-		assertThat(ContentCryptoProvider.COMPATIBLE_ENCRYPTION_METHODS.get(384)).contains(EncryptionMethod.A192CBC_HS384);
-		assertThat(ContentCryptoProvider.COMPATIBLE_ENCRYPTION_METHODS.get(384).size()).isEqualTo(1);
+		Assertions.assertThat(ContentCryptoProvider.COMPATIBLE_ENCRYPTION_METHODS.get(384)).contains(EncryptionMethod.A192CBC_HS384);
+		Assertions.assertThat(ContentCryptoProvider.COMPATIBLE_ENCRYPTION_METHODS.get(384).size()).isEqualTo(1);
 
 		// 512 bit cek
-		assertThat(ContentCryptoProvider.COMPATIBLE_ENCRYPTION_METHODS.get(512)).contains(EncryptionMethod.A256CBC_HS512);
-		assertThat(ContentCryptoProvider.COMPATIBLE_ENCRYPTION_METHODS.get(512).size()).isEqualTo(1);
+		Assertions.assertThat(ContentCryptoProvider.COMPATIBLE_ENCRYPTION_METHODS.get(512)).contains(EncryptionMethod.A256CBC_HS512);
+		Assertions.assertThat(ContentCryptoProvider.COMPATIBLE_ENCRYPTION_METHODS.get(512).size()).isEqualTo(1);
 
 		// Total
-		assertThat(ContentCryptoProvider.COMPATIBLE_ENCRYPTION_METHODS.size()).isEqualTo(5);
+		Assertions.assertThat(ContentCryptoProvider.COMPATIBLE_ENCRYPTION_METHODS.size()).isEqualTo(5);
 	}
 
 	@Test
@@ -86,7 +84,7 @@ public class ContentCryptoProviderTest {
 				cek,
 				encryptedKey);
 
-		assertThat(Arrays.equals(clearText, ContentCryptoProvider.decrypt(
+		Assertions.assertThat(Arrays.equals(clearText, ContentCryptoProvider.decrypt(
 				header,
 				jweParts.getInitializationVector(),
 				jweParts.getCipherText(),
@@ -104,14 +102,14 @@ public class ContentCryptoProviderTest {
 		SecretKey cek = new SecretKeySpec(cekBytes, "AES");
 		Base64URLValue encryptedKey = null;
 
-		KeyLengthException e = Assertions.assertThrows(KeyLengthException.class,
-				() -> ContentCryptoProvider.encrypt(
-						header,
-						clearText,
-						cek,
-						encryptedKey));
-
-		assertThat(e.getMessage()).isEqualTo("The Content Encryption Key (CEK) length for A256CBC-HS512 must be 512 bits");
+		Assertions.assertThatThrownBy(
+						() -> ContentCryptoProvider.encrypt(
+								header,
+								clearText,
+								cek,
+								encryptedKey))
+				.isInstanceOf(KeyLengthException.class)
+				.hasMessage("The Content Encryption Key (CEK) length for A256CBC-HS512 must be 512 bits");
 	}
 
 	@Test
@@ -124,28 +122,27 @@ public class ContentCryptoProviderTest {
 		SecretKey cek = new SecretKeySpec(cekBytes, "AES");
 		Base64URLValue encryptedKey = null;
 
-		KeyLengthException e = Assertions.assertThrows(KeyLengthException.class,
-				() -> ContentCryptoProvider.encrypt(
-						header,
-						clearText,
-						cek,
-						encryptedKey
-				));
-
-
-		assertThat(e.getMessage()).isEqualTo("The Content Encryption Key (CEK) length for A256GCM must be 256 bits");
+		Assertions.assertThatThrownBy(
+						() -> ContentCryptoProvider.encrypt(
+								header,
+								clearText,
+								cek,
+								encryptedKey
+						))
+				.isInstanceOf(KeyLengthException.class)
+				.hasMessage("The Content Encryption Key (CEK) length for A256GCM must be 256 bits");
 
 	}
 
 	@Test
 	public void testKeyGen() {
 
-		assertThat(ContentCryptoProvider.generateCEK(EncryptionMethod.A128GCM).getEncoded().length).isEqualTo(ByteUtils.byteLength(128));
-		assertThat(ContentCryptoProvider.generateCEK(EncryptionMethod.A192GCM).getEncoded().length).isEqualTo(ByteUtils.byteLength(192));
-		assertThat(ContentCryptoProvider.generateCEK(EncryptionMethod.A256GCM).getEncoded().length).isEqualTo(ByteUtils.byteLength(256));
-		assertThat(ContentCryptoProvider.generateCEK(EncryptionMethod.A128CBC_HS256).getEncoded().length).isEqualTo(ByteUtils.byteLength(256));
-		assertThat(ContentCryptoProvider.generateCEK(EncryptionMethod.A192CBC_HS384).getEncoded().length).isEqualTo(ByteUtils.byteLength(384));
-		assertThat(ContentCryptoProvider.generateCEK(EncryptionMethod.A256CBC_HS512).getEncoded().length).isEqualTo(ByteUtils.byteLength(512));
+		Assertions.assertThat(ContentCryptoProvider.generateCEK(EncryptionMethod.A128GCM).getEncoded().length).isEqualTo(ByteUtils.byteLength(128));
+		Assertions.assertThat(ContentCryptoProvider.generateCEK(EncryptionMethod.A192GCM).getEncoded().length).isEqualTo(ByteUtils.byteLength(192));
+		Assertions.assertThat(ContentCryptoProvider.generateCEK(EncryptionMethod.A256GCM).getEncoded().length).isEqualTo(ByteUtils.byteLength(256));
+		Assertions.assertThat(ContentCryptoProvider.generateCEK(EncryptionMethod.A128CBC_HS256).getEncoded().length).isEqualTo(ByteUtils.byteLength(256));
+		Assertions.assertThat(ContentCryptoProvider.generateCEK(EncryptionMethod.A192CBC_HS384).getEncoded().length).isEqualTo(ByteUtils.byteLength(384));
+		Assertions.assertThat(ContentCryptoProvider.generateCEK(EncryptionMethod.A256CBC_HS512).getEncoded().length).isEqualTo(ByteUtils.byteLength(512));
 
 	}
 }

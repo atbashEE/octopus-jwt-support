@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import be.atbash.ee.security.octopus.keys.Filters;
 import be.atbash.ee.security.octopus.keys.TestKeys;
 import be.atbash.ee.security.octopus.nimbus.jwk.JWKSet;
 import be.atbash.ee.security.octopus.nimbus.jwk.RSAKey;
-import org.junit.jupiter.api.Assertions;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -53,7 +53,8 @@ public class KeyWriterFactoryTest {
         JWKSet jwkSet = new JWKSet(rsaKey);
         KeyEncoderParameters parameters = new KeyEncoderParameters(jwkSet);
 
-        Assertions.assertThrows(DuplicateKeyIdException.class, () -> factory.writeKeyAsJWKSet(atbashKeys.get(1), parameters));
+        Assertions.assertThatThrownBy(() -> factory.writeKeyAsJWKSet(atbashKeys.get(1), parameters))
+                        .isInstanceOf(DuplicateKeyIdException.class);
     }
 
     @Test
@@ -72,7 +73,9 @@ public class KeyWriterFactoryTest {
 
 
         List<AtbashKey> atbashKeys2 = TestKeys.generateRSAKeys("kid2");
-        factory.writeKeyAsJWKSet(atbashKeys2.get(0), parameters);
+
+        byte[] bytes = factory.writeKeyAsJWKSet(atbashKeys2.get(0), parameters);
+        Assertions.assertThat(bytes).isNotNull();
     }
 
 }

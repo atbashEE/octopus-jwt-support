@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,11 +25,10 @@ import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.keys.selector.KeySelector;
 import be.atbash.ee.security.octopus.keys.selector.SelectorCriteria;
 import be.atbash.ee.security.octopus.keys.selector.SingleKeySelector;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class AtbashKeyJSONTest {
 
@@ -42,16 +41,16 @@ public class AtbashKeyJSONTest {
         SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID).withAsymmetricPart(AsymmetricPart.PRIVATE).build();
         List<AtbashKey> keyList = keyManager.retrieveKeys(criteria);
 
-        assertThat(keyList).hasSize(1);
+        Assertions.assertThat(keyList).hasSize(1);
 
         JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.NONE).build();
         String json = new JWTEncoder().encode(keyList.get(0), parameters);
 
         AtbashKey key = new JWTDecoder().decode(json, AtbashKey.class).getData();
 
-        assertThat(key.getKey().getAlgorithm()).isEqualTo(keyList.get(0).getKey().getAlgorithm());
+        Assertions.assertThat(key.getKey().getAlgorithm()).isEqualTo(keyList.get(0).getKey().getAlgorithm());
         // When encoded representation (PKCS#8) is the same, I guess both keys are the same
-        assertThat(key.getKey().getEncoded()).isEqualTo(keyList.get(0).getKey().getEncoded());
+        Assertions.assertThat(key.getKey().getEncoded()).isEqualTo(keyList.get(0).getKey().getEncoded());
 
     }
 
@@ -62,16 +61,16 @@ public class AtbashKeyJSONTest {
         SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID).withAsymmetricPart(AsymmetricPart.PUBLIC).build();
         List<AtbashKey> keyList = keyManager.retrieveKeys(criteria);
 
-        assertThat(keyList).hasSize(1);
+        Assertions.assertThat(keyList).hasSize(1);
 
         JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.NONE).build();
         String json = new JWTEncoder().encode(keyList.get(0), parameters);
 
         AtbashKey key = new JWTDecoder().decode(json, AtbashKey.class).getData();
 
-        assertThat(key.getKey().getAlgorithm()).isEqualTo(keyList.get(0).getKey().getAlgorithm());
+        Assertions.assertThat(key.getKey().getAlgorithm()).isEqualTo(keyList.get(0).getKey().getAlgorithm());
         // When encoded representation (PKCS#8) is the same, I guess both keys are the same
-        assertThat(key.getKey().getEncoded()).isEqualTo(keyList.get(0).getKey().getEncoded());
+        Assertions.assertThat(key.getKey().getEncoded()).isEqualTo(keyList.get(0).getKey().getEncoded());
 
     }
 
@@ -82,18 +81,18 @@ public class AtbashKeyJSONTest {
         SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID).withAsymmetricPart(AsymmetricPart.PRIVATE).build();
         List<AtbashKey> keyList = keyManager.retrieveKeys(criteria);
 
-        assertThat(keyList).hasSize(1);
+        Assertions.assertThat(keyList).hasSize(1);
 
         JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.NONE).build();
         String json = new JWTEncoder().encode(keyList.get(0), parameters);
 
         AtbashKey key = new JWTDecoder().decode(json, AtbashKey.class).getData();
 
-        //assertThat(key.getKey().getAlgorithm()).isEqualTo(keyList.get(0).getKey().getAlgorithm());
-        assertThat(key.getKey().getAlgorithm()).isEqualTo("EC"); // Original is ECDSA
+        //Assertions.assertThat(key.getKey().getAlgorithm()).isEqualTo(keyList.get(0).getKey().getAlgorithm());
+        Assertions.assertThat(key.getKey().getAlgorithm()).isEqualTo("EC"); // Original is ECDSA
 
         // Alternative test by alternativeTest_ECSerialization()
-        //assertThat(key.getKey().getEncoded()).isEqualTo(keyList.get(0).getKey().getEncoded());
+        //Assertions.assertThat(key.getKey().getEncoded()).isEqualTo(keyList.get(0).getKey().getEncoded());
 
     }
 
@@ -104,19 +103,19 @@ public class AtbashKeyJSONTest {
         SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID).withAsymmetricPart(AsymmetricPart.PUBLIC).build();
         List<AtbashKey> keyList = keyManager.retrieveKeys(criteria);
 
-        assertThat(keyList).hasSize(1);
+        Assertions.assertThat(keyList).hasSize(1);
 
         JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.NONE).build();
         String json = new JWTEncoder().encode(keyList.get(0), parameters);
 
         AtbashKey key = new JWTDecoder().decode(json, AtbashKey.class).getData();
 
-        //assertThat(key.getKey().getAlgorithm()).isEqualTo(keyList.get(0).getKey().getAlgorithm());
-        assertThat(key.getKey().getAlgorithm()).isEqualTo("EC"); // Original is ECDSA
+        //Assertions.assertThat(key.getKey().getAlgorithm()).isEqualTo(keyList.get(0).getKey().getAlgorithm());
+        Assertions.assertThat(key.getKey().getAlgorithm()).isEqualTo("EC"); // Original is ECDSA
 
 
         // Alternative test by alternativeTest_ECSerialization()
-        //assertThat(key.getKey().getEncoded()).isEqualTo(keyList.get(0).getKey().getEncoded());
+        //Assertions.assertThat(key.getKey().getEncoded()).isEqualTo(keyList.get(0).getKey().getEncoded());
 
     }
 
@@ -127,8 +126,8 @@ public class AtbashKeyJSONTest {
         String json = new JWTEncoder().encode(keys.get(0), parameters);
 
         AtbashKey key = new JWTDecoder().decode(json, AtbashKey.class).getData();
-        assertThat(key.getKey().getAlgorithm()).isEqualTo("AES");
-        assertThat(key.getKey().getEncoded()).isEqualTo(keys.get(0).getKey().getEncoded());
+        Assertions.assertThat(key.getKey().getAlgorithm()).isEqualTo("AES");
+        Assertions.assertThat(key.getKey().getEncoded()).isEqualTo(keys.get(0).getKey().getEncoded());
     }
 
     @Test
@@ -138,17 +137,17 @@ public class AtbashKeyJSONTest {
         SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID).withAsymmetricPart(AsymmetricPart.PRIVATE).build();
         List<AtbashKey> keyList = keyManager.retrieveKeys(criteria);
 
-        assertThat(keyList).hasSize(1);
+        Assertions.assertThat(keyList).hasSize(1);
 
         JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.NONE).build();
         String json = new JWTEncoder().encode(keyList.get(0), parameters);
 
         AtbashKey key = new JWTDecoder().decode(json, AtbashKey.class).getData();
 
-        assertThat(key.getKey().getAlgorithm()).isEqualTo(keyList.get(0).getKey().getAlgorithm());
+        Assertions.assertThat(key.getKey().getAlgorithm()).isEqualTo(keyList.get(0).getKey().getAlgorithm());
 
         // When encoded representation (PKCS#8) is the same, I guess both keys are the same
-        assertThat(key.getKey().getEncoded()).isEqualTo(keyList.get(0).getKey().getEncoded());
+        Assertions.assertThat(key.getKey().getEncoded()).isEqualTo(keyList.get(0).getKey().getEncoded());
 
     }
 
@@ -159,17 +158,17 @@ public class AtbashKeyJSONTest {
         SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID).withAsymmetricPart(AsymmetricPart.PUBLIC).build();
         List<AtbashKey> keyList = keyManager.retrieveKeys(criteria);
 
-        assertThat(keyList).hasSize(1);
+        Assertions.assertThat(keyList).hasSize(1);
 
         JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.NONE).build();
         String json = new JWTEncoder().encode(keyList.get(0), parameters);
 
         AtbashKey key = new JWTDecoder().decode(json, AtbashKey.class).getData();
 
-        assertThat(key.getKey().getAlgorithm()).isEqualTo(keyList.get(0).getKey().getAlgorithm());
+        Assertions.assertThat(key.getKey().getAlgorithm()).isEqualTo(keyList.get(0).getKey().getAlgorithm());
 
         // When encoded representation (PKCS#8) is the same, I guess both keys are the same
-        assertThat(key.getKey().getEncoded()).isEqualTo(keyList.get(0).getKey().getEncoded());
+        Assertions.assertThat(key.getKey().getEncoded()).isEqualTo(keyList.get(0).getKey().getEncoded());
 
     }
 
@@ -185,14 +184,14 @@ public class AtbashKeyJSONTest {
         SelectorCriteria criteria = SelectorCriteria.newBuilder().withId(KID).withAsymmetricPart(AsymmetricPart.PRIVATE).build();
         List<AtbashKey> keyList = keyManager.retrieveKeys(criteria);
 
-        assertThat(keyList).hasSize(1);
+        Assertions.assertThat(keyList).hasSize(1);
 
         AtbashKey privateOriginalKey = keyList.get(0);
 
         criteria = SelectorCriteria.newBuilder().withId(KID).withAsymmetricPart(AsymmetricPart.PUBLIC).build();
         keyList = keyManager.retrieveKeys(criteria);
 
-        assertThat(keyList).hasSize(1);
+        Assertions.assertThat(keyList).hasSize(1);
         AtbashKey publicOriginalKey = keyList.get(0);
 
         // 1. Test with the original keys (to verify if JWTEncoder and JWTDecoder doesn't have a problem)
@@ -233,7 +232,7 @@ public class AtbashKeyJSONTest {
         KeySelector keySelector = new SingleKeySelector(publicOriginalKey);
         Payload data = new JWTDecoder().decode(encoded, Payload.class, keySelector).getData();
 
-        assertThat(payload).isEqualToComparingFieldByField(data);
+        Assertions.assertThat(payload).usingRecursiveComparison().isEqualTo(data);
     }
 
     private Payload getPayload() {

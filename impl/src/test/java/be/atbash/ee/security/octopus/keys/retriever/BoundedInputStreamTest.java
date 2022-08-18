@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,12 @@
  */
 package be.atbash.ee.security.octopus.keys.retriever;
 
-import org.junit.jupiter.api.Assertions;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class BoundedInputStreamTest {
 
@@ -41,7 +39,7 @@ public class BoundedInputStreamTest {
         byte[] data = createDataArray();
         InputStream stream = new ByteArrayInputStream(data);
         BoundedInputStream bis = new BoundedInputStream(stream);
-        assertThat(bis.getLimitBytes()).isEqualTo(-1L);
+        Assertions.assertThat(bis.getLimitBytes()).isEqualTo(-1L);
     }
 
     @Test
@@ -55,14 +53,15 @@ public class BoundedInputStreamTest {
 
         BoundedInputStream bis = new BoundedInputStream(stream, limit);
 
-        assertThat(bis.getLimitBytes()).isEqualTo(limit);
+        Assertions.assertThat(bis.getLimitBytes()).isEqualTo(limit);
 
         byte[] readData = new byte[data.length];
 
-        IOException e = Assertions.assertThrows(IOException.class, () -> bis.read(readData));
-        assertThat(e.getMessage()).isEqualTo("Exceeded configured input limit of 50 bytes");
+        Assertions.assertThatThrownBy(() -> bis.read(readData))
+                .isInstanceOf(IOException.class)
+                .hasMessage("Exceeded configured input limit of 50 bytes.");
 
-        assertThat(bis.available()).isEqualTo(0);
+        Assertions.assertThat(bis.available()).isEqualTo(0);
     }
 
     @Test
@@ -76,13 +75,13 @@ public class BoundedInputStreamTest {
 
         BoundedInputStream bis = new BoundedInputStream(stream, limit);
 
-        assertThat(bis.getLimitBytes()).isEqualTo(limit);
+        Assertions.assertThat(bis.getLimitBytes()).isEqualTo(limit);
 
         byte[] readData = new byte[data.length];
 
-        assertThat(bis.read(readData)).isEqualTo(data.length);
+        Assertions.assertThat(bis.read(readData)).isEqualTo(data.length);
 
-        assertThat(bis.available()).isEqualTo(0);
+        Assertions.assertThat(bis.available()).isEqualTo(0);
     }
 
     @Test
@@ -96,16 +95,17 @@ public class BoundedInputStreamTest {
 
         BoundedInputStream bis = new BoundedInputStream(stream, limit);
 
-        assertThat(bis.getLimitBytes()).isEqualTo(limit);
+        Assertions.assertThat(bis.getLimitBytes()).isEqualTo(limit);
 
         for (int i = 0; i < limit; i++) {
-            assertThat(bis.read()).isEqualTo(1);
+            Assertions.assertThat(bis.read()).isEqualTo(1);
         }
 
-        IOException e = Assertions.assertThrows(IOException.class, () -> bis.read());
-        assertThat(e.getMessage()).isEqualTo("Exceeded configured input limit of 50 bytes");
+        Assertions.assertThatThrownBy(() -> bis.read())
+                .isInstanceOf(IOException.class)
+                .hasMessage("Exceeded configured input limit of 50 bytes.");
 
-        assertThat(bis.available()).isEqualTo(0);
+        Assertions.assertThat(bis.available()).isEqualTo(0);
     }
 
     @Test
@@ -119,13 +119,13 @@ public class BoundedInputStreamTest {
 
         BoundedInputStream bis = new BoundedInputStream(stream, limit);
 
-        assertThat(bis.getLimitBytes()).isEqualTo(limit);
+        Assertions.assertThat(bis.getLimitBytes()).isEqualTo(limit);
 
         for (int i = 0; i < limit - 1; i++) {
-            assertThat(bis.read()).isEqualTo(1);
+            Assertions.assertThat(bis.read()).isEqualTo(1);
         }
-        assertThat(bis.read()).isEqualTo(-1);
-        assertThat(bis.available()).isEqualTo(0);
+        Assertions.assertThat(bis.read()).isEqualTo(-1);
+        Assertions.assertThat(bis.available()).isEqualTo(0);
     }
 
     @Test
@@ -137,12 +137,12 @@ public class BoundedInputStreamTest {
 
         BoundedInputStream bis = new BoundedInputStream(stream, -1L);
 
-        assertThat(bis.getLimitBytes()).isEqualTo(-1L);
+        Assertions.assertThat(bis.getLimitBytes()).isEqualTo(-1L);
 
         for (int i = 0; i < data.length; i++) {
-            assertThat(bis.read()).isEqualTo(1);
+            Assertions.assertThat(bis.read()).isEqualTo(1);
         }
-        assertThat(bis.read()).isEqualTo(-1);
-        assertThat(bis.available()).isEqualTo(0);
+        Assertions.assertThat(bis.read()).isEqualTo(-1);
+        Assertions.assertThat(bis.available()).isEqualTo(0);
     }
 }

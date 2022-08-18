@@ -24,7 +24,6 @@ import javax.json.Json;
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
-import java.io.Serializable;
 import java.net.URI;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -67,10 +66,7 @@ import java.util.*;
  *
  * Based on code by Vladimir Dzhuvinov, Justin Richer and Stefan Larsson
  */
-public abstract class JWK implements Serializable {
-
-
-    private static final long serialVersionUID = 1L;
+public abstract class JWK {
 
 
     /**

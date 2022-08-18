@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Arrays;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.assertj.core.api.Assertions;
 
 
 /**
@@ -54,7 +54,7 @@ public class AESKWTest {
                 (byte) 249, (byte) 52, (byte) 117, (byte) 184, (byte) 140, (byte) 81, (byte) 246, (byte) 158,
                 (byte) 161, (byte) 177, (byte) 20, (byte) 33, (byte) 245, (byte) 57, (byte) 59, (byte) 4};
 
-        assertThat(Arrays.equals(expectedEncryptedCEK, encryptedCEK)).isTrue();
+        Assertions.assertThat(Arrays.equals(expectedEncryptedCEK, encryptedCEK)).isTrue();
     }
 
 
@@ -80,8 +80,8 @@ public class AESKWTest {
                 (byte) 161, (byte) 131, (byte) 36, (byte) 55, (byte) 202, (byte) 236, (byte) 185, (byte) 172,
                 (byte) 129, (byte) 23, (byte) 153, (byte) 194, (byte) 195, (byte) 48, (byte) 253, (byte) 182};
 
-        assertThat(Arrays.equals(expectedCEK, cek.getEncoded())).isTrue();
-        assertThat(cek.getAlgorithm()).isEqualTo("AES");
+        Assertions.assertThat(Arrays.equals(expectedCEK, cek.getEncoded())).isTrue();
+        Assertions.assertThat(cek.getAlgorithm()).isEqualTo("AES");
     }
 
     @Test
@@ -106,7 +106,7 @@ public class AESKWTest {
                 (byte) 161, (byte) 131, (byte) 36, (byte) 55, (byte) 202, (byte) 236, (byte) 185, (byte) 172,
                 (byte) 129, (byte) 23, (byte) 153, (byte) 194, (byte) 195, (byte) 48, (byte) 253, (byte) 182};
 
-        assertThat(cek.getEncoded()).isEqualTo(expectedCEK);
-        assertThat(cek.getAlgorithm()).isEqualTo("AES");
+        Assertions.assertThat(cek.getEncoded()).isEqualTo(expectedCEK);
+        Assertions.assertThat(cek.getAlgorithm()).isEqualTo("AES");
     }
 }

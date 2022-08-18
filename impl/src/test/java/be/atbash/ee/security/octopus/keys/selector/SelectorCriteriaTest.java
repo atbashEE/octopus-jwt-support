@@ -17,12 +17,11 @@ package be.atbash.ee.security.octopus.keys.selector;
 
 import be.atbash.ee.security.octopus.keys.fake.FakeRSAPublic;
 import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class SelectorCriteriaTest {
 
@@ -45,15 +44,15 @@ public class SelectorCriteriaTest {
 
         SelectorCriteria criteria = builder.build();
 
-        assertThat(criteria.getId()).isEqualTo("kid");
-        assertThat(criteria.getKeyType()).isEqualTo(KeyType.RSA);
-        assertThat(criteria.getSecretKeyType()).isEqualTo(secretKeyType);
-        assertThat(criteria.getAsymmetricPart()).isEqualTo(AsymmetricPart.PUBLIC);
-        assertThat(criteria.getJku().toString()).isEqualTo("http://jkuURL");
+        Assertions.assertThat(criteria.getId()).isEqualTo("kid");
+        Assertions.assertThat(criteria.getKeyType()).isEqualTo(KeyType.RSA);
+        Assertions.assertThat(criteria.getSecretKeyType()).isEqualTo(secretKeyType);
+        Assertions.assertThat(criteria.getAsymmetricPart()).isEqualTo(AsymmetricPart.PUBLIC);
+        Assertions.assertThat(criteria.getJku().toString()).isEqualTo("http://jkuURL");
 
         Object d = criteria.getDiscriminator();
-        assertThat(d).isInstanceOf(Long.class);
-        assertThat(d).isEqualTo(123L);
+        Assertions.assertThat(d).isInstanceOf(Long.class);
+        Assertions.assertThat(d).isEqualTo(123L);
     }
 
     @Test
@@ -80,14 +79,14 @@ public class SelectorCriteriaTest {
 
         SelectorCriteria criteria = builder.build();
 
-        assertThat(criteria.getId()).isEqualTo("new-kid");
-        assertThat(criteria.getKeyType()).isEqualTo(KeyType.RSA);
-        assertThat(criteria.getSecretKeyType()).isEqualTo(secretKeyType);
-        assertThat(criteria.getAsymmetricPart()).isNull();
-        assertThat(criteria.getJku().toString()).isEqualTo("http://jkuURL");
+        Assertions.assertThat(criteria.getId()).isEqualTo("new-kid");
+        Assertions.assertThat(criteria.getKeyType()).isEqualTo(KeyType.RSA);
+        Assertions.assertThat(criteria.getSecretKeyType()).isEqualTo(secretKeyType);
+        Assertions.assertThat(criteria.getAsymmetricPart()).isNull();
+        Assertions.assertThat(criteria.getJku().toString()).isEqualTo("http://jkuURL");
 
         Object d = criteria.getDiscriminator();
-        assertThat(d).isInstanceOf(Long.class);
-        assertThat(d).isEqualTo(123L);
+        Assertions.assertThat(d).isInstanceOf(Long.class);
+        Assertions.assertThat(d).isEqualTo(123L);
     }
 }

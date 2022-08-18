@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,8 @@
 package be.atbash.ee.security.octopus.keys.generator;
 
 import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
-import org.junit.jupiter.api.Assertions;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class ECGenerationParametersTest {
 
@@ -30,40 +28,40 @@ public class ECGenerationParametersTest {
                 .withCurveName("secp256r1")
                 .build();
 
-        assertThat(parameters).isNotNull();
-        assertThat(parameters.getKid()).isEqualTo("kid");
-        assertThat(parameters.getKeyType()).isEqualTo(KeyType.EC);
-        assertThat(parameters.getCurveName()).isEqualTo("secp256r1");
+        Assertions.assertThat(parameters).isNotNull();
+        Assertions.assertThat(parameters.getKid()).isEqualTo("kid");
+        Assertions.assertThat(parameters.getKeyType()).isEqualTo(KeyType.EC);
+        Assertions.assertThat(parameters.getCurveName()).isEqualTo("secp256r1");
 
     }
 
     @Test
     public void ecGenerationParameters_invalidCurve() {
-        Assertions.assertThrows(KeyGenerationParameterException.class, () ->
+        Assertions.assertThatThrownBy(() ->
                 new ECGenerationParameters.ECGenerationParametersBuilder()
                         .withKeyId("kid")
                         .withCurveName("secp256x1")
                         .build()
-        );
+        ).isInstanceOf(KeyGenerationParameterException.class);
     }
 
     @Test
     public void ecGenerationParameters_kidRequired() {
-        Assertions.assertThrows(KeyGenerationParameterException.class, () ->
+        Assertions.assertThatThrownBy(() ->
                 new ECGenerationParameters.ECGenerationParametersBuilder()
                         .withCurveName("secp256r1")
                         .build()
-        );
+        ).isInstanceOf(KeyGenerationParameterException.class);
 
     }
 
     @Test
     public void ecGenerationParameters_curveRequired() {
-        Assertions.assertThrows(KeyGenerationParameterException.class, () ->
+        Assertions.assertThatThrownBy(() ->
                 new ECGenerationParameters.ECGenerationParametersBuilder()
                         .withKeyId("kid")
                         .build()
-        );
+        ).isInstanceOf(KeyGenerationParameterException.class);
 
     }
 

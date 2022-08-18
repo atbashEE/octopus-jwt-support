@@ -61,6 +61,7 @@ class JCASupportConfigurationTest {
                 .stream()
                 .map(Thread::getName)
                 .collect(Collectors.toList());
+        Assertions.assertThat(threadNames).isNotEmpty();
         Assertions.assertThat(threadNames).doesNotContain("Task to recreate SecureRandom");
 
     }

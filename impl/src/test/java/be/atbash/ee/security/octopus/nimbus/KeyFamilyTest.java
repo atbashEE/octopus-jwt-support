@@ -18,7 +18,6 @@ package be.atbash.ee.security.octopus.nimbus;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
 
 class KeyFamilyTest {
 

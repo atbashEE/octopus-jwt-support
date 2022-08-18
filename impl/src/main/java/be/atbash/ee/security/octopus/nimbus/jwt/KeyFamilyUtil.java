@@ -52,7 +52,7 @@ public final class KeyFamilyUtil {
             result = KeyFamily.AES;
         }
         if (secretKey instanceof BCEdDSAPublicKey) {
-            result = KeyFamily.OKP_PUBlIC;
+            result = KeyFamily.OKP_PUBLIC;
         }
         if (secretKey instanceof BCEdDSAPrivateKey) {
             result = KeyFamily.OKP_PRIVATE;
