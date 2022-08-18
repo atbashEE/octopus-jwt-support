@@ -641,10 +641,10 @@ public class RSAKeyTest {
 
 
         // Key pair import, 2nd private form
-        key = new RSAKey(pubKey, privCrtKey, KeyUse.SIGNATURE, null, JWSAlgorithm.RS256, "1", null, null, null, null, null);
+        key = new RSAKey(pubKey, privCrtKey, KeyUse.SIGNATURE, null, JWSAlgorithm.RS256, "2", null, null, null, null);
         Assertions.assertThat(key.getKeyUse()).isEqualTo(KeyUse.SIGNATURE);
         Assertions.assertThat(key.getAlgorithm()).isEqualTo(JWSAlgorithm.RS256);
-        Assertions.assertThat(key.getKeyID()).isEqualTo("1");
+        Assertions.assertThat(key.getKeyID()).isEqualTo("2");
 
         Assertions.assertThat(key.getModulus()).isEqualTo(new Base64URLValue(n));
         Assertions.assertThat(key.getPublicExponent()).isEqualTo(new Base64URLValue(e));
@@ -755,7 +755,7 @@ public class RSAKeyTest {
         RSAPublicKey rsaPublicKeyIn = (RSAPublicKey) keyPair.getPublic();
         RSAPrivateCrtKey rsaPrivateKeyIn = (RSAPrivateCrtKey) keyPair.getPrivate();
 
-        RSAKey rsaJWK = new RSAKey(rsaPublicKeyIn, rsaPrivateKeyIn, null, null, null, null, null, null, null, null, null);
+        RSAKey rsaJWK = new RSAKey(rsaPublicKeyIn, rsaPrivateKeyIn, null, null, null, null, null, null, null, null);
 
         // Compare JWK values with original Java RSA values
         Assertions.assertThat(rsaJWK.getPublicExponent().decodeToBigInteger()).isEqualTo(rsaPublicKeyIn.getPublicExponent());

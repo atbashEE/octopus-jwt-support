@@ -413,7 +413,7 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
         /**
          * Creates a new RSA JWK builder.
          *
-         * @param n The the modulus value for the public RSA key. It is
+         * @param n The n modulus value for the public RSA key. It is
          *          represented as the Base64URL encoding of value's
          *          big endian representation. Must not be
          *          {@code null}.
@@ -1367,8 +1367,7 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
      */
     public RSAKey(RSAPublicKey pub, RSAPrivateCrtKey priv,
                   KeyUse use, Set<KeyOperation> ops, Algorithm alg, String kid,
-                  URI x5u, Base64URLValue x5t, Base64URLValue x5t256, List<Base64Value> x5c,
-                  // FIXME Base64URLValue x5t remove and restructure constructors.
+                  URI x5u, Base64URLValue x5t256, List<Base64Value> x5c,
                   KeyStore ks) {
 
         this(Base64URLValue.encode(pub.getModulus()),
