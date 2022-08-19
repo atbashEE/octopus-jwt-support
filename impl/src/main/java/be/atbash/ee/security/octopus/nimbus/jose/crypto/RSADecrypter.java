@@ -181,17 +181,6 @@ public class RSADecrypter extends RSACryptoProvider implements JWEDecrypter {
         return privateKey;
     }
 
-    public Set<String> getProcessedCriticalHeaderParams() {
-
-        return critPolicy.getProcessedCriticalHeaderParams();
-    }
-
-    public Set<String> getDeferredCriticalHeaderParams() {
-
-        return critPolicy.getProcessedCriticalHeaderParams();
-    }
-
-
     @Override
     public byte[] decrypt(JWEHeader header,
                           Base64URLValue encryptedKey,

@@ -226,7 +226,7 @@ public class JWKSetRetrieverTest {
         URL url = new URL("http://localhost:" + port + "/c2id/jwks.json");
         Assertions.assertThatThrownBy(() -> resourceRetriever.retrieveResource(url))
                 .isInstanceOf(IOException.class)
-                .hasMessage("Connection refused");
+                .hasMessageStartingWith("Connection refused");
 
     }
 
@@ -243,7 +243,7 @@ public class JWKSetRetrieverTest {
         URL url = new URL("http://localhost:" + Jadler.port() + "/c2id/jwks.json");
         Assertions.assertThatThrownBy(() -> resourceRetriever.retrieveResource(url))
                 .isInstanceOf(IOException.class)
-                .hasMessage("Connection refused");
+                .hasMessageStartingWith("Connection refused");
 
     }
 
@@ -292,7 +292,7 @@ public class JWKSetRetrieverTest {
 
         Assertions.assertThatThrownBy(() -> resourceRetriever.retrieveResource(url))
                 .isInstanceOf(IOException.class)
-                .hasMessage("Parsing of content of 'http://localhost:");
+                .hasMessageStartingWith("Parsing of content of 'http://localhost:");
         // Size overrun exception poses as file not found
         // FIXME Can we bring this message back?
 

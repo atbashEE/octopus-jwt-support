@@ -26,7 +26,7 @@ public class DHGenerationParameters extends GenerationParameters {
     public static final KeyType DH = new KeyType("DH");
 
     private final int keySize;  // in bits
-    private final DHParameterSpec parameterSpec; // or the Paramaters to use for generation
+    private final DHParameterSpec parameterSpec; // or the Parameters to use for generation
 
     private DHGenerationParameters(DHGenerationParametersBuilder builder) {
         super(builder, DH);
