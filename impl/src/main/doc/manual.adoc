@@ -227,6 +227,7 @@ The developer can define the header names that are accepted by the `crit` header
 
 . When using the low-level method of creating a `JWSVerifier` through the `JWSVerifierFactory.createJWSVerifier()` method by specifying the names as the var-arg parameter.
 . When using the high-level `JWTDecoder.decode()` method also specifying the names as the var-arg parameter.
+. When using `JWTDecoder` you, you can also specifying the accepted critical header names through the `JWTVerifier` by overriding the default `getSupportedCritHeaderValues` method.
 
 == Creating JWE
 
