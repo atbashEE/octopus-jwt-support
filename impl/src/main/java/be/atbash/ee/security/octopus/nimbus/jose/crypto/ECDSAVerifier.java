@@ -118,17 +118,6 @@ public class ECDSAVerifier extends ECDSAProvider implements JWSVerifier {
         critPolicy.setDeferredCriticalHeaderParams(defCritHeaders);
     }
 
-    public Set<String> getProcessedCriticalHeaderParams() {
-
-        return critPolicy.getProcessedCriticalHeaderParams();
-    }
-
-    public Set<String> getDeferredCriticalHeaderParams() {
-
-        return critPolicy.getProcessedCriticalHeaderParams();
-    }
-
-
     @Override
     public boolean verify(JWSHeader header,
                           byte[] signedContent,
