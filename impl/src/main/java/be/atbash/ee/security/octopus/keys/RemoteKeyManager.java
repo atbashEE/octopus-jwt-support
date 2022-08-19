@@ -35,11 +35,11 @@ public class RemoteKeyManager extends AbstractKeyManager implements KeyManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RemoteKeyManager.class);
 
-    private Map<URI, JWKSetCache> remoteJWKSetCache = new HashMap<>();
+    private final Map<URI, JWKSetCache> remoteJWKSetCache = new HashMap<>();
 
-    private JWKSetRetriever jwkSetRetriever = new JWKSetRetriever();
+    private final JWKSetRetriever jwkSetRetriever = new JWKSetRetriever();
 
-    private ValidateRemoteJWKSetURI validator = retrieveJWKSetURIValidator();
+    private final ValidateRemoteJWKSetURI validator = retrieveJWKSetURIValidator();
 
     @Override
     public List<AtbashKey> retrieveKeys(SelectorCriteria selectorCriteria) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ public class LocalKeyManager extends AbstractKeyManager implements KeyManager {
 
     private KeyResourcePasswordLookup passwordLookup;
 
-    private List<AtbashKey> keys = new ArrayList<>();
+    private final List<AtbashKey> keys = new ArrayList<>();
 
     @Override
     public List<AtbashKey> retrieveKeys(SelectorCriteria selectorCriteria) {

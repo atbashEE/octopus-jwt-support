@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,9 +32,9 @@ import java.security.interfaces.RSAKey;
 @PublicAPI
 public class AtbashKey {
 
-    private String keyId;
-    private SecretKeyType secretKeyType;
-    private Key key;
+    private final String keyId;
+    private final SecretKeyType secretKeyType;
+    private final Key key;
 
     /**
      * Creates an AtbashKey from the cryptographic key and the Key id. When the key Id starts with a classpath,

@@ -423,14 +423,14 @@ public class JWEObject extends JOSEObject {
 
         if (encryptedKey != null) {
 
-            sb.append(encryptedKey.toString());
+            sb.append(encryptedKey);
         }
 
         sb.append('.');
 
         if (iv != null) {
 
-            sb.append(iv.toString());
+            sb.append(iv);
         }
 
         sb.append('.');

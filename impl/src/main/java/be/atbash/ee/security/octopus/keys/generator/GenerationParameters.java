@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@ import be.atbash.util.StringUtils;
 @PublicAPI
 public class GenerationParameters {
 
-    private String kid;
-    private KeyType keyType;
+    private final String kid;
+    private final KeyType keyType;
 
     GenerationParameters(GenerationParametersBuilders builder, KeyType keyType) {
         this.keyType = keyType;

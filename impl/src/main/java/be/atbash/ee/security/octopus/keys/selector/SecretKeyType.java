@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,8 +33,8 @@ import java.security.interfaces.RSAKey;
 
 public class SecretKeyType {
 
-    private KeyType keyType;
-    private AsymmetricPart asymmetricPart;
+    private final KeyType keyType;
+    private final AsymmetricPart asymmetricPart;
 
     public SecretKeyType(KeyType keyType) {
         this(keyType, AsymmetricPart.SYMMETRIC);

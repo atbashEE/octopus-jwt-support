@@ -29,7 +29,7 @@ import java.util.List;
 
 public class KeyTypeKeyFilter implements KeyFilter {
 
-    private KeyType keyType;
+    private final KeyType keyType;
 
     public KeyTypeKeyFilter(KeyType keyType) {
         if (keyType == null) {

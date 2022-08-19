@@ -416,7 +416,7 @@ public final class JWTClaimsSet {
         } catch (ParseException e) {
             return Collections.emptyList();
         }
-        return aud != null ? Collections.unmodifiableList(aud) : Collections.emptyList();
+        return aud != null ? aud : Collections.emptyList();
     }
 
 

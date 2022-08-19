@@ -113,16 +113,6 @@ public class JWSObject extends JOSEObject {
         setPayload(payload);
 
         signingInputString = composeSigningInput();
-        // FIXME start
-        /*
-        if (header.getCustomParameter("b64") == null || (Boolean) header.getCustomParameter("b64")) {
-            signingInputString = composeSigningInput(header.toBase64URL(), payload.toBase64URL());
-        } else {
-            signingInputString = header.toBase64URL().toString() + '.' + payload.toString();
-        }
-
-         */
-        // end
         signature = null;
 
         state = State.UNSIGNED;

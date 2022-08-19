@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,8 @@ public class DHGenerationParameters extends GenerationParameters {
 
     public static final KeyType DH = new KeyType("DH");
 
-    private int keySize;  // in bits
-    private DHParameterSpec parameterSpec; // or the Paramaters to use for generation
+    private final int keySize;  // in bits
+    private final DHParameterSpec parameterSpec; // or the Parameters to use for generation
 
     private DHGenerationParameters(DHGenerationParametersBuilder builder) {
         super(builder, DH);

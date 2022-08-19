@@ -54,10 +54,10 @@ public class KeyReader {
 
     private KeyResourceTypeProvider keyResourceTypeProvider;
 
-    private KeyReaderKeyStore keyReaderKeyStore = new KeyReaderKeyStore();
-    private KeyReaderPEM keyReaderPEM = new KeyReaderPEM();
-    private KeyReaderJWK keyReaderJWK = new KeyReaderJWK();
-    private KeyReaderJWKSet keyReaderJWKSet = new KeyReaderJWKSet();
+    private final KeyReaderKeyStore keyReaderKeyStore = new KeyReaderKeyStore();
+    private final KeyReaderPEM keyReaderPEM = new KeyReaderPEM();
+    private final KeyReaderJWK keyReaderJWK = new KeyReaderJWK();
+    private final KeyReaderJWKSet keyReaderJWKSet = new KeyReaderJWKSet();
 
     @PostConstruct
     public void init() {

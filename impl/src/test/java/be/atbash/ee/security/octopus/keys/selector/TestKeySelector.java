@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import be.atbash.ee.security.octopus.keys.KeyManager;
 
 public class TestKeySelector extends KeySelector {
 
-    private KeyManager keyManager;
+    private final KeyManager keyManager;
 
     public TestKeySelector(KeyManager keyManager) {
         this.keyManager = keyManager;

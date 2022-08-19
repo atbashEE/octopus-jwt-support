@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import java.security.Key;
 @Vetoed // parent class is a CDI bean and otherwise this class would gives issues in CDI injection.
 public class SingleKeySelector extends KeySelector {
 
-    private AtbashKey theKey;
+    private final AtbashKey theKey;
 
     public SingleKeySelector(AtbashKey theKey) {
         this.theKey = theKey;

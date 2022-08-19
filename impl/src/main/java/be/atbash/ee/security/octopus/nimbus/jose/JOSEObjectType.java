@@ -109,7 +109,7 @@ public final class JOSEObjectType {
     public boolean equals(Object object) {
 
         return object instanceof JOSEObjectType &&
-                this.type.toLowerCase().equals(((JOSEObjectType) object).type.toLowerCase());
+                this.type.equalsIgnoreCase(((JOSEObjectType) object).type);
     }
 
 

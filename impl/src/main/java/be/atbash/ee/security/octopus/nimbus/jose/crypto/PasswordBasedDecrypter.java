@@ -25,7 +25,6 @@ import be.atbash.ee.security.octopus.nimbus.jwt.jwe.*;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
 
 import javax.crypto.SecretKey;
-import java.util.Set;
 
 
 /**
@@ -78,17 +77,6 @@ public class PasswordBasedDecrypter extends PasswordBasedCryptoProvider implemen
 
         super(secretKey);
     }
-
-    public Set<String> getProcessedCriticalHeaderParams() {
-
-        return critPolicy.getProcessedCriticalHeaderParams();
-    }
-
-    public Set<String> getDeferredCriticalHeaderParams() {
-
-        return critPolicy.getProcessedCriticalHeaderParams();
-    }
-
 
     @Override
     public byte[] decrypt(JWEHeader header,

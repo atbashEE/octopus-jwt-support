@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import org.eclipse.microprofile.config.ConfigProvider;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -96,11 +97,7 @@ public class ConfigKeyResourcePasswordLookup implements KeyResourcePasswordLooku
                 } else {
                     // TODO Improve constructor by using array.
                     String alias;
-                    try {
-                        alias = URLDecoder.decode(parts[1], "UTF-8");
-                    } catch (UnsupportedEncodingException e) {
-                        throw new ConfigurationException(String.format("config key uses invalid encoding '%s'", parts[1]));
-                    }
+                    alias = URLDecoder.decode(parts[1], StandardCharsets.UTF_8);
                     result.put(new ConfigKey(parts[0], alias), value.toCharArray());
                 }
             }
@@ -119,8 +116,8 @@ public class ConfigKeyResourcePasswordLookup implements KeyResourcePasswordLooku
     }
 
     private static class ConfigKey {
-        private String path;
-        private String keyId;
+        private final String path;
+        private final String keyId;
 
         public ConfigKey(String path, String keyId) {
 

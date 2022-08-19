@@ -209,10 +209,7 @@ public class KeyWriter {
     private byte[] writeKeyAsPEM(AtbashKey atbashKey, char[] keyPassword) throws IOException {
         if (jwtSupportConfiguration.getPemKeyEncryption() != PemKeyEncryption.NONE) {
 
-            boolean checkRequired = true;
-            if (jwtSupportConfiguration.getPemKeyEncryption() == PemKeyEncryption.PKCS1 && StringUtils.isEmpty(jwtSupportConfiguration.getPKCS1EncryptionAlgorithm())) {
-                checkRequired = false;
-            }
+            boolean checkRequired = jwtSupportConfiguration.getPemKeyEncryption() != PemKeyEncryption.PKCS1 || !StringUtils.isEmpty(jwtSupportConfiguration.getPKCS1EncryptionAlgorithm());
 
             if (checkRequired) {
                 // Only when encrypting the key, we need to check the password/passphrase.

@@ -42,11 +42,11 @@ import java.util.Map;
 @PublicAPI
 public final class JWTParametersBuilder {
 
-    private Logger logger = LoggerFactory.getLogger(JWTParametersBuilder.class);
+    private final Logger logger = LoggerFactory.getLogger(JWTParametersBuilder.class);
 
-    private JWTEncoding encoding;
+    private final JWTEncoding encoding;
 
-    private Map<String, Object> headerValues;
+    private final Map<String, Object> headerValues;
     private AtbashKey secretKeySigning;
 
     private AtbashKey secretKeyEncryption;

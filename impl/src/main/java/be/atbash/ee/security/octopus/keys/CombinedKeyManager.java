@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,9 @@ import java.util.List;
 @Vetoed
 public class CombinedKeyManager extends AbstractKeyManager implements KeyManager {
 
-    private LocalKeyManager localKeyManager = new LocalKeyManager();
+    private final LocalKeyManager localKeyManager = new LocalKeyManager();
 
-    private RemoteKeyManager remoteKeyManager = new RemoteKeyManager();
+    private final RemoteKeyManager remoteKeyManager = new RemoteKeyManager();
 
     @Override
     public List<AtbashKey> retrieveKeys(SelectorCriteria selectorCriteria) {

@@ -28,7 +28,7 @@ import java.util.List;
  */
 public class AsymmetricPartKeyFilter implements KeyFilter {
 
-    private AsymmetricPart asymmetricPart;
+    private final AsymmetricPart asymmetricPart;
 
     public AsymmetricPartKeyFilter(AsymmetricPart asymmetricPart) {
         this.asymmetricPart = asymmetricPart;

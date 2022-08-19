@@ -47,7 +47,7 @@ public class Algorithm {
     /**
      * The algorithm name.
      */
-    private String name;
+    private final String name;
 
     /**
      * Creates a new JOSE algorithm name.

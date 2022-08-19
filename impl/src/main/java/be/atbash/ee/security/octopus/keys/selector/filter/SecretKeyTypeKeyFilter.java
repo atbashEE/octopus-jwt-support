@@ -29,7 +29,7 @@ import java.util.List;
 
 public class SecretKeyTypeKeyFilter implements KeyFilter {
 
-    private SecretKeyType secretKeyType;
+    private final SecretKeyType secretKeyType;
 
     public SecretKeyTypeKeyFilter(SecretKeyType secretKeyType) {
         if (secretKeyType == null) {

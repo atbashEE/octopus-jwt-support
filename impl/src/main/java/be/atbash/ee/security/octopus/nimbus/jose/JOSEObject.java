@@ -158,7 +158,7 @@ public abstract class JOSEObject {
             }
 
             if (part != null) {
-                sb.append(part.toString());
+                sb.append(part);
             }
         }
 
