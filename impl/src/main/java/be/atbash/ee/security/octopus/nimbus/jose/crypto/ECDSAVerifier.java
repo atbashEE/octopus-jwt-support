@@ -142,6 +142,7 @@ public class ECDSAVerifier extends ECDSAProvider implements JWSVerifier {
         }
 
         if (!critPolicy.headerPasses(header)) {
+            MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, "Verification failed due to 'crit' header parameter deferral policy");
             return false;
         }
 

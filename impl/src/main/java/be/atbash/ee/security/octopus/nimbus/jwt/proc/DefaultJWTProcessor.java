@@ -41,6 +41,7 @@ import org.slf4j.MDC;
 import java.net.URI;
 import java.security.Key;
 import java.text.ParseException;
+import java.util.Set;
 
 
 /**
@@ -99,6 +100,8 @@ public class DefaultJWTProcessor implements JWTProcessor {
     private KeySelector jweKeySelector;
 
 
+    private Set<String> defCritHeaders;
+
     /**
      * The JWS verifier factory.
      */
@@ -127,6 +130,11 @@ public class DefaultJWTProcessor implements JWTProcessor {
     public void setJWEKeySelector(KeySelector jweKeySelector) {
 
         this.jweKeySelector = jweKeySelector;
+    }
+
+    @Override
+    public void setDeferredCritHeaders(Set<String> defCritHeaders) {
+        this.defCritHeaders = defCritHeaders;
     }
 
     public void setJWSVerifierFactory(JWSVerifierFactory factory) {
@@ -255,7 +263,7 @@ public class DefaultJWTProcessor implements JWTProcessor {
             throw new InvalidJWTException(String.format("No key found for keyId '%s'", signedJWT.getHeader().getKeyID()));
         }
 
-        JWSVerifier verifier = jwsVerifierFactory.createJWSVerifier(signedJWT.getHeader(), secretKey);
+        JWSVerifier verifier = jwsVerifierFactory.createJWSVerifier(signedJWT.getHeader(), secretKey, defCritHeaders);
 
         if (verifier == null) {
             // These messages are in function of JWT validation by Atbash Runtime so have slightly narrow meaning of the provided parameters.
@@ -270,7 +278,11 @@ public class DefaultJWTProcessor implements JWTProcessor {
             return verifyClaims(signedJWT.getHeader(), claimsSet);
         }
 
-        MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, "No token signature verification failed");
+        if (!MDC.getCopyOfContextMap().containsKey(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON)) {
+            // Only set a reason when no reason yet mentioned.
+            MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, "No token signature verification failed");
+        }
+
         throw new InvalidJWTException("Signed JWT rejected: Invalid signature");
 
     }

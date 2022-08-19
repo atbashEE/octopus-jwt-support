@@ -35,8 +35,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.json.JsonObject;
 import javax.json.bind.Jsonb;
 import java.text.ParseException;
-import java.util.Iterator;
-import java.util.ServiceLoader;
+import java.util.*;
 
 /**
  *
@@ -48,18 +47,22 @@ public class JWTDecoder {
     private JWTProcessor jwtProcessor;
 
     public <T> JWTData<T> decode(String data, Class<T> classType) {
-        return decode(data, classType, null, null);
+        return decode(data, classType, null, (JWTVerifier) null);
     }
 
     public <T> JWTData<T> decode(String data, Class<T> classType, KeySelector keySelector) {
-        return decode(data, classType, keySelector, null);
+        return decode(data, classType, keySelector, (JWTVerifier) null);
     }
 
     public <T> JWTData<T> decode(String data, Class<T> classType, JWTVerifier verifier) {
         return decode(data, classType, null, verifier);
     }
 
-    public <T> JWTData<T> decode(String data, Class<T> classType, KeySelector keySelector, JWTVerifier verifier) {
+    public <T> JWTData<T> decode(String data, Class<T> classType, KeySelector keySelector, String... defCritHeaders) {
+        return decode(data, classType, keySelector, null, defCritHeaders);
+    }
+
+    public <T> JWTData<T> decode(String data, Class<T> classType, KeySelector keySelector, JWTVerifier verifier, String... defCritHeaders) {
         JWTEncoding encoding = determineEncoding(data);
         if (encoding == null) {
             // These messages are in function of JWT validation by Atbash Runtime so have slightly narrow meaning of the provided parameters.
@@ -82,13 +85,13 @@ public class JWTDecoder {
                     if (keySelector == null) {
                         throw new AtbashIllegalActionException("(OCT-DEV-101) keySelector required for decoding a JWT encoded value");
                     }
-                    result = readSignedJWT(data, keySelector, classType, verifier);
+                    result = readSignedJWT(data, keySelector, classType, verifier, getDefCritHeaders(defCritHeaders));
                     break;
                 case JWE:
                     if (keySelector == null) {
                         throw new AtbashIllegalActionException("(OCT-DEV-101) keySelector required for decoding a JWE encoded value");
                     }
-                    result = readEncryptedJWT(data, keySelector, classType, verifier);
+                    result = readEncryptedJWT(data, keySelector, classType, verifier, getDefCritHeaders(defCritHeaders));
                     break;
                 default:
                     throw new IllegalArgumentException(String.format("JWTEncoding not supported %s", encoding));
@@ -101,24 +104,31 @@ public class JWTDecoder {
         return result;
     }
 
+    private HashSet<String> getDefCritHeaders(String[] defCritHeaders) {
+        if (defCritHeaders == null) {
+            return new HashSet<>();
+        }
+        return new HashSet<>(Arrays.asList(defCritHeaders));
+    }
+
     private <T> JWTData<T> readPlainJWT(String data, Class<T> classType) throws ParseException {
         PlainJWT plainJWT = PlainJWT.parse(data);
 
         return handlePlainJWT(plainJWT, classType);
     }
 
-    private <T> JWTData<T> readEncryptedJWT(String data, KeySelector keySelector, Class<T> classType, JWTVerifier verifier) throws ParseException {
+    private <T> JWTData<T> readEncryptedJWT(String data, KeySelector keySelector, Class<T> classType, JWTVerifier verifier, Set<String> defCritHeaders) throws ParseException {
 
         EncryptedJWT encryptedJWT = EncryptedJWT.parse(data);
 
-        return handleEncryptedJWT(encryptedJWT, keySelector, classType, verifier);
+        return handleEncryptedJWT(encryptedJWT, keySelector, classType, verifier, defCritHeaders);
 
     }
 
-    private <T> JWTData<T> readSignedJWT(String data, KeySelector keySelector, Class<T> classType, JWTVerifier verifier) throws ParseException {
+    private <T> JWTData<T> readSignedJWT(String data, KeySelector keySelector, Class<T> classType, JWTVerifier verifier, Set<String> defCritHeaders) throws ParseException {
         SignedJWT signedJWT = SignedJWT.parse(data);
 
-        return handleSignedJWT(signedJWT, keySelector, classType, verifier);
+        return handleSignedJWT(signedJWT, keySelector, classType, verifier, defCritHeaders);
     }
 
     private <T> JWTData<T> readJSONString(String data, Class<T> classType) {
@@ -170,18 +180,22 @@ public class JWTDecoder {
     }
 
     public <T> JWTData<T> decode(JsonObject data, Class<T> classType) {
-        return decode(data, classType, null, null);
+        return decode(data, classType, null, (JWTVerifier) null);
     }
 
     public <T> JWTData<T> decode(JsonObject data, Class<T> classType, KeySelector keySelector) {
-        return decode(data, classType, keySelector, null);
+        return decode(data, classType, keySelector, (JWTVerifier) null);
     }
 
     public <T> JWTData<T> decode(JsonObject data, Class<T> classType, JWTVerifier verifier) {
         return decode(data, classType, null, verifier);
     }
 
-    public <T> JWTData<T> decode(JsonObject data, Class<T> classType, KeySelector keySelector, JWTVerifier verifier) {
+    public <T> JWTData<T> decode(JsonObject data, Class<T> classType, KeySelector keySelector, String... defCritHeaders) {
+        return decode(data, classType, keySelector, null, defCritHeaders);
+    }
+
+    public <T> JWTData<T> decode(JsonObject data, Class<T> classType, KeySelector keySelector, JWTVerifier verifier, String... defCritHeaders) {
         JWTEncoding encoding = determineEncoding(data);
         if (encoding == null) {
             throw new IllegalArgumentException("Unable to determine the encoding of the data");
@@ -198,13 +212,13 @@ public class JWTDecoder {
                     if (keySelector == null) {
                         throw new AtbashIllegalActionException("(OCT-DEV-101) keySelector required for decoding a JWT encoded value");
                     }
-                    result = readSignedJWT(data, keySelector, classType, verifier);
+                    result = readSignedJWT(data, keySelector, classType, verifier, getDefCritHeaders(defCritHeaders));
                     break;
                 case JWE:
                     if (keySelector == null) {
                         throw new AtbashIllegalActionException("(OCT-DEV-101) keySelector required for decoding a JWE encoded value");
                     }
-                    result = readEncryptedJWT(data, keySelector, classType, verifier);
+                    result = readEncryptedJWT(data, keySelector, classType, verifier, getDefCritHeaders(defCritHeaders));
                     break;
                 default:
                     throw new IllegalArgumentException(String.format("JWTEncoding not supported %s", encoding));
@@ -249,15 +263,16 @@ public class JWTDecoder {
         return readJSONString(jwtClaimsSet.toJSONObject().toString(), classType, metaJWTData);
     }
 
-    private <T> JWTData<T> readSignedJWT(JsonObject data, KeySelector keySelector, Class<T> classType, JWTVerifier verifier) throws ParseException {
+    private <T> JWTData<T> readSignedJWT(JsonObject data, KeySelector keySelector, Class<T> classType, JWTVerifier verifier, Set<String> defCritHeaders) throws ParseException {
         SignedJWT signedJWT = SignedJWT.parse(data);
 
-        return handleSignedJWT(signedJWT, keySelector, classType, verifier);
+        return handleSignedJWT(signedJWT, keySelector, classType, verifier, defCritHeaders);
     }
 
-    private <T> JWTData<T> handleSignedJWT(SignedJWT signedJWT, KeySelector keySelector, Class<T> classType, JWTVerifier verifier) throws ParseException {
+    private <T> JWTData<T> handleSignedJWT(SignedJWT signedJWT, KeySelector keySelector, Class<T> classType, JWTVerifier verifier, Set<String> defCritHeaders) throws ParseException {
         JWTProcessor processor = getJwtProcessor();
         processor.setJWSKeySelector(keySelector);
+        processor.setDeferredCritHeaders(defCritHeaders);
         JWTClaimsSet jwtClaimsSet = processor.process(signedJWT);
 
         if (verifier != null && !verifier.verify(signedJWT.getHeader(), signedJWT.getJWTClaimsSet())) {
@@ -273,20 +288,21 @@ public class JWTDecoder {
         return readJSONString(signedJWT.getPayload().toString(), classType, metaJWTData);
     }
 
-    private <T> JWTData<T> readEncryptedJWT(JsonObject data, KeySelector keySelector, Class<T> classType, JWTVerifier verifier) throws ParseException {
+    private <T> JWTData<T> readEncryptedJWT(JsonObject data, KeySelector keySelector, Class<T> classType, JWTVerifier verifier, Set<String> defCritHeaders) throws ParseException {
 
         EncryptedJWT encryptedJWT = EncryptedJWT.parse(data);
 
-        return handleEncryptedJWT(encryptedJWT, keySelector, classType, verifier);
+        return handleEncryptedJWT(encryptedJWT, keySelector, classType, verifier, defCritHeaders);
 
     }
 
-    private <T> JWTData<T> handleEncryptedJWT(EncryptedJWT encryptedJWT, KeySelector keySelector, Class<T> classType, JWTVerifier verifier) {
+    private <T> JWTData<T> handleEncryptedJWT(EncryptedJWT encryptedJWT, KeySelector keySelector, Class<T> classType, JWTVerifier verifier, Set<String> defCritHeaders) {
         String keyID = encryptedJWT.getHeader().getKeyID();
 
         JWTProcessor processor = getJwtProcessor();
         processor.setJWSKeySelector(keySelector);
         processor.setJWEKeySelector(keySelector);
+        processor.setDeferredCritHeaders(defCritHeaders);
         JWTClaimsSet jwtClaimsSet = processor.process(encryptedJWT);
 
         if (verifier != null && !verifier.verify(encryptedJWT.getHeader(), jwtClaimsSet)) {

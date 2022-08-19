@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto;
 
 
+import be.atbash.ee.security.octopus.jwt.JWTValidationConstant;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.CriticalHeaderParamsDeferral;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.HMAC;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.MACProvider;
@@ -26,6 +27,7 @@ import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSHeader;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSObject;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSVerifier;
 import be.atbash.ee.security.octopus.nimbus.util.Base64URLValue;
+import org.slf4j.MDC;
 
 import javax.crypto.SecretKey;
 import java.util.Set;
@@ -97,6 +99,21 @@ public class MACVerifier extends MACProvider implements JWSVerifier {
         this(secretKey.getEncoded());
     }
 
+    /**
+     * Creates a new Message Authentication (MAC) verifier.
+     *
+     * @param secretKey      The secret key. Must be at least 256 bits long and
+     *                       not {@code null}.
+     * @param defCritHeaders The names of the critical header parameters
+     *                       that are deferred to the application for
+     *                       processing, empty set or {@code null} if none.
+     */
+    public MACVerifier(SecretKey secretKey,
+                       Set<String> defCritHeaders) {
+
+        this(secretKey.getEncoded(), defCritHeaders);
+    }
+
 
     /**
      * Creates a new Message Authentication (MAC) verifier.
@@ -159,6 +176,7 @@ public class MACVerifier extends MACProvider implements JWSVerifier {
                           Base64URLValue signature) {
 
         if (!critPolicy.headerPasses(header)) {
+            MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, "Verification failed due to 'crit' header parameter deferral policy");
             return false;
         }
 

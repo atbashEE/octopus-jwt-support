@@ -100,6 +100,20 @@ public class RSASSAVerifier extends RSASSAProvider implements JWSVerifier {
         this(getPublicKey(atbashKey));
     }
 
+    /**
+     * Creates a new RSA Signature-Scheme-with-Appendix (RSASSA) verifier.
+     *
+     * @param atbashKey      The public RSA key. Must not be {@code null}.
+     * @param defCritHeaders The names of the critical header parameters
+     *                       that are deferred to the application for
+     *                       processing, empty set or {@code null} if none.
+     */
+    public RSASSAVerifier(AtbashKey atbashKey,
+                          Set<String> defCritHeaders) {
+
+        this(getPublicKey(atbashKey), defCritHeaders);
+    }
+
     private static RSAPublicKey getPublicKey(AtbashKey atbashKey) {
         if (atbashKey.getSecretKeyType().getKeyType() != KeyType.RSA) {
             throw new KeyTypeException(ECPrivateKey.class);
@@ -155,6 +169,7 @@ public class RSASSAVerifier extends RSASSAProvider implements JWSVerifier {
         }
 
         if (!critPolicy.headerPasses(header)) {
+            MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, "Verification failed due to 'crit' header parameter deferral policy");
             return false;
         }
 
