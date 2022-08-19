@@ -272,7 +272,10 @@ public class JWTDecoder {
     private <T> JWTData<T> handleSignedJWT(SignedJWT signedJWT, KeySelector keySelector, Class<T> classType, JWTVerifier verifier, Set<String> defCritHeaders) throws ParseException {
         JWTProcessor processor = getJwtProcessor();
         processor.setJWSKeySelector(keySelector);
-        processor.setDeferredCritHeaders(defCritHeaders);
+
+        Set<String> allCritHeaders = assembleAllCritHeaders(verifier, defCritHeaders);
+
+        processor.setDeferredCritHeaders(allCritHeaders);
         JWTClaimsSet jwtClaimsSet = processor.process(signedJWT);
 
         if (verifier != null && !verifier.verify(signedJWT.getHeader(), signedJWT.getJWTClaimsSet())) {
@@ -286,6 +289,17 @@ public class JWTDecoder {
             return new JWTData<>((T) jwtClaimsSet, metaJWTData);
         }
         return readJSONString(signedJWT.getPayload().toString(), classType, metaJWTData);
+    }
+
+    private Set<String> assembleAllCritHeaders(JWTVerifier claimsVerifier, Set<String> defCritHeaders) {
+        Set<String> result = defCritHeaders;
+        if (result == null) {
+            result = new HashSet<>();
+        }
+        if (claimsVerifier != null) {
+            result.addAll(claimsVerifier.getSupportedCritHeaderValues());
+        }
+        return result;
     }
 
     private <T> JWTData<T> readEncryptedJWT(JsonObject data, KeySelector keySelector, Class<T> classType, JWTVerifier verifier, Set<String> defCritHeaders) throws ParseException {

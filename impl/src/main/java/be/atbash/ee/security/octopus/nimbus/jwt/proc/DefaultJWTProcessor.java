@@ -163,10 +163,8 @@ public class DefaultJWTProcessor implements JWTProcessor {
 
     private JWTClaimsSet verifyClaims(JWSHeader header, JWTClaimsSet claimsSet) {
 
-        if (claimsVerifier != null) {
-            if (!claimsVerifier.verify(header, claimsSet)) {
-                throw new BadJWTException("JWT Claims validation failed");
-            }
+        if (claimsVerifier != null && !claimsVerifier.verify(header, claimsSet)) {
+            throw new BadJWTException("JWT Claims validation failed");
         }
         return claimsSet;
     }
