@@ -127,14 +127,17 @@ public abstract class Header {
         this.typ = HeaderParameterType.getParameterValue(HeaderParameterNames.TYPE, typ, parameters);
         this.cty = HeaderParameterType.getParameterValue(HeaderParameterNames.CONTENT_TYPE, cty, parameters);
 
-        Set<String> temp = HeaderParameterType.getParameterValue(HeaderParameterNames.CRITICAL, crit, parameters);
-        if (temp != null) {
-            // Copy and make unmodifiable
-            this.crit = Collections.unmodifiableSet(new HashSet<>(temp));
+        if (crit == null) {
+            Set<String> temp = HeaderParameterType.getParameterValue(HeaderParameterNames.CRITICAL, crit, parameters);
+            if (temp != null) {
+                // Copy and make unmodifiable
+                this.crit = Collections.unmodifiableSet(new HashSet<>(temp));
+            } else {
+                this.crit = null;
+            }
         } else {
-            this.crit = null;
+            this.crit = Collections.unmodifiableSet(crit);
         }
-
         this.customParameters = HeaderParameterType.filterOutRegisteredNames(parameters, REGISTERED_PARAMETER_NAMES);
 
         this.parsedBase64URL = parsedBase64URL;

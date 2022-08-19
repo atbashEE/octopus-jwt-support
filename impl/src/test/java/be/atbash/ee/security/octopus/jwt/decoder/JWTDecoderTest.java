@@ -40,13 +40,13 @@ import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSObject;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSSigner;
 import be.atbash.ee.security.octopus.nimbus.jwt.util.DateUtils;
 import be.atbash.ee.security.octopus.nimbus.util.InvalidBase64ValueException;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.MDC;
 
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -160,7 +160,7 @@ class JWTDecoderTest {
     void decode_withVerifier_valid() {
 
         List<AtbashKey> keys = TestKeys.generateRSAKeys("kid");
-        Map<String, String> headerValues = new HashMap<>();
+        Map<String, Object> headerValues = new HashMap<>();
         headerValues.put("head1", "value1");
         JWTParameters parameters = getJwtParameters(keys, headerValues);
         JWTEncoder encoder = new JWTEncoder();
@@ -192,7 +192,7 @@ class JWTDecoderTest {
     void decode_withVerifier_valid_json() {
 
         List<AtbashKey> keys = TestKeys.generateRSAKeys("kid");
-        Map<String, String> headerValues = new HashMap<>();
+        Map<String, Object> headerValues = new HashMap<>();
         headerValues.put("head1", "value1");
         JWTParameters parameters = getJwtParameters(keys, headerValues);
         JWTEncoder encoder = new JWTEncoder();
@@ -230,7 +230,7 @@ class JWTDecoderTest {
     void decode_withVerifier_invalidHeader() {
 
         List<AtbashKey> keys = TestKeys.generateRSAKeys("kid");
-        Map<String, String> headerValues = new HashMap<>();
+        Map<String, Object> headerValues = new HashMap<>();
         headerValues.put("head1", "value2");
         JWTParameters parameters = getJwtParameters(keys, headerValues);
         JWTEncoder encoder = new JWTEncoder();
@@ -263,7 +263,7 @@ class JWTDecoderTest {
     void decode_withVerifier_invalidClaim() {
 
         List<AtbashKey> keys = TestKeys.generateRSAKeys("kid");
-        Map<String, String> headerValues = new HashMap<>();
+        Map<String, Object> headerValues = new HashMap<>();
         headerValues.put("head1", "value2");
         JWTParameters parameters = getJwtParameters(keys, headerValues);
         JWTEncoder encoder = new JWTEncoder();
@@ -323,7 +323,51 @@ class JWTDecoderTest {
 
     }
 
-    private JWTParameters getJwtParameters(List<AtbashKey> keys, Map<String, String> headerValues) {
+    @Test
+    void decode_withCritHeader() {
+
+        List<AtbashKey> keys = TestKeys.generateRSAKeys("kid");
+        Map<String, Object> headerValues = new HashMap<>();
+        headerValues.put("head1", "value1");
+        Set<String> critValues = new HashSet<>();
+        critValues.add("someHeaderClaim");
+        headerValues.put("crit", critValues);
+        JWTParameters parameters = getJwtParameters(keys, headerValues);
+        JWTEncoder encoder = new JWTEncoder();
+        JWTClaimsSet claims = new JWTClaimsSet.Builder().claim("value", "123").build();
+
+        String json = encoder.encode(claims, parameters);
+
+        ListKeyManager keyManager = new ListKeyManager(keys);
+        Map<String, String> result = decoder.decode(json, HashMap.class, new TestKeySelector(keyManager), "someHeaderClaim").getData();
+        Assertions.assertThat(result.keySet()).containsOnlyOnce("value");
+    }
+
+    @Test
+    void decode_withCritHeader_Missing() {
+
+        List<AtbashKey> keys = TestKeys.generateRSAKeys("kid");
+        Map<String, Object> headerValues = new HashMap<>();
+        headerValues.put("head1", "value1");
+        Set<String> critValues = new HashSet<>();
+        critValues.add("someHeaderClaim");
+        headerValues.put("crit", critValues);
+        JWTParameters parameters = getJwtParameters(keys, headerValues);
+        JWTEncoder encoder = new JWTEncoder();
+        JWTClaimsSet claims = new JWTClaimsSet.Builder().claim("value", "123").build();
+
+        String json = encoder.encode(claims, parameters);
+
+        ListKeyManager keyManager = new ListKeyManager(keys);
+
+        Assertions.assertThatThrownBy(
+                        () -> decoder.decode(json, HashMap.class, new TestKeySelector(keyManager))
+                ).isInstanceOf(InvalidJWTException.class)
+                .hasMessage("Signed JWT rejected: Invalid signature");
+        Assertions.assertThat(MDC.getCopyOfContextMap().get("jwt.verification.fail")).isEqualTo("Verification failed due to 'crit' header parameter deferral policy");
+    }
+
+    private JWTParameters getJwtParameters(List<AtbashKey> keys, Map<String, Object> headerValues) {
 
         ListKeyManager keyManager = new ListKeyManager(keys);
         SelectorCriteria criteria = SelectorCriteria.newBuilder().withAsymmetricPart(AsymmetricPart.PRIVATE).build();
@@ -335,7 +379,7 @@ class JWTDecoderTest {
                 .withSecretKeyForSigning(keyList.get(0));
 
         if (headerValues != null) {
-            headerValues.forEach(builder::withHeader);
+            headerValues.forEach(builder::withHeaderObject);
         }
         return builder.build();
     }

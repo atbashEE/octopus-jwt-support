@@ -72,6 +72,14 @@ public final class JWTParametersBuilder {
         return this;
     }
 
+    public JWTParametersBuilder withHeaderObject(String key, Object value) {
+        if (encoding == JWTEncoding.NONE) {
+            logger.warn("Header values are not supported with JWTEncoding.NONE");
+        }
+        headerValues.put(key, value);
+        return this;
+    }
+
     // Convenient way for withHeader("jku",url);
     public JWTParametersBuilder withJSONKeyURL(String url) {
         return withHeader(HeaderParameterNames.JWK_SET_URL, url);

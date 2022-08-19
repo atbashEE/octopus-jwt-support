@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,11 +21,12 @@ import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSProvider;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSVerifier;
 
 import java.security.Key;
+import java.util.Set;
 
 
 /**
  * JSON Web Signature (JWS) verifier factory.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
 public interface JWSVerifierFactory extends JWSProvider {
@@ -39,5 +40,18 @@ public interface JWSVerifierFactory extends JWSProvider {
      *               {@code null}.
      * @return The JWS verifier.
      */
-    JWSVerifier createJWSVerifier(JWSHeader header, Key key);
+    default JWSVerifier createJWSVerifier(JWSHeader header, Key key) {
+        return createJWSVerifier(header, key, null);
+    }
+
+    /**
+     * Creates a new JWS verifier for the specified header and key with indication of deferred critical parameters.
+     *
+     * @param header        The JWS header. Not {@code null}.
+     * @param key           The key intended to verify the JWS message. Not
+     *                      {@code null}.
+     * @param defCritHeader The Set of critical Header names that are understood by the application
+     * @return The JWS verifier.
+     */
+    JWSVerifier createJWSVerifier(JWSHeader header, Key key, Set<String> defCritHeader);
 }

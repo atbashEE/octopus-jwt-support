@@ -16,6 +16,7 @@
 package be.atbash.ee.security.octopus.nimbus.jose.crypto;
 
 
+import be.atbash.ee.security.octopus.jwt.JWTValidationConstant;
 import be.atbash.ee.security.octopus.keys.AtbashKey;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
@@ -34,6 +35,7 @@ import org.bouncycastle.asn1.*;
 import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters;
 import org.bouncycastle.jcajce.provider.asymmetric.edec.BCEdDSAPublicKey;
+import org.slf4j.MDC;
 
 import java.io.IOException;
 import java.security.interfaces.ECPrivateKey;
@@ -163,16 +165,17 @@ public class Ed25519Verifier extends EdDSAProvider implements JWSVerifier {
 
         // Check for unrecognized "crit" properties
         if (!critPolicy.headerPasses(header)) {
-			return false;
-		}
+            MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, "Verification failed due to 'crit' header parameter deferral policy");
+            return false;
+        }
 
-		byte[] jwsSignature = signature.decode();
+        byte[] jwsSignature = signature.decode();
 
 
-		verifier.update(signedContent, 0, signedContent.length);
-		boolean result = verifier.verifySignature(jwsSignature);
-		verifier.reset();
-		return result;
+        verifier.update(signedContent, 0, signedContent.length);
+        boolean result = verifier.verifySignature(jwsSignature);
+        verifier.reset();
+        return result;
 
-	}
+    }
 }

@@ -75,7 +75,7 @@ public class DefaultJWSVerifierFactory implements JWSVerifierFactory {
     }
 
     @Override
-    public JWSVerifier createJWSVerifier(JWSHeader header, Key key) {
+    public JWSVerifier createJWSVerifier(JWSHeader header, Key key, Set<String> defCritHeaders) {
 
         JWSVerifier verifier;
 
@@ -88,7 +88,7 @@ public class DefaultJWSVerifierFactory implements JWSVerifierFactory {
 
             SecretKey macKey = (SecretKey) key;
 
-            verifier = new MACVerifier(macKey);
+            verifier = new MACVerifier(macKey, defCritHeaders);
 
         } else if (RSASSAVerifier.SUPPORTED_ALGORITHMS.contains(header.getAlgorithm())) {
 
@@ -99,7 +99,7 @@ public class DefaultJWSVerifierFactory implements JWSVerifierFactory {
 
             RSAPublicKey rsaPublicKey = (RSAPublicKey) key;
 
-            verifier = new RSASSAVerifier(rsaPublicKey);
+            verifier = new RSASSAVerifier(rsaPublicKey, defCritHeaders);
 
         } else if (ECDSAVerifier.SUPPORTED_ALGORITHMS.contains(header.getAlgorithm())) {
 
@@ -110,7 +110,7 @@ public class DefaultJWSVerifierFactory implements JWSVerifierFactory {
 
             ECPublicKey ecPublicKey = (ECPublicKey) key;
 
-            verifier = new ECDSAVerifier(ecPublicKey);
+            verifier = new ECDSAVerifier(ecPublicKey, defCritHeaders);
 
         } else if (Ed25519Verifier.SUPPORTED_ALGORITHMS.contains(header.getAlgorithm())) {
 
@@ -121,7 +121,7 @@ public class DefaultJWSVerifierFactory implements JWSVerifierFactory {
             }
 
             BCEdDSAPublicKey okpPublicKey = (BCEdDSAPublicKey) key;
-            verifier = new Ed25519Verifier(okpPublicKey);
+            verifier = new Ed25519Verifier(okpPublicKey, defCritHeaders);
         } else {
             MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, String.format("No Signature verifier found for the algorithm specified in Header %s.", header.getAlgorithm().getName()));
             throw new JOSEException("Unsupported JWS algorithm: " + header.getAlgorithm());

@@ -31,7 +31,6 @@ import java.util.Set;
  * Based on code by Vladimir Dzhuvinov
  */
 public class CriticalHeaderParamsDeferral {
-// FIXME verify usage nad usefullness
 
     /**
      * The names of the deferred critical headers.

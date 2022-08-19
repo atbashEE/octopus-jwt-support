@@ -17,6 +17,8 @@ User manual for Atbash JWT Support.
 . Support for parsing Strings in the different Readers.
 . Convert 'Java Objects' to JsonValue instances and vice versa.
 . The _exp_, _iat_, and _nbf_ claims can be set as `LocalDateTime` value using the `JWTClaimsSet.Builder`
+. Support for setting 'crit' header values that are handled by applicaiton (understood by `JWSVerifier` implementations).
+Possibility to pass on these header clams to `DefaultJWSVerifierFactory` ad `JWTDecoder`.
 . New method within the builder to define the expiration time as a duration from current time. `Builder.expirationTime(Duration)`.
 . Identify the `SecretKey` through the class `KeyFamilyUtil`.
 . The reason for a Failed JWT token verification (signature, verifier, ...) can be found within MDC of SLF4J with key `JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON`.
@@ -217,6 +219,15 @@ The instance can be defined through the ServiceLoader mechanism or as CDI bean (
 
 When no instances of `RemoteJWKSetURIValidator` are found, no URI will be valid.
 
+== Verify 'crit' header content
+
+When you are processing a JWT containing a value for the `crit` header, the Application must indicate the header names it understands/process from the JWT before the token can be accepted.
+
+The developer can define the header names that are accepted by the `crit` header:
+
+. When using the low-level method of creating a `JWSVerifier` through the `JWSVerifierFactory.createJWSVerifier()` method by specifying the names as the var-arg parameter.
+. When using the high-level `JWTDecoder.decode()` method also specifying the names as the var-arg parameter.
+
 == Creating JWE
 
 Creating a JWE, the JWT variant which uses encryption, is very similar in creating a signed version.
@@ -224,7 +235,8 @@ This is done on purpose so that creating a signed JWT or an encrypted JWT is sim
 
     String encoded = new JWTEncoder().encode(payload, parameters);
 
-The `JWTEncoder` class can also be used for creating a JWE. The difference is the parameter we supply, when encoding.
+The `JWTEncoder` class can also be used for creating a JWE.
+The difference is the parameter we supply, when encoding.
 The following example shows the minimal required parameters.
 
     JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWE)
@@ -234,7 +246,7 @@ The following example shows the minimal required parameters.
 
 When creating a JWE, first a signed JWT is created and then a encryption is done.
 
-The signing key can be of type RSA, EC, or AES. The only requirement is that when decoding the corresponding key is present in the ++KeyManager++.
+The signing key can be of type RSA, EC, or AES.The only requirement is that when decoding the corresponding key is present in the ++KeyManager++.
 
 
 == Keys
