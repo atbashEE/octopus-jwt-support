@@ -48,7 +48,30 @@ public class AtbashKeyTest {
         AtbashKey key = new AtbashKey(ResourceUtil.CLASSPATH_PREFIX + "test", new FakeRSAPublic());
 
         Assertions.assertThat(key.getKeyId()).isEqualTo("test");
+    }
 
+    @Test
+    public void getKeyId_DeepDirectoryStructure() {
+
+        AtbashKey key = new AtbashKey(ResourceUtil.CLASSPATH_PREFIX + "/path/with/keys/test.pem", new FakeRSAPublic());
+
+        Assertions.assertThat(key.getKeyId()).isEqualTo("/path/with/keys/test");
+    }
+
+    @Test
+    public void getKeyId_filePrefix() {
+
+        AtbashKey key = new AtbashKey(ResourceUtil.FILE_PREFIX + "/path/with/keys/test.pem", new FakeRSAPublic());
+
+        Assertions.assertThat(key.getKeyId()).isEqualTo("/path/with/keys/test");
+    }
+
+    @Test
+    public void getKeyId_urlPrefix() {
+
+        AtbashKey key = new AtbashKey(ResourceUtil.URL_PREFIX + "http://host:8080/path/to/test.pem", new FakeRSAPublic());
+
+        Assertions.assertThat(key.getKeyId()).isEqualTo("/path/to/test");
     }
 
     @Test
