@@ -19,11 +19,10 @@ import be.atbash.ee.security.octopus.keys.fake.FakeRSAPrivate;
 import be.atbash.ee.security.octopus.keys.fake.FakeRSAPublic;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.util.resource.ResourceUtil;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-
-import org.assertj.core.api.Assertions;
 
 public class AtbashKeyTest {
 
@@ -49,7 +48,30 @@ public class AtbashKeyTest {
         AtbashKey key = new AtbashKey(ResourceUtil.CLASSPATH_PREFIX + "test", new FakeRSAPublic());
 
         Assertions.assertThat(key.getKeyId()).isEqualTo("test");
+    }
 
+    @Test
+    public void getKeyId_DeepDirectoryStructure() {
+
+        AtbashKey key = new AtbashKey(ResourceUtil.CLASSPATH_PREFIX + "/path/with/keys/test.pem", new FakeRSAPublic());
+
+        Assertions.assertThat(key.getKeyId()).isEqualTo("/path/with/keys/test");
+    }
+
+    @Test
+    public void getKeyId_filePrefix() {
+
+        AtbashKey key = new AtbashKey(ResourceUtil.FILE_PREFIX + "/path/with/keys/test.pem", new FakeRSAPublic());
+
+        Assertions.assertThat(key.getKeyId()).isEqualTo("/path/with/keys/test");
+    }
+
+    @Test
+    public void getKeyId_urlPrefix() {
+
+        AtbashKey key = new AtbashKey(ResourceUtil.URL_PREFIX + "http://host:8080/path/to/test.pem", new FakeRSAPublic());
+
+        Assertions.assertThat(key.getKeyId()).isEqualTo("/path/to/test");
     }
 
     @Test

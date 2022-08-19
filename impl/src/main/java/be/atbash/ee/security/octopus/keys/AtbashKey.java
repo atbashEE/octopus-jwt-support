@@ -22,6 +22,8 @@ import be.atbash.ee.security.octopus.nimbus.jwk.KeyType;
 import be.atbash.util.PublicAPI;
 import be.atbash.util.resource.ResourceUtil;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.Key;
 import java.security.interfaces.ECKey;
 import java.security.interfaces.RSAKey;
@@ -34,16 +36,23 @@ public class AtbashKey {
     private final SecretKeyType secretKeyType;
     private final Key key;
 
-    public AtbashKey(String path, Key key) {
+    /**
+     * Creates an AtbashKey from the cryptographic key and the Key id. When the key Id starts with a classpath,
+     * File or URL prefix, the kid is based on the 'resource' name.
+     *
+     * @param kid The identification
+     * @param key The cryptographic key
+     */
+    public AtbashKey(String kid, Key key) {
 
         if (key == null) {
             throw new IllegalArgumentException("Parameter key cannot be null");
         }
-        if (path == null) {
-            throw new IllegalArgumentException("Parameter path cannot be null");
+        if (kid == null) {
+            throw new IllegalArgumentException("Parameter kid cannot be null");
         }
 
-        keyId = defineKeyId(path);
+        keyId = defineKeyId(kid);
         this.key = key;
         secretKeyType = SecretKeyType.fromKey(key);
     }
@@ -82,13 +91,29 @@ public class AtbashKey {
     private String defineKeyId(String value) {
         String result = value;
         if (value.startsWith(ResourceUtil.CLASSPATH_PREFIX)) {
-            int prefixStart = result.lastIndexOf('.');
-            if (prefixStart != -1) {
-                result = result.substring(0, prefixStart);
-            }
-            result = result.substring(ResourceUtil.CLASSPATH_PREFIX.length());
+            result = defineKeyId(result, ResourceUtil.CLASSPATH_PREFIX);
         }
-        // FIXME Other prefixes.
+        if (value.startsWith(ResourceUtil.FILE_PREFIX)) {
+            result = defineKeyId(result, ResourceUtil.FILE_PREFIX);
+        }
+        if (value.startsWith(ResourceUtil.URL_PREFIX)) {
+            try {
+                result = result.substring(ResourceUtil.URL_PREFIX.length());
+                URL url = new URL(result);
+                result = defineKeyId(url.getPath(), "");
+            } catch (MalformedURLException e) {
+                // Use de value without prefix as key
+            }
+        }
+        return result;
+    }
+
+    private String defineKeyId(String result, String prefix) {
+        int prefixStart = result.lastIndexOf('.');
+        if (prefixStart != -1) {
+            result = result.substring(0, prefixStart);
+        }
+        result = result.substring(prefix.length());
         return result;
     }
 
@@ -98,7 +123,9 @@ public class AtbashKey {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
+        if (this == o) {
+            return true;
+        }
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
