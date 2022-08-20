@@ -36,7 +36,6 @@ import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
-import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.ECParameterSpec;
 import java.text.ParseException;

@@ -19,8 +19,6 @@ package be.atbash.ee.security.octopus.nimbus.util;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.math.BigInteger;
-
 
 /**
  * Tests the Base64URL class.

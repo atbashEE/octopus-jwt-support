@@ -1,7 +1,0 @@
-language: java
-sudo: false # faster builds
-
-jdk: openjdk7
-
-install: "mvn package -pl '!keyhelper'"
-script: "mvn test -pl '!keyhelper'"

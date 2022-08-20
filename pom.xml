@@ -54,7 +54,7 @@
     <scm>
         <connection>scm:git:git://github.com/atbashEE/octopus-jwt-support.git</connection>
         <developerConnection>scm:git:ssh://github.com:atbashEE/octopus-jwt-support.git</developerConnection>
-        <url>http://github.com/atbashEE/octopus-jwt-support/tree/master</url>
+        <url>https://github.com/atbashEE/octopus-jwt-support/tree/master</url>
     </scm>
 
     <properties>
