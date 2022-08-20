@@ -1,6 +1,6 @@
 = Atbash Octopus JWT Support
 Rudy De Busscher <rdebusscher@gmail.com>
-v1.1.0, ??/??/20??
+v1.1.0, 20/08/2022
 :example-caption!:
 ifndef::imagesdir[:imagesdir: images]
 ifndef::sourcedir[:sourcedir: ../../main/java]
@@ -37,6 +37,16 @@ Added method to `JWTEncoder` and `JWTDecoder` to support this.
 * _b64_ header parameter is now supported (no longer use header.parameter to specify this value)
 * Improved detection off missing values
 * Updates KeyUse.from(X509Certificate) to return null when the certificate public key use doesn't map to a single JWK use value.
+
+*Breaking changes*
+
+There are many small changes, but the majority of the code should still compile without any change.
+
+- `RSA_OAEP_256` is removed and replaced by `RSA_OAEP_2`
+- Many classes no longer implement `Serializable`.
+- Removed `getDeferredCriticalHeaderParams()` from `JWEDecrypter` and `JWTVerifier` implementations.
+- The method `asJsonArray` is removed from `JSONObjectUtils`, and you should use `toJsonArray` method.
+
 === 1.0.0
 
 . RemoteKeyManager
@@ -50,7 +60,7 @@ Added method to `JWTEncoder` and `JWTDecoder` to support this.
 . Various small fixes and updates.
 . Configuration of SecureRandom (JVM default or BouncyCastle defined one)
 
-Breaking changes
+*Breaking changes*
 
 - be.atbash.ee.security.octopus.jwt.decoder.JWTDecoder.decode(java.lang.String, java.lang.Class<T>) has a changed return type.
 - A subset of Nimbus JOSE is integrated in this JWT support module.
