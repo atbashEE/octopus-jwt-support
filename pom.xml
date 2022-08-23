@@ -63,8 +63,8 @@
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <atbash-utils.version>1.0.0</atbash-utils.version>
-        <atbash-utils.jakarta.version>1.0.1</atbash-utils.jakarta.version>
+        <atbash-utils.version>1.1.0</atbash-utils.version>
+        <atbash-utils.jakarta.version>1.1.0-SNAPSHOT</atbash-utils.jakarta.version>
         <atbash-config.version>1.0.0</atbash-config.version>
         <jakarta.json.bind.version>1.0</jakarta.json.bind.version>
         <jakarta.json.version>1.1</jakarta.json.version>

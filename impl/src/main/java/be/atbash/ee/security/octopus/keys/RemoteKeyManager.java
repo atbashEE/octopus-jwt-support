@@ -21,7 +21,7 @@ import be.atbash.ee.security.octopus.keys.selector.filter.KeyFilter;
 import be.atbash.ee.security.octopus.nimbus.jwk.JWKSet;
 import be.atbash.util.CDIUtils;
 import be.atbash.util.exception.AtbashIllegalActionException;
-import be.atbash.util.reflection.CDICheck;
+import be.atbash.util.CDICheck;
 import jakarta.enterprise.inject.Vetoed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

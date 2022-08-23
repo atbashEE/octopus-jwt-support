@@ -32,7 +32,7 @@ import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import be.atbash.ee.security.octopus.util.PeriodUtil;
 import be.atbash.util.StringUtils;
-import be.atbash.util.reflection.CDICheck;
+import be.atbash.util.CDICheck;
 import be.atbash.util.reflection.ClassUtils;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.eclipse.microprofile.config.inject.ConfigProperty;

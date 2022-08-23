@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import be.atbash.ee.security.octopus.keys.ListKeyManager;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.PBKDF;
 import be.atbash.ee.security.octopus.nimbus.jose.crypto.impl.PRFParams;
 import be.atbash.util.CDIUtils;
-import be.atbash.util.reflection.CDICheck;
+import be.atbash.util.CDICheck;
 
 import javax.crypto.SecretKey;
 import jakarta.enterprise.inject.Vetoed;
