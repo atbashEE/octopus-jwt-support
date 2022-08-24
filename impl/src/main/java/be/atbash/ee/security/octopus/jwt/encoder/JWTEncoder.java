@@ -219,6 +219,10 @@ public class JWTEncoder {
         if (encryptionFactory == null) {
             encryptionFactory = new JWEEncryptionFactory();
         }
+
+        if (jwtSupportConfiguration == null) {
+            jwtSupportConfiguration = JwtSupportConfiguration.getInstance();
+        }
     }
 
 }
