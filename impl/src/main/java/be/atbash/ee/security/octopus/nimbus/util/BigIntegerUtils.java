@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2017-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import java.math.BigInteger;
 
 /**
  * Big integer utilities.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
 public final class BigIntegerUtils {
@@ -36,7 +36,7 @@ public final class BigIntegerUtils {
      * @return A byte array representation of the big integer, without the
      * sign bit.
      */
-    public static byte[] toBytesUnsigned(final BigInteger bigInt) {
+    public static byte[] toBytesUnsigned( BigInteger bigInt) {
 
         // Copied from Apache Commons Codec 1.8
 

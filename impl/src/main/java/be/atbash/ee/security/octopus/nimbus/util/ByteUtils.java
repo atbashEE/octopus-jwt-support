@@ -23,7 +23,7 @@ import java.io.InputStream;
 
 /**
  * Byte utilities.
- *
+ * <p>
  * Based on code by Vladimir Dzhuvinov
  */
 public final class ByteUtils {
@@ -146,7 +146,7 @@ public final class ByteUtils {
      * Returns the byte length of the specified bit length.
      *
      * @param bitLength The bit length.
-     * @return The byte byte length.
+     * @return The byte length.
      */
     public static int byteLength(int bitLength) {
 

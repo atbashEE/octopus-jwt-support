@@ -24,12 +24,12 @@
     <parent>
         <groupId>be.atbash.jakarta.json</groupId>
         <artifactId>jwt-support-parent</artifactId>
-        <version>1.1.0-SNAPSHOT</version>
+        <version>1.1.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>octopus-jwt-support</artifactId>
-    <version>1.1.0-SNAPSHOT</version>
+    <version>1.1.0</version>
     <packaging>jar</packaging>
 
     <inceptionYear>2017</inceptionYear>
@@ -51,7 +51,7 @@
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
             <distribution>repo</distribution>
             <comments>A business-friendly OSS license</comments>
         </license>
@@ -60,7 +60,7 @@
     <scm>
         <connection>scm:git:git://github.com/atbashEE/octopus-jwt-support.git</connection>
         <developerConnection>scm:git:ssh://github.com:atbashEE/octopus-jwt-support.git</developerConnection>
-        <url>http://github.com/atbashEE/octopus-jwt-support/tree/master</url>
+        <url>https://github.com/atbashEE/octopus-jwt-support/tree/master</url>
     </scm>
 
     <properties>
