@@ -29,4 +29,4 @@ mvn clirr:check
 
 # Setting versions
 
-mvn versions:set -DnewVersion=1.1.0 -DgenerateBackupPoms=false
+mvn versions:set -DnewVersion=1.1.1-SNAPSHOT -DgenerateBackupPoms=false
