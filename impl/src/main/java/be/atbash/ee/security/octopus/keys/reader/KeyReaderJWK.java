@@ -107,38 +107,44 @@ public class KeyReaderJWK {
 
     protected List<AtbashKey> parse(String json, String path, KeyResourcePasswordLookup passwordLookup) throws ParseException {
 
-        Jsonb jsonb = JsonbUtil.getJsonb();
-        JsonObject jwkJsonObject;
         try {
-            jwkJsonObject = jsonb.fromJson(json, JsonObject.class);
-        } catch (JsonParsingException | JsonbException e) {
-            // Not a JSON, but as this can be part of 'testing' out which type it is.
-            return new ArrayList<>();
-        }
-
-        JWK jwk;
-        if (jwkJsonObject.get(JWKIdentifiers.ENCRYPTION_ALGORITHM) == null) {
-            // not encrypted
-            jwk = JWK.parse(json);
-
-        } else {
-            if (passwordLookup == null) {
-                throw new MissingPasswordLookupException();
+            Jsonb jsonb = JsonbUtil.getJsonb();
+            JsonObject jwkJsonObject;
+            try {
+                jwkJsonObject = jsonb.fromJson(json, JsonObject.class);
+            } catch (JsonParsingException | JsonbException e) {
+                // Not a JSON, but as this can be part of 'testing' out which type it is.
+                return new ArrayList<>();
             }
-            String kid = JSONObjectUtils.getString(jwkJsonObject, JWKIdentifiers.KEY_ID);
-            String enc = JSONObjectUtils.getString(jwkJsonObject, "enc");
-            char[] password = passwordLookup.getKeyPassword(path, kid);
-            String decoded = EncryptionHelper.decode(enc, password);
 
-            JsonObject decodedJSON = jsonb.fromJson(decoded, JsonObject.class);
+            JWK jwk;
+            if (jwkJsonObject.get(JWKIdentifiers.ENCRYPTION_ALGORITHM) == null) {
+                // not encrypted
+                jwk = JWK.parse(json);
 
-            JsonObjectBuilder merged = Json.createObjectBuilder();
-            decodedJSON.forEach(merged::add);
-            jwkJsonObject.forEach(merged::add);
+            } else {
+                if (passwordLookup == null) {
+                    throw new MissingPasswordLookupException();
+                }
+                String kid = JSONObjectUtils.getString(jwkJsonObject, JWKIdentifiers.KEY_ID);
+                String enc = JSONObjectUtils.getString(jwkJsonObject, "enc");
+                char[] password = passwordLookup.getKeyPassword(path, kid);
+                String decoded = EncryptionHelper.decode(enc, password);
 
-            jwk = JWK.parse(merged.build().toString());
+                JsonObject decodedJSON = jsonb.fromJson(decoded, JsonObject.class);
+
+                JsonObjectBuilder merged = Json.createObjectBuilder();
+                decodedJSON.forEach(merged::add);
+                jwkJsonObject.forEach(merged::add);
+
+                jwk = JWK.parse(merged.build().toString());
+            }
+            return processJWK(jwk);
+        } catch (JsonbException e) {
+            // Ignore
+            // When not a JSON format, it was maybe just a try to see what format it is.
         }
-        return processJWK(jwk);
+        return new ArrayList<>();
     }
 
     private List<AtbashKey> processJWK(JWK jwk) {

@@ -166,6 +166,17 @@ public class KeyReaderTest {
     }
 
     @Test
+    @Disabled //There seems to be something wrong with the key
+    public void readKeyResource_scenario6b() {
+        // EC  PKCS#8 format, not encrypted
+
+        List<AtbashKey> keys = keyReader.readKeyResource(ResourceUtil.CLASSPATH_PREFIX + "ec_key_p256_8.pem", null);
+
+        Assertions.assertThat(keys).hasSize(2);
+
+    }
+
+    @Test
     public void readKeyResource_scenario7() {
         // RSA JWK
 

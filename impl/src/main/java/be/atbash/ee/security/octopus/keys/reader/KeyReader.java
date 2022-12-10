@@ -25,7 +25,6 @@ import be.atbash.util.exception.AtbashUnexpectedException;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.json.bind.JsonbException;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.pkcs.PKCSException;
 
@@ -331,18 +330,16 @@ public class KeyReader {
     }
 
     private List<AtbashKey> parseFromJWKSet(String path, KeyResourcePasswordLookup passwordLookup, List<AtbashKey> result, String json) {
-        try {
-            result = keyReaderJWKSet.parseContent(json, path, passwordLookup);
-        } catch (JsonbException e) {
-            // Carry on with next format.
-        }
+
+        result = keyReaderJWKSet.parseContent(json, path, passwordLookup);
+
         return result;
     }
 
     private List<AtbashKey> parseFromJWK(String path, KeyResourcePasswordLookup passwordLookup, List<AtbashKey> result, String json) {
         try {
             result = keyReaderJWK.parse(json, path, passwordLookup);
-        } catch (ParseException | JsonbException e) {
+        } catch (ParseException e) {
             // Carry on with next format.
         }
         return result;

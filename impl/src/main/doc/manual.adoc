@@ -14,6 +14,11 @@ User manual for Atbash JWT Support.
 
 == Release Notes
 
+=== 1.1.1
+
+. Experimental support for reading EC key in PEM format
+. Show correct message when reading a key file fails due to wrong format.
+
 === 1.1.0
 
 . Support for Reading PEM in PKCS8 unencrypted format.

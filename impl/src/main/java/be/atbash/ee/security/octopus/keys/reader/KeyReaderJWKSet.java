@@ -68,41 +68,46 @@ public class KeyReaderJWKSet extends KeyReaderJWK {
     public List<AtbashKey> parseContent(String fileContent, String path, KeyResourcePasswordLookup passwordLookup) {
         List<AtbashKey> result = new ArrayList<>();
 
-        Jsonb jsonb = JsonbUtil.getJsonb();
-        JsonObject jsonObject;
         try {
-            jsonObject = jsonb.fromJson(fileContent, JsonObject.class);
-        } catch (JsonParsingException | JsonbException e) {
-            // Not a JSON, No error as this can be part of 'testing' out which type it is.
-            return result;
-        }
-
-        if (!jsonObject.containsKey(JWKIdentifiers.KEYS)) {
-            // If it is not a jwkSet JSON
-            return result;
-        }
-
-        JsonArray keys = jsonObject.getJsonArray(JWKIdentifiers.KEYS);
-        try {
-            Set<String> kids = new HashSet<>();
-            for (Object key : keys) {
-                if (!(key instanceof JsonObject)) {
-                    throw new InvalidJWKSetFormatException("The '" + JWKIdentifiers.KEYS + "' JSON array must contain JSON objects only");
-                }
-
-                JsonObject jwkJson = (JsonObject) key;
-                String kid = JSONObjectUtils.getString(jwkJson, JWKIdentifiers.KEY_ID);
-                if (kids.contains(kid)) {
-                    throw new InvalidJWKSetFormatException(String.format("The kid '%s' was found multiple times in the resource '%s'", kid, path));
-                }
-                kids.add(kid);
-                result.addAll(parse(jwkJson.toString(), path, passwordLookup));
+            Jsonb jsonb = JsonbUtil.getJsonb();
+            JsonObject jsonObject;
+            try {
+                jsonObject = jsonb.fromJson(fileContent, JsonObject.class);
+            } catch (JsonParsingException e) {
+                // Not a JSON, No error as this can be part of 'testing' out which type it is.
+                return result;
             }
-        } catch (ParseException e) {
-            // TODO We need another exception, indicating that loading failed
-            throw new AtbashUnexpectedException(e);
-        }
 
+            if (!jsonObject.containsKey(JWKIdentifiers.KEYS)) {
+                // If it is not a jwkSet JSON
+                return result;
+            }
+
+            JsonArray keys = jsonObject.getJsonArray(JWKIdentifiers.KEYS);
+            try {
+                Set<String> kids = new HashSet<>();
+                for (Object key : keys) {
+                    if (!(key instanceof JsonObject)) {
+                        throw new InvalidJWKSetFormatException("The '" + JWKIdentifiers.KEYS + "' JSON array must contain JSON objects only");
+                    }
+
+                    JsonObject jwkJson = (JsonObject) key;
+                    String kid = JSONObjectUtils.getString(jwkJson, JWKIdentifiers.KEY_ID);
+                    if (kids.contains(kid)) {
+                        throw new InvalidJWKSetFormatException(String.format("The kid '%s' was found multiple times in the resource '%s'", kid, path));
+                    }
+                    kids.add(kid);
+                    result.addAll(parse(jwkJson.toString(), path, passwordLookup));
+                }
+            } catch (ParseException e) {
+                // TODO We need another exception, indicating that loading failed
+                throw new AtbashUnexpectedException(e);
+            }
+
+        } catch (JsonbException e) {
+            // Ignore
+            // When not a JSON format, it was maybe just a try to see what format it is.
+        }
         return result;
     }
 
