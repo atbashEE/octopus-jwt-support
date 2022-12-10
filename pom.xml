@@ -63,7 +63,8 @@
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <atbash-utils.version>1.1.0</atbash-utils.version>
+        <atbash-utils-se.version>1.2.0</atbash-utils-se.version>
+        <atbash-utils-cdi.version>1.1.0</atbash-utils-cdi.version>
         <atbash-config.version>1.0.0</atbash-config.version>
         <javax.json.bind.version>1.0</javax.json.bind.version>
         <javax.json.version>1.1</javax.json.version>

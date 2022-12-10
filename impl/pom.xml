@@ -94,13 +94,13 @@
         <dependency>
             <groupId>be.atbash.utils</groupId>
             <artifactId>utils-se</artifactId>
-            <version>${atbash-utils.version}</version>
+            <version>${atbash-utils-se.version}</version>
         </dependency>
 
         <dependency>
             <groupId>be.atbash.utils</groupId>
             <artifactId>utils-cdi</artifactId>
-            <version>${atbash-utils.version}</version>
+            <version>${atbash-utils-cdi.version}</version>
         </dependency>
 
         <dependency>
@@ -218,7 +218,7 @@
         <dependency>
             <groupId>be.atbash.utils</groupId>
             <artifactId>utils-se</artifactId>
-            <version>${atbash-utils.version}</version>
+            <version>${atbash-utils-se.version}</version>
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
