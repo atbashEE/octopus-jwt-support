@@ -25,13 +25,24 @@ import be.atbash.util.StringUtils;
 import be.atbash.util.exception.AtbashUnexpectedException;
 import be.atbash.util.resource.ResourceUtil;
 import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.pkcs.RSAPrivateKey;
 import org.bouncycastle.asn1.pkcs.RSAPublicKey;
+import org.bouncycastle.asn1.sec.ECPrivateKey;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.asn1.x9.X962NamedCurves;
+import org.bouncycastle.asn1.x9.X962Parameters;
+import org.bouncycastle.asn1.x9.X9ECParameters;
+import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
+import org.bouncycastle.crypto.params.ECDomainParameters;
+import org.bouncycastle.crypto.params.ECPublicKeyParameters;
+import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPublicKey;
+import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMDecryptorProvider;
 import org.bouncycastle.openssl.PEMEncryptedKeyPair;
 import org.bouncycastle.openssl.PEMKeyPair;
@@ -39,6 +50,7 @@ import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.bouncycastle.openssl.jcajce.JceOpenSSLPKCS8DecryptorProviderBuilder;
 import org.bouncycastle.openssl.jcajce.JcePEMDecryptorProviderBuilder;
+import org.bouncycastle.operator.DefaultAlgorithmNameFinder;
 import org.bouncycastle.operator.InputDecryptorProvider;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.pkcs.PKCS8EncryptedPrivateKeyInfo;
@@ -95,7 +107,7 @@ public class KeyReaderPEM {
     /**
      * Parses the content trying supporting different PEM based encodings.  If the content is not
      * a PEM based encoding, it returns an empty list.  The method can throw also various BouncyCastle
-     * Exception to indicate problems with the PEM byteds.
+     * Exception to indicate problems with the PEM bytes.
      *
      * @param reader         Reader providing the contents.
      * @param path           The Path or identification of the content that will be used by the passwordLookup if needed.
@@ -116,6 +128,7 @@ public class KeyReaderPEM {
         Provider provider = BouncyCastleProviderSingleton.getInstance();
         JcaPEMKeyConverter converter = new JcaPEMKeyConverter().setProvider(provider);
         if (pemData instanceof PEMEncryptedKeyPair) {
+            // PKCS#1
             if (passwordLookup == null) {
                 throw new MissingPasswordLookupException();
             }
@@ -137,6 +150,7 @@ public class KeyReaderPEM {
             result.add(new AtbashKey(path, pair.getPublic()));
         }
         if (pemData instanceof PKCS8EncryptedPrivateKeyInfo) {
+            // PKCS#1
             if (passwordLookup == null) {
                 throw new MissingPasswordLookupException();
             }
@@ -158,19 +172,20 @@ public class KeyReaderPEM {
 
         }
         if (pemData instanceof SubjectPublicKeyInfo) {
-            // Unencrypted key - no password needed
+            // public key - no password needed
             PublicKey publicKey = converter.getPublicKey((SubjectPublicKeyInfo) pemData);
             result.add(new AtbashKey(path, publicKey));
 
         }
         if (pemData instanceof PrivateKeyInfo) {
-            // Unencrypted key
+            // Unencrypted key PKCS#8
             PrivateKeyInfo info = (PrivateKeyInfo) pemData;
             pemData = convertPrivateKeyFromPKCS8ToPKCS1(info);
 
         }
 
         if (pemData instanceof PEMKeyPair) {
+            // Unencrypted  PKCS#1 or PKCS#8
             PEMKeyPair keyPair = (PEMKeyPair) pemData;
             PrivateKey privateKey = converter.getPrivateKey(keyPair.getPrivateKeyInfo());
             PublicKey publicKey = converter.getPublicKey(keyPair.getPublicKeyInfo());
@@ -184,15 +199,43 @@ public class KeyReaderPEM {
     private static PEMKeyPair convertPrivateKeyFromPKCS8ToPKCS1(PrivateKeyInfo privateKeyInfo) throws IOException {
         // Parse the key wrapping to determine the internal key structure
         ASN1Encodable asn1PrivateKey = privateKeyInfo.parsePrivateKey();
-        // Convert the parsed key to an RSA private key
-        RSAPrivateKey keyStruct = RSAPrivateKey.getInstance(asn1PrivateKey);
-        // Create the RSA public key from the modulus and exponent
-        RSAPublicKey pubSpec = new RSAPublicKey(
-                keyStruct.getModulus(), keyStruct.getPublicExponent());
-        // Create an algorithm identifier for forming the key pair
-        AlgorithmIdentifier algId = new AlgorithmIdentifier(PKCSObjectIdentifiers.rsaEncryption, DERNull.INSTANCE);
 
-        // Create the key pair container
-        return new PEMKeyPair(new SubjectPublicKeyInfo(algId, pubSpec), new PrivateKeyInfo(algId, keyStruct));
+        DefaultAlgorithmNameFinder algFinder = new DefaultAlgorithmNameFinder();
+
+        String algorithmName = algFinder.getAlgorithmName(privateKeyInfo.getPrivateKeyAlgorithm().getAlgorithm());
+
+        if ("RSA".equals(algorithmName)) {
+            // Convert the parsed key to an RSA private key
+            RSAPrivateKey keyStruct = RSAPrivateKey.getInstance(asn1PrivateKey);
+            // Create the RSA public key from the modulus and exponent
+            RSAPublicKey pubSpec = new RSAPublicKey(
+                    keyStruct.getModulus(), keyStruct.getPublicExponent());
+            // Create an algorithm identifier for forming the key pair
+            AlgorithmIdentifier algId = new AlgorithmIdentifier(PKCSObjectIdentifiers.rsaEncryption, DERNull.INSTANCE);
+
+            // Create the key pair container
+            return new PEMKeyPair(new SubjectPublicKeyInfo(algId, pubSpec), new PrivateKeyInfo(algId, keyStruct));
+        }
+
+        if (algorithmName.startsWith(X9ObjectIdentifiers.ansi_X9_62.getId())) {
+            ECPrivateKey keyStruct = ECPrivateKey.getInstance(asn1PrivateKey);
+
+            ASN1ObjectIdentifier objectIdentifier = ASN1ObjectIdentifier.getInstance(X962Parameters.getInstance(privateKeyInfo.getPrivateKeyAlgorithm().getParameters()).getParameters());
+            String name = X962NamedCurves.getName(objectIdentifier);
+            System.out.println(name);
+
+            //X9ECParameters curve = ECUtil.getNamedCurveByOid(objectIdentifier);
+            X9ECParameters curve = ECUtil.getNamedCurveByName(name);
+            AlgorithmIdentifier algorithmIdentifier = new AlgorithmIdentifier(objectIdentifier);
+
+            ECPublicKeyParameters keyParameters = new ECPublicKeyParameters(curve.getG(), new ECDomainParameters(curve));
+
+            BCECPublicKey publicKey = new BCECPublicKey("EC", keyParameters, BouncyCastleProvider.CONFIGURATION);
+
+            SubjectPublicKeyInfo publicKeyInfo = new SubjectPublicKeyInfo(algorithmIdentifier, publicKey.getEncoded());
+            return new PEMKeyPair(publicKeyInfo, privateKeyInfo);
+        }
+
+        return null;
     }
 }

@@ -28,7 +28,6 @@ import org.bouncycastle.pkcs.PKCSException;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.json.bind.JsonbException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -326,18 +325,16 @@ public class KeyReader {
     }
 
     private List<AtbashKey> parseFromJWKSet(String path, KeyResourcePasswordLookup passwordLookup, List<AtbashKey> result, String json) {
-        try {
+
             result = keyReaderJWKSet.parseContent(json, path, passwordLookup);
-        } catch (JsonbException e) {
-            // Carry on with next format.
-        }
+
         return result;
     }
 
     private List<AtbashKey> parseFromJWK(String path, KeyResourcePasswordLookup passwordLookup, List<AtbashKey> result, String json) {
         try {
             result = keyReaderJWK.parse(json, path, passwordLookup);
-        } catch (ParseException | JsonbException e) {
+        } catch (ParseException e) {
             // Carry on with next format.
         }
         return result;
