@@ -247,10 +247,12 @@ This is done on purpose so that creating a signed JWT or an encrypted JWT is sim
 The `JWTEncoder` class can also be used for creating a JWE. The difference is the parameter we supply, when encoding.
 The following example shows the minimal required parameters.
 
+----
     JWTParameters parameters = JWTParametersBuilder.newBuilderFor(JWTEncoding.JWE)
             .withSecretKeyForSigning(signKey)
             .withSecretKeyForEncryption(encryptKey)
             .build();
+----
 
 When creating a JWE, first a signed JWT is created and then a encryption is done.
 
@@ -352,10 +354,11 @@ The **ListKeyManager** is created specially for this purpose. It is also a _KeyM
 
 The following snippet retrieves the public key.
 
+----
     ListKeyManager keyManager = new ListKeyManager(keys);
     SelectorCriteria criteria = SelectorCriteria.newBuilder().withAsymmetricPart(AsymmetricPart.PUBLIC).build();
     List<AtbashKey> keyList = keyManager.retrieveKeys(criteria);
-
+----
 
 == Supported Key Formats
 
@@ -374,16 +377,20 @@ It is a CDI bean and can be injected into other CDI controlled classes. But you 
 
 By calling the method
 
+----
     generateKeys(GenerationParameters);
+----
 
 It will give you one or more keys, depending on the type you requested. For asymmetric keys, like RSA keys, you get the corresponding public and private keys.
 
 The kind of keys which are generated, depend on the parameter you supply, which can be created using a builder pattern. The following example gives you the code for generating an RSA key.
 
+----
         RSAGenerationParameters generationParameters = new RSAGenerationParameters.RSAGenerationParametersBuilder()
                 .withKeyId("the-kid")
                 .build();
         List<AtbashKey> atbashKeys = generator.generateKeys(generationParameters);
+----
 
 The default size of the generated key is 2048, but you can define it using the method _.withKeySize_ on the builder.
 
